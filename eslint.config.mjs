@@ -18,6 +18,7 @@ const eslintConfig = [
       'next-env.d.ts',
       'node_modules/**',
       '.claude/**',
+      '.cline/skills/**',
       'scripts/**',
     ],
   },

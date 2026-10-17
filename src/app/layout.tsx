@@ -1,3 +1,6 @@
+import { ToastProvider } from '@/components/ui/Toast';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
 import type { Metadata } from 'next';
 import { Manrope, Playfair_Display } from 'next/font/google';
 import './globals.css';
@@ -26,7 +29,20 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="fr" className={`${manrope.variable} ${playfair.variable}`}>
-      <body>{children}</body>
+      <body>
+        {/* P2.9 : lien d'evitement clavier */}
+        <a
+          href="#contenu"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-accent focus:px-4 focus:py-2 focus:font-semibold focus:text-ink"
+        >
+          Aller au contenu
+        </a>
+        <ToastProvider>
+          <Header />
+          <div id="contenu">{children}</div>
+          <Footer />
+        </ToastProvider>
+      </body>
     </html>
   );
 }

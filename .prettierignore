@@ -8,6 +8,8 @@ package-lock.json
 Cahier de charge.md
 ROADMAP.md
 .claude/
+.cline/skills/
+docs/migration/
 
 # Générés
 .next

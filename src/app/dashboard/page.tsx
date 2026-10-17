@@ -13,9 +13,9 @@ export default async function DashboardPage() {
   if (!user) redirect('/connexion?callbackUrl=/dashboard');
 
   return (
-    <main className="mx-auto max-w-3xl px-6 py-16">
+    <div>
       <h1 className="text-3xl font-semibold">Tableau de bord</h1>
-      <p className="mt-2 opacity-70">
+      <p className="mt-2 text-ink-soft">
         Connecté en tant que <strong>{user.name}</strong> ({user.email}).
       </p>
       <form action={logout} className="mt-6">
@@ -26,6 +26,6 @@ export default async function DashboardPage() {
           Se déconnecter
         </button>
       </form>
-    </main>
+    </div>
   );
 }
