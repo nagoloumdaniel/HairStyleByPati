@@ -16,7 +16,7 @@ declare namespace NodeJS {
 
     // --- Application ---
     readonly NEXT_PUBLIC_APP_URL: string;
-    readonly SALON_TIMEZONE: string;
+    readonly SALON_TIMEZONE?: string;
     readonly NEXT_PUBLIC_APP_LOCALE: string;
 
     // --- Authentification (Auth.js) ---

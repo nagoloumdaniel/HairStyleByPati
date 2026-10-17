@@ -1,10 +1,13 @@
 /**
  * Stratégie dates/fuseau horaire — P1.5 (§14.4).
  *
- * Règle : tout est STOCKÉ en UTC (Date Prisma). Le fuseau du salon
- * (IANA, ex. Europe/Paris) est explicite et configuré via
- * SALON_TIMEZONE. Aucune dépendance externe : conversions pures via
- * l'API Intl de Node, testables isolément (TDD).
+ * Règle : tout est STOCKÉ en UTC (Date Prisma). Le fuseau utilisé pour
+ * l'affichage et la saisie locale s'adapte à l'appareil de l'utilisateur
+ * (détecté via Intl côté navigateur). Aucune dépendance externe :
+ * conversions pures via l'API Intl de Node, testables isolément (TDD).
+ *
+ * Côté serveur, si SALON_TIMEZONE n'est pas définie, le fallback est 'UTC'.
+ * Côté client, getDeviceTimezone() renvoie le fuseau du navigateur.
  */
 
 export const WEEKDAY_FR = [
@@ -17,8 +20,24 @@ export const WEEKDAY_FR = [
   'dimanche',
 ] as const;
 
-/** Fuseau du salon, lu une fois depuis l'environnement. */
-export const SALON_TIMEZONE = process.env.SALON_TIMEZONE ?? 'Europe/Paris';
+/** Fuseau configuré côté serveur (variable d'env). Peut être undefined. */
+export const SALON_TIMEZONE = process.env.SALON_TIMEZONE ?? undefined;
+
+/**
+ * Détecte le fuseau horaire de l'appareil sur lequel l'app tourne.
+ * - Côté navigateur : utilise Intl.DateTimeFormat().resolvedOptions().timeZone
+ * - Côté serveur : renvoie SALON_TIMEZONE si définie, sinon 'UTC'
+ */
+export function getDeviceTimezone(): string {
+  if (typeof window !== 'undefined') {
+    try {
+      return Intl.DateTimeFormat().resolvedOptions().timeZone;
+    } catch {
+      // fallback si le navigateur ne supporte pas Intl
+    }
+  }
+  return SALON_TIMEZONE ?? 'UTC';
+}
 
 export function isValidTimeZone(timeZone: string): boolean {
   if (!timeZone) return false;
@@ -68,7 +87,7 @@ function timeZoneOffsetMs(date: Date, timeZone: string): number {
 export function salonTimeToUtc(
   dateISO: string,
   minute: number,
-  timeZone: string = SALON_TIMEZONE,
+  timeZone: string = getDeviceTimezone(),
 ): Date {
   const [y, m, d] = dateISO.split('-').map(Number);
   if (!y || !m || !d) {
@@ -94,7 +113,7 @@ export interface SalonParts {
 }
 
 /** Décompose un instant UTC en parties locales du salon. */
-export function utcToSalonParts(date: Date, timeZone: string = SALON_TIMEZONE): SalonParts {
+export function utcToSalonParts(date: Date, timeZone: string = getDeviceTimezone()): SalonParts {
   const parts = new Intl.DateTimeFormat('en-US', {
     timeZone,
     hour12: false,
