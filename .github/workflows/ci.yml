@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main, 'phase/**']
+  pull_request:
+    branches: [main]
+
+# Respect du quota GitHub : une seule exécution par branche,
+# les runs en cours sont annulés dès qu'un nouveau push arrive.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck (tsc --noEmit)
+        run: npm run typecheck
+
+      - name: Format check (Prettier)
+        run: npm run format:check
+
+      # Sera activé en Phase 1 dès que ESLint/Next.js sont installés :
+      # - name: Lint
+      #   run: npm run lint
+      # Sera activé en Phase 11 dès que les tests existent :
+      # - name: Unit tests
+      #   run: npm test
+      # Sera activé en Phase 1 dès que le scaffold Next.js est en place :
+      # - name: Build
+      #   run: npm run build
