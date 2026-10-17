@@ -1,0 +1,35 @@
+@import 'tailwindcss';
+
+/* ============================================================
+   Tokens design — cahier des charges §2.2 (P1.2)
+   Palette imprimée : or, noir, crème, cacao, blanc, alerte.
+   ============================================================ */
+@theme {
+  --color-accent: #f4c542; /* jaune doré — CTA et highlights */
+  --color-ink: #191919; /* texte principal */
+  --color-cream: #fff8e9; /* fond crème */
+  --color-cacao: #76513d; /* brun profond — accents */
+  --color-surface: #ffffff; /* surfaces blanches */
+  --color-alert: #c94b4b; /* erreurs et alertes */
+
+  /* Polices (P1.3) injectées via next/font, variables CSS */
+  --font-heading: var(--font-playfair), Georgia, serif;
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Contraste §2.2 : texte des boutons accent = ink (#191919 sur #F4C542
+   ≈ 10.9:1, AAA). Ne JAMAIS mettre de texte blanc sur le jaune (1.6:1). */
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-heading);
+}

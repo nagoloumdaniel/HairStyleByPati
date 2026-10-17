@@ -1,0 +1,32 @@
+import type { Metadata } from 'next';
+import { Manrope, Playfair_Display } from 'next/font/google';
+import './globals.css';
+
+/* P1.3 — polices optimisées via next/font : préchargement, swap,
+   zéro requête externe, poids limités au strict nécessaire. */
+const manrope = Manrope({
+  subsets: ['latin'],
+  variable: '--font-manrope',
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+});
+
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  variable: '--font-playfair',
+  weight: ['500', '600', '700'],
+  display: 'swap',
+});
+
+export const metadata: Metadata = {
+  title: 'Hairstyle by Patricia',
+  description: 'Salon de coiffure spécialisé tresses, vanilles et locs — réservation en ligne.',
+};
+
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <html lang="fr" className={`${manrope.variable} ${playfair.variable}`}>
+      <body>{children}</body>
+    </html>
+  );
+}
