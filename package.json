@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "vitest run"
+    "ci": "node scripts/ci.mjs"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx,json,css,md,yml,yaml}": "prettier --write"

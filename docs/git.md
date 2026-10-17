@@ -40,12 +40,26 @@ Pas d'emoji, pas d'attribution IA, pas de « now/currently » dans le corps.
 
 Le commit est rejeté si l'un échoue. Contournement d'urgence uniquement : `git commit --no-verify` (à justifier).
 
+## CI/CD locale (décision du 17/10/2026)
+
+GitHub Actions étant désactivé sur le dépôt (« reach out to GitHub Support »), la chaîne CI tourne **en local** :
+
+```bash
+npm run ci     # typecheck, format:check, lint, test, build (étapes absentes = ignorées)
+```
+
+- Script : `scripts/ci.mjs` — fail fast, récapitulatif, code retour 0/1.
+- Déclenchement automatique sur **chaque `git push`** via le hook `.husky/pre-push`.
+- Les étapes s'activent seules au fil des phases : `lint` (Phase 1), `test` (Vitest, Phase 11), `build` (scaffold Next.js).
+- Workflow GitHub Actions conservé dans `.github/workflows/ci.yml` : réactivable sans rien changer.
+- **CD :** Vercel build automatique au push sur `main` (projet non commercial, plan Hobby retenu).
+
 ## Règles de push
 
 - Toujours pusher `main` après une tâche/phase vérifiée.
 - Jamais de secret dans un commit (`.env` ignoré, seul `.env.example` est versionné).
 - Ne pas forcer (`--force`) sur `main`.
-- Respecter le quota GitHub : workflows CI regroupés, pas de runs redondants.
+- Le hook `pre-push` exécute `npm run ci` : jamais de push avec une chaîne rouge.
 
 ## Vérification obligatoire avant chaque commit (skill `verification-before-completion`)
 

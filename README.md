@@ -35,13 +35,14 @@ Phase **0 — Préparation & governance** en cours. Aucune fonctionnalité appli
 
 ```bash
 npm install
-npm run typecheck   # tsc --noEmit
-npm run format      # Prettier
-npm run dev         # serveur de développement (à partir de la Phase 1)
-npm run lint        # ESLint (à partir de la Phase 1)
+npm run ci         # CI locale : typecheck + format (+ lint/tests/build selon la phase)
+npm run typecheck  # tsc --noEmit
+npm run format     # Prettier
+npm run dev        # serveur de développement (à partir de la Phase 1)
+npm run lint       # ESLint (à partir de la Phase 1)
 ```
 
-Les hooks `pre-commit` (lint-staged + `tsc --noEmit`) sont installés automatiquement par `npm install` (script `prepare` → husky).
+Les hooks `pre-commit` (lint-staged + `tsc --noEmit`) et `pre-push` (`npm run ci`) sont installés automatiquement par `npm install` (script `prepare` → husky). CI/CD : locale via `npm run ci`, déploiement Vercel au push sur `main`.
 
 ## Règles du projet
 
