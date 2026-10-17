@@ -33,15 +33,15 @@
 
 > Objectif : socle projet, décisions structurantes, zéro code fonctionnel.
 
-- [ ] **P0.1** Init repo Git, `.gitignore` Next.js, README initial, premier commit. — *skill : caveman + verification-before-completion*
-- [ ] **P0.2** Figer le cahier des charges : extraire la liste complète des critères d'acceptation §17 dans `docs/acceptation.md`. — *skill : writing-plans*
-- [ ] **P0.3** Rédiger `docs/plan-detaille.md` décomposant chaque fonctionnalité en modules (§14.2) avec interfaces et données. — *skill : writing-plans + executing-plans*
-- [ ] **P0.4** Décision stack précise : Next.js 15 / React 19 / Tailwind v4 / Prisma / PostgreSQL (Neon ou équivalent) / Resend / S3 (Cloudflare R2 ou équivalent). Documenter le « pourquoi » dans `docs/stack.md`. — *skill : lean-build + pick-ui-library*
-- [ ] **P0.5** Arborescence modulaire par domaine (catalogue, compatibilite, disponibilites, reservations, clients, demandes, messagerie, notifications, fichiers, auth, parametres, stats). — *skill : site-architecture*
-- [ ] **P0.6** Créer `.env.example` documenté (toutes variables : DB, S3, e-mail, secrets de signature, fuseau horaire salon). Aucun secret réel dans le repo. — *skill : caveman*
-- [ ] **P0.7** Branch strategy + conventions de commit (conventional commits). Hooks pre-commit : lint-staged + tsc --noEmit. — *skill : caveman-commit*
-- [ ] **P0.8** Isolation de l'espace de travail initial. — *skill : using-git-worktrees*
-- [ ] **P0.9** Validation cahier des charges §17 vs plan : checklist couverture 100 %. — *skill : verify-and-stop*
+- [x] **P0.1** Init repo Git, `.gitignore` Next.js, README initial, premier commit. — *skill : caveman + verification-before-completion*
+- [x] **P0.2** Figer le cahier des charges : extraire la liste complète des critères d'acceptation §17 dans `docs/acceptation.md`. — *skill : writing-plans*
+- [x] **P0.3** Rédiger `docs/plan-detaille.md` décomposant chaque fonctionnalité en modules (§14.2) avec interfaces et données. — *skill : writing-plans + executing-plans*
+- [x] **P0.4** Décision stack précise : Next.js 15 / React 19 / Tailwind v4 / Prisma / PostgreSQL (Neon ou équivalent) / Resend / S3 (Cloudflare R2 ou équivalent). Documenter le « pourquoi » dans `docs/stack.md`. — *skill : lean-build + pick-ui-library*
+- [x] **P0.5** Arborescence modulaire par domaine (catalogue, compatibilite, disponibilites, reservations, clients, demandes, messagerie, notifications, fichiers, auth, parametres, stats). — *skill : site-architecture*
+- [x] **P0.6** Créer `.env.example` documenté (toutes variables : DB, S3, e-mail, secrets de signature, fuseau horaire salon). Aucun secret réel dans le repo. — *skill : caveman*
+- [x] **P0.7** Branch strategy + conventions de commit (conventional commits). Hooks pre-commit : lint-staged + tsc --noEmit. — *skill : caveman-commit*
+- [x] **P0.8** Isolation de l'espace de travail initial. — *skill : using-git-worktrees*
+- [x] **P0.9** Validation cahier des charges §17 vs plan : checklist couverture 100 %. — *skill : verify-and-stop*
 
 ## PHASE 1 — FONDATIONS TECHNIQUES
 

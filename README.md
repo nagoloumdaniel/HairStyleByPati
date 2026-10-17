@@ -8,36 +8,37 @@ Phase **0 — Préparation & governance** en cours. Aucune fonctionnalité appli
 
 ## Stack (figée — voir [docs/stack.md](docs/stack.md))
 
-| Couche | Choix |
-|---|---|
-| Framework | Next.js 15 (App Router) + React 19 + TypeScript strict |
-| UI | **Tailwind CSS v4** + composants personnalisés (shadcn/ui) |
-| Base de données | PostgreSQL (Neon) + Prisma |
-| E-mails | Resend |
-| Fichiers | Cloudflare R2 (API S3) |
-| Auth | Auth.js (NextAuth) credentials + Argon2 |
-| Hébergement | Vercel |
+| Couche          | Choix                                                      |
+| --------------- | ---------------------------------------------------------- |
+| Framework       | Next.js 15 (App Router) + React 19 + TypeScript strict     |
+| UI              | **Tailwind CSS v4** + composants personnalisés (shadcn/ui) |
+| Base de données | PostgreSQL (Neon) + Prisma                                 |
+| E-mails         | Resend                                                     |
+| Fichiers        | Cloudflare R2 (API S3)                                     |
+| Auth            | Auth.js (NextAuth) credentials + Argon2                    |
+| Hébergement     | Vercel                                                     |
 
 ## Documentation
 
-| Document | Contenu |
-|---|---|
-| [Cahier de charge.md](<Cahier de charge.md>) | Spécification client v1.0 (20 sections) |
-| [ROADMAP.md](ROADMAP.md) | 13 phases, 122 mini-tâches |
-| [docs/acceptation.md](docs/acceptation.md) | Critères d'acceptation §17 + couverture |
-| [docs/plan-detaille.md](docs/plan-detaille.md) | Décomposition par module (§14.2) |
-| [docs/stack.md](docs/stack.md) | Choix techniques et justification |
-| [docs/architecture.md](docs/architecture.md) | Arborescence par domaine + plan de pages |
-| [docs/git.md](docs/git.md) | Branches, conventions de commit, hooks |
-| [.env.example](.env.example) | Variables d'environnement documentées |
+| Document                                       | Contenu                                  |
+| ---------------------------------------------- | ---------------------------------------- |
+| [Cahier de charge.md](<Cahier de charge.md>)   | Spécification client v1.0 (20 sections)  |
+| [ROADMAP.md](ROADMAP.md)                       | 13 phases, 122 mini-tâches               |
+| [docs/acceptation.md](docs/acceptation.md)     | Critères d'acceptation §17 + couverture  |
+| [docs/plan-detaille.md](docs/plan-detaille.md) | Décomposition par module (§14.2)         |
+| [docs/stack.md](docs/stack.md)                 | Choix techniques et justification        |
+| [docs/architecture.md](docs/architecture.md)   | Arborescence par domaine + plan de pages |
+| [docs/git.md](docs/git.md)                     | Branches, conventions de commit, hooks   |
+| [.env.example](.env.example)                   | Variables d'environnement documentées    |
 
 ## Développement
 
 ```bash
 npm install
 npm run typecheck   # tsc --noEmit
-npm run lint        # eslint (Phase 1)
-npm run dev         # serveur de développement (Phase 1)
+npm run format      # Prettier
+npm run dev         # serveur de développement (à partir de la Phase 1)
+npm run lint        # ESLint (à partir de la Phase 1)
 ```
 
 Les hooks `pre-commit` (lint-staged + `tsc --noEmit`) sont installés automatiquement par `npm install` (script `prepare` → husky).
