@@ -78,7 +78,7 @@
 **Règles métier :**
 
 - Entrées : horaires + durées prestation/options + pauses + fermetures + congés + exceptions.
-- Fuseau salon `SALON_TIMEZONE`, conversion UTC à l'enregistrement (P1.5).
+- Heure locale de l'appareil connecté, conversion UTC à l'enregistrement (P1.5).
 - Toute modification impactant des RDV confirmés exige confirmation explicite (P6.10).
 
 **Tests / critères :** A-RES-2 ; P11.1.

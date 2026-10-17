@@ -1,6 +1,7 @@
 // Schéma complet — cahier des charges §14.3 (P1.4)
-// Règles §14.4 : instantanés prix/durée sur Appointment, UTC +
-// fuseau salon explicite, notifications idempotentes, AuditLog.
+// Règles §14.4 : instantanés prix/durée sur Appointment, stockage UTC +
+// heure locale de l'appareil (aucun fuseau configurable), notifications
+// idempotentes, AuditLog.
 
 generator client {
   provider = "prisma-client-js"
@@ -407,8 +408,6 @@ model AuditLog {
 model SalonSettings {
   id                   Int      @id @default(1)
   name                 String   @default("Hairstyle by Patricia")
-  // Fuseau horaire IANA explicite — tout est stocké en UTC (§14.4)
-  timezone             String   @default("Europe/Paris")
   contactEmail         String?
   phone                String?
   address              String?

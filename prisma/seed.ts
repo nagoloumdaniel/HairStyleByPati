@@ -24,13 +24,12 @@ async function main(): Promise<void> {
     });
   }
 
-  // Settings du singleton (fuseau §14.4)
+  // Settings du singleton (P1.6)
   await db.salonSettings.upsert({
     where: { id: 1 },
     update: {},
     create: {
       id: 1,
-      timezone: process.env.SALON_TIMEZONE ?? 'Europe/Paris',
       contactEmail: process.env.ADMIN_EMAIL ?? null,
     },
   });

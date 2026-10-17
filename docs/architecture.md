@@ -64,7 +64,7 @@ HairStyleByPati/
 │   │   └── shared/               # états vides, squelettes, erreurs (P2.7)
 │   ├── lib/
 │   │   ├── db.ts  auth.ts  errors.ts  mail.ts  rate-limit.ts
-│   │   └── dates.ts              # UTC + SALON_TIMEZONE (P1.5)
+│   │   └── dates.ts              # UTC + heure appareil (P1.5)
 │   └── types/                    # env.d.ts, globals.ts
 ├── tests/e2e/                    # Playwright (P11.2)
 ├── .env.example
