@@ -50,5 +50,5 @@ Les hooks `pre-commit` (lint-staged + `tsc --noEmit`) et `pre-push` (`npm run ci
 - Validation serveur systématique (Zod) sur toutes les entrées.
 - Règles de compatibilité vérifiées côté serveur uniquement.
 - Instantanés de prix/durée sur chaque réservation.
-- Fuseau horaire du salon explicite (`SALON_TIMEZONE`), stockage UTC.
+- Dates stockées en UTC, affichées à l'heure de l'appareil connecté.
 - Conventional Commits sur toutes les branches.

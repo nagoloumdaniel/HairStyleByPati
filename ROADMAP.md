@@ -38,7 +38,7 @@
 - [x] **P0.3** Rédiger `docs/plan-detaille.md` décomposant chaque fonctionnalité en modules (§14.2) avec interfaces et données. — *skill : writing-plans + executing-plans*
 - [x] **P0.4** Décision stack précise : Next.js 15 / React 19 / Tailwind v4 / Prisma / PostgreSQL (Neon ou équivalent) / Resend / S3 (Cloudflare R2 ou équivalent). Documenter le « pourquoi » dans `docs/stack.md`. — *skill : lean-build + pick-ui-library*
 - [x] **P0.5** Arborescence modulaire par domaine (catalogue, compatibilite, disponibilites, reservations, clients, demandes, messagerie, notifications, fichiers, auth, parametres, stats). — *skill : site-architecture*
-- [x] **P0.6** Créer `.env.example` documenté (toutes variables : DB, S3, e-mail, secrets de signature, fuseau horaire salon). Aucun secret réel dans le repo. — *skill : caveman*
+- [x] **P0.6** Créer `.env.example` documenté (toutes variables : DB, S3, e-mail, secrets de signature). Aucun secret réel dans le repo. — *skill : caveman*
 - [x] **P0.7** Branch strategy + conventions de commit (conventional commits). Hooks pre-commit : lint-staged + tsc --noEmit. — *skill : caveman-commit*
 - [x] **P0.8** Isolation de l'espace de travail initial. — *skill : using-git-worktrees*
 - [x] **P0.9** Validation cahier des charges §17 vs plan : checklist couverture 100 %. — *skill : verify-and-stop*
@@ -47,17 +47,17 @@
 
 > Objectif : app qui compile, DB modélisée, auth admin verrouillée.
 
-- [ ] **P1.1** Scaffold Next.js App Router + TypeScript strict + ESLint + Prettier. Build vert. — *skill : caveman + verification-before-completion*
-- [ ] **P1.2** Tailwind configuré avec les tokens du §2.2 : `#F4C542` (accent), `#191919` (texte), `#FFF8E9` (crème), `#76513D` (cacao), `#FFFFFF`, `#C94B4B` (alerte). Vérifier contraste texte/boutons jaunes. — *skill : frontend-design*
-- [ ] **P1.3** Polices Playfair Display (titres) + Manrope (textes/UI) chargées optimisément (next/font, poids limités). — *skill : frontend-design*
-- [ ] **P1.4** Schéma Prisma complet des entités §14.3 : User, Service, ServiceImage, Category, AvailabilityRule, BlockedPeriod, Customer, Appointment, CustomRequest, HairAssessment, Conversation, Message, Notification, AuditLog + tables règles compatibilité et options. Instantanés de prix/durée sur Appointment. — *skill : migration*
-- [ ] **P1.5** Stratégie dates/fuseau horaire (stockage UTC + fuseau salon explicite). — *skill : test-driven-development*
-- [ ] **P1.6** Migrations + seed (catégories de base : Tresses, Vanilles, Locs, Départ de locs, Protectrices, Coupes + settings salon). — *skill : caveman*
-- [ ] **P1.7** Auth administrateur (Auth.js/NextAuth credentials, Argon2 ou bcrypt, session sécurisée). — *skill : security-audit*
-- [ ] **P1.8** Middleware + garde serveur sur toutes les routes `/dashboard/*` et server actions d'administration. Test : visiteur non authentifié redirigé. — *skill : security-audit + test-driven-development*
-- [ ] **P1.9** Schéma server actions / route handlers : validation Zod sur TOUTES les entrées, gestion centralisée des erreurs, typage strict. — *skill : react-best-practices*
-- [ ] **P1.10** Journalisation de base (AuditLog + logs serveur). — *skill : caveman*
-- [ ] **P1.11** CI : lint + typecheck + tests + build à chaque push. — *skill : verification-before-completion*
+- [x] **P1.1** Scaffold Next.js App Router + TypeScript strict + ESLint + Prettier. Build vert. — *skill : caveman + verification-before-completion*
+- [x] **P1.2** Tailwind configuré avec les tokens du §2.2 : `#F4C542` (accent), `#191919` (texte), `#FFF8E9` (crème), `#76513D` (cacao), `#FFFFFF`, `#C94B4B` (alerte). Vérifier contraste texte/boutons jaunes. — *skill : frontend-design*
+- [x] **P1.3** Polices Playfair Display (titres) + Manrope (textes/UI) chargées optimisément (next/font, poids limités). — *skill : frontend-design*
+- [x] **P1.4** Schéma Prisma complet des entités §14.3 : User, Service, ServiceImage, Category, AvailabilityRule, BlockedPeriod, Customer, Appointment, CustomRequest, HairAssessment, Conversation, Message, Notification, AuditLog + tables règles compatibilité et options. Instantanés de prix/durée sur Appointment. — *skill : migration*
+- [x] **P1.5** Stratégie dates (stockage UTC + heure de l'appareil connecté, aucun fuseau configurable). — *skill : test-driven-development*
+- [x] **P1.6** Migrations + seed (catégories de base : Tresses, Vanilles, Locs, Départ de locs, Protectrices, Coupes + settings salon). — *skill : caveman*
+- [x] **P1.7** Auth administrateur (Auth.js/NextAuth credentials, Argon2 ou bcrypt, session sécurisée). — *skill : security-audit*
+- [x] **P1.8** Middleware + garde serveur sur toutes les routes `/dashboard/*` et server actions d'administration. Test : visiteur non authentifié redirigé. — *skill : security-audit + test-driven-development*
+- [x] **P1.9** Schéma server actions / route handlers : validation Zod sur TOUTES les entrées, gestion centralisée des erreurs, typage strict. — *skill : react-best-practices*
+- [x] **P1.10** Journalisation de base (AuditLog + logs serveur). — *skill : caveman*
+- [x] **P1.11** CI : lint + typecheck + tests + build à chaque push. — *skill : verification-before-completion*
 
 ## PHASE 2 — DESIGN SYSTEM & IDENTITÉ VISUELLE
 

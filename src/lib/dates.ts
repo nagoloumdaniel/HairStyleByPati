@@ -1,15 +1,12 @@
 /**
- * Stratégie dates/fuseau horaire — P1.5 (§14.4).
+ * Stratégie dates — P1.5 (heure de l'appareil).
  *
- * Règle : tout est STOCKÉ en UTC (Date Prisma). Le fuseau utilisé pour
- * l'affichage et la saisie locale s'adapte à l'appareil de l'utilisateur
- * (détecté via Intl côté navigateur). Aucune dépendance externe :
- * conversions pures via l'API Intl de Node, testables isolément (TDD).
- *
- * Côté serveur, si SALON_TIMEZONE n'est pas définie, le fallback est 'UTC'.
- * Côté client, getDeviceTimezone() renvoie le fuseau du navigateur.
+ * Règle : tout est STOCKÉ en UTC (Date Prisma). L'affichage et la
+ * saisie utilisent uniquement l'heure locale de l'appareil connecté
+ * (détectée via Intl côté navigateur). Aucun fuseau configurable,
+ * aucune variable d'environnement, aucun fuseau salon en base.
+ * Conversions pures via l'API Intl, testables isolément (TDD).
  */
-
 export const WEEKDAY_FR = [
   'lundi',
   'mardi',
@@ -20,13 +17,11 @@ export const WEEKDAY_FR = [
   'dimanche',
 ] as const;
 
-/** Fuseau configuré côté serveur (variable d'env). Peut être undefined. */
-export const SALON_TIMEZONE = process.env.SALON_TIMEZONE ?? undefined;
-
 /**
- * Détecte le fuseau horaire de l'appareil sur lequel l'app tourne.
- * - Côté navigateur : utilise Intl.DateTimeFormat().resolvedOptions().timeZone
- * - Côté serveur : renvoie SALON_TIMEZONE si définie, sinon 'UTC'
+ * Fuseau de l'appareil connecté.
+ * - Côté navigateur : Intl.DateTimeFormat().resolvedOptions().timeZone
+ * - Côté serveur : 'UTC' (le serveur ne connaît pas l'appareil,
+ *   la mise en forme locale se fait côté client).
  */
 export function getDeviceTimezone(): string {
   if (typeof window !== 'undefined') {
@@ -36,17 +31,7 @@ export function getDeviceTimezone(): string {
       // fallback si le navigateur ne supporte pas Intl
     }
   }
-  return SALON_TIMEZONE ?? 'UTC';
-}
-
-export function isValidTimeZone(timeZone: string): boolean {
-  if (!timeZone) return false;
-  try {
-    new Intl.DateTimeFormat('en-US', { timeZone });
-    return true;
-  } catch {
-    return false;
-  }
+  return 'UTC';
 }
 
 /** Offset UTC (ms) d'une zone à un instant donné, via Intl. */
@@ -81,10 +66,10 @@ function timeZoneOffsetMs(date: Date, timeZone: string): number {
 }
 
 /**
- * Convertit une date locale du salon (YYYY-MM-DD) + minutes depuis
+ * Convertit une date locale de l'appareil (YYYY-MM-DD) + minutes depuis
  * minuit LOCAL en instant UTC.
  */
-export function salonTimeToUtc(
+export function deviceTimeToUtc(
   dateISO: string,
   minute: number,
   timeZone: string = getDeviceTimezone(),
@@ -103,8 +88,8 @@ export function salonTimeToUtc(
   return new Date(utcMs);
 }
 
-export interface SalonParts {
-  /** Date locale du salon au format YYYY-MM-DD */
+export interface DeviceParts {
+  /** Date locale de l'appareil au format YYYY-MM-DD */
   dateISO: string;
   /** Heure locale en minutes depuis minuit */
   minute: number;
@@ -112,8 +97,8 @@ export interface SalonParts {
   weekday: number;
 }
 
-/** Décompose un instant UTC en parties locales du salon. */
-export function utcToSalonParts(date: Date, timeZone: string = getDeviceTimezone()): SalonParts {
+/** Décompose un instant UTC en parties locales de l'appareil. */
+export function utcToDeviceParts(date: Date, timeZone: string = getDeviceTimezone()): DeviceParts {
   const parts = new Intl.DateTimeFormat('en-US', {
     timeZone,
     hour12: false,
