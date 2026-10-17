@@ -33,12 +33,15 @@ jobs:
       - name: Format check (Prettier)
         run: npm run format:check
 
-      # Sera activé en Phase 1 dès que ESLint/Next.js sont installés :
-      # - name: Lint
-      #   run: npm run lint
-      # Sera activé en Phase 11 dès que les tests existent :
-      # - name: Unit tests
-      #   run: npm test
-      # Sera activé en Phase 1 dès que le scaffold Next.js est en place :
-      # - name: Build
-      #   run: npm run build
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+        env:
+          # Secrets factices : le build ne touche jamais la base ni Auth.js
+          AUTH_SECRET: ci-build-only-secret-not-real
+          DATABASE_URL: postgresql://user:pass@localhost:5432/ci-placeholder
