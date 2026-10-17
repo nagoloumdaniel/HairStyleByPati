@@ -1,0 +1,26 @@
+{
+  "name": "hairstyle-by-pati",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Site vitrine et réservation en ligne — Hairstyle by Patricia",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "prepare": "husky",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,json,css,md,yml,yaml}": "prettier --write"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.9.10",
+    "typescript": "^5.9.3"
+  }
+}

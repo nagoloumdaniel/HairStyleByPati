@@ -1,0 +1,15 @@
+# Prettier ignore (P0.7)
+node_modules
+package-lock.json
+.husky/_
+.worktrees/
+
+# Documents source du client — ne jamais reformatter
+Cahier de charge.md
+ROADMAP.md
+.claude/
+
+# Générés
+.next
+coverage
+test-results
