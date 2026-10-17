@@ -22,12 +22,14 @@
 **Données :** `Category`, `Service`, `ServiceImage`, `ServiceOption`.
 
 **Interfaces :**
+
 - Public : `GET /coiffures` (catalogue + filtres), `GET /coiffures/[slug]` (fiche), `GET /categories/[slug]`.
 - Dashboard : `/dashboard/catalogue` (liste, recherche, statuts), `/dashboard/catalogue/nouvelle`, `/dashboard/catalogue/[id]` (éditeur : infos, prix, durée, photos, options), `/dashboard/catalogue/categories`.
 - Actions : `createService`, `updateService`, `publishService`, `archiveService`, `reorderServiceImages`, `upsertCategory`.
 - Stockage : `fichiers/uploadServiceImage` (P4.4, URLs signées privées).
 
 **Règles métier :**
+
 - 4 modes de prix (fixe, de départ, fourchette, « Prix à confirmer ») — §4.4.
 - Jamais de suppression physique d'une coiffure avec historique de réservations → archivage (P4.6).
 - Publication = statut `PUBLISHED` ; brouillon invisible côté public.
@@ -44,12 +46,14 @@
 **Données :** `CompatibilityRule`, `QuestionDefinition`, `HairAssessment` (statuts : reçue, en cours, infos demandées, acceptée, refusée, réservation en attente, confirmée).
 
 **Interfaces :**
+
 - Moteur pur : `evaluateCompatibility({ service, answers }) → { verdict, message, missingInfo? }` — fonction pure, zéro I/O (P5.2).
 - Public : `POST /compatibilite/evaluer` (server action), parcours questions conditionnelles (P5.3), état « Je ne suis pas sûr(e) » → upload photo (P5.4, P5.5).
 - Dashboard : `/dashboard/evaluations` (file d'attente, photo, décisions : accepter / refuser / demander infos / proposer autre coiffure / autoriser sous conditions), historique.
 - Actions : `submitAssessment`, `decideAssessment`, `requestMoreInfo`.
 
 **Règles métier (critiques) :**
+
 - Règles lues depuis la DB, **jamais** de décision front-only (§14.4).
 - **Règle d'or :** `decideAssessment(accept)` ne crée JAMAIS d'`Appointment` : elle ouvre l'accès au réservation avec re-vérification à l'enregistrement (P5.7, P5.8).
 - Photos d'évaluation : stockage privé, jamais dans la galerie publique, purge au délai configuré (P9.7).
@@ -66,11 +70,13 @@
 **Données :** `AvailabilityRule` (jour de la semaine / date, début, fin, type, statut), `BlockedPeriod` (début, fin, motif, auteur), créneaux spécifiques.
 
 **Interfaces :**
+
 - Moteur pur : `computeSlots({ service, date, rules, blocks, appointments }) → Slot[]` — testable sans DB (P6.1).
 - Public : `GET /api/slots?serviceId=&date=` (réutilisé par le formulaire, P6.3).
 - Dashboard : `/dashboard/disponibilites` (horaires habituels, exceptions, blocages), alerte « la modification impacte N RDV confirmés » (P6.10).
 
 **Règles métier :**
+
 - Entrées : horaires + durées prestation/options + pauses + fermetures + congés + exceptions.
 - Fuseau salon `SALON_TIMEZONE`, conversion UTC à l'enregistrement (P1.5).
 - Toute modification impactant des RDV confirmés exige confirmation explicite (P6.10).
@@ -87,12 +93,14 @@
 **Données :** `Appointment` (client, prestation, début/fin, statut, **instantanés prix/durée**, options, infos capillaires, commentaires), transitions de statuts.
 
 **Interfaces :**
+
 - Public : parcours 8 étapes `GET /reserver` + `POST /reserver/etape/[n]` (P6.3), confirmation page + e-mail.
 - Lien client signé : `GET /annulation/[token]` (P6.7).
 - Dashboard : `/dashboard/calendrier` (jour/semaine/mois/liste, fiche RDV), `/dashboard/reservations/[id]`.
 - Actions : `createAppointment`, `confirmAppointment`, `cancelAppointmentByAdmin`, `cancelAppointmentByLink`, `rescheduleAppointment`, `markNoShow`.
 
 **Règles métier (critiques) :**
+
 - Machine à statuts : `EN_ATTENTE_CONFIRMATION, CONFIRMEE, REPROGRAMMEE, ANNULEE_CLIENT, ANNULEE_ADMIN, TERMINEE, ABSENTE` — transitions contrôlées serveur (P6.5).
 - **Anti double-réservation :** transaction Postgres + contrainte d'exclusivité sur (début, fin) pour statuts occupant ; test concurrence 2 clients (P6.2).
 - Reprogrammation atomique : ancien créneau libéré seulement si nouveau valide (P6.8).
@@ -112,11 +120,13 @@
 **Données :** `Customer` (nom, e-mail, téléphone), relations `Appointment`, `Conversation`, `HairAssessment`, `CustomRequest`.
 
 **Interfaces :**
+
 - Dashboard : `/dashboard/clients` (liste), `/dashboard/clients/[id]` (fiche + historique + coordonnées) (P8.3).
 - Public : fiche minimale auto-créée à la réservation (upsert par e-mail), espace client lié au lien de suivi d'e-mail.
 - Actions : `upsertCustomerFromBooking`, `exportCustomerData` (RGPD §15.3), `deleteCustomerData`.
 
 **Règles métier :**
+
 - Minimisation des données (§15.3) : pas d'information capillaire stockée sur `Customer` (elle vit sur `Appointment`/`HairAssessment`).
 - Accès restreint : un client ne voit que ses propres données (A-SEC-2).
 
@@ -132,6 +142,7 @@
 **Données :** `CustomRequest` (demandeur/coordonnées, description, photos de référence, statut, réponse, prix estimatif, dates de suivi).
 
 **Interfaces :**
+
 - Public : `GET/POST /demandes-personnalisees` (formulaire, accusé de réception client) (P8.1).
 - Dashboard : `/dashboard/demandes` (file), décisions : accepter, refuser, demander précisions, proposer prestation existante, prix estimatif, proposer créneau + historique complet (P8.2).
 
@@ -149,6 +160,7 @@
 **Données :** `Conversation` (client, sujet, statut : nouveau, en cours, attente réponse, traité, archivé), `Message` (auteur, contenu, type, lu, **note interne**).
 
 **Interfaces :**
+
 - Public : `POST /contact` (anti-spam honeypot + rate limit, P3.6).
 - Dashboard : `/dashboard/messages` (boîte), `/dashboard/messages/[id]`, réponse e-mail directe, notes internes.
 - Actions : `createConversation`, `replyToConversation`, `setConversationStatus`, `addInternalNote`.
@@ -166,11 +178,13 @@
 **Données :** `Notification` (destinataire, événement, modèle, canal e-mail/dashboard, statut d'envoi, dates, **clé d'idempotence unique**).
 
 **Interfaces :**
+
 - Service : `notify({ event, payload, channel })` — appelé par les autres modules, jamais par le front.
 - Dashboard : cloche + `/dashboard/notifications` (lien direct vers la fiche concernée).
 - Cron : `POST /api/cron/reminders` (Vercel Cron, rappel H-24 configurable), idempotent.
 
 **Règles métier (critiques) :**
+
 - **Jamais de blocage :** envoi e-mail asynchrone (file), ne conditionne pas l'enregistrement d'une réservation (P7.2).
 - Idempotence par clé `(event, entityId, recipient)` → zéro doublon (A-MES-4).
 - Échecs visibles dans le dashboard + journaux (A-MES-3), reprise automatique.
@@ -263,6 +277,3 @@ auth --------------> tout le dashboard
 5. `notifications` puis `messagerie` — Phase 7
 6. `demandes`, `clients`, `stats` — Phase 8
 7. Sécurité globale, performance, recette — Phases 9-11
-
-
-

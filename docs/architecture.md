@@ -92,17 +92,17 @@ HairStyleByPati/
 └── /confidentialite ............ RGPD
 ```
 
-| Page | URL | Parent | Nav | Priorité |
-|---|---|---|---|---|
-| Accueil | `/` | — | Header | Haute |
-| Catalogue | `/coiffures` | Accueil | Header | Haute |
-| Fiche coiffure | `/coiffures/[slug]` | Catalogue | — | Haute |
-| Réserver | `/reserver` | Fiche | CTA Header | Haute |
-| Compatibilité | `/compatibilite` | Fiche | CTA contextuel | Moyenne |
-| Demande personnalisée | `/demandes-personnalisees` | Accueil | Header | Moyenne |
-| Contact | `/contact` | Accueil | Header/Footer | Moyenne |
-| Salon / FAQ / Infos | `/salon`, `/faq`, `/informations` | Accueil | Header | Basse |
-| Légal | `/mentions-legales`, `/confidentialite` | — | Footer | Basse |
+| Page                  | URL                                     | Parent    | Nav            | Priorité |
+| --------------------- | --------------------------------------- | --------- | -------------- | -------- |
+| Accueil               | `/`                                     | —         | Header         | Haute    |
+| Catalogue             | `/coiffures`                            | Accueil   | Header         | Haute    |
+| Fiche coiffure        | `/coiffures/[slug]`                     | Catalogue | —              | Haute    |
+| Réserver              | `/reserver`                             | Fiche     | CTA Header     | Haute    |
+| Compatibilité         | `/compatibilite`                        | Fiche     | CTA contextuel | Moyenne  |
+| Demande personnalisée | `/demandes-personnalisees`              | Accueil   | Header         | Moyenne  |
+| Contact               | `/contact`                              | Accueil   | Header/Footer  | Moyenne  |
+| Salon / FAQ / Infos   | `/salon`, `/faq`, `/informations`       | Accueil   | Header         | Basse    |
+| Légal                 | `/mentions-legales`, `/confidentialite` | —         | Footer         | Basse    |
 
 **Règles :** 3 clics maximum vers toute page importante ; aucune page orpheline (au moins 1 lien entrant) ; CTA « Réserver » visible sur toutes les pages du header ; fil d'Ariane sur catalogue et fiche.
 
@@ -110,12 +110,12 @@ HairStyleByPati/
 
 Sidebar fixe, regroupée en 4 sections :
 
-| Section | Entrées |
-|---|---|
-| **Pilotage** | Tableau de bord, Calendrier, Statistiques, Historique des actions |
-| **Offre** | Catalogue, Catégories, Règles capillaires, Disponibilités |
-| **Clients** | Réservations, Évaluations par photo, Demandes personnalisées, Clients, Messages |
-| **Administration** | Notifications, Paramètres du salon, Déconnexion |
+| Section            | Entrées                                                                         |
+| ------------------ | ------------------------------------------------------------------------------- |
+| **Pilotage**       | Tableau de bord, Calendrier, Statistiques, Historique des actions               |
+| **Offre**          | Catalogue, Catégories, Règles capillaires, Disponibilités                       |
+| **Clients**        | Réservations, Évaluations par photo, Demandes personnalisées, Clients, Messages |
+| **Administration** | Notifications, Paramètres du salon, Déconnexion                                 |
 
 Responsive : sidebar devient tiroir (drawer) sur mobile/tablette ; état actif visible + `aria-current="page"`.
 
@@ -125,4 +125,3 @@ Responsive : sidebar devient tiroir (drawer) sur mobile/tablette ; état actif v
 - Fichiers module : `schemas.ts` (Zod), `service.ts` (règles), `queries.ts` (lectures), `actions.ts` (mutations), `engine.ts` (moteur pur), `components/` (UI du domaine), `*.test.ts`.
 - Composants React : PascalCase, exports nommés.
 - Variables d'env : `SCREAMING_SNAKE_CASE`.
-
