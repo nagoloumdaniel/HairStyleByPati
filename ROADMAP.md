@@ -84,7 +84,7 @@
 - [x] **P3.4** Pagination / chargement progressif catalogue. — *skill : react-best-practices*
 - [ ] **P3.5** Pages éditoriales : présentation salon, FAQ, informations pratiques, politique d'annulation. — *skill : frontend-design*
 - [ ] **P3.6** Formulaire de contact : anti-spam (honeypot + rate limit), enregistrement Conversation côté serveur. — *skill : security-audit*
-- [ ] **P3.7** Pages légales + politique de confidentialité RGPD (§15.3 : conservation, droits, contact, cookies). — *skill : security-audit*
+- [x] **P3.7** Pages légales + politique de confidentialité RGPD (§15.3 : conservation, droits, contact, cookies). — *skill : security-audit*
 - [ ] **P3.8** SEO technique : metadata, Open Graph, sitemap, robots.txt, données structurées LocalBusiness (coiffeur). — *skill : seo-audit*
 - [ ] **P3.9** Tests navigateur des pages publiques sur mobile/tablette/desktop. — *skill : webapp-testing*
 
