@@ -1,0 +1,158 @@
+import Link from 'next/link';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Informations pratiques',
+  description:
+    "Horaires, préparation du rendez-vous et politique d'annulation du salon Hairstyle by Patricia.",
+  alternates: { canonical: '/infos-pratiques' },
+};
+
+const preparation = [
+  'Venez avec des cheveux propres, démêlés et séchés.',
+  'Si vous portez une coiffure existante (locs, tresses), ne la défaites pas la veille.',
+  'Prévoyez une tenue confortable : certaines coiffures demandent plusieurs heures.',
+  'Apportez une photo ou une inspiration de la coiffure souhaitée si vous en avez une.',
+];
+
+const annulationRules = [
+  {
+    label: 'Annulation à temps',
+    description:
+      'Vous pouvez annuler ou déplacer votre rendez-vous gratuitement jusqu’à 24 heures avant l’heure convenue, via le lien sécurisé reçu par e-mail.',
+  },
+  {
+    label: 'Annulation tardive',
+    description:
+      'Passé le délai de 24 heures, l’annulation est prise en compte mais le créneau ne peut être libéré pour d’autres clientes. Contactez-nous directement pour étudier votre situation.',
+  },
+  {
+    label: 'Absence',
+    description:
+      'En cas d’absence sans préavis, le salon se réserve le droit de demander un acompte pour toute réservation ultérieure.',
+  },
+  {
+    label: 'Annulation par le salon',
+    description:
+      'Si Patricia doit annuler pour un motif personnel (maladie, urgence), vous serez contactée sans délai et un nouveau rendez-vous vous sera proposé en priorité, sans frais.',
+  },
+];
+
+export default function InfosPratiquesPage() {
+  return (
+    <main className="mx-auto w-full max-w-7xl space-y-12 px-4 py-8 sm:px-6 md:py-12">
+      <nav aria-label="Fil d'Ariane" className="text-sm text-ink-soft">
+        <ol className="flex flex-wrap items-center gap-2">
+          <li>
+            <Link href="/" className="transition hover:text-cacao">
+              Accueil
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li>
+            <span aria-current="page" className="font-medium text-ink">
+              Informations pratiques
+            </span>
+          </li>
+        </ol>
+      </nav>
+
+      <header className="max-w-3xl space-y-3">
+        <p className="text-sm font-semibold uppercase tracking-[0.14em] text-cacao">Pratique</p>
+        <h1 className="font-heading text-4xl font-bold text-ink md:text-5xl">
+          Informations pratiques
+        </h1>
+        <p className="text-lg leading-relaxed text-ink-soft">
+          Tout ce qu&apos;il faut savoir avant votre venue : horaires, préparation du rendez-vous et
+          conditions d&apos;annulation.
+        </p>
+      </header>
+
+      {/* Coordonnées et horaires */}
+      <section className="grid grid-cols-1 gap-8 md:grid-cols-2">
+        <div className="space-y-6 rounded-2xl bg-surface p-8 shadow-soft">
+          <h2 className="font-heading text-2xl font-bold text-ink">Coordonnées</h2>
+          <p className="text-ink-soft">
+            <span className="font-semibold text-ink">Adresse</span>
+            <br />
+            12 Rue de la Coiffure
+            <br />
+            75000 Paris
+          </p>
+          <p className="text-ink-soft">
+            <span className="font-semibold text-ink">Téléphone</span>
+            <br />
+            01 23 45 67 89
+          </p>
+          <p className="text-ink-soft">
+            <span className="font-semibold text-ink">E-mail</span>
+            <br />
+            contact@hairstylebypati.fr
+          </p>
+        </div>
+        <div className="space-y-6 rounded-2xl bg-surface p-8 shadow-soft">
+          <h2 className="font-heading text-2xl font-bold text-ink">Horaires</h2>
+          <p className="text-ink-soft">
+            Mardi – Samedi : 10h – 19h
+            <br />
+            Fermé dimanche et lundi
+          </p>
+          <p className="text-ink-soft">
+            Les rendez-vous sont strictement sur réservation. Merci de respecter l&apos;heure
+            convenue : chaque retard réduit le temps de votre prestation.
+          </p>
+        </div>
+      </section>
+
+      {/* Préparation */}
+      <section className="space-y-6">
+        <h2 className="font-heading text-3xl font-bold text-ink">Préparer votre rendez-vous</h2>
+        <ul className="max-w-3xl space-y-3">
+          {preparation.map((item) => (
+            <li key={item} className="flex items-start gap-3 text-ink-soft">
+              <span aria-hidden="true" className="mt-1 font-bold text-accent">
+                ✓
+              </span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Politique d'annulation */}
+      <section className="space-y-6">
+        <h2 className="font-heading text-3xl font-bold text-ink">Politique d&apos;annulation</h2>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          {annulationRules.map((rule) => (
+            <div key={rule.label} className="border-l-4 border-accent pl-5">
+              <h3 className="font-heading text-xl font-bold text-ink">{rule.label}</h3>
+              <p className="mt-1 leading-relaxed text-ink-soft">{rule.description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-2xl bg-cream p-8 text-center md:p-10">
+        <h2 className="font-heading text-2xl font-bold text-ink">Une question ?</h2>
+        <p className="mx-auto mt-3 max-w-md text-ink-soft">
+          Pour toute demande particulière (groupe, coiffure sur mesure, situation particulière),
+          contactez-nous avant de réserver.
+        </p>
+        <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+          <Link
+            href="/contact"
+            className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-ink shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
+          >
+            Nous contacter
+          </Link>
+          <Link
+            href="/reserver"
+            className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] border border-cream-dark bg-surface px-6 py-3 font-semibold text-ink shadow-soft transition hover:border-cacao hover:bg-cream"
+          >
+            Réserver un créneau
+          </Link>
+        </div>
+      </section>
+    </main>
+  );
+}
