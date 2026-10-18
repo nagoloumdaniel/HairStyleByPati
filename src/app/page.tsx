@@ -74,7 +74,7 @@ export default function HomePage() {
               <br />
               avec Patricia
             </h1>
-            <p className="text-lg md:text-xl text-ink-soft max-w-md leading-relaxed">
+            <p className="text-lg md:text-xl text-cream/90 max-w-md leading-relaxed">
               Coiffeuse spécialisée en tresses, vanilles et locs. Prenez rendez-vous en quelques
               clics pour une coiffure sur mesure.
             </p>
