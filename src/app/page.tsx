@@ -1,7 +1,22 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
+
+export const metadata: Metadata = {
+  title: 'Hairstyle by Patricia — Coiffures texturées, tresses, vanilles et locs à Paris',
+  description:
+    'Salon de coiffure spécialisé en tresses, vanilles et locs. Diagnostic capillaire sur mesure et réservation en ligne. Paris 12e.',
+  alternates: { canonical: '/' },
+  openGraph: {
+    title: 'Hairstyle by Patricia — Sublimez vos cheveux avec Patricia',
+    description:
+      'Coiffeuse spécialisée en tresses, vanilles et locs. Prenez rendez-vous en quelques clics pour une coiffure sur mesure.',
+    type: 'website',
+    url: '/',
+  },
+};
 
 const popularServices = [
   {

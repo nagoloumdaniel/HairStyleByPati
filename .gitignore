@@ -20,6 +20,11 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# logs locaux de dev (non committés)
+build.log
+lint.log
+playwright-*.log
+
 # local env files — never commit real secrets
 .env
 .env.*
