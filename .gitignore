@@ -47,3 +47,8 @@ next-env.d.ts
 .vscode/*
 !.vscode/extensions.json
 *.local
+
+# Cline / Claude config — retiré du suivi du dépôt
+.cline/
+.claude/
+.clinerule
