@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ServiceCard } from '@/components/catalogue/ServiceCard';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { getPublishedCategories, getPublishedServices, parseCatalogueQuery } from '@/lib/catalogue';
-import { CatalogueFilters } from './catalogue-filters';
+import { CatalogueFilters } from '../catalogue-filters';
 
 export const metadata: Metadata = {
   title: 'Catalogue des coiffures',

@@ -80,7 +80,7 @@
 
 - [x] **P3.1** Page d'accueil : hero photo coiffure, accroche, 2 boutons (Réserver / Découvrir), coiffures populaires, prestations, étapes de réservation, présentation Patricia, témoignages, coordonnées. — *skill : frontend-design*
 - [x] **P3.2** Catalogue : cartes (photo, nom, prix/départ, description, durée, catégories, boutons Voir détails / Réserver), recherche + filtres par catégories dynamiques. — *skill : frontend-design + react-best-practices*
-- [ ] **P3.3** Fiche détaillée : galerie multi-photos navigable sans quitter la page, prix/fourchette, durée, longueurs acceptées, compatibilités, restrictions, options, infos avant RDV. — *skill : frontend-design*
+- [x] **P3.3** Fiche détaillée : galerie multi-photos navigable sans quitter la page, prix/fourchette, durée, longueurs acceptées, compatibilités, restrictions, options, infos avant RDV. — *skill : frontend-design*
 - [x] **P3.4** Pagination / chargement progressif catalogue. — *skill : react-best-practices*
 - [ ] **P3.5** Pages éditoriales : présentation salon, FAQ, informations pratiques, politique d'annulation. — *skill : frontend-design*
 - [ ] **P3.6** Formulaire de contact : anti-spam (honeypot + rate limit), enregistrement Conversation côté serveur. — *skill : security-audit*

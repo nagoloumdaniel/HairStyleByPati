@@ -176,6 +176,67 @@ const DEMO_SERVICES: DemoService[] = [
   },
 ];
 
+const pexels = (id: number) =>
+  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=1200`;
+
+/**
+ * Galerie de démonstration par catégorie. Les `key` contiennent ici des URLs
+ * publiques (photos libres Pexels) : en production, `ServiceImage.key` contient
+ * une clé S3 privée et l'URL signée est résolue côté serveur (P4.4).
+ */
+const DEMO_GALLERY: Record<string, { key: string; alt: string }[]> = {
+  tresses: [
+    {
+      key: pexels(36441633),
+      alt: 'Tresses africaines réalisées en salon (photo de démonstration)',
+    },
+    {
+      key: pexels(33664383),
+      alt: 'Coiffure tressée élégante vue de profil (photo de démonstration)',
+    },
+    {
+      key: pexels(31801412),
+      alt: 'Portrait d’une femme aux cheveux tressés (photo de démonstration)',
+    },
+  ],
+  vanilles: [
+    {
+      key: pexels(37547660),
+      alt: 'Femmes aux cheveux tressés en vanilles (photo de démonstration)',
+    },
+    {
+      key: pexels(33475847),
+      alt: 'Portrait d’une femme aux cheveux tressés (photo de démonstration)',
+    },
+  ],
+  locs: [
+    { key: pexels(30152002), alt: 'Femme portant des locs (photo de démonstration)' },
+    { key: pexels(14778613), alt: 'Cheveux naturels bouclés en close-up (photo de démonstration)' },
+  ],
+  'depart-de-locs': [
+    {
+      key: pexels(31801412),
+      alt: 'Portrait d’une femme aux cheveux tressés (photo de démonstration)',
+    },
+    { key: pexels(30152002), alt: 'Femme portant des locs (photo de démonstration)' },
+  ],
+  protectrices: [
+    {
+      key: pexels(16563139),
+      alt: 'Mains d’une coiffeuse réalisant une coiffure (photo de démonstration)',
+    },
+    { key: pexels(11269055), alt: 'Femme aux cheveux courts et soignés (photo de démonstration)' },
+  ],
+  coupes: [
+    { key: pexels(11269055), alt: 'Femme aux cheveux courts et soignés (photo de démonstration)' },
+    {
+      key: pexels(10825829),
+      alt: 'Portrait de démonstration d’une femme coiffée (photo de démonstration)',
+    },
+    { key: pexels(10810251), alt: 'Cheveux courts colorés et coiffés (photo de démonstration)' },
+  ],
+};
+
 async function main(): Promise<void> {
   const categories = await db.category.findMany({ select: { slug: true } });
   const known = new Set(categories.map((category) => category.slug));
@@ -221,9 +282,23 @@ async function main(): Promise<void> {
         data: demo.options.map((option) => ({ ...option, serviceId: service.id })),
       });
     }
+
+    // Galerie de démonstration recréée (la première photo est la couverture).
+    const gallery = DEMO_GALLERY[demo.categorySlug] ?? [];
+    await db.serviceImage.deleteMany({ where: { serviceId: service.id } });
+    if (gallery.length > 0) {
+      await db.serviceImage.createMany({
+        data: gallery.map((image, index) => ({
+          ...image,
+          serviceId: service.id,
+          order: index,
+          isPrimary: index === 0,
+        })),
+      });
+    }
   }
 
-  console.log(`Seed démo OK : ${DEMO_SERVICES.length} prestations publiées.`);
+  console.log(`Seed démo OK : ${DEMO_SERVICES.length} prestations publiées avec galeries.`);
 }
 
 main()

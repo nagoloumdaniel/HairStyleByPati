@@ -4,7 +4,7 @@ Application web de réservation en ligne pour un salon de coiffure spécialisé 
 
 ## Statut
 
-Phase **3 — Site public** en cours : accueil (P3.1) et catalogue avec recherche, filtres et pagination (P3.2/P3.4) livrés. La fiche détaillée, les pages éditoriales et le SEO arrivent dans la suite de la phase.
+Phase **3 — Site public** en cours : accueil (P3.1), catalogue avec recherche, filtres et pagination (P3.2/P3.4) et fiche détaillée avec galerie (P3.3) livrés. Restent les pages éditoriales, le formulaire de contact, les pages légales et le SEO de la phase.
 
 ## Stack (figée — voir [docs/stack.md](docs/stack.md))
 

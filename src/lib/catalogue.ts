@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { Prisma } from '@prisma/client';
+import type { HairLength, PhotoPolicy, Prisma } from '@prisma/client';
 import { db } from './db';
 
 /* ------------------------------------------------------------------ */
@@ -134,6 +134,77 @@ export async function getPublishedServices(query: CatalogueQuery) {
     pageSize,
     totalPages: Math.max(1, Math.ceil(total / pageSize)),
   };
+}
+
+/* ------------------------------------------------------------------ */
+/* Fiche détaillée (P3.3)                                             */
+/* ------------------------------------------------------------------ */
+
+const SERVICE_DETAIL_SELECT = {
+  ...CATALOGUE_SERVICE_SELECT,
+  images: {
+    orderBy: [{ isPrimary: 'desc' }, { order: 'asc' }],
+    select: { id: true, key: true, alt: true, order: true, isPrimary: true },
+  },
+  options: {
+    where: { active: true },
+    orderBy: { name: 'asc' },
+    select: { id: true, name: true, priceCents: true, durationMinutes: true },
+  },
+  compatibility: {
+    select: {
+      acceptedLengths: true,
+      requiresLocs: true,
+      incompatibleLocs: true,
+      photoPolicy: true,
+      autoApprove: true,
+      incompatibleMessage: true,
+      uncertainMessage: true,
+    },
+  },
+} satisfies Prisma.ServiceSelect;
+
+export type ServiceDetail = Prisma.ServiceGetPayload<{
+  select: typeof SERVICE_DETAIL_SELECT;
+}>;
+
+export async function getPublishedServiceBySlug(slug: string): Promise<ServiceDetail | null> {
+  return db.service.findFirst({
+    where: { slug, status: 'PUBLISHED', category: { active: true } },
+    select: SERVICE_DETAIL_SELECT,
+  });
+}
+
+export const HAIR_LENGTH_LABELS: Record<HairLength, string> = {
+  SHORT: 'Cheveux courts',
+  MEDIUM: 'Longueur moyenne',
+  LONG: 'Cheveux longs',
+  VERY_LONG: 'Cheveux très longs',
+};
+
+export const PHOTO_POLICY_LABELS: Record<PhotoPolicy, string | null> = {
+  REQUIRED: 'Une photo de vos cheveux est obligatoire pour l’évaluation.',
+  OPTIONAL: 'Vous pouvez joindre une photo de vos cheveux (facultatif).',
+  FORBIDDEN: null,
+};
+
+/** Galerie d'une fiche : images réelles, sinon photos de démonstration. */
+export function serviceGallery(
+  service: Pick<ServiceDetail, 'name' | 'slug' | 'images' | 'category'>,
+): { key: string; src: string; alt: string }[] {
+  const displayable = service.images.filter((image) => isDisplayableImageKey(image.key));
+  if (displayable.length > 0) {
+    return displayable.map((image, index) => ({
+      key: image.id,
+      src: image.key,
+      alt:
+        image.alt ||
+        `${service.name} — photo ${index + 1} sur ${displayable.length} (${service.category.name})`,
+    }));
+  }
+
+  const fallback = demoImage(service);
+  return [{ key: 'demo', src: fallback.src, alt: fallback.alt }];
 }
 
 /* ------------------------------------------------------------------ */

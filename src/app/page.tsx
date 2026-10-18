@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 
@@ -78,18 +79,18 @@ export default function HomePage() {
               clics pour une coiffure sur mesure.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <a
+              <Link
                 href="/reserver"
                 className="inline-flex items-center justify-center gap-2 font-semibold bg-accent text-ink hover:bg-accent-hover shadow-soft px-7 py-3.5 text-lg rounded-[var(--radius-md)] transition active:scale-[0.98]"
               >
                 Réserver un créneau
-              </a>
-              <a
+              </Link>
+              <Link
                 href="/coiffures"
                 className="inline-flex items-center justify-center gap-2 font-semibold bg-surface text-ink border border-cream-dark hover:border-cacao shadow-soft px-7 py-3.5 text-lg rounded-[var(--radius-md)] transition active:scale-[0.98]"
               >
                 Découvrir le catalogue
-              </a>
+              </Link>
             </div>
           </div>
           <div className="md:w-1/2 flex justify-center">
@@ -112,12 +113,12 @@ export default function HomePage() {
             <h2 className="text-3xl font-heading font-bold text-ink">Coiffures populaires</h2>
             <p className="text-ink-soft">Nos prestations les plus demandées.</p>
           </div>
-          <a
+          <Link
             href="/coiffures"
             className="inline-flex items-center justify-center gap-2 font-semibold bg-accent text-ink hover:bg-accent-hover shadow-soft px-7 py-3.5 text-lg rounded-[var(--radius-md)] transition active:scale-[0.98]"
           >
             Voir toutes les coiffures
-          </a>
+          </Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {popularServices.map((service) => (
@@ -140,12 +141,12 @@ export default function HomePage() {
                 </div>
                 <h3 className="text-xl font-heading font-bold text-ink mb-1">{service.title}</h3>
                 <p className="text-ink-soft text-sm mb-4">{service.duration}</p>
-                <a
+                <Link
                   href={`/coiffures/${service.slug}`}
                   className="inline-flex items-center justify-center gap-2 font-semibold bg-accent text-ink hover:bg-accent-hover shadow-soft px-3 py-1.5 text-sm rounded-[var(--radius-sm)] transition active:scale-[0.98]"
                 >
                   Voir les détails
-                </a>
+                </Link>
               </div>
             </Card>
           ))}
@@ -229,12 +230,12 @@ export default function HomePage() {
               Une question sur une prestation ou sur la disponibilité d&apos;un créneau ?
               Contactez-nous, nous vous répondrons rapidement.
             </p>
-            <a
+            <Link
               href="/contact"
               className="inline-flex items-center justify-center gap-2 font-semibold bg-accent text-ink hover:bg-accent-hover shadow-soft px-7 py-3.5 text-lg rounded-[var(--radius-md)] transition active:scale-[0.98]"
             >
               Envoyer un message
-            </a>
+            </Link>
           </div>
           <div className="space-y-4">
             <p className="flex items-start gap-3 text-ink">
