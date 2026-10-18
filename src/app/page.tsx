@@ -1,30 +1,37 @@
+import Image from 'next/image';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 
 const popularServices = [
   {
     title: 'Tresses BOX',
+    slug: 'tresses-box',
     price: 'À partir de 80 €',
     duration: '3h00',
     category: 'Tresses',
-    image: 'https://images.unsplash.com/photo-1522337457743-1e9770e33e3e?w=800&q=80',
-    alt: 'Tresses BOX — coiffure protectrice',
+    image:
+      'https://images.pexels.com/photos/36441633/pexels-photo-36441633.jpeg?auto=compress&cs=tinysrgb&w=800',
+    alt: 'Tresses BOX — coiffure protectrice (photo de démonstration)',
   },
   {
     title: 'Vanilles légères',
+    slug: 'vanilles-legeres',
     price: 'À partir de 60 €',
     duration: '2h30',
     category: 'Vanilles',
-    image: 'https://images.unsplash.com/photo-1559256709-5bb6d2e0d3a4?w=800&q=80',
-    alt: 'Vanilles légères — coiffure protectrice',
+    image:
+      'https://images.pexels.com/photos/37547660/pexels-photo-37547660.jpeg?auto=compress&cs=tinysrgb&w=800',
+    alt: 'Vanilles légères — coiffure protectrice (photo de démonstration)',
   },
   {
-    title: 'Locs retissage',
+    title: 'Rétissage de locs',
+    slug: 'retissage-de-locs',
     price: 'À partir de 100 €',
     duration: '2h00',
     category: 'Locs',
-    image: 'https://images.unsplash.com/photo-1519239528316-1e8d6058a9b6?w=800&q=80',
-    alt: 'Locs retissage — coiffure protectrice',
+    image:
+      'https://images.pexels.com/photos/30152002/pexels-photo-30152002.jpeg?auto=compress&cs=tinysrgb&w=800',
+    alt: 'Rétissage de locs — entretien (photo de démonstration)',
   },
 ];
 
@@ -86,14 +93,13 @@ export default function HomePage() {
             </div>
           </div>
           <div className="md:w-1/2 flex justify-center">
-            <img
-              src="https://images.unsplash.com/photo-1556740734-67e7766542d6?w=600&q=80"
-              alt="Patricia coiffeuse — salon de coiffure afro"
+            <Image
+              src="https://images.pexels.com/photos/33664383/pexels-photo-33664383.jpeg?auto=compress&cs=tinysrgb&w=900"
+              alt="Coiffure tressée réalisée en salon (photo de démonstration)"
               className="rounded-xl shadow-lift"
               width={600}
               height={600}
-              loading="eager"
-              decoding="async"
+              priority
             />
           </div>
         </div>
@@ -119,14 +125,13 @@ export default function HomePage() {
               key={service.title}
               className="overflow-hidden shadow-soft hover:shadow-lift transition-shadow"
             >
-              <img
+              <Image
                 src={service.image}
                 alt={service.alt}
                 className="w-full h-48 object-cover"
                 width={400}
                 height={300}
                 loading="lazy"
-                decoding="async"
               />
               <div className="p-5">
                 <div className="flex justify-between items-start mb-2">
@@ -136,7 +141,7 @@ export default function HomePage() {
                 <h3 className="text-xl font-heading font-bold text-ink mb-1">{service.title}</h3>
                 <p className="text-ink-soft text-sm mb-4">{service.duration}</p>
                 <a
-                  href={`/coiffures/${service.title.toLowerCase().replace(/\s+/g, '-')}`}
+                  href={`/coiffures/${service.slug}`}
                   className="inline-flex items-center justify-center gap-2 font-semibold bg-accent text-ink hover:bg-accent-hover shadow-soft px-3 py-1.5 text-sm rounded-[var(--radius-sm)] transition active:scale-[0.98]"
                 >
                   Voir les détails
@@ -166,14 +171,13 @@ export default function HomePage() {
       {/* Présentation Patricia */}
       <section id="patricia" className="flex flex-col md:flex-row gap-12 items-center reveal">
         <div className="md:w-1/2 flex justify-center">
-          <img
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&q=80"
-            alt="Patricia — coiffeuse experte en tresses, vanilles et locs"
+          <Image
+            src="https://images.pexels.com/photos/10825829/pexels-photo-10825829.jpeg?auto=compress&cs=tinysrgb&w=700"
+            alt="Portrait de démonstration — coiffeuse experte en tresses, vanilles et locs"
             className="rounded-full shadow-lift"
             width={500}
             height={500}
             loading="lazy"
-            decoding="async"
           />
         </div>
         <div className="md:w-1/2 space-y-6">
