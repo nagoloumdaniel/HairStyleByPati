@@ -42,6 +42,24 @@ describe('renderNotification', () => {
     expect(rendered?.text).toContain('devis');
   });
 
+  it('should render a custom request decision with price and proposed slot', () => {
+    const rendered = renderNotification('custom_request_decision', {
+      kind: 'custom',
+      requestId: 'request-1',
+      requesterName: 'Amina',
+      requesterEmail: 'amina@example.com',
+      description: 'Tresses personnalisées pour un mariage.',
+      adminReply: 'Votre projet est réalisable.',
+      estimatedPriceCents: 15000,
+      proposedServiceName: 'Tresses BOX',
+      proposedSlot: '2026-11-20T09:00:00.000Z',
+    });
+    expect(rendered?.subject).toContain('demande');
+    expect(rendered?.html).toContain('150,00');
+    expect(rendered?.html).toContain('Tresses BOX');
+    expect(rendered?.html).toContain('/reserver');
+  });
+
   it('should return null for an unknown template or an empty payload', () => {
     expect(renderNotification('unknown_template', appointment)).toBeNull();
     expect(renderNotification('booking_confirmed', null)).toBeNull();
@@ -50,6 +68,7 @@ describe('renderNotification', () => {
   it('should know the supported templates', () => {
     expect(notificationTemplateExists('booking_reminder')).toBe(true);
     expect(notificationTemplateExists('conversation_reply')).toBe(true);
+    expect(notificationTemplateExists('custom_request_decision')).toBe(true);
     expect(notificationTemplateExists('autre')).toBe(false);
   });
 });
