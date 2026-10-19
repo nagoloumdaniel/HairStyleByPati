@@ -54,6 +54,22 @@ async function main(): Promise<void> {
     console.warn('AUTH_ADMIN_EMAIL / AUTH_ADMIN_PASSWORD absents : admin non créé.');
   }
 
+  // Disponibilités par défaut (P6.1) : du lundi au samedi, 9h-18h.
+  // Patricia peut tout modifier depuis /dashboard/disponibilites.
+  const availabilityCount = await db.availabilityRule.count();
+  if (availabilityCount === 0) {
+    await db.availabilityRule.createMany({
+      data: [0, 1, 2, 3, 4, 5].map((weekday) => ({
+        kind: 'WEEKLY' as const,
+        weekday,
+        startMinute: 9 * 60,
+        endMinute: 18 * 60,
+        active: true,
+      })),
+    });
+    console.log('Disponibilités par défaut créées (lundi au samedi, 9h-18h).');
+  }
+
   console.log(`Seed OK : ${CATEGORIES.length} catégories.`);
 }
 
