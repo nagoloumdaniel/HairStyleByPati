@@ -4,11 +4,11 @@ Application web de réservation en ligne pour un salon de coiffure spécialisé 
 
 ## Statut
 
-Phase **9, sécurité, RGPD et fiabilité**, terminée le 19/10/2026 : limitation des tentatives de connexion, cookie de session explicite, en-têtes de sécurité et CSP en production, protection des API admin, export et anonymisation RGPD, purge automatique des photos privées, sonde de santé, scripts de sauvegarde et de restauration testés. Vérifiée par 179 tests Vitest et 7 parcours Playwright de sécurité dédiés.
+Phase **10, performance, accessibilité et SEO**, terminée le 19/10/2026 : images AVIF/WebP responsives avec placeholders, cache ISR des fiches prestation, métadonnées SEO dans le head, image Open Graph, favicon, contrastes et libellés corrigés, tests responsive desktop/tablette/mobile/iPhone. Scores Lighthouse mobile de 96 à 98 en performance, 100 en accessibilité, bonnes pratiques et SEO sur les pages principales. Vérifiée par 179 tests Vitest et 22 parcours responsive/SEO sur les trois projects Playwright.
 
 Le thème **clair / sombre** est disponible sur toutes les interfaces via l'icône du header. La préférence système est détectée au chargement, le choix est mémorisé dans le navigateur et appliqué avant le premier rendu pour éviter tout flash. Vérifié par 4 parcours Playwright desktop et mobile.
 
-Prochaine étape : phase **10, performance, accessibilité et SEO**. Le seed crée des disponibilités par défaut du lundi au samedi, 9h-18h.
+Prochaine étape : phase **11, tests, recette et revue**. Le seed crée des disponibilités par défaut du lundi au samedi, 9h-18h.
 
 ### Notifications en local
 
@@ -32,18 +32,19 @@ curl -H "Authorization: Bearer ${CRON_SECRET}" http://localhost:3000/api/cron/re
 
 ## Documentation
 
-| Document                                       | Contenu                                  |
-| ---------------------------------------------- | ---------------------------------------- |
-| [Cahier de charge.md](<Cahier de charge.md>)   | Spécification client v1.0 (20 sections)  |
-| [ROADMAP.md](ROADMAP.md)                       | 13 phases, 122 mini-tâches               |
-| [docs/acceptation.md](docs/acceptation.md)     | Critères d'acceptation §17 + couverture  |
-| [docs/plan-detaille.md](docs/plan-detaille.md) | Décomposition par module (§14.2)         |
-| [docs/stack.md](docs/stack.md)                 | Choix techniques et justification        |
-| [docs/architecture.md](docs/architecture.md)   | Arborescence par domaine + plan de pages |
-| [docs/security.md](docs/security.md)           | Revue sécurité, risques, sauvegarde      |
-| [docs/rgpd.md](docs/rgpd.md)                   | Registre, droits et procédures RGPD      |
-| [docs/git.md](docs/git.md)                     | Branches, conventions de commit, hooks   |
-| [.env.example](.env.example)                   | Variables d'environnement documentées    |
+| Document                                       | Contenu                                   |
+| ---------------------------------------------- | ----------------------------------------- |
+| [Cahier de charge.md](<Cahier de charge.md>)   | Spécification client v1.0 (20 sections)   |
+| [ROADMAP.md](ROADMAP.md)                       | 13 phases, 122 mini-tâches                |
+| [docs/acceptation.md](docs/acceptation.md)     | Critères d'acceptation §17 + couverture   |
+| [docs/plan-detaille.md](docs/plan-detaille.md) | Décomposition par module (§14.2)          |
+| [docs/stack.md](docs/stack.md)                 | Choix techniques et justification         |
+| [docs/architecture.md](docs/architecture.md)   | Arborescence par domaine + plan de pages  |
+| [docs/security.md](docs/security.md)           | Revue sécurité, risques, sauvegarde       |
+| [docs/rgpd.md](docs/rgpd.md)                   | Registre, droits et procédures RGPD       |
+| [docs/performance.md](docs/performance.md)     | Scores Lighthouse, axe, SEO et responsive |
+| [docs/git.md](docs/git.md)                     | Branches, conventions de commit, hooks    |
+| [.env.example](.env.example)                   | Variables d'environnement documentées     |
 
 ## Développement
 
