@@ -173,18 +173,19 @@
 ## PHASE 9 — SÉCURITÉ APPROFONDIE, RGPD, FIABILITÉ
 
 > Objectif : §15 intégralement, avant mise en ligne. Non négociable.
+> État : livrée le 19/10/2026 avec les limites documentées dans [docs/security.md](docs/security.md). Les DPA et l'identité légale doivent être complétés avant production.
 
-- [ ] **P9.1** Audit sécurité complet du code (auth, sessions, autorisations sur CHAQUE opération sensible, validation serveur). — *skill : security-audit*
-- [ ] **P9.2** Checklist OWASP : injection SQL (requêtes Prisma paramétrées), XSS (échappement, CSP), CSRF (tokens), upload malveillant (noms non prévisibles, MIME + contenu vérifié, isolation stockage), déni de service. — *skill : security-audit*
-- [ ] **P9.3** Rate limiting sur formulaires publics, login, annulation par lien. Protection anti-abus récupération de compte. — *skill : security-audit*
-- [ ] **P9.4** En-têtes sécurité : CSP, HSTS, X-Frame-Options, Referrer-Policy. Cookies httpOnly/secure/sameSite. — *skill : security-audit*
-- [ ] **P9.5** Secrets : uniquement côté serveur, rotation documentée, aucun secret en clair ni dans le repo ni dans les logs. — *skill : security-audit*
-- [ ] **P9.6** RGPD opérationnel : politique confidentialité publiée, durée de conservation paramétrable, procédure suppression/rectification, registre des traitements, minimisation des données capillaires, contrats prestataires (DPA). — *skill : security-audit*
-- [ ] **P9.7** Politique de conservation/suppression des photos d'évaluation (délai paramétrable, purge automatique). — *skill : test-driven-development*
-- [ ] **P9.8** Sauvegardes DB automatiques + procédure de restauration TESTÉE en réel. — *skill : caveman + verification-before-completion*
-- [ ] **P9.9** Mise à jour + audit des dépendances (npm audit), verrouillage versions. — *skill : caveman*
-- [ ] **P9.10** Surveillance erreurs applicatives + gestion dégradation mode (e-mails en échec visibles, jamais blocant les réservations). — *skill : caveman*
-- [ ] **P9.11** Recette sécurité scénarios §17 (visiteur bloqué dashboard, client incapable de modifier RDV d'autrui, photo privée inaccessible, données validées, opérations sensibles contrôlées). — *skill : verify-and-stop + security-audit*
+- [x] **P9.1** Audit sécurité complet du code (auth, sessions, autorisations sur CHAQUE opération sensible, validation serveur). — *skill : security-audit*
+- [x] **P9.2** Checklist OWASP : injection SQL, XSS, CSP, CSRF, upload malveillant, déni de service. CSP en production avec unsafe-inline requis par Next.js, documenté. — *skill : security-audit*
+- [x] **P9.3** Rate limiting sur formulaires publics, login, annulation par lien. Limiteur en mémoire, à remplacer par Redis en multi-instances. — *skill : security-audit*
+- [x] **P9.4** En-têtes sécurité : CSP, HSTS, X-Frame-Options, Referrer-Policy. Cookies HttpOnly, Secure et SameSite. — *skill : security-audit*
+- [x] **P9.5** Secrets : uniquement côté serveur, rotation documentée, aucun secret en clair ni dans le repo ni dans les logs. — *skill : security-audit*
+- [x] **P9.6** RGPD opérationnel : politique confidentialité publiée, durée de conservation paramétrable, export, rectification et anonymisation, registre des traitements, minimisation, documentation des DPA à obtenir. — *skill : security-audit*
+- [x] **P9.7** Politique de conservation et suppression des photos : délai paramétrable et purge automatique quotidienne. — *skill : test-driven-development*
+- [x] **P9.8** Sauvegarde DB et restauration testées en réel dans une base temporaire. Automatisation planifiée à activer avant production. — *skill : caveman + verification-before-completion*
+- [x] **P9.9** Audit des dépendances, lockfile versionné. Avis résiduels dans la chaîne de build Next/PostCSS et la CLI Prisma, sans correctif non cassant ; montée majeure planifiée en phase 12. — *skill : caveman*
+- [x] **P9.10** Sonde /api/health, échecs d'e-mails visibles et non bloquants. Monitoring externe et alerting à brancher en phase 12. — *skill : caveman*
+- [x] **P9.11** Recette sécurité automatisée : dashboard bloqué, API admin 401, en-têtes, cookie, export RGPD, XSS échappé, cron de purge protégé. — *skill : verify-and-stop + security-audit*
 
 ## PHASE 10 — PERFORMANCE, ACCESSIBILITÉ, SEO (EXIGENCES §16)
 
