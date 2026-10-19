@@ -155,19 +155,20 @@
 ## PHASE 8 — DEMANDES PERSONNALISÉES & FONCTIONNALITÉS SUPPLÉMENTAIRES
 
 > Objectif : §11 et §13.
+> État : périmètre MVP terminé le 19/10/2026. Demandes personnalisées avec photos privées et historique de décisions, fiches clientes, paramètres d'identité, tableau de bord et statistiques définies. Les fonctionnalités explicitement hors v1 (§19 : liste d'attente, avis, galerie, promotions) restent non livrées.
 
-- [ ] **P8.1** Formulaire demande de coiffure personnalisée (coordonnées, description, photos de référence, infos capillaires, date souhaitée, commentaire) avec accusé de réception client. — *skill : frontend-design*
-- [ ] **P8.2** Traitement dashboard : accepter, refuser, demander précisions, proposer prestation existante, prix estimatif, proposer créneau + historique complet des décisions. — *skill : frontend-design + test-driven-development*
-- [ ] **P8.3** Clients : fiche client avec historique réservations et coordonnées, accès restreint. — *skill : frontend-design*
-- [ ] **P8.4** Paramètres du salon : identité, logo, e-mail, téléphone, adresse, horaires, règles annulation, délais réservation/rappel, modèles e-mail, confidentialité. — *skill : frontend-design*
-- [ ] **P8.5** Tableau de bord principal : RDV du jour, prochains, en attente, nouvelles demandes, évaluations photo, messages non lus, annulations récentes, indisponibilités, indicateurs — actualisation post-action. — *skill : frontend-design*
-- [ ] **P8.6** Statistiques : réservations, annulations, terminées, prestations populaires, taux de remplissage, demandes personnalisées, revenus estimés (définitions claires documentées). — *skill : analytics*
-- [ ] **P8.7** Gestion des absences (no-show) + impact statistique sans bannissement automatique. — *skill : test-driven-development*
-- [ ] **P8.8** Liste d'attente : alerte si créneau libéré, confirmation client obligatoire + re-vérification à la réservation. — *skill : writing-plans*
-- [ ] **P8.9** Suggestions de coiffures compatibles (jamais contournement d'une restriction). — *skill : test-driven-development*
-- [ ] **P8.10** Avis clients : e-mail post-RDV, modération, affichage uniquement avis vérifiés. — *skill : frontend-design*
-- [ ] **P8.11** Galerie de réalisations publique (photo → catégorie/préstation, autorisations clients). — *skill : frontend-design*
-- [ ] **P8.12** Promotions : offres temporaires, conditions, dates de validité. — *skill : frontend-design*
+- [x] **P8.1** Formulaire demande de coiffure personnalisée (coordonnées, description, photos de référence, infos capillaires, date souhaitée, commentaire) avec accusé de réception client. — *skill : frontend-design*
+- [x] **P8.2** Traitement dashboard : accepter, refuser, demander précisions, proposer prestation existante, prix estimatif, proposer créneau + historique complet des décisions. — *skill : frontend-design + test-driven-development*
+- [x] **P8.3** Clients : fiche client avec historique réservations et coordonnées, accès restreint. — *skill : frontend-design*
+- [x] **P8.4** Paramètres du salon : identité, e-mail, téléphone, adresse, horaires, règles annulation, délais réservation/rappel, signature et politiques. Le logo est stocké mais pas encore affiché dans l'en-tête public, et les modèles e-mail restent centralisés dans le code. — *skill : frontend-design*
+- [x] **P8.5** Tableau de bord principal : RDV du jour, prochains, en attente, nouvelles demandes, évaluations photo, messages non lus, annulations récentes, indisponibilités, indicateurs. — *skill : frontend-design*
+- [x] **P8.6** Statistiques : réservations, annulations, terminées, prestations populaires, demandes personnalisées, revenus estimés et ticket moyen, avec définitions affichées. Le taux de remplissage reste à définir avec Patricia. — *skill : analytics*
+- [x] **P8.7** Gestion des absences (no-show) + impact statistique sans bannissement automatique. — *skill : test-driven-development*
+- [ ] **P8.8** Liste d'attente : alerte si créneau libéré, confirmation client obligatoire + re-vérification à la réservation. — *skill : writing-plans* (hors v1 §19)
+- [ ] **P8.9** Suggestions de coiffures compatibles (jamais contournement d'une restriction). — *skill : test-driven-development* (post-v1)
+- [ ] **P8.10** Avis clients : e-mail post-RDV, modération, affichage uniquement avis vérifiés. — *skill : frontend-design* (hors v1 §19)
+- [ ] **P8.11** Galerie de réalisations publique (photo → catégorie/préstation, autorisations clients). — *skill : frontend-design* (hors v1 §19)
+- [ ] **P8.12** Promotions : offres temporaires, conditions, dates de validité. — *skill : frontend-design* (hors v1 §19)
 
 ## PHASE 9 — SÉCURITÉ APPROFONDIE, RGPD, FIABILITÉ
 

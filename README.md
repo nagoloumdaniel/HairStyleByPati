@@ -4,11 +4,11 @@ Application web de réservation en ligne pour un salon de coiffure spécialisé 
 
 ## Statut
 
-Phase **7, notifications et messagerie**, terminée le 19/10/2026 : file d'attente e-mail idempotente avec abstraction fournisseur Resend et mode console local, reprise progressive sur échec, rappels H-24 configurables, notifications dashboard avec liens directs, visibilité et relance des échecs, boîte de réception des messages avec réponse e-mail, notes internes privées et statuts de suivi. Vérifiée par 167 tests Vitest et 5 parcours Playwright dédiés, en plus des parcours des phases précédentes.
+Phase **8, demandes personnalisées et pilotage**, terminée le 19/10/2026 : formulaire public de coiffure sur mesure avec photos de référence privées, file de traitement avec décisions et historique, fiches clientes et historiques, paramètres d'identité et de politiques, tableau de bord opérationnel et statistiques aux définitions affichées. Les fonctionnalités explicitement hors v1 (liste d'attente, avis, galerie, promotions) restent non livrées. Vérifiée par 174 tests Vitest et 6 parcours Playwright dédiés, en plus des parcours des phases précédentes.
 
 Le thème **clair / sombre** est disponible sur toutes les interfaces via l'icône du header. La préférence système est détectée au chargement, le choix est mémorisé dans le navigateur et appliqué avant le premier rendu pour éviter tout flash. Vérifié par 4 parcours Playwright desktop et mobile.
 
-Prochaine étape : phase **8, demandes personnalisées et fonctionnalités supplémentaires**. Le seed crée des disponibilités par défaut du lundi au samedi, 9h-18h.
+Prochaine étape : phase **9, sécurité approfondie, RGPD et fiabilité**. Le seed crée des disponibilités par défaut du lundi au samedi, 9h-18h.
 
 ### Notifications en local
 
