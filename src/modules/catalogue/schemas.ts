@@ -197,10 +197,22 @@ export const compatibilityRuleInputSchema = z
       },
       z.array(z.nativeEnum(HairLength)).default([]),
     ),
+    acceptedHairTypes: z.preprocess(
+      (value) => {
+        if (Array.isArray(value)) return value.filter((item) => typeof item === 'string');
+        if (typeof value === 'string' && value !== '') return [value];
+        return [];
+      },
+      z.array(z.string().trim().min(1).max(80)).max(30).default([]),
+    ),
     requiresLocs: checkbox,
     incompatibleLocs: checkbox,
     photoPolicy: z.nativeEnum(PhotoPolicy).default('OPTIONAL'),
     autoApprove: checkbox,
+    conditionsNote: z.preprocess(
+      (value) => (typeof value === 'string' ? value : ''),
+      z.string().trim().max(1000, 'Les conditions sont limitées à 1000 caractères.').default(''),
+    ),
     incompatibleMessage: z.preprocess(
       (value) => (typeof value === 'string' ? value : ''),
       z.string().trim().max(500).default(''),
@@ -236,6 +248,20 @@ export const questionInputSchema = z
       .regex(/^[a-z0-9_]+$/, 'Clé invalide : minuscules, chiffres et tirets bas uniquement.'),
     label: z.string().trim().min(3, 'La question est trop courte.').max(200),
     type: z.nativeEnum(AnswerType),
+    options: z.preprocess(
+      (value) => {
+        const list = Array.isArray(value)
+          ? value
+          : typeof value === 'string'
+            ? value.split(/[\n,;]+/)
+            : [];
+        return list
+          .map((item) => (typeof item === 'string' ? item.trim() : ''))
+          .filter((item) => item.length > 0)
+          .slice(0, 20);
+      },
+      z.array(z.string().max(80)).default([]),
+    ),
     required: checkbox,
     active: checkbox,
     order: z.coerce.number().int().min(0).default(0),

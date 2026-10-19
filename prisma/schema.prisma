@@ -21,15 +21,16 @@ enum Role {
 }
 
 model User {
-  id             String          @id @default(cuid())
-  name           String
-  email          String          @unique
-  passwordHash   String
-  role           Role            @default(ADMIN)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  blockedPeriods BlockedPeriod[]
-  auditLogs      AuditLog[]
+  id                  String           @id @default(cuid())
+  name                String
+  email               String           @unique
+  passwordHash        String
+  role                Role             @default(ADMIN)
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+  blockedPeriods      BlockedPeriod[]
+  auditLogs           AuditLog[]
+  assessmentDecisions HairAssessment[] @relation("AssessmentDecider")
 }
 
 // ============================================================
@@ -75,6 +76,7 @@ model Service {
   compatibility   CompatibilityRule?
   questions       QuestionDefinition[]
   appointments    Appointment[]
+  assessments     HairAssessment[]
 }
 
 model ServiceImage {
@@ -129,10 +131,14 @@ model CompatibilityRule {
   serviceId           String       @unique
   service             Service      @relation(fields: [serviceId], references: [id], onDelete: Cascade)
   acceptedLengths     HairLength[]
+  // Types de cheveux acceptés (valeurs libres, voir questions capillaires)
+  acceptedHairTypes   String[]     @default([])
   requiresLocs        Boolean      @default(false)
   incompatibleLocs    Boolean      @default(false)
   photoPolicy         PhotoPolicy  @default(OPTIONAL)
   autoApprove         Boolean      @default(false)
+  // Conditions particulières affichées à la cliente et à Patricia (§5.2)
+  conditionsNote      String?
   // Messages configurables par situation (§5.2)
   incompatibleMessage String?
   uncertainMessage    String?
@@ -147,6 +153,8 @@ model QuestionDefinition {
   key       String
   label     String
   type      AnswerType
+  // Choix proposés pour SINGLE_CHOICE et MULTI_CHOICE
+  options   String[]   @default([])
   required  Boolean    @default(true)
   order     Int        @default(0)
   active    Boolean    @default(true)
@@ -296,6 +304,9 @@ enum AssessmentStatus {
 
 model HairAssessment {
   id              String           @id @default(cuid())
+  // Prestation évaluée : indispensable dès la demande, avant toute réservation
+  serviceId       String
+  service         Service          @relation(fields: [serviceId], references: [id], onDelete: Cascade)
   customRequestId String?
   customRequest   CustomRequest?   @relation(fields: [customRequestId], references: [id])
   appointmentId   String?
@@ -306,10 +317,18 @@ model HairAssessment {
   answers         Json
   photoKeys       String[]         @default([]) // PRIVÉ — jamais en galerie publique
   status          AssessmentStatus @default(RECEIVED)
+  // Note interne de Patricia et message transmis à la cliente
   decisionNote    String?
+  decisionMessage String?
+  decidedById     String?
+  decidedBy       User?            @relation("AssessmentDecider", fields: [decidedById], references: [id])
   decidedAt       DateTime?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
+
+  @@index([status, createdAt])
+  @@index([serviceId])
+  @@index([customerId])
 }
 
 // ============================================================

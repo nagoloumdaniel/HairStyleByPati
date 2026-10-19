@@ -272,6 +272,7 @@ export interface AdminQuestion {
   key: string;
   label: string;
   type: AnswerType;
+  options: string[];
   required: boolean;
   order: number;
   active: boolean;
@@ -280,10 +281,12 @@ export interface AdminQuestion {
 
 export interface AdminCompatibilityRule {
   acceptedLengths: HairLength[];
+  acceptedHairTypes: string[];
   requiresLocs: boolean;
   incompatibleLocs: boolean;
   photoPolicy: PhotoPolicy;
   autoApprove: boolean;
+  conditionsNote: string | null;
   incompatibleMessage: string | null;
   uncertainMessage: string | null;
 }
@@ -356,10 +359,12 @@ export async function getAdminServiceDetail(id: string): Promise<AdminServiceDet
     compatibility: service.compatibility
       ? {
           acceptedLengths: service.compatibility.acceptedLengths,
+          acceptedHairTypes: service.compatibility.acceptedHairTypes,
           requiresLocs: service.compatibility.requiresLocs,
           incompatibleLocs: service.compatibility.incompatibleLocs,
           photoPolicy: service.compatibility.photoPolicy,
           autoApprove: service.compatibility.autoApprove,
+          conditionsNote: service.compatibility.conditionsNote,
           incompatibleMessage: service.compatibility.incompatibleMessage,
           uncertainMessage: service.compatibility.uncertainMessage,
         }
@@ -369,6 +374,7 @@ export async function getAdminServiceDetail(id: string): Promise<AdminServiceDet
       key: question.key,
       label: question.label,
       type: question.type,
+      options: question.options,
       required: question.required,
       order: question.order,
       active: question.active,
@@ -653,10 +659,12 @@ export async function upsertCompatibilityRule(
   serviceId: string,
   data: {
     acceptedLengths: HairLength[];
+    acceptedHairTypes: string[];
     requiresLocs: boolean;
     incompatibleLocs: boolean;
     photoPolicy: PhotoPolicy;
     autoApprove: boolean;
+    conditionsNote: string;
     incompatibleMessage: string;
     uncertainMessage: string;
   },
@@ -669,19 +677,23 @@ export async function upsertCompatibilityRule(
     create: {
       serviceId,
       acceptedLengths: data.acceptedLengths,
+      acceptedHairTypes: data.acceptedHairTypes,
       requiresLocs: data.requiresLocs,
       incompatibleLocs: data.incompatibleLocs,
       photoPolicy: data.photoPolicy,
       autoApprove: data.autoApprove,
+      conditionsNote: data.conditionsNote || null,
       incompatibleMessage: data.incompatibleMessage || null,
       uncertainMessage: data.uncertainMessage || null,
     },
     update: {
       acceptedLengths: data.acceptedLengths,
+      acceptedHairTypes: data.acceptedHairTypes,
       requiresLocs: data.requiresLocs,
       incompatibleLocs: data.incompatibleLocs,
       photoPolicy: data.photoPolicy,
       autoApprove: data.autoApprove,
+      conditionsNote: data.conditionsNote || null,
       incompatibleMessage: data.incompatibleMessage || null,
       uncertainMessage: data.uncertainMessage || null,
     },
@@ -706,6 +718,7 @@ export async function createServiceQuestion(
     key: string;
     label: string;
     type: AnswerType;
+    options: string[];
     required: boolean;
     active: boolean;
     order: number;
@@ -723,6 +736,7 @@ export async function createServiceQuestion(
       key: data.key,
       label: data.label,
       type: data.type,
+      options: data.options,
       required: data.required,
       active: data.active,
       order: data.order,
@@ -737,6 +751,7 @@ export async function updateServiceQuestion(
     key: string;
     label: string;
     type: AnswerType;
+    options: string[];
     required: boolean;
     active: boolean;
     order: number;
@@ -757,6 +772,7 @@ export async function updateServiceQuestion(
       key: data.key,
       label: data.label,
       type: data.type,
+      options: data.options,
       required: data.required,
       active: data.active,
       order: data.order,
