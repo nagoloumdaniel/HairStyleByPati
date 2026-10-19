@@ -238,7 +238,7 @@ export default async function EvaluationsPage({
               Page précédente
             </Link>
           ) : (
-            <span className="text-sm text-muted/60">Page précédente</span>
+            <span className="text-sm text-muted">Page précédente</span>
           )}
           <p className="text-sm text-muted">
             Page {result.page} sur {result.totalPages} · {result.total} demande
@@ -253,7 +253,7 @@ export default async function EvaluationsPage({
               Page suivante
             </Link>
           ) : (
-            <span className="text-sm text-muted/60">Page suivante</span>
+            <span className="text-sm text-muted">Page suivante</span>
           )}
         </nav>
       ) : null}

@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { IMAGE_BLUR_DATA_URL } from '@/lib/image-placeholder';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
@@ -39,6 +40,9 @@ export function ServiceCard({
           fill
           sizes={IMAGE_SIZES}
           priority={priority}
+          placeholder="blur"
+          blurDataURL={IMAGE_BLUR_DATA_URL}
+          quality={80}
           className="object-cover transition duration-500 group-hover:scale-[1.03]"
         />
         <Badge tone="neutral" className="absolute left-3 top-3">

@@ -29,7 +29,7 @@ export function Input({ label, error, hint, id, required, ...rest }: InputProps)
         required={required}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy || undefined}
-        className={`w-full rounded-[var(--radius-md)] border bg-card px-4 py-2.5 text-fg placeholder:text-muted/60 transition ${
+        className={`w-full rounded-[var(--radius-md)] border bg-card px-4 py-2.5 text-fg placeholder:text-muted transition ${
           error ? 'border-alert' : 'border-line focus:border-cacao'
         }`}
       />

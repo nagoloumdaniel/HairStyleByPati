@@ -149,6 +149,7 @@ export function CustomRequestForm() {
         <input
           type="file"
           name="photos"
+          aria-label="Photos de référence, trois maximum"
           accept="image/jpeg,image/png,image/webp"
           multiple
           className="block w-full rounded-[var(--radius-md)] border border-line bg-page p-3 text-sm text-fg file:mr-3 file:rounded-full file:border-0 file:bg-accent file:px-4 file:py-2 file:font-semibold file:text-accent-fg"

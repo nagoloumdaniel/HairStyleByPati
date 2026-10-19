@@ -1,7 +1,12 @@
+import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { countUnreadCustomerMessages } from '@/modules/messagerie/queries';
 import { countUnreadNotifications } from '@/modules/notifications/queries';
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 /* P2.6 : coquille dashboard, sidebar sombre distincte du public.
    Sur mobile, la navigation devient une barre horizontale compacte. */
@@ -23,7 +28,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           badges={{ messages: unreadMessages, notifications: unreadNotifications }}
         />
       </aside>
-      <section className="min-w-0">{children}</section>
+      <main className="min-w-0">{children}</main>
     </div>
   );
 }

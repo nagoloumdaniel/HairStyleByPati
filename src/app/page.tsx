@@ -1,6 +1,8 @@
 import Image from 'next/image';
+import { IMAGE_BLUR_DATA_URL } from '@/lib/image-placeholder';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 
@@ -115,6 +117,10 @@ export default function HomePage() {
               className="rounded-xl shadow-lift"
               width={600}
               height={600}
+              sizes="(max-width: 768px) 100vw, 45vw"
+              placeholder="blur"
+              blurDataURL={IMAGE_BLUR_DATA_URL}
+              quality={80}
               priority
             />
           </div>
@@ -147,6 +153,10 @@ export default function HomePage() {
                 className="w-full h-48 object-cover"
                 width={400}
                 height={300}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                placeholder="blur"
+                blurDataURL={IMAGE_BLUR_DATA_URL}
+                quality={80}
                 loading="lazy"
               />
               <div className="p-5">
@@ -193,6 +203,10 @@ export default function HomePage() {
             className="rounded-full shadow-lift"
             width={500}
             height={500}
+            sizes="(max-width: 768px) 80vw, 40vw"
+            placeholder="blur"
+            blurDataURL={IMAGE_BLUR_DATA_URL}
+            quality={80}
             loading="lazy"
           />
         </div>

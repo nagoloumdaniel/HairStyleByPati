@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ServiceGallery } from '@/components/catalogue/ServiceGallery';
+import { db } from '@/lib/db';
 import { Badge } from '@/components/ui/Badge';
 import {
   HAIR_LENGTH_LABELS,
@@ -14,6 +15,17 @@ import {
 } from '@/lib/catalogue';
 
 type ServicePageProps = { params: Promise<{ slug: string }> };
+
+// Cache ISR court : les modifications du catalogue déclenchent une revalidation.
+export const revalidate = 300;
+
+export async function generateStaticParams() {
+  const services = await db.service.findMany({
+    where: { status: 'PUBLISHED', category: { active: true } },
+    select: { slug: true },
+  });
+  return services.map((service) => ({ slug: service.slug }));
+}
 
 function truncate(text: string | null, maxLength: number): string {
   if (!text) return '';

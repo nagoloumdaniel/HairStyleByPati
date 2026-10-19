@@ -24,8 +24,24 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'),
   title: 'Hairstyle by Patricia',
   description: 'Salon de coiffure spécialisé tresses, vanilles et locs — réservation en ligne.',
+  applicationName: 'Hairstyle by Patricia',
+  authors: [{ name: 'Hairstyle by Patricia' }],
+  openGraph: {
+    type: 'website',
+    locale: 'fr_FR',
+    siteName: 'Hairstyle by Patricia',
+    title: 'Hairstyle by Patricia',
+    description: 'Tresses, vanilles et locs sur mesure à Paris. Réservez votre créneau en ligne.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Hairstyle by Patricia',
+    description: 'Tresses, vanilles et locs sur mesure à Paris. Réservez votre créneau en ligne.',
+  },
+  robots: { index: true, follow: true },
 };
 
 /* Applique le thème avant le premier rendu pour éviter tout flash clair.

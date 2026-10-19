@@ -225,7 +225,7 @@ export function CalendarClient() {
                   </span>
                   <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                     {entries.length === 0 ? (
-                      <span className="text-xs text-muted/50">Libre</span>
+                      <span className="text-xs text-muted">Libre</span>
                     ) : (
                       entries.map((appointment) => (
                         <Link
@@ -286,7 +286,7 @@ export function CalendarClient() {
                   </button>
                   <div className="mt-2 flex min-h-24 flex-col gap-1.5">
                     {entries.length === 0 ? (
-                      <p className="text-xs text-muted/60">Aucun rendez-vous</p>
+                      <p className="text-xs text-muted">Aucun rendez-vous</p>
                     ) : (
                       entries.map((appointment) => (
                         <Link

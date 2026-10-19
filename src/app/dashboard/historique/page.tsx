@@ -152,7 +152,7 @@ export default async function HistoriquePage({
               Page précédente
             </Link>
           ) : (
-            <span className="text-sm text-muted/60">Page précédente</span>
+            <span className="text-sm text-muted">Page précédente</span>
           )}
           <p className="text-sm text-muted">
             Page {page} sur {totalPages} · {total} action{total > 1 ? 's' : ''}
@@ -166,7 +166,7 @@ export default async function HistoriquePage({
               Page suivante
             </Link>
           ) : (
-            <span className="text-sm text-muted/60">Page suivante</span>
+            <span className="text-sm text-muted">Page suivante</span>
           )}
         </nav>
       ) : null}

@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { IMAGE_BLUR_DATA_URL } from '@/lib/image-placeholder';
 import { useState } from 'react';
 
 type GalleryImage = { key: string; src: string; alt: string };
@@ -53,6 +54,9 @@ export function ServiceGallery({
           fill
           priority
           sizes="(max-width: 1024px) 100vw, 45vw"
+          placeholder="blur"
+          blurDataURL={IMAGE_BLUR_DATA_URL}
+          quality={80}
           className="object-cover"
         />
 
