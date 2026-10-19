@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react';
 import type { AdminCompatibilityRule } from '@/lib/catalogue-admin';
+import { HAIR_TYPE_OPTIONS } from '@/modules/compatibilite/questions';
 import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
@@ -9,7 +10,7 @@ import { adminSaveCompatibility, type CatalogueActionState } from '@/modules/cat
 
 /* ============================================================
  * P4.7 — Éditeur des règles de compatibilité capillaire.
- * Ces règles seront évaluées côté serveur par le moteur P5.
+ * Ces règles sont évaluées côté serveur par le moteur P5.
  * ============================================================ */
 
 const HAIR_LENGTHS = [
@@ -37,6 +38,7 @@ export function CompatibilityPanel({
     {},
   );
   const accepted = new Set(rule?.acceptedLengths ?? []);
+  const acceptedHairTypes = new Set(rule?.acceptedHairTypes ?? []);
 
   return (
     <form action={formAction} className="flex flex-col gap-5 p-4">
@@ -58,6 +60,28 @@ export function CompatibilityPanel({
                 className="size-4"
               />
               {length.label}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset className="rounded-[var(--radius-md)] border border-cream-dark p-4">
+        <legend className="px-2 text-sm font-semibold">Types de cheveux acceptés</legend>
+        <p className="mb-3 text-sm text-ink-soft">
+          Si aucun type n’est coché, tous les types sont acceptés. Un type non listé déclenche une
+          demande d’évaluation.
+        </p>
+        <div className="grid gap-2 sm:grid-cols-2">
+          {HAIR_TYPE_OPTIONS.map((hairType) => (
+            <label key={hairType} className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                name="acceptedHairTypes"
+                value={hairType}
+                defaultChecked={acceptedHairTypes.has(hairType)}
+                className="size-4"
+              />
+              {hairType}
             </label>
           ))}
         </div>
@@ -122,6 +146,13 @@ export function CompatibilityPanel({
       </fieldset>
 
       <div className="grid gap-4">
+        <Textarea
+          label="Conditions particulières (facultatif)"
+          name="conditionsNote"
+          defaultValue={rule?.conditionsNote ?? ''}
+          hint="Affichées à la cliente et à Patricia, par exemple un soin préalable ou un temps supplémentaire."
+          rows={2}
+        />
         <Textarea
           label="Message si la prestation est incompatible"
           name="incompatibleMessage"

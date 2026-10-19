@@ -54,9 +54,11 @@ export default async function ServicePage({ params }: ServicePageProps) {
   const hasCompatibilityInfo =
     Boolean(compatibility) &&
     (acceptedLengths.length > 0 ||
+      (compatibility?.acceptedHairTypes.length ?? 0) > 0 ||
       compatibility?.requiresLocs ||
       compatibility?.incompatibleLocs ||
       Boolean(photoPolicyLabel) ||
+      Boolean(compatibility?.conditionsNote) ||
       Boolean(compatibility?.incompatibleMessage) ||
       Boolean(compatibility?.uncertainMessage));
 
@@ -143,6 +145,21 @@ export default async function ServicePage({ params }: ServicePageProps) {
             </Link>
           </div>
 
+          <Link
+            href={`/compatibilite?service=${encodeURIComponent(service.slug)}`}
+            className="flex items-center justify-between gap-3 rounded-[var(--radius-md)] border border-accent bg-accent-soft px-5 py-3 font-semibold text-ink transition hover:border-cacao"
+          >
+            <span>
+              Vérifier ma compatibilité capillaire
+              <span className="block text-sm font-normal text-ink-soft">
+                Quelques questions, sans engagement et sans réservation.
+              </span>
+            </span>
+            <span aria-hidden="true" className="text-cacao">
+              →
+            </span>
+          </Link>
+
           {service.options.length > 0 ? (
             <section aria-labelledby="options-titre" className="space-y-3">
               <h2 id="options-titre" className="font-heading text-2xl font-bold text-ink">
@@ -191,6 +208,12 @@ export default async function ServicePage({ params }: ServicePageProps) {
                     {acceptedLengths.map((length) => HAIR_LENGTH_LABELS[length]).join(', ')}
                   </li>
                 ) : null}
+                {(compatibility?.acceptedHairTypes.length ?? 0) > 0 ? (
+                  <li>
+                    <span className="font-semibold text-ink">Types de cheveux acceptés : </span>
+                    {compatibility?.acceptedHairTypes.join(', ')}
+                  </li>
+                ) : null}
                 {compatibility?.requiresLocs ? (
                   <li>Cette prestation nécessite des locs déjà posées.</li>
                 ) : null}
@@ -211,6 +234,12 @@ export default async function ServicePage({ params }: ServicePageProps) {
                 {compatibility?.uncertainMessage ? (
                   <li className="rounded-[var(--radius-sm)] bg-accent-soft px-3 py-2 text-ink">
                     {compatibility.uncertainMessage}
+                  </li>
+                ) : null}
+                {compatibility?.conditionsNote ? (
+                  <li className="rounded-[var(--radius-sm)] bg-cream-dark px-3 py-2 text-ink">
+                    <span className="font-semibold">Conditions : </span>
+                    {compatibility.conditionsNote}
                   </li>
                 ) : null}
               </ul>

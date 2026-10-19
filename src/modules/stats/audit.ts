@@ -96,3 +96,27 @@ export async function countCatalogueAuditLogs(entityId?: string): Promise<number
     },
   });
 }
+
+/** Historique d'une entité précise (évaluation, demande, réservation). */
+export async function listAuditLogsForEntity(
+  entityType: string,
+  entityId: string,
+  take = 50,
+): Promise<AuditLogEntry[]> {
+  const rows = await db.auditLog.findMany({
+    where: { entityType, entityId },
+    orderBy: { createdAt: 'desc' },
+    take: Math.min(Math.max(take, 1), 200),
+    include: { user: { select: { name: true, email: true } } },
+  });
+  return rows.map((row) => ({
+    id: row.id,
+    action: row.action,
+    entityType: row.entityType,
+    entityId: row.entityId,
+    metadata: row.metadata,
+    createdAt: row.createdAt,
+    userName: row.user?.name ?? null,
+    userEmail: row.user?.email ?? null,
+  }));
+}

@@ -743,6 +743,7 @@ export async function adminSaveCompatibility(
 
   const raw: Record<string, unknown> = Object.fromEntries(formData);
   raw.acceptedLengths = formData.getAll('acceptedLengths');
+  raw.acceptedHairTypes = formData.getAll('acceptedHairTypes');
 
   const parsed = parseForm(compatibilityRuleInputSchema, raw);
   if ('error' in parsed) return { error: parsed.error };
@@ -750,10 +751,12 @@ export async function adminSaveCompatibility(
   try {
     await upsertCompatibilityRule(serviceId, {
       acceptedLengths: parsed.data.acceptedLengths,
+      acceptedHairTypes: parsed.data.acceptedHairTypes,
       requiresLocs: parsed.data.requiresLocs,
       incompatibleLocs: parsed.data.incompatibleLocs,
       photoPolicy: parsed.data.photoPolicy,
       autoApprove: parsed.data.autoApprove,
+      conditionsNote: parsed.data.conditionsNote,
       incompatibleMessage: parsed.data.incompatibleMessage,
       uncertainMessage: parsed.data.uncertainMessage,
     });
@@ -764,6 +767,7 @@ export async function adminSaveCompatibility(
       entityId: serviceId,
       metadata: {
         acceptedLengths: parsed.data.acceptedLengths.join(','),
+        acceptedHairTypes: parsed.data.acceptedHairTypes.join(','),
         photoPolicy: parsed.data.photoPolicy,
       },
     });
@@ -804,6 +808,7 @@ export async function adminCreateQuestion(
       key: parsed.data.key,
       label: parsed.data.label,
       type: parsed.data.type,
+      options: parsed.data.options,
       required: parsed.data.required,
       active: parsed.data.active,
       order: parsed.data.order,
@@ -841,6 +846,7 @@ export async function adminUpdateQuestion(
       key: parsed.data.key,
       label: parsed.data.label,
       type: parsed.data.type,
+      options: parsed.data.options,
       required: parsed.data.required,
       active: parsed.data.active,
       order: parsed.data.order,

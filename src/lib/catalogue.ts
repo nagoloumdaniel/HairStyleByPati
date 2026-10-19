@@ -154,10 +154,12 @@ const SERVICE_DETAIL_SELECT = {
   compatibility: {
     select: {
       acceptedLengths: true,
+      acceptedHairTypes: true,
       requiresLocs: true,
       incompatibleLocs: true,
       photoPolicy: true,
       autoApprove: true,
+      conditionsNote: true,
       incompatibleMessage: true,
       uncertainMessage: true,
     },

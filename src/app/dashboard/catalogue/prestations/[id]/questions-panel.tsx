@@ -103,6 +103,12 @@ function QuestionForm({
         />
       </div>
 
+      <Input
+        label="Choix proposés"
+        name="options"
+        defaultValue={initial?.options?.join(', ') ?? ''}
+        hint="Pour les types Choix unique et Choix multiple : séparez les choix par des virgules. Laissez vide pour un champ libre."
+      />
       <div className="flex flex-wrap gap-4">
         <label className="flex items-center gap-2 text-sm font-semibold">
           <input
