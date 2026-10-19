@@ -10,7 +10,7 @@ export function Select({ label, error, options, id, required, ...rest }: SelectP
   const inputId = id ?? `select-${label.replace(/\s+/g, '-').toLowerCase()}`;
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={inputId} className="text-sm font-semibold text-ink">
+      <label htmlFor={inputId} className="text-sm font-semibold text-fg">
         {label}{' '}
         {required ? (
           <span aria-hidden="true" className="text-alert">
@@ -25,8 +25,8 @@ export function Select({ label, error, options, id, required, ...rest }: SelectP
         required={required}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${inputId}-error` : undefined}
-        className={`w-full rounded-[var(--radius-md)] border bg-surface px-4 py-2.5 text-ink transition ${
-          error ? 'border-alert' : 'border-cream-dark focus:border-cacao'
+        className={`w-full rounded-[var(--radius-md)] border bg-card px-4 py-2.5 text-fg transition ${
+          error ? 'border-alert' : 'border-line focus:border-cacao'
         }`}
       >
         {options.map((o) => (

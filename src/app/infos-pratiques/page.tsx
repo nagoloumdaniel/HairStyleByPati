@@ -41,7 +41,7 @@ const annulationRules = [
 export default function InfosPratiquesPage() {
   return (
     <main className="mx-auto w-full max-w-7xl space-y-12 px-4 py-8 sm:px-6 md:py-12">
-      <nav aria-label="Fil d'Ariane" className="text-sm text-ink-soft">
+      <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
             <Link href="/" className="transition hover:text-cacao">
@@ -50,7 +50,7 @@ export default function InfosPratiquesPage() {
           </li>
           <li aria-hidden="true">/</li>
           <li>
-            <span aria-current="page" className="font-medium text-ink">
+            <span aria-current="page" className="font-medium text-fg">
               Informations pratiques
             </span>
           </li>
@@ -59,10 +59,10 @@ export default function InfosPratiquesPage() {
 
       <header className="max-w-3xl space-y-3">
         <p className="text-sm font-semibold uppercase tracking-[0.14em] text-cacao">Pratique</p>
-        <h1 className="font-heading text-4xl font-bold text-ink md:text-5xl">
+        <h1 className="font-heading text-4xl font-bold text-fg md:text-5xl">
           Informations pratiques
         </h1>
-        <p className="text-lg leading-relaxed text-ink-soft">
+        <p className="text-lg leading-relaxed text-muted">
           Tout ce qu&apos;il faut savoir avant votre venue : horaires, préparation du rendez-vous et
           conditions d&apos;annulation.
         </p>
@@ -70,34 +70,34 @@ export default function InfosPratiquesPage() {
 
       {/* Coordonnées et horaires */}
       <section className="grid grid-cols-1 gap-8 md:grid-cols-2">
-        <div className="space-y-6 rounded-2xl bg-surface p-8 shadow-soft">
-          <h2 className="font-heading text-2xl font-bold text-ink">Coordonnées</h2>
-          <p className="text-ink-soft">
-            <span className="font-semibold text-ink">Adresse</span>
+        <div className="space-y-6 rounded-2xl bg-card p-8 shadow-soft">
+          <h2 className="font-heading text-2xl font-bold text-fg">Coordonnées</h2>
+          <p className="text-muted">
+            <span className="font-semibold text-fg">Adresse</span>
             <br />
             12 Rue de la Coiffure
             <br />
             75000 Paris
           </p>
-          <p className="text-ink-soft">
-            <span className="font-semibold text-ink">Téléphone</span>
+          <p className="text-muted">
+            <span className="font-semibold text-fg">Téléphone</span>
             <br />
             01 23 45 67 89
           </p>
-          <p className="text-ink-soft">
-            <span className="font-semibold text-ink">E-mail</span>
+          <p className="text-muted">
+            <span className="font-semibold text-fg">E-mail</span>
             <br />
             contact@hairstylebypati.fr
           </p>
         </div>
-        <div className="space-y-6 rounded-2xl bg-surface p-8 shadow-soft">
-          <h2 className="font-heading text-2xl font-bold text-ink">Horaires</h2>
-          <p className="text-ink-soft">
+        <div className="space-y-6 rounded-2xl bg-card p-8 shadow-soft">
+          <h2 className="font-heading text-2xl font-bold text-fg">Horaires</h2>
+          <p className="text-muted">
             Mardi – Samedi : 10h – 19h
             <br />
             Fermé dimanche et lundi
           </p>
-          <p className="text-ink-soft">
+          <p className="text-muted">
             Les rendez-vous sont strictement sur réservation. Merci de respecter l&apos;heure
             convenue : chaque retard réduit le temps de votre prestation.
           </p>
@@ -106,10 +106,10 @@ export default function InfosPratiquesPage() {
 
       {/* Préparation */}
       <section className="space-y-6">
-        <h2 className="font-heading text-3xl font-bold text-ink">Préparer votre rendez-vous</h2>
+        <h2 className="font-heading text-3xl font-bold text-fg">Préparer votre rendez-vous</h2>
         <ul className="max-w-3xl space-y-3">
           {preparation.map((item) => (
-            <li key={item} className="flex items-start gap-3 text-ink-soft">
+            <li key={item} className="flex items-start gap-3 text-muted">
               <span aria-hidden="true" className="mt-1 font-bold text-accent">
                 ✓
               </span>
@@ -121,33 +121,33 @@ export default function InfosPratiquesPage() {
 
       {/* Politique d'annulation */}
       <section className="space-y-6">
-        <h2 className="font-heading text-3xl font-bold text-ink">Politique d&apos;annulation</h2>
+        <h2 className="font-heading text-3xl font-bold text-fg">Politique d&apos;annulation</h2>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {annulationRules.map((rule) => (
             <div key={rule.label} className="border-l-4 border-accent pl-5">
-              <h3 className="font-heading text-xl font-bold text-ink">{rule.label}</h3>
-              <p className="mt-1 leading-relaxed text-ink-soft">{rule.description}</p>
+              <h3 className="font-heading text-xl font-bold text-fg">{rule.label}</h3>
+              <p className="mt-1 leading-relaxed text-muted">{rule.description}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="rounded-2xl bg-cream p-8 text-center md:p-10">
-        <h2 className="font-heading text-2xl font-bold text-ink">Une question ?</h2>
-        <p className="mx-auto mt-3 max-w-md text-ink-soft">
+      <section className="rounded-2xl bg-page p-8 text-center md:p-10">
+        <h2 className="font-heading text-2xl font-bold text-fg">Une question ?</h2>
+        <p className="mx-auto mt-3 max-w-md text-muted">
           Pour toute demande particulière (groupe, coiffure sur mesure, situation particulière),
           contactez-nous avant de réserver.
         </p>
         <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
           <Link
             href="/contact"
-            className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-ink shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
+            className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
           >
             Nous contacter
           </Link>
           <Link
             href="/reserver"
-            className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] border border-cream-dark bg-surface px-6 py-3 font-semibold text-ink shadow-soft transition hover:border-cacao hover:bg-cream"
+            className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] border border-line bg-card px-6 py-3 font-semibold text-fg shadow-soft transition hover:border-cacao hover:bg-page"
           >
             Réserver un créneau
           </Link>

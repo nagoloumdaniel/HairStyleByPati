@@ -33,7 +33,7 @@ export default async function CompatibilitePage({
     const services = await listPublishedServicesForCompatibility();
     return (
       <main className="mx-auto w-full max-w-5xl space-y-8 px-4 py-8 sm:px-6 md:py-12">
-        <nav aria-label="Fil d'Ariane" className="text-sm text-ink-soft">
+        <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
           <ol className="flex flex-wrap items-center gap-2">
             <li>
               <Link href="/" className="transition hover:text-cacao">
@@ -42,7 +42,7 @@ export default async function CompatibilitePage({
             </li>
             <li aria-hidden="true">/</li>
             <li>
-              <span aria-current="page" className="font-medium text-ink">
+              <span aria-current="page" className="font-medium text-fg">
                 Compatibilité
               </span>
             </li>
@@ -53,10 +53,10 @@ export default async function CompatibilitePage({
           <p className="text-sm font-semibold uppercase tracking-[0.14em] text-cacao">
             Avant de réserver
           </p>
-          <h1 className="font-heading text-4xl font-bold text-ink md:text-5xl">
+          <h1 className="font-heading text-4xl font-bold text-fg md:text-5xl">
             Vérifiez la compatibilité de votre coiffure
           </h1>
-          <p className="text-lg leading-relaxed text-ink-soft">
+          <p className="text-lg leading-relaxed text-muted">
             Chaque prestation a ses propres exigences. Quelques questions suffisent pour savoir si
             elle est réalisable sur vos cheveux, ou pour demander une évaluation à Patricia.
           </p>
@@ -71,7 +71,7 @@ export default async function CompatibilitePage({
           />
         ) : (
           <section aria-labelledby="choix-prestation" className="space-y-4">
-            <h2 id="choix-prestation" className="font-heading text-2xl font-bold text-ink">
+            <h2 id="choix-prestation" className="font-heading text-2xl font-bold text-fg">
               Choisissez votre prestation
             </h2>
             <ul className="grid gap-3 sm:grid-cols-2">
@@ -79,11 +79,11 @@ export default async function CompatibilitePage({
                 <li key={service.id}>
                   <Link
                     href={`/compatibilite?service=${encodeURIComponent(service.slug)}`}
-                    className="flex items-center justify-between gap-3 rounded-[var(--radius-lg)] border border-cream-dark bg-surface p-4 shadow-soft transition hover:border-cacao hover:bg-cream"
+                    className="flex items-center justify-between gap-3 rounded-[var(--radius-lg)] border border-line bg-card p-4 shadow-soft transition hover:border-cacao hover:bg-page"
                   >
                     <span>
-                      <span className="block font-semibold text-ink">{service.name}</span>
-                      <span className="text-sm text-ink-soft">{service.categoryName}</span>
+                      <span className="block font-semibold text-fg">{service.name}</span>
+                      <span className="text-sm text-muted">{service.categoryName}</span>
                     </span>
                     <span aria-hidden="true" className="text-cacao">
                       →
@@ -105,7 +105,7 @@ export default async function CompatibilitePage({
 
   return (
     <main className="mx-auto w-full max-w-4xl space-y-8 px-4 py-8 sm:px-6 md:py-12">
-      <nav aria-label="Fil d'Ariane" className="text-sm text-ink-soft">
+      <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
             <Link href="/" className="transition hover:text-cacao">
@@ -126,7 +126,7 @@ export default async function CompatibilitePage({
           </li>
           <li aria-hidden="true">/</li>
           <li>
-            <span aria-current="page" className="font-medium text-ink">
+            <span aria-current="page" className="font-medium text-fg">
               Compatibilité
             </span>
           </li>
@@ -138,10 +138,10 @@ export default async function CompatibilitePage({
           <Badge tone="neutral">{service.categoryName}</Badge>
           <Badge tone="accent">Compatibilité capillaire</Badge>
         </div>
-        <h1 className="font-heading text-3xl font-bold text-ink md:text-4xl">
+        <h1 className="font-heading text-3xl font-bold text-fg md:text-4xl">
           Votre coiffure est-elle compatible ?
         </h1>
-        <p className="max-w-2xl text-lg leading-relaxed text-ink-soft">
+        <p className="max-w-2xl text-lg leading-relaxed text-muted">
           Répondez uniquement aux questions utiles pour <strong>{service.name}</strong>. Aucune
           réservation n’est créée à cette étape : Patricia valide les cas particuliers avant de
           confirmer un rendez-vous.

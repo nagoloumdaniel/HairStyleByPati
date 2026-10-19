@@ -31,8 +31,8 @@ export function Sidebar({ pathname }: { pathname?: string }) {
             aria-current={active ? 'page' : undefined}
             className={`whitespace-nowrap rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium transition lg:px-4 lg:py-2.5 lg:text-base ${
               active
-                ? 'bg-accent font-semibold text-ink'
-                : 'text-cream/85 hover:bg-cream/10 hover:text-cream'
+                ? 'bg-accent font-semibold text-accent-fg'
+                : 'text-panel-fg/85 hover:bg-panel-fg/10 hover:text-panel-fg'
             }`}
           >
             {item.label}

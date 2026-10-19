@@ -185,7 +185,7 @@ export function OptionsPanel({
   return (
     <div className="flex flex-col gap-4 p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-ink-soft">
+        <p className="text-sm text-muted">
           Options facturées en plus de la prestation (mèches, soin, finition).
         </p>
         <Button type="button" size="sm" onClick={() => setCreateOpen(true)}>
@@ -202,7 +202,7 @@ export function OptionsPanel({
       </Modal>
 
       {options.length === 0 ? (
-        <p className="rounded-[var(--radius-md)] border border-dashed border-cream-dark p-8 text-center text-ink-soft">
+        <p className="rounded-[var(--radius-md)] border border-dashed border-line p-8 text-center text-muted">
           Aucune option. La prestation s’ajoute au panier sans supplément.
         </p>
       ) : (
@@ -210,7 +210,7 @@ export function OptionsPanel({
           {options.map((option) => (
             <li
               key={option.id}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-md)] border border-cream-dark bg-surface p-3"
+              className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-md)] border border-line bg-card p-3"
             >
               <div className="min-w-0">
                 <p className="flex flex-wrap items-center gap-2 font-semibold">
@@ -221,7 +221,7 @@ export function OptionsPanel({
                     <Badge tone="alert">Désactivée</Badge>
                   )}
                 </p>
-                <p className="mt-1 text-sm text-ink-soft">
+                <p className="mt-1 text-sm text-muted">
                   {formatCents(option.priceCents)}
                   {option.durationMinutes > 0
                     ? ` · +${option.durationMinutes} min`

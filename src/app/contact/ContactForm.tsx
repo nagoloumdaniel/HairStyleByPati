@@ -5,12 +5,12 @@ import { useActionState } from 'react';
 import { createConversation } from './actions';
 
 const inputClasses =
-  'w-full rounded-[var(--radius-md)] border border-cream-dark bg-surface px-4 py-2.5 text-ink ' +
+  'w-full rounded-[var(--radius-md)] border border-line bg-card px-4 py-2.5 text-fg ' +
   'focus:outline-none focus:ring-2 focus:ring-accent transition';
 
 const btnBase =
   'inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] ' +
-  'px-6 py-3 font-semibold text-ink shadow-soft transition disabled:opacity-70 disabled:cursor-not-allowed';
+  'px-6 py-3 font-semibold text-fg shadow-soft transition disabled:opacity-70 disabled:cursor-not-allowed';
 
 export function ContactForm() {
   const [state, formAction, isPending] = useActionState(createConversation, null);
@@ -46,7 +46,7 @@ export function ContactForm() {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1">
-          <label htmlFor="name" className="text-sm font-medium text-ink">
+          <label htmlFor="name" className="text-sm font-medium text-fg">
             Nom
           </label>
           <input
@@ -61,7 +61,7 @@ export function ContactForm() {
           />
         </div>
         <div className="space-y-1">
-          <label htmlFor="email" className="text-sm font-medium text-ink">
+          <label htmlFor="email" className="text-sm font-medium text-fg">
             E-mail
           </label>
           <input
@@ -75,7 +75,7 @@ export function ContactForm() {
           />
         </div>
         <div className="space-y-1 sm:col-span-2">
-          <label htmlFor="phone" className="text-sm font-medium text-ink">
+          <label htmlFor="phone" className="text-sm font-medium text-fg">
             Téléphone (facultatif)
           </label>
           <input
@@ -88,7 +88,7 @@ export function ContactForm() {
           />
         </div>
         <div className="space-y-1 sm:col-span-2">
-          <label htmlFor="subject" className="text-sm font-medium text-ink">
+          <label htmlFor="subject" className="text-sm font-medium text-fg">
             Sujet
           </label>
           <input
@@ -102,7 +102,7 @@ export function ContactForm() {
           />
         </div>
         <div className="space-y-1 sm:col-span-2">
-          <label htmlFor="message" className="text-sm font-medium text-ink">
+          <label htmlFor="message" className="text-sm font-medium text-fg">
             Message
           </label>
           <textarea

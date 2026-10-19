@@ -53,16 +53,16 @@ export function QuestionField({
   const describedBy = question.help ? `${inputId}-help` : undefined;
 
   const help = question.help ? (
-    <p id={`${inputId}-help`} className="text-sm text-ink-soft">
+    <p id={`${inputId}-help`} className="text-sm text-muted">
       {question.help}
     </p>
   ) : null;
 
   if (question.type === 'PHOTO') {
     return (
-      <fieldset className="rounded-[var(--radius-md)] border border-cream-dark p-4">
-        <legend className="px-2 text-sm font-semibold text-ink">{question.label}</legend>
-        <p className="text-sm text-ink-soft">
+      <fieldset className="rounded-[var(--radius-md)] border border-line p-4">
+        <legend className="px-2 text-sm font-semibold text-fg">{question.label}</legend>
+        <p className="text-sm text-muted">
           Vous pourrez joindre une photo de vos cheveux juste après la vérification.
         </p>
       </fieldset>
@@ -87,8 +87,8 @@ export function QuestionField({
   if (question.type === 'MULTI_CHOICE' && question.options.length > 0) {
     const selected = Array.isArray(value) ? value.map(String) : [];
     return (
-      <fieldset className="rounded-[var(--radius-md)] border border-cream-dark p-4">
-        <legend className="px-2 text-sm font-semibold text-ink">
+      <fieldset className="rounded-[var(--radius-md)] border border-line p-4">
+        <legend className="px-2 text-sm font-semibold text-fg">
           {question.label}
           {question.required ? <span className="text-alert"> *</span> : null}
         </legend>
@@ -118,8 +118,8 @@ export function QuestionField({
 
   if (question.options.length > 0) {
     return (
-      <fieldset className="rounded-[var(--radius-md)] border border-cream-dark p-4">
-        <legend className="px-2 text-sm font-semibold text-ink">
+      <fieldset className="rounded-[var(--radius-md)] border border-line p-4">
+        <legend className="px-2 text-sm font-semibold text-fg">
           {question.label}
           {question.required ? <span className="text-alert"> *</span> : null}
         </legend>
@@ -129,8 +129,8 @@ export function QuestionField({
               key={option.value}
               className={`flex cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] border px-3 py-2 text-sm transition ${
                 value === option.value
-                  ? 'border-cacao bg-accent-soft font-semibold text-ink'
-                  : 'border-cream-dark hover:border-cacao'
+                  ? 'border-cacao bg-accent-soft font-semibold text-fg'
+                  : 'border-line hover:border-cacao'
               }`}
             >
               <input
@@ -243,10 +243,10 @@ export function CompatibilityWizard({
             aria-current={step === item.number ? 'step' : undefined}
             className={`inline-flex items-center gap-2 rounded-[var(--radius-full)] px-3 py-1.5 ${
               step === item.number
-                ? 'bg-ink font-semibold text-cream'
+                ? 'bg-ink font-semibold text-panel-fg'
                 : step > item.number
                   ? 'bg-success-soft text-success'
-                  : 'bg-cream-dark text-ink-soft'
+                  : 'bg-line text-muted'
             }`}
           >
             <span aria-hidden="true" className="font-bold">
@@ -262,11 +262,11 @@ export function CompatibilityWizard({
           <h2
             ref={headingRef}
             tabIndex={-1}
-            className="font-heading text-2xl font-bold text-ink outline-none"
+            className="font-heading text-2xl font-bold text-fg outline-none"
           >
             Quelques questions sur vos cheveux
           </h2>
-          <p className="mt-2 text-ink-soft">
+          <p className="mt-2 text-muted">
             Pour {serviceName}, seules les informations réellement utiles sont demandées.
           </p>
 
@@ -333,7 +333,7 @@ export function CompatibilityWizard({
             <h2
               ref={headingRef}
               tabIndex={-1}
-              className="font-heading text-2xl font-bold text-ink outline-none"
+              className="font-heading text-2xl font-bold text-fg outline-none"
             >
               {preview.verdict === 'COMPATIBLE'
                 ? 'Bonne nouvelle'
@@ -343,11 +343,11 @@ export function CompatibilityWizard({
             </h2>
           </div>
 
-          <p className="mt-4 whitespace-pre-line text-lg leading-relaxed text-ink">
+          <p className="mt-4 whitespace-pre-line text-lg leading-relaxed text-fg">
             {preview.message}
           </p>
           {preview.conditionsNote ? (
-            <p className="mt-3 rounded-[var(--radius-md)] bg-accent-soft px-4 py-3 text-sm text-ink">
+            <p className="mt-3 rounded-[var(--radius-md)] bg-accent-soft px-4 py-3 text-sm text-fg">
               {preview.conditionsNote}
             </p>
           ) : null}
@@ -356,7 +356,7 @@ export function CompatibilityWizard({
             {preview.nextStep === 'BOOK' ? (
               <Link
                 href={`/reserver?service=${encodeURIComponent(serviceSlug)}`}
-                className="inline-flex items-center justify-center rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-ink shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
+                className="inline-flex items-center justify-center rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
               >
                 Réserver cette prestation
               </Link>
@@ -374,13 +374,13 @@ export function CompatibilityWizard({
               <>
                 <Link
                   href="/coiffures"
-                  className="inline-flex items-center justify-center rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-ink shadow-soft transition hover:bg-accent-hover"
+                  className="inline-flex items-center justify-center rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover"
                 >
                   Voir les autres coiffures
                 </Link>
                 <Link
                   href="/contact"
-                  className="inline-flex items-center justify-center rounded-[var(--radius-md)] border border-cream-dark bg-surface px-6 py-3 font-semibold text-ink transition hover:border-cacao"
+                  className="inline-flex items-center justify-center rounded-[var(--radius-md)] border border-line bg-card px-6 py-3 font-semibold text-fg transition hover:border-cacao"
                 >
                   Contacter Patricia
                 </Link>
@@ -400,12 +400,12 @@ export function CompatibilityWizard({
           </div>
 
           {preview.nextStep !== 'BOOK' ? (
-            <p className="mt-4 text-sm text-ink-soft">
+            <p className="mt-4 text-sm text-muted">
               Aucune réservation n’est créée à cette étape. Patricia examine votre demande et vous
               répond. La disponibilité du créneau sera vérifiée séparément au moment de réserver.
             </p>
           ) : (
-            <p className="mt-4 text-sm text-ink-soft">
+            <p className="mt-4 text-sm text-muted">
               La compatibilité et la disponibilité seront vérifiées à nouveau côté serveur au moment
               d’enregistrer votre rendez-vous.
             </p>
@@ -418,11 +418,11 @@ export function CompatibilityWizard({
           <h2
             ref={headingRef}
             tabIndex={-1}
-            className="font-heading text-2xl font-bold text-ink outline-none"
+            className="font-heading text-2xl font-bold text-fg outline-none"
           >
             Demander l’évaluation de Patricia
           </h2>
-          <p className="mt-2 text-ink-soft">
+          <p className="mt-2 text-muted">
             Laissez vos coordonnées pour recevoir la réponse. Vos informations capillaires et vos
             photos ne sont jamais publiées.
           </p>
@@ -463,7 +463,7 @@ export function CompatibilityWizard({
 
             {!photoForbidden ? (
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="compat-photos" className="text-sm font-semibold text-ink">
+                <label htmlFor="compat-photos" className="text-sm font-semibold text-fg">
                   Photos de vos cheveux {photoRequired ? '(obligatoire)' : '(facultatif)'}
                 </label>
                 <input
@@ -473,15 +473,15 @@ export function CompatibilityWizard({
                   multiple
                   accept="image/jpeg,image/png,image/webp"
                   required={photoRequired}
-                  className="w-full rounded-[var(--radius-md)] border border-cream-dark bg-surface px-4 py-2.5 text-sm file:mr-3 file:rounded-full file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-ink"
+                  className="w-full rounded-[var(--radius-md)] border border-line bg-card px-4 py-2.5 text-sm file:mr-3 file:rounded-full file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-fg"
                 />
-                <p className="text-sm text-ink-soft">
+                <p className="text-sm text-muted">
                   JPEG, PNG ou WebP, 5 Mo maximum par photo, 3 photos maximum. Ces photos restent
                   privées et ne sont visibles que par Patricia.
                 </p>
               </div>
             ) : (
-              <p className="rounded-[var(--radius-md)] bg-cream-dark px-4 py-3 text-sm text-ink-soft">
+              <p className="rounded-[var(--radius-md)] bg-line px-4 py-3 text-sm text-muted">
                 Cette prestation ne nécessite pas de photo. Votre commentaire suffit à Patricia pour
                 vous répondre.
               </p>
@@ -528,16 +528,16 @@ export function CompatibilityWizard({
           <h2
             ref={headingRef}
             tabIndex={-1}
-            className="font-heading text-2xl font-bold text-ink outline-none"
+            className="font-heading text-2xl font-bold text-fg outline-none"
           >
             {success.status === 'COMPATIBLE'
               ? 'Vos informations sont compatibles'
               : 'Votre demande a bien été transmise'}
           </h2>
-          <p className="mt-3 whitespace-pre-line text-lg text-ink">{success.message}</p>
+          <p className="mt-3 whitespace-pre-line text-lg text-fg">{success.message}</p>
 
           {success.status === 'RECEIVED' ? (
-            <div className="mt-4 space-y-2 rounded-[var(--radius-md)] bg-accent-soft px-4 py-3 text-sm text-ink">
+            <div className="mt-4 space-y-2 rounded-[var(--radius-md)] bg-accent-soft px-4 py-3 text-sm text-fg">
               <p>
                 Statut : <strong>en attente d’évaluation</strong>. Patricia vous répondra après
                 examen de vos informations.
@@ -555,14 +555,14 @@ export function CompatibilityWizard({
             {success.canBook ? (
               <Link
                 href={`/reserver?service=${encodeURIComponent(serviceSlug)}`}
-                className="inline-flex items-center justify-center rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-ink shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
+                className="inline-flex items-center justify-center rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
               >
                 Réserver cette prestation
               </Link>
             ) : null}
             <Link
               href="/coiffures"
-              className="inline-flex items-center justify-center rounded-[var(--radius-md)] border border-cream-dark bg-surface px-6 py-3 font-semibold text-ink transition hover:border-cacao"
+              className="inline-flex items-center justify-center rounded-[var(--radius-md)] border border-line bg-card px-6 py-3 font-semibold text-fg transition hover:border-cacao"
             >
               Retour au catalogue
             </Link>

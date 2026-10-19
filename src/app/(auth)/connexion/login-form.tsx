@@ -17,7 +17,7 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
           name="email"
           required
           autoComplete="email"
-          className="rounded-lg border border-cacao/30 bg-surface px-3 py-2 focus:outline-2 focus:outline-accent"
+          className="rounded-lg border border-cacao/30 bg-card px-3 py-2 focus:outline-2 focus:outline-accent"
         />
       </label>
 
@@ -28,7 +28,7 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
           name="password"
           required
           autoComplete="current-password"
-          className="rounded-lg border border-cacao/30 bg-surface px-3 py-2 focus:outline-2 focus:outline-accent"
+          className="rounded-lg border border-cacao/30 bg-card px-3 py-2 focus:outline-2 focus:outline-accent"
         />
       </label>
 
@@ -41,7 +41,7 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
       <button
         type="submit"
         disabled={pending}
-        className="rounded-lg bg-accent px-4 py-2 font-semibold text-ink transition hover:brightness-95 disabled:opacity-60"
+        className="rounded-lg bg-accent px-4 py-2 font-semibold text-accent-fg transition hover:brightness-95 disabled:opacity-60"
       >
         {pending ? 'Connexion…' : 'Se connecter'}
       </button>

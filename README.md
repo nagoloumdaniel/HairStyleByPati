@@ -6,6 +6,8 @@ Application web de réservation en ligne pour un salon de coiffure spécialisé 
 
 Phase **6, réservation, disponibilités et calendrier**, terminée le 19/10/2026 : parcours public de réservation en 8 étapes, moteur de disponibilités (horaires, exceptions, pauses, blocages, marges, délais), verrou PostgreSQL anti double réservation, validation manuelle avec libération automatique, annulation client par lien sécurisé, annulation admin, reprogrammation atomique, calendrier jour/semaine/mois/liste et gestion des disponibilités avec alertes de conflit. Le garde de compatibilité de la phase 5 est rejoué avant chaque enregistrement. Vérifiée par 157 tests Vitest et 8 parcours Playwright.
 
+Le thème **clair / sombre** est disponible sur toutes les interfaces via l'icône du header. La préférence système est détectée au chargement, le choix est mémorisé dans le navigateur et appliqué avant le premier rendu pour éviter tout flash. Vérifié par 4 parcours Playwright desktop et mobile.
+
 Prochaine étape : phase **7, notifications et messagerie**. Les notifications de réservation sont déjà mises en file d'attente de façon idempotente. Le seed crée des disponibilités par défaut du lundi au samedi, 9h-18h.
 
 ## Stack (figée — voir [docs/stack.md](docs/stack.md))

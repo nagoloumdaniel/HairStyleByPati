@@ -14,7 +14,7 @@ export function Input({ label, error, hint, id, required, ...rest }: InputProps)
     .join(' ');
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={inputId} className="text-sm font-semibold text-ink">
+      <label htmlFor={inputId} className="text-sm font-semibold text-fg">
         {label}{' '}
         {required ? (
           <span aria-hidden="true" className="text-alert">
@@ -29,12 +29,12 @@ export function Input({ label, error, hint, id, required, ...rest }: InputProps)
         required={required}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy || undefined}
-        className={`w-full rounded-[var(--radius-md)] border bg-surface px-4 py-2.5 text-ink placeholder:text-ink-soft/60 transition ${
-          error ? 'border-alert' : 'border-cream-dark focus:border-cacao'
+        className={`w-full rounded-[var(--radius-md)] border bg-card px-4 py-2.5 text-fg placeholder:text-muted/60 transition ${
+          error ? 'border-alert' : 'border-line focus:border-cacao'
         }`}
       />
       {hint && !error ? (
-        <p id={`${inputId}-hint`} className="text-sm text-ink-soft">
+        <p id={`${inputId}-hint`} className="text-sm text-muted">
           {hint}
         </p>
       ) : null}

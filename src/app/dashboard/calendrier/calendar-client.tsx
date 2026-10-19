@@ -157,7 +157,7 @@ export function CalendarClient() {
           >
             →
           </Button>
-          <p className="ml-2 font-heading text-lg font-bold text-ink">
+          <p className="ml-2 font-heading text-lg font-bold text-fg">
             {view === 'month'
               ? new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' }).format(
                   parseISO(dateISO || isoFromDate(new Date())),
@@ -174,7 +174,7 @@ export function CalendarClient() {
                   : ''}
           </p>
         </div>
-        <div className="flex flex-wrap gap-1 rounded-[var(--radius-full)] bg-cream-dark p-1">
+        <div className="flex flex-wrap gap-1 rounded-[var(--radius-full)] bg-line p-1">
           {(Object.keys(VIEW_LABELS) as View[]).map((item) => (
             <button
               key={item}
@@ -182,7 +182,7 @@ export function CalendarClient() {
               onClick={() => setView(item)}
               aria-pressed={view === item}
               className={`rounded-[var(--radius-full)] px-3 py-1.5 text-sm font-semibold transition ${
-                view === item ? 'bg-ink text-cream' : 'text-ink-soft hover:text-ink'
+                view === item ? 'bg-ink text-panel-fg' : 'text-muted hover:text-fg'
               }`}
             >
               {VIEW_LABELS[item]}
@@ -205,14 +205,14 @@ export function CalendarClient() {
           {state.error}
         </p>
       ) : pending ? (
-        <p className="rounded-[var(--radius-md)] bg-cream-dark px-4 py-3 text-sm text-ink-soft">
+        <p className="rounded-[var(--radius-md)] bg-line px-4 py-3 text-sm text-muted">
           Chargement du calendrier…
         </p>
       ) : null}
 
       {view === 'day' ? (
         <Card className="p-4">
-          <div className="divide-y divide-cream-dark">
+          <div className="divide-y divide-line">
             {Array.from({ length: 14 }, (_, index) => index + 7).map((hour) => {
               const entries = (byDay.get(dateISO) ?? []).filter((appointment) => {
                 const parts = utcToDeviceParts(new Date(appointment.startsAt), timeZone);
@@ -220,24 +220,24 @@ export function CalendarClient() {
               });
               return (
                 <div key={hour} className="flex gap-3 py-2">
-                  <span className="w-14 shrink-0 text-xs font-semibold text-ink-soft">
+                  <span className="w-14 shrink-0 text-xs font-semibold text-muted">
                     {pad(hour)}:00
                   </span>
                   <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                     {entries.length === 0 ? (
-                      <span className="text-xs text-ink-soft/50">Libre</span>
+                      <span className="text-xs text-muted/50">Libre</span>
                     ) : (
                       entries.map((appointment) => (
                         <Link
                           key={appointment.id}
                           href={`/dashboard/reservations/${appointment.id}`}
-                          className="flex flex-wrap items-center justify-between gap-2 rounded-[var(--radius-sm)] border border-cream-dark bg-surface px-3 py-2 text-sm transition hover:border-cacao"
+                          className="flex flex-wrap items-center justify-between gap-2 rounded-[var(--radius-sm)] border border-line bg-card px-3 py-2 text-sm transition hover:border-cacao"
                         >
                           <span className="min-w-0">
                             <span className="font-semibold">
                               {timeLabel(appointment.startsAt, timeZone)}
                             </span>{' '}
-                            <span className="text-ink-soft">
+                            <span className="text-muted">
                               {appointment.customerName} · {appointment.serviceName}
                             </span>
                           </span>
@@ -267,7 +267,7 @@ export function CalendarClient() {
                 <div
                   key={dayISO}
                   className={`rounded-[var(--radius-md)] border p-2 ${
-                    isToday ? 'border-cacao bg-accent-soft/40' : 'border-cream-dark bg-surface'
+                    isToday ? 'border-cacao bg-accent-soft/40' : 'border-line bg-card'
                   }`}
                 >
                   <button
@@ -276,7 +276,7 @@ export function CalendarClient() {
                       setDateISO(dayISO);
                       setView('day');
                     }}
-                    className="w-full text-left text-xs font-semibold uppercase tracking-wide text-ink-soft hover:text-cacao"
+                    className="w-full text-left text-xs font-semibold uppercase tracking-wide text-muted hover:text-cacao"
                   >
                     {new Intl.DateTimeFormat('fr-FR', {
                       weekday: 'short',
@@ -286,21 +286,21 @@ export function CalendarClient() {
                   </button>
                   <div className="mt-2 flex min-h-24 flex-col gap-1.5">
                     {entries.length === 0 ? (
-                      <p className="text-xs text-ink-soft/60">Aucun rendez-vous</p>
+                      <p className="text-xs text-muted/60">Aucun rendez-vous</p>
                     ) : (
                       entries.map((appointment) => (
                         <Link
                           key={appointment.id}
                           href={`/dashboard/reservations/${appointment.id}`}
-                          className="rounded-[var(--radius-sm)] border border-cream-dark bg-cream px-2 py-1.5 text-xs transition hover:border-cacao"
+                          className="rounded-[var(--radius-sm)] border border-line bg-page px-2 py-1.5 text-xs transition hover:border-cacao"
                         >
                           <span className="block font-semibold">
                             {timeLabel(appointment.startsAt, timeZone)}
                           </span>
-                          <span className="block truncate text-ink-soft">
+                          <span className="block truncate text-muted">
                             {appointment.customerName}
                           </span>
-                          <span className="block truncate text-ink-soft">
+                          <span className="block truncate text-muted">
                             {appointment.serviceName}
                           </span>
                           <span className="mt-1 block">
@@ -323,7 +323,7 @@ export function CalendarClient() {
       {view === 'month' ? (
         <div className="overflow-x-auto">
           <div className="min-w-[700px]">
-            <div className="grid grid-cols-7 gap-1 pb-1 text-center text-xs font-semibold uppercase tracking-wide text-ink-soft">
+            <div className="grid grid-cols-7 gap-1 pb-1 text-center text-xs font-semibold uppercase tracking-wide text-muted">
               {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((day) => (
                 <span key={day}>{day}</span>
               ))}
@@ -341,9 +341,7 @@ export function CalendarClient() {
                       setView('day');
                     }}
                     className={`min-h-20 rounded-[var(--radius-sm)] border p-1.5 text-left align-top transition hover:border-cacao ${
-                      inMonth
-                        ? 'border-cream-dark bg-surface'
-                        : 'border-cream-dark/50 bg-cream/50 opacity-60'
+                      inMonth ? 'border-line bg-card' : 'border-line/50 bg-page/50 opacity-60'
                     }`}
                   >
                     <span className="text-xs font-semibold">{Number(dayISO.slice(-2))}</span>
@@ -353,7 +351,7 @@ export function CalendarClient() {
                     {entries.slice(0, 2).map((appointment) => (
                       <span
                         key={appointment.id}
-                        className="mt-0.5 block truncate text-[11px] text-ink-soft"
+                        className="mt-0.5 block truncate text-[11px] text-muted"
                       >
                         {timeLabel(appointment.startsAt, timeZone)} {appointment.customerName}
                       </span>
@@ -369,9 +367,9 @@ export function CalendarClient() {
       {view === 'list' ? (
         <Card className="p-0">
           {appointments.length === 0 ? (
-            <p className="p-6 text-center text-ink-soft">Aucun rendez-vous sur cette période.</p>
+            <p className="p-6 text-center text-muted">Aucun rendez-vous sur cette période.</p>
           ) : (
-            <ul className="divide-y divide-cream-dark">
+            <ul className="divide-y divide-line">
               {appointments.map((appointment) => (
                 <li
                   key={appointment.id}
@@ -379,7 +377,7 @@ export function CalendarClient() {
                 >
                   <div className="min-w-0">
                     <p className="font-semibold">
-                      <span className="text-ink-soft">
+                      <span className="text-muted">
                         {new Intl.DateTimeFormat('fr-FR', {
                           dateStyle: 'medium',
                         }).format(new Date(appointment.startsAt))}{' '}
@@ -387,7 +385,7 @@ export function CalendarClient() {
                       </span>{' '}
                       {appointment.customerName}
                     </p>
-                    <p className="text-sm text-ink-soft">{appointment.serviceName}</p>
+                    <p className="text-sm text-muted">{appointment.serviceName}</p>
                   </div>
                   <div className="flex items-center gap-3">
                     <Badge tone={APPOINTMENT_STATUS_TONES[appointment.status] ?? 'neutral'}>
@@ -407,7 +405,7 @@ export function CalendarClient() {
         </Card>
       ) : null}
 
-      <p className="text-xs text-ink-soft">
+      <p className="text-xs text-muted">
         Les couleurs de statut sont toujours accompagnées d’un libellé. Les horaires suivent l’heure
         locale de votre appareil.
       </p>

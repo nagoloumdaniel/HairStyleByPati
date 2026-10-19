@@ -22,7 +22,7 @@ export function CancelForm({ token, reasonRequired }: { token: string; reasonReq
     return (
       <div className="rounded-[var(--radius-lg)] border border-success bg-success-soft p-6">
         <h2 className="font-heading text-xl font-bold text-success">Rendez-vous annulé</h2>
-        <p className="mt-2 text-sm text-ink">{state.success}</p>
+        <p className="mt-2 text-sm text-fg">{state.success}</p>
       </div>
     );
   }
@@ -51,7 +51,7 @@ export function CancelForm({ token, reasonRequired }: { token: string; reasonReq
         </Button>
         <a
           href="/contact"
-          className="inline-flex items-center rounded-[var(--radius-md)] border border-cream-dark bg-surface px-5 py-2.5 text-sm font-semibold text-ink transition hover:border-cacao"
+          className="inline-flex items-center rounded-[var(--radius-md)] border border-line bg-card px-5 py-2.5 text-sm font-semibold text-fg transition hover:border-cacao"
         >
           Contacter le salon
         </a>

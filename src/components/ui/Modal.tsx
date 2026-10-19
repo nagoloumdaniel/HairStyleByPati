@@ -41,7 +41,7 @@ export function Modal({
         aria-label={title}
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg rounded-[var(--radius-lg)] bg-surface p-6 shadow-lift"
+        className="w-full max-w-lg rounded-[var(--radius-lg)] bg-card p-6 shadow-lift"
       >
         <h2 className="text-xl font-semibold">{title}</h2>
         <div className="mt-4">{children}</div>

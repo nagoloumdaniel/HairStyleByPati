@@ -75,7 +75,7 @@ export default async function EvaluationsPage({
     <div className="p-6">
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-semibold">Évaluations capillaires</h1>
-        <p className="text-ink-soft">
+        <p className="text-muted">
           Demandes envoyées depuis le site public. Une décision ne crée jamais de réservation : le
           créneau reste vérifié séparément.
         </p>
@@ -86,14 +86,12 @@ export default async function EvaluationsPage({
           <Link
             key={card.status}
             href={pageHref(card.status, 1)}
-            className={`rounded-[var(--radius-lg)] border bg-surface p-4 shadow-soft transition hover:border-cacao ${
-              status === card.status ? 'border-cacao' : 'border-cream-dark'
+            className={`rounded-[var(--radius-lg)] border bg-card p-4 shadow-soft transition hover:border-cacao ${
+              status === card.status ? 'border-cacao' : 'border-line'
             }`}
           >
-            <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">
-              {card.label}
-            </p>
-            <p className="mt-1 font-heading text-3xl font-bold text-ink">{counts[card.status]}</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted">{card.label}</p>
+            <p className="mt-1 font-heading text-3xl font-bold text-fg">{counts[card.status]}</p>
           </Link>
         ))}
       </div>
@@ -102,7 +100,7 @@ export default async function EvaluationsPage({
         <form
           method="get"
           action="/dashboard/evaluations"
-          className="flex flex-wrap items-end gap-3 border-b border-cream-dark p-4"
+          className="flex flex-wrap items-end gap-3 border-b border-line p-4"
         >
           <div className="min-w-52">
             <Select
@@ -144,25 +142,25 @@ export default async function EvaluationsPage({
           </div>
         ) : (
           <>
-            <ul className="divide-y divide-cream-dark md:hidden">
+            <ul className="divide-y divide-line md:hidden">
               {result.items.map((assessment) => (
                 <li key={assessment.id} className="flex flex-col gap-2 p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="truncate font-semibold">{assessment.customerName}</p>
-                      <p className="truncate text-sm text-ink-soft">{assessment.serviceName}</p>
+                      <p className="truncate text-sm text-muted">{assessment.serviceName}</p>
                     </div>
                     <Badge tone={STATUS_TONES[assessment.status] ?? 'neutral'}>
                       {ASSESSMENT_STATUS_LABELS[assessment.status] ?? assessment.status}
                     </Badge>
                   </div>
-                  <p className="text-sm text-ink-soft">
+                  <p className="text-sm text-muted">
                     {dateFormatter.format(assessment.createdAt)} · {assessment.photoCount} photo
                     {assessment.photoCount > 1 ? 's' : ''}
                   </p>
                   <Link
                     href={`/dashboard/evaluations/${assessment.id}`}
-                    className="self-start rounded-[var(--radius-sm)] border border-cream-dark px-3 py-1.5 text-sm font-semibold transition hover:border-cacao"
+                    className="self-start rounded-[var(--radius-sm)] border border-line px-3 py-1.5 text-sm font-semibold transition hover:border-cacao"
                   >
                     Ouvrir la demande
                   </Link>
@@ -173,7 +171,7 @@ export default async function EvaluationsPage({
             <div className="hidden overflow-x-auto md:block">
               <table className="w-full border-collapse text-left">
                 <thead>
-                  <tr className="border-b border-cream-dark">
+                  <tr className="border-b border-line">
                     <th scope="col" className="p-4 pb-3 text-sm font-semibold">
                       Cliente
                     </th>
@@ -196,10 +194,10 @@ export default async function EvaluationsPage({
                 </thead>
                 <tbody>
                   {result.items.map((assessment) => (
-                    <tr key={assessment.id} className="border-b border-cream-dark">
+                    <tr key={assessment.id} className="border-b border-line">
                       <td className="p-4">
                         <p className="font-semibold">{assessment.customerName}</p>
-                        <p className="text-xs text-ink-soft">{assessment.customerEmail}</p>
+                        <p className="text-xs text-muted">{assessment.customerEmail}</p>
                       </td>
                       <td className="p-4 text-sm">{assessment.serviceName}</td>
                       <td className="p-4 text-sm">{dateFormatter.format(assessment.createdAt)}</td>
@@ -235,14 +233,14 @@ export default async function EvaluationsPage({
             <Link
               href={pageHref(status, result.page - 1)}
               rel="prev"
-              className="rounded-[var(--radius-md)] border border-cream-dark bg-surface px-4 py-2 text-sm font-semibold transition hover:border-cacao"
+              className="rounded-[var(--radius-md)] border border-line bg-card px-4 py-2 text-sm font-semibold transition hover:border-cacao"
             >
               Page précédente
             </Link>
           ) : (
-            <span className="text-sm text-ink-soft/60">Page précédente</span>
+            <span className="text-sm text-muted/60">Page précédente</span>
           )}
-          <p className="text-sm text-ink-soft">
+          <p className="text-sm text-muted">
             Page {result.page} sur {result.totalPages} · {result.total} demande
             {result.total > 1 ? 's' : ''}
           </p>
@@ -250,12 +248,12 @@ export default async function EvaluationsPage({
             <Link
               href={pageHref(status, result.page + 1)}
               rel="next"
-              className="rounded-[var(--radius-md)] border border-cream-dark bg-surface px-4 py-2 text-sm font-semibold transition hover:border-cacao"
+              className="rounded-[var(--radius-md)] border border-line bg-card px-4 py-2 text-sm font-semibold transition hover:border-cacao"
             >
               Page suivante
             </Link>
           ) : (
-            <span className="text-sm text-ink-soft/60">Page suivante</span>
+            <span className="text-sm text-muted/60">Page suivante</span>
           )}
         </nav>
       ) : null}

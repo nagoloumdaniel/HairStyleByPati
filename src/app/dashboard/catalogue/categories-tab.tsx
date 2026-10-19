@@ -208,7 +208,7 @@ function ReorderButton({
     return (
       <span
         aria-hidden="true"
-        className="inline-flex size-8 items-center justify-center rounded-[var(--radius-sm)] border border-cream-dark text-ink-soft/40"
+        className="inline-flex size-8 items-center justify-center rounded-[var(--radius-sm)] border border-line text-muted/40"
       >
         {direction === -1 ? '↑' : '↓'}
       </span>
@@ -266,7 +266,7 @@ export function CategoriesTab({ categories }: { categories: AdminCategory[] }) {
   return (
     <div className="flex flex-col gap-4 p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-ink-soft">
+        <p className="text-sm text-muted">
           {categories.length} catégorie{categories.length > 1 ? 's' : ''}. L’ordre est repris sur le
           site public.
         </p>
@@ -274,7 +274,7 @@ export function CategoriesTab({ categories }: { categories: AdminCategory[] }) {
       </div>
 
       {categories.length === 0 ? (
-        <p className="rounded-[var(--radius-md)] border border-dashed border-cream-dark p-8 text-center text-ink-soft">
+        <p className="rounded-[var(--radius-md)] border border-dashed border-line p-8 text-center text-muted">
           Aucune catégorie. Créez la première pour organiser le catalogue.
         </p>
       ) : (
@@ -282,7 +282,7 @@ export function CategoriesTab({ categories }: { categories: AdminCategory[] }) {
           {categories.map((category, index) => (
             <li
               key={category.id}
-              className="rounded-[var(--radius-md)] border border-cream-dark bg-surface p-3"
+              className="rounded-[var(--radius-md)] border border-line bg-card p-3"
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex min-w-0 items-start gap-2">
@@ -293,21 +293,19 @@ export function CategoriesTab({ categories }: { categories: AdminCategory[] }) {
                   <div className="min-w-0">
                     <p className="flex flex-wrap items-center gap-2 font-semibold">
                       <span className="truncate">{category.name}</span>
-                      <span className="font-normal text-ink-soft">({category.slug})</span>
+                      <span className="font-normal text-muted">({category.slug})</span>
                       {category.active ? (
                         <Badge tone="success">Active</Badge>
                       ) : (
                         <Badge tone="alert">Désactivée</Badge>
                       )}
                     </p>
-                    <p className="mt-1 text-sm text-ink-soft">
+                    <p className="mt-1 text-sm text-muted">
                       Ordre {category.order} · {category.serviceCount} prestation
                       {category.serviceCount > 1 ? 's' : ''}
                     </p>
                     {category.description ? (
-                      <p className="mt-1 line-clamp-2 text-sm text-ink-soft">
-                        {category.description}
-                      </p>
+                      <p className="mt-1 line-clamp-2 text-sm text-muted">{category.description}</p>
                     ) : null}
                   </div>
                 </div>

@@ -23,7 +23,7 @@ export function Tabs({
             aria-controls={`panel-${t.id}`}
             onClick={() => setActive(i)}
             className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-              i === active ? 'bg-ink text-cream' : 'bg-cream-dark text-ink hover:bg-accent-soft'
+              i === active ? 'bg-ink text-panel-fg' : 'bg-line text-fg hover:bg-accent-soft'
             }`}
           >
             {t.label}

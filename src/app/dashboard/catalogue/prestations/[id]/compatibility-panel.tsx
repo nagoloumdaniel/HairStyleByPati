@@ -44,9 +44,9 @@ export function CompatibilityPanel({
     <form action={formAction} className="flex flex-col gap-5 p-4">
       <input type="hidden" name="serviceId" value={serviceId} />
 
-      <fieldset className="rounded-[var(--radius-md)] border border-cream-dark p-4">
+      <fieldset className="rounded-[var(--radius-md)] border border-line p-4">
         <legend className="px-2 text-sm font-semibold">Longueurs de cheveux acceptées</legend>
-        <p className="mb-3 text-sm text-ink-soft">
+        <p className="mb-3 text-sm text-muted">
           Si aucune longueur n’est cochée, aucune restriction de longueur n’est appliquée.
         </p>
         <div className="grid gap-2 sm:grid-cols-2">
@@ -65,9 +65,9 @@ export function CompatibilityPanel({
         </div>
       </fieldset>
 
-      <fieldset className="rounded-[var(--radius-md)] border border-cream-dark p-4">
+      <fieldset className="rounded-[var(--radius-md)] border border-line p-4">
         <legend className="px-2 text-sm font-semibold">Types de cheveux acceptés</legend>
-        <p className="mb-3 text-sm text-ink-soft">
+        <p className="mb-3 text-sm text-muted">
           Si aucun type n’est coché, tous les types sont acceptés. Un type non listé déclenche une
           demande d’évaluation.
         </p>
@@ -87,7 +87,7 @@ export function CompatibilityPanel({
         </div>
       </fieldset>
 
-      <fieldset className="rounded-[var(--radius-md)] border border-cream-dark p-4">
+      <fieldset className="rounded-[var(--radius-md)] border border-line p-4">
         <legend className="px-2 text-sm font-semibold">Locs</legend>
         <div className="flex flex-col gap-2">
           <label className="flex items-start gap-2 text-sm">
@@ -99,7 +99,7 @@ export function CompatibilityPanel({
             />
             <span>
               Les locs sont obligatoires pour cette prestation.
-              <span className="block text-ink-soft">La cliente doit déjà porter des locs.</span>
+              <span className="block text-muted">La cliente doit déjà porter des locs.</span>
             </span>
           </label>
           <label className="flex items-start gap-2 text-sm">
@@ -111,7 +111,7 @@ export function CompatibilityPanel({
             />
             <span>
               Les locs sont incompatibles avec cette prestation.
-              <span className="block text-ink-soft">
+              <span className="block text-muted">
                 La prestation est refusée si la cliente porte des locs.
               </span>
             </span>
@@ -119,7 +119,7 @@ export function CompatibilityPanel({
         </div>
       </fieldset>
 
-      <fieldset className="rounded-[var(--radius-md)] border border-cream-dark p-4">
+      <fieldset className="rounded-[var(--radius-md)] border border-line p-4">
         <legend className="px-2 text-sm font-semibold">Photo et validation</legend>
         <div className="flex flex-col gap-4">
           <Select
@@ -137,7 +137,7 @@ export function CompatibilityPanel({
             />
             <span>
               Accepter automatiquement l’évaluation.
-              <span className="block text-ink-soft">
+              <span className="block text-muted">
                 Si cette case est décochée, l’évaluation arrive dans la file de validation.
               </span>
             </span>

@@ -70,7 +70,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
 
   return (
     <div className="p-6">
-      <nav aria-label="Fil d'Ariane" className="text-sm text-ink-soft">
+      <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
             <Link href="/dashboard/catalogue" className="transition hover:text-cacao">
@@ -79,7 +79,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
           </li>
           <li aria-hidden="true">/</li>
           <li>
-            <span aria-current="page" className="font-medium text-ink">
+            <span aria-current="page" className="font-medium text-fg">
               {service.name}
             </span>
           </li>
@@ -94,12 +94,12 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
               {STATUS_LABELS[service.status] ?? service.status}
             </Badge>
           </div>
-          <p className="mt-1 text-sm text-ink-soft">
+          <p className="mt-1 text-sm text-muted">
             {service.categoryName} · {formatPrice(service)} ·{' '}
             {formatDuration(service.durationMinutes)} · /coiffures/{service.slug}
           </p>
           {service.appointmentCount > 0 ? (
-            <p className="mt-2 text-sm text-ink-soft">
+            <p className="mt-2 text-sm text-muted">
               {service.appointmentCount} réservation{service.appointmentCount > 1 ? 's' : ''}{' '}
               rattachée{service.appointmentCount > 1 ? 's' : ''} : l’archivage est préféré à la
               suppression.

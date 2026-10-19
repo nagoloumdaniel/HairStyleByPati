@@ -42,9 +42,9 @@ function statCard(label: string, value: number, tone: string) {
   return (
     <div
       key={label}
-      className="rounded-[var(--radius-lg)] border border-cream-dark bg-surface p-4 shadow-soft"
+      className="rounded-[var(--radius-lg)] border border-line bg-card p-4 shadow-soft"
     >
-      <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">{label}</p>
+      <p className="text-xs font-semibold uppercase tracking-wide text-muted">{label}</p>
       <p className={`mt-1 font-heading text-3xl font-bold ${tone}`}>{value}</p>
     </div>
   );
@@ -84,7 +84,7 @@ export default async function CataloguePage({
       <form
         method="get"
         action="/dashboard/catalogue"
-        className="flex flex-col gap-3 border-b border-cream-dark p-4 sm:flex-row sm:flex-wrap sm:items-end"
+        className="flex flex-col gap-3 border-b border-line p-4 sm:flex-row sm:flex-wrap sm:items-end"
       >
         <div className="min-w-0 flex-1 sm:min-w-[220px]">
           <Input
@@ -132,13 +132,13 @@ export default async function CataloguePage({
       </form>
 
       <div className="flex flex-wrap items-center justify-between gap-3 p-4">
-        <p className="text-sm text-ink-soft">
+        <p className="text-sm text-muted">
           {services.length} prestation{services.length > 1 ? 's' : ''}
           {hasFilters ? ' correspondent aux filtres' : ' au total'}
         </p>
         <Link
           href="/dashboard/catalogue/prestations/nouvelle"
-          className="inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-accent px-4 py-2.5 text-sm font-semibold text-ink shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
+          className="inline-flex items-center gap-2 rounded-[var(--radius-md)] bg-accent px-4 py-2.5 text-sm font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
         >
           <span aria-hidden="true">+</span> Nouvelle prestation
         </Link>
@@ -164,14 +164,11 @@ export default async function CataloguePage({
           {/* Mobile : cartes empilées, aucun défilement horizontal. */}
           <ul className="flex flex-col gap-3 p-4 md:hidden">
             {services.map((service) => (
-              <li
-                key={service.id}
-                className="rounded-[var(--radius-md)] border border-cream-dark p-4"
-              >
+              <li key={service.id} className="rounded-[var(--radius-md)] border border-line p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="truncate font-semibold">{service.name}</p>
-                    <p className="truncate text-xs text-ink-soft">
+                    <p className="truncate text-xs text-muted">
                       {service.categoryName} · {service.imageCount} photo
                       {service.imageCount > 1 ? 's' : ''}
                     </p>
@@ -186,7 +183,7 @@ export default async function CataloguePage({
                 <div className="mt-3 flex flex-wrap items-center gap-2">
                   <Link
                     href={`/dashboard/catalogue/prestations/${service.id}`}
-                    className="rounded-[var(--radius-sm)] border border-cream-dark px-3 py-1.5 text-sm font-semibold transition hover:border-cacao"
+                    className="rounded-[var(--radius-sm)] border border-line px-3 py-1.5 text-sm font-semibold transition hover:border-cacao"
                   >
                     Modifier
                   </Link>
@@ -200,7 +197,7 @@ export default async function CataloguePage({
           <div className="hidden overflow-x-auto p-4 md:block">
             <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="border-b border-cream-dark">
+                <tr className="border-b border-line">
                   <th scope="col" className="pb-3 text-sm font-semibold">
                     Prestation
                   </th>
@@ -223,7 +220,7 @@ export default async function CataloguePage({
               </thead>
               <tbody>
                 {services.map((service: AdminService) => (
-                  <tr key={service.id} className="border-b border-cream-dark align-top">
+                  <tr key={service.id} className="border-b border-line align-top">
                     <td className="p-4">
                       <Link
                         href={`/dashboard/catalogue/prestations/${service.id}`}
@@ -231,7 +228,7 @@ export default async function CataloguePage({
                       >
                         {service.name}
                       </Link>
-                      <div className="text-xs text-ink-soft">{service.slug}</div>
+                      <div className="text-xs text-muted">{service.slug}</div>
                     </td>
                     <td className="p-4 text-sm">{service.categoryName}</td>
                     <td className="p-4 text-sm">{formatPrice(service)}</td>
@@ -258,14 +255,14 @@ export default async function CataloguePage({
     <div className="p-6">
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-semibold">Catalogue des prestations</h1>
-        <p className="text-ink-soft">
+        <p className="text-muted">
           Gérez vos catégories, vos prestations, leurs photos et leurs règles de compatibilité.
         </p>
       </div>
 
       <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {statCard('Publiées', stats.published, 'text-success')}
-        {statCard('Brouillons', stats.draft, 'text-ink')}
+        {statCard('Brouillons', stats.draft, 'text-fg')}
         {statCard('Archivées', stats.archived, 'text-alert')}
         {statCard('Catégories', stats.categories, 'text-cacao')}
       </div>

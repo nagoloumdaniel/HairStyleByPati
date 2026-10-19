@@ -77,7 +77,7 @@ function useDeviceTimeZone(): string {
 
 function ConflictCheckbox() {
   return (
-    <label className="flex items-start gap-2 text-xs text-ink-soft">
+    <label className="flex items-start gap-2 text-xs text-muted">
       <input type="checkbox" name="confirmConflicts" className="mt-0.5 size-3.5" />
       Confirmer même si des rendez-vous existent déjà sur ce créneau.
     </label>
@@ -123,7 +123,7 @@ function WeekdayForm({
   const [active, setActive] = useState(Boolean(rule));
 
   return (
-    <form action={formAction} className="rounded-[var(--radius-md)] border border-cream-dark p-3">
+    <form action={formAction} className="rounded-[var(--radius-md)] border border-line p-3">
       <input type="hidden" name="weekday" value={weekday} />
       <input type="hidden" name="timeZone" value={timeZone} />
       <div className="flex flex-wrap items-end gap-3">
@@ -173,7 +173,7 @@ export function WeeklyScheduleEditor({ rules }: { rules: WeeklyRuleView[] }) {
     <div className="flex flex-col gap-2">
       {WEEKDAYS.map((label, weekday) => (
         <div key={label}>
-          <p className="mb-1 text-sm font-semibold text-ink">{label}</p>
+          <p className="mb-1 text-sm font-semibold text-fg">{label}</p>
           <WeekdayForm
             weekday={weekday}
             rule={rules.find((rule) => rule.weekday === weekday) ?? null}
@@ -224,13 +224,13 @@ export function SpecificDatesEditor({ rules }: { rules: SpecificRuleView[] }) {
       <Feedback state={state} />
 
       {rules.length === 0 ? (
-        <p className="text-sm text-ink-soft">Aucune exception de date.</p>
+        <p className="text-sm text-muted">Aucune exception de date.</p>
       ) : (
         <ul className="flex flex-col gap-2">
           {rules.map((rule) => (
             <li
               key={rule.id}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-md)] border border-cream-dark bg-surface p-3"
+              className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-md)] border border-line bg-card p-3"
             >
               <p className="text-sm">
                 <span className="font-semibold">
@@ -294,19 +294,19 @@ export function BlockedPeriodsEditor({ periods }: { periods: BlockedPeriodView[]
       <Feedback state={state} />
 
       {periods.length === 0 ? (
-        <p className="text-sm text-ink-soft">Aucune indisponibilité enregistrée.</p>
+        <p className="text-sm text-muted">Aucune indisponibilité enregistrée.</p>
       ) : (
         <ul className="flex flex-col gap-2">
           {periods.map((period) => (
             <li
               key={period.id}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-md)] border border-cream-dark bg-surface p-3"
+              className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-md)] border border-line bg-card p-3"
             >
               <div className="text-sm">
                 <p className="font-semibold">
                   <LocalDateTime iso={period.startsAt} /> → <LocalDateTime iso={period.endsAt} />
                 </p>
-                <p className="text-ink-soft">
+                <p className="text-muted">
                   {period.reason || 'Sans motif'}
                   {period.createdByName ? ` · ${period.createdByName}` : ''}
                 </p>
