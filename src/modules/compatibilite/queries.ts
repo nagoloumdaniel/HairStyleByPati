@@ -23,7 +23,7 @@ export interface CompatibilityService {
   questions: ConfiguredQuestion[];
 }
 
-function mapRule(
+export function mapCompatibilityRule(
   rule: {
     acceptedLengths: CompatibilityRuleData['acceptedLengths'];
     acceptedHairTypes: string[];
@@ -86,7 +86,7 @@ export async function getCompatibilityServiceBySlug(
     slug: service.slug,
     categoryName: service.category.name,
     durationMinutes: service.durationMinutes,
-    rule: mapRule(service.compatibility),
+    rule: mapCompatibilityRule(service.compatibility),
     questions: service.questions,
   };
 }
@@ -279,7 +279,7 @@ export async function getAssessmentDetail(id: string): Promise<AssessmentDetail 
     !Array.isArray(assessment.answers)
       ? (assessment.answers as Record<string, unknown>)
       : {};
-  const rule = mapRule(assessment.service.compatibility);
+  const rule = mapCompatibilityRule(assessment.service.compatibility);
   const questions = buildPublicQuestions({
     rule,
     configured: assessment.service.questions,
@@ -346,7 +346,7 @@ export async function verifyCompatibilityForBooking(input: {
 
   return verifyBookingCompatibility({
     serviceId: input.serviceId,
-    rule: mapRule(service?.compatibility ?? null),
+    rule: mapCompatibilityRule(service?.compatibility ?? null),
     answers: normalizeAnswers(input.answers),
     assessment,
   });

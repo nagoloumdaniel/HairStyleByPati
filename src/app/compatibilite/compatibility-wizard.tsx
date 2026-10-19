@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { useActionState, useEffect, useRef, useState } from 'react';
@@ -40,7 +40,7 @@ function verdictLabel(verdict: string): string {
   return 'À vérifier';
 }
 
-function QuestionField({
+export function QuestionField({
   question,
   value,
   onChange,

@@ -4,9 +4,9 @@ Application web de réservation en ligne pour un salon de coiffure spécialisé 
 
 ## Statut
 
-Phase **5, moteur de compatibilité capillaire**, terminée le 19/10/2026 : moteur d'évaluation pur (compatible, incompatible, incertain), parcours public conditionnel `/compatibilite`, cas « Je ne suis pas sûr(e) », photos d'évaluation privées sur R2, file d'évaluations dans le dashboard, décisions de Patricia avec message et historique. La règle d'or est garantie : accepter une évaluation ne crée aucune réservation. Vérifiée par 103 tests Vitest et 6 parcours Playwright, photos R2 réelles comprises.
+Phase **6, réservation, disponibilités et calendrier**, terminée le 19/10/2026 : parcours public de réservation en 8 étapes, moteur de disponibilités (horaires, exceptions, pauses, blocages, marges, délais), verrou PostgreSQL anti double réservation, validation manuelle avec libération automatique, annulation client par lien sécurisé, annulation admin, reprogrammation atomique, calendrier jour/semaine/mois/liste et gestion des disponibilités avec alertes de conflit. Le garde de compatibilité de la phase 5 est rejoué avant chaque enregistrement. Vérifiée par 157 tests Vitest et 8 parcours Playwright.
 
-Prochaine étape : phase **6, réservation, disponibilités et calendrier**. Le garde de compatibilité `verifyCompatibilityForBooking` y sera branché avant l'enregistrement d'un rendez-vous.
+Prochaine étape : phase **7, notifications et messagerie**. Les notifications de réservation sont déjà mises en file d'attente de façon idempotente. Le seed crée des disponibilités par défaut du lundi au samedi, 9h-18h.
 
 ## Stack (figée — voir [docs/stack.md](docs/stack.md))
 
@@ -47,6 +47,7 @@ npm run db:seed    # catégories de base + compte admin
 npm run db:seed:demo  # catalogue de démonstration (développement uniquement)
 npx playwright test tests/e2e/dashboard.spec.ts --project=desktop  # back-office (E2E_ADMIN_EMAIL/E2E_ADMIN_PASSWORD requis)
 npx playwright test tests/e2e/compatibilite.spec.ts --project=desktop  # compatibilité, photos privées et décisions
+npx playwright test tests/e2e/reservations.spec.ts --project=desktop --workers=1  # réservation, annulation, calendrier
 ```
 
 `npm run db:seed:demo` ajoute 12 prestations d'exemple publiées pour vérifier le site public. Ne jamais l'exécuter sur la base de production : le catalogue réel est saisi par Patricia depuis le dashboard (Phase 4).

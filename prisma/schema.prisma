@@ -197,6 +197,8 @@ model BlockedPeriod {
   createdById String
   createdBy   User     @relation(fields: [createdById], references: [id])
   createdAt   DateTime @default(now())
+
+  @@index([startsAt, endsAt])
 }
 
 // ============================================================
@@ -219,40 +221,50 @@ model Customer {
 }
 
 enum AppointmentStatus {
-  PENDING // en attente de confirmation
+  PENDING // en attente de confirmation, créneau réservé temporairement
   CONFIRMED
-  CANCELLED
+  RESCHEDULED // reprogrammée, conserve le créneau actuel
+  CANCELLED_BY_CUSTOMER
+  CANCELLED_BY_ADMIN
   COMPLETED
   NO_SHOW
 }
 
 model Appointment {
-  id              String            @id @default(cuid())
-  customerId      String
-  customer        Customer          @relation(fields: [customerId], references: [id])
-  serviceId       String
-  service         Service           @relation(fields: [serviceId], references: [id])
-  startsAt        DateTime // UTC
-  endsAt          DateTime // UTC
-  status          AppointmentStatus @default(PENDING)
+  id                   String            @id @default(cuid())
+  customerId           String
+  customer             Customer          @relation(fields: [customerId], references: [id])
+  serviceId            String
+  service              Service           @relation(fields: [serviceId], references: [id])
+  startsAt             DateTime // UTC
+  endsAt               DateTime // UTC
+  status               AppointmentStatus @default(PENDING)
   // Instantanés figés à la réservation (§14.4) : une modification
   // du catalogue ne change JAMAIS l'historique
-  priceCents      Int?
-  durationMinutes Int
-  selectedOptions Json? // [{ optionId, name, priceCents }]
+  priceCents           Int?
+  durationMinutes      Int
+  selectedOptions      Json? // [{ optionId, name, priceCents }]
   // Réponses aux questions capillaires au moment de la réservation
-  hairInfo        Json?
-  comments        String?
+  hairInfo             Json?
+  comments             String?
   // Lien d'annulation client signé (§9)
-  cancelToken     String?           @unique
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  assessments     HairAssessment[]
+  cancelToken          String?           @unique
+  cancelTokenExpiresAt DateTime?
+  // Réservation en attente : libération automatique après ce délai (§7.2)
+  holdExpiresAt        DateTime?
+  cancelledAt          DateTime?
+  cancelReason         String?
+  // Ancien créneau conservé lors d'une reprogrammation (§9.4)
+  rescheduledFrom      DateTime?
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  assessments          HairAssessment[]
 
   // Anti double-réservation : un créneau ne peut être occupé qu'une
-  // fois par prestation (renforcé par transaction + contrainte, P6.2)
+  // fois par prestation (renforcé par transaction + verrou P6.2)
   @@unique([serviceId, startsAt])
   @@index([startsAt])
+  @@index([status, startsAt])
   @@index([customerId])
 }
 
@@ -435,5 +447,11 @@ model SalonSettings {
   holdSlotMinutes      Int      @default(30)
   minCancelNoticeHours Int      @default(24)
   reminderLeadHours    Int      @default(24)
+  // Réservation (§7, §8)
+  bufferMinutes        Int      @default(0)
+  slotIntervalMinutes  Int      @default(15)
+  maxAdvanceDays       Int      @default(60)
+  minLeadTimeMinutes   Int      @default(120)
+  cancelReasonRequired Boolean  @default(false)
   updatedAt            DateTime @updatedAt
 }
