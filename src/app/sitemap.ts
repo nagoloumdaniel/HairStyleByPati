@@ -15,6 +15,7 @@ const STATIC_ROUTES = [
   { url: '/contact', changeFrequency: 'monthly' as const, priority: 0.8 },
   { url: '/faq', changeFrequency: 'monthly' as const, priority: 0.7 },
   { url: '/infos-pratiques', changeFrequency: 'monthly' as const, priority: 0.7 },
+  { url: '/demandes-personnalisees', changeFrequency: 'monthly' as const, priority: 0.8 },
   { url: '/mentions-legales', changeFrequency: 'yearly' as const, priority: 0.5 },
   { url: '/confidentialite', changeFrequency: 'yearly' as const, priority: 0.5 },
 ] as const;

@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   // La limite applicative reste de 5 Mo (voir image-validation.ts).
   experimental: {
     serverActions: {
-      bodySizeLimit: '6mb',
+      bodySizeLimit: '20mb',
     },
   },
   images: {
