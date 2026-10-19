@@ -63,30 +63,30 @@
 
 > Objectif : direction artistique élégante/chaleureuse (§2), composants réutilisables, mobile-first.
 
-- [ ] **P2.1** Moodboard et direction artistique validée (premium, féminin, chaleureux, photos mises en avant — pas un template générique). — *skill : brainstorming + design-taste-frontend*
-- [ ] **P2.2** Design tokens étendus : espacements, rayons (angles légèrement arrondis), ombres, échelle typo, états (chargement/succès/erreur/invalide). — *skill : frontend-design*
-- [ ] **P2.3** Bibliothèque composants de base : Button (primaire jaune doré avec contraste garanti), Input, Textarea, Select, Card, Badge (statuts), Modal, Tabs, Accordion. — *skill : pick-ui-library*
-- [ ] **P2.4** Composants feedback : toasts (statuts réservation, erreurs formulaires). — *skill : ask-sonner*
-- [ ] **P2.5** Layout public : header logo + navigation, footer coordonnées/réseaux, responsive mobile-first. — *skill : frontend-design*
-- [ ] **P2.6** Layout dashboard : sidebar navigation (§3.2), identité visuelle cohérente mais distincte du public. — *skill : frontend-design*
-- [ ] **P2.7** États transverses : squelettes de chargement, états vides, messages d'erreur compréhensibles, formulaires qui conservent la saisie après échec de validation. — *skill : web-design-guidelines*
-- [ ] **P2.8** Animations discrètes et fluides (apparitions sections, transitions pages). — *skill : animate*
-- [ ] **P2.9** Accessibilité fondation : navigation clavier, focus visibles, ARIA, contrastes AA, statuts texte + couleur. — *skill : web-design-guidelines*
-- [ ] **P2.10** Revue design du système complet avant assemblage. — *skill : high-end-visual-design + web-design-guidelines*
+- [x] **P2.1** Moodboard et direction artistique validée (premium, féminin, chaleureux, photos mises en avant — pas un template générique). — *skill : brainstorming + design-taste-frontend*
+- [x] **P2.2** Design tokens étendus : espacements, rayons (angles légèrement arrondis), ombres, échelle typo, états (chargement/succès/erreur/invalide). — *skill : frontend-design*
+- [x] **P2.3** Bibliothèque composants de base : Button (primaire jaune doré avec contraste garanti), Input, Textarea, Select, Card, Badge (statuts), Modal, Tabs, Accordion. — *skill : pick-ui-library*
+- [x] **P2.4** Composants feedback : toasts (statuts réservation, erreurs formulaires). — *skill : ask-sonner*
+- [x] **P2.5** Layout public : header logo + navigation, footer coordonnées/réseaux, responsive mobile-first. — *skill : frontend-design*
+- [x] **P2.6** Layout dashboard : sidebar navigation (§3.2), identité visuelle cohérente mais distincte du public. — *skill : frontend-design*
+- [x] **P2.7** États transverses : squelettes de chargement, états vides, messages d'erreur compréhensibles, formulaires qui conservent la saisie après échec de validation. — *skill : web-design-guidelines*
+- [x] **P2.8** Animations discrètes et fluides (apparitions sections, transitions pages). — *skill : animate*
+- [x] **P2.9** Accessibilité fondation : navigation clavier, focus visibles, ARIA, contrastes AA, statuts texte + couleur. — *skill : web-design-guidelines*
+- [x] **P2.10** Revue design du système complet avant assemblage. — *skill : high-end-visual-design + web-design-guidelines*
 
 ## PHASE 3 — SITE PUBLIC
 
 > Objectif : vitrine qui convertit, conforme §4.
 
-- [ ] **P3.1** Page d'accueil : hero photo coiffure, accroche, 2 boutons (Réserver / Découvrir), coiffures populaires, prestations, étapes de réservation, présentation Patricia, témoignages, coordonnées. — *skill : frontend-design*
-- [ ] **P3.2** Catalogue : cartes (photo, nom, prix/départ, description, durée, catégories, boutons Voir détails / Réserver), recherche + filtres par catégories dynamiques. — *skill : frontend-design + react-best-practices*
-- [ ] **P3.3** Fiche détaillée : galerie multi-photos navigable sans quitter la page, prix/fourchette, durée, longueurs acceptées, compatibilités, restrictions, options, infos avant RDV. — *skill : frontend-design*
-- [ ] **P3.4** Pagination / chargement progressif catalogue. — *skill : react-best-practices*
-- [ ] **P3.5** Pages éditoriales : présentation salon, FAQ, informations pratiques, politique d'annulation. — *skill : frontend-design*
-- [ ] **P3.6** Formulaire de contact : anti-spam (honeypot + rate limit), enregistrement Conversation côté serveur. — *skill : security-audit*
-- [ ] **P3.7** Pages légales + politique de confidentialité RGPD (§15.3 : conservation, droits, contact, cookies). — *skill : security-audit*
-- [ ] **P3.8** SEO technique : metadata, Open Graph, sitemap, robots.txt, données structurées LocalBusiness (coiffeur). — *skill : seo-audit*
-- [ ] **P3.9** Tests navigateur des pages publiques sur mobile/tablette/desktop. — *skill : webapp-testing*
+- [x] **P3.1** Page d'accueil : hero photo coiffure, accroche, 2 boutons (Réserver / Découvrir), coiffures populaires, prestations, étapes de réservation, présentation Patricia, témoignages, coordonnées. — *skill : frontend-design*
+- [x] **P3.2** Catalogue : cartes (photo, nom, prix/départ, description, durée, catégories, boutons Voir détails / Réserver), recherche + filtres par catégories dynamiques. — *skill : frontend-design + react-best-practices*
+- [x] **P3.3** Fiche détaillée : galerie multi-photos navigable sans quitter la page, prix/fourchette, durée, longueurs acceptées, compatibilités, restrictions, options, infos avant RDV. — *skill : frontend-design*
+- [x] **P3.4** Pagination / chargement progressif catalogue. — *skill : react-best-practices*
+- [x] **P3.5** Pages éditoriales : présentation salon, FAQ, informations pratiques, politique d'annulation. — *skill : frontend-design*
+- [x] **P3.6** Formulaire de contact : anti-spam (honeypot + rate limit), enregistrement Conversation côté serveur. — *skill : security-audit*
+- [x] **P3.7** Pages légales + politique de confidentialité RGPD (§15.3 : conservation, droits, contact, cookies). — *skill : security-audit*
+- [x] **P3.8** SEO technique : metadata, Open Graph, sitemap, robots.txt, données structurées LocalBusiness (coiffeur). — *skill : seo-audit*
+- [x] **P3.9** Tests navigateur des pages publiques sur mobile/tablette/desktop. — *skill : webapp-testing*
 
 ## PHASE 4 — BACK-OFFICE CATALOGUE
 

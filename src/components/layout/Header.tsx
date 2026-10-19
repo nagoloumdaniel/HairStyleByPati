@@ -5,9 +5,9 @@ import { useState } from 'react';
 
 /* P2.5 : header public mobile-first, navigation clavier, menu hamburger accessible. */
 const LINKS = [
-  { href: '/coiffures', label: 'Coiffures' },
-  { href: '/#prestations', label: 'Prestations' },
-  { href: '/#salon', label: 'Le salon' },
+  { href: '/coiffures', label: 'Catalogue' },
+  { href: '/salon', label: 'Le salon' },
+  { href: '/faq', label: 'FAQ' },
   { href: '/contact', label: 'Contact' },
 ];
 

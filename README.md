@@ -4,7 +4,7 @@ Application web de réservation en ligne pour un salon de coiffure spécialisé 
 
 ## Statut
 
-Phase **0 — Préparation & governance** en cours. Aucune fonctionnalité applicative livrée pour l'instant (le scaffold Next.js arrive en Phase 1).
+Phase **3 — Site public** en cours : accueil (P3.1), catalogue avec recherche, filtres et pagination (P3.2/P3.4) et fiche détaillée avec galerie (P3.3) livrés. Restent les pages éditoriales, le formulaire de contact, les pages légales et le SEO de la phase.
 
 ## Stack (figée — voir [docs/stack.md](docs/stack.md))
 
@@ -35,14 +35,36 @@ Phase **0 — Préparation & governance** en cours. Aucune fonctionnalité appli
 
 ```bash
 npm install
-npm run ci         # CI locale : typecheck + format (+ lint/tests/build selon la phase)
+npm run dev        # serveur de développement
+npm run ci         # CI locale : typecheck + format + lint + tests + build
 npm run typecheck  # tsc --noEmit
+npm run lint       # ESLint
 npm run format     # Prettier
-npm run dev        # serveur de développement (à partir de la Phase 1)
-npm run lint       # ESLint (à partir de la Phase 1)
+npm run clean      # supprime le cache .next
+npm run db:seed    # catégories de base + compte admin
+npm run db:seed:demo  # catalogue de démonstration (développement uniquement)
 ```
 
+`npm run db:seed:demo` ajoute 12 prestations d'exemple publiées pour vérifier le site public. Ne jamais l'exécuter sur la base de production : le catalogue réel est saisi par Patricia depuis le dashboard (Phase 4).
+
 Les hooks `pre-commit` (lint-staged + `tsc --noEmit`) et `pre-push` (`npm run ci`) sont installés automatiquement par `npm install` (script `prepare` → husky). CI/CD : locale via `npm run ci`, déploiement Vercel au push sur `main`.
+
+### Cache `.next` : erreurs `Cannot find module './500.js'`
+
+`next dev` et `next build` partagent le dossier `.next`. Lancer un build
+(ou un `git push`, car le hook `pre-push` exécute `npm run ci`) pendant que
+le serveur de développement tourne corrompt ce cache.
+
+Procédure :
+
+```bash
+# 1. arrêter le serveur de développement (Ctrl+C)
+npm run clean   # 2. supprimer le cache .next
+npm run dev     # 3. relancer
+```
+
+Règle : lancer `npm run ci` / `npm run build` / `git push` serveur de
+développement arrêté.
 
 ## Règles du projet
 

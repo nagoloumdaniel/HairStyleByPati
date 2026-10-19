@@ -1,6 +1,8 @@
 import { ToastProvider } from '@/components/ui/Toast';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import LocalBusiness from '@/components/seo/LocalBusiness';
+import { LOCAL_BUSINESS } from '@/components/seo/LocalBusiness';
 import type { Metadata } from 'next';
 import { Manrope, Playfair_Display } from 'next/font/google';
 import './globals.css';
@@ -37,6 +39,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         >
           Aller au contenu
         </a>
+        {/* P3.8 : donnees structurees LocalBusiness (JSON-LD) */}
+        <LocalBusiness data={LOCAL_BUSINESS} />
         <ToastProvider>
           <Header />
           <div id="contenu">{children}</div>

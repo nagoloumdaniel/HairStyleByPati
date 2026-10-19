@@ -20,6 +20,24 @@ export function Footer() {
               </Link>
             </li>
             <li>
+              <Link href="/salon" className="opacity-80 hover:opacity-100 hover:underline">
+                Le salon
+              </Link>
+            </li>
+            <li>
+              <Link href="/faq" className="opacity-80 hover:opacity-100 hover:underline">
+                FAQ
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/infos-pratiques"
+                className="opacity-80 hover:opacity-100 hover:underline"
+              >
+                Infos pratiques
+              </Link>
+            </li>
+            <li>
               <Link href="/contact" className="opacity-80 hover:opacity-100 hover:underline">
                 Contact
               </Link>

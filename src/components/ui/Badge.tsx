@@ -10,10 +10,18 @@ const TONES: Record<BadgeTone, string> = {
 };
 
 /* P2.3 + P2.9 : statut toujours en texte, jamais couleur seule. */
-export function Badge({ tone = 'neutral', children }: { tone?: BadgeTone; children: ReactNode }) {
+export function Badge({
+  tone = 'neutral',
+  children,
+  className = '',
+}: {
+  tone?: BadgeTone;
+  children: ReactNode;
+  className?: string;
+}) {
   return (
     <span
-      className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold ${TONES[tone]}`}
+      className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold ${TONES[tone]} ${className}`}
     >
       {children}
     </span>
