@@ -57,7 +57,9 @@ export async function queueAppointmentNotifications(
   context: NotificationContext,
 ): Promise<void> {
   const suffix = context.idempotencySuffix ?? context.status;
+  const appUrl = appBaseUrl();
   const payload = {
+    kind: 'appointment',
     appointmentId: context.appointmentId,
     customerName: context.customerName,
     customerEmail: context.customerEmail,
@@ -67,7 +69,7 @@ export async function queueAppointmentNotifications(
     endsAt: context.endsAt.toISOString(),
     status: context.status,
     reason: context.reason ?? null,
-    cancelUrl: context.cancelToken ? `${appBaseUrl()}/annulation/${context.cancelToken}` : null,
+    cancelUrl: context.cancelToken ? `${appUrl}/annulation/${context.cancelToken}` : null,
   } as Prisma.InputJsonValue;
 
   const rows: Prisma.NotificationCreateManyInput[] = [];
@@ -82,13 +84,30 @@ export async function queueAppointmentNotifications(
   }
 
   const adminTemplate = ADMIN_TEMPLATES[event];
-  const adminEmail = context.settings.contactEmail ?? process.env.ADMIN_EMAIL ?? null;
+  const adminEmail =
+    context.settings.contactEmail?.trim() || process.env.ADMIN_EMAIL?.trim() || null;
   if (adminTemplate && adminEmail) {
     rows.push({
       idempotencyKey: `appointment:${context.appointmentId}:${event}:admin:${suffix}`,
       recipient: adminEmail,
       templateKey: adminTemplate,
       payload,
+    });
+  }
+
+  // P7.5 : notification dashboard avec lien direct vers la fiche concernée.
+  if (
+    adminEmail &&
+    (event === 'created' || event === 'cancelled_by_customer' || event === 'rescheduled')
+  ) {
+    const link = `/dashboard/reservations/${context.appointmentId}`;
+    rows.push({
+      idempotencyKey: `appointment:${context.appointmentId}:${event}:admin:inapp:${suffix}`,
+      recipient: adminEmail,
+      channel: 'IN_APP',
+      templateKey: 'admin_appointment_update',
+      link,
+      payload: { ...(payload as Record<string, unknown>), link } as Prisma.InputJsonValue,
     });
   }
 

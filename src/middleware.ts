@@ -16,7 +16,10 @@ export default auth((req) => {
     return NextResponse.redirect(loginUrl);
   }
 
-  return NextResponse.next();
+  // Expose le chemin courant au layout dashboard pour l'état actif de la navigation.
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set('x-pathname', req.nextUrl.pathname);
+  return NextResponse.next({ request: { headers: requestHeaders } });
 });
 
 export const config = {

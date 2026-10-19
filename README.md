@@ -4,11 +4,19 @@ Application web de réservation en ligne pour un salon de coiffure spécialisé 
 
 ## Statut
 
-Phase **6, réservation, disponibilités et calendrier**, terminée le 19/10/2026 : parcours public de réservation en 8 étapes, moteur de disponibilités (horaires, exceptions, pauses, blocages, marges, délais), verrou PostgreSQL anti double réservation, validation manuelle avec libération automatique, annulation client par lien sécurisé, annulation admin, reprogrammation atomique, calendrier jour/semaine/mois/liste et gestion des disponibilités avec alertes de conflit. Le garde de compatibilité de la phase 5 est rejoué avant chaque enregistrement. Vérifiée par 157 tests Vitest et 8 parcours Playwright.
+Phase **7, notifications et messagerie**, terminée le 19/10/2026 : file d'attente e-mail idempotente avec abstraction fournisseur Resend et mode console local, reprise progressive sur échec, rappels H-24 configurables, notifications dashboard avec liens directs, visibilité et relance des échecs, boîte de réception des messages avec réponse e-mail, notes internes privées et statuts de suivi. Vérifiée par 167 tests Vitest et 5 parcours Playwright dédiés, en plus des parcours des phases précédentes.
 
 Le thème **clair / sombre** est disponible sur toutes les interfaces via l'icône du header. La préférence système est détectée au chargement, le choix est mémorisé dans le navigateur et appliqué avant le premier rendu pour éviter tout flash. Vérifié par 4 parcours Playwright desktop et mobile.
 
-Prochaine étape : phase **7, notifications et messagerie**. Les notifications de réservation sont déjà mises en file d'attente de façon idempotente. Le seed crée des disponibilités par défaut du lundi au samedi, 9h-18h.
+Prochaine étape : phase **8, demandes personnalisées et fonctionnalités supplémentaires**. Le seed crée des disponibilités par défaut du lundi au samedi, 9h-18h.
+
+### Notifications en local
+
+Avec `EMAIL_MODE="console"` dans `.env.local`, aucun e-mail réel n'est envoyé : les envois sont simulés et tracés. Les routes cron sont protégées par `CRON_SECRET` et définies dans `vercel.json` (`/api/cron/notifications` toutes les 10 minutes, `/api/cron/reminders` toutes les heures). Exemple local :
+
+```bash
+curl -H "Authorization: Bearer ${CRON_SECRET}" http://localhost:3000/api/cron/reminders
+```
 
 ## Stack (figée — voir [docs/stack.md](docs/stack.md))
 

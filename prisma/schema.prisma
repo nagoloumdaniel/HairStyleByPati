@@ -348,19 +348,34 @@ model HairAssessment {
 // ============================================================
 
 enum ConversationStatus {
-  OPEN
-  CLOSED
+  NEW
+  IN_PROGRESS
+  WAITING_RESPONSE
+  TREATED
+  ARCHIVED
+}
+
+enum ConversationSource {
+  CONTACT
+  APPOINTMENT
+  COMPATIBILITY
+  CUSTOM
 }
 
 model Conversation {
-  id         String             @id @default(cuid())
-  customerId String?
-  customer   Customer?          @relation(fields: [customerId], references: [id])
-  subject    String
-  status     ConversationStatus @default(OPEN)
-  createdAt  DateTime           @default(now())
-  updatedAt  DateTime           @updatedAt
-  messages   Message[]
+  id            String             @id @default(cuid())
+  customerId    String?
+  customer      Customer?          @relation(fields: [customerId], references: [id])
+  subject       String
+  status        ConversationStatus @default(NEW)
+  source        ConversationSource @default(CONTACT)
+  lastMessageAt DateTime           @default(now())
+  archivedAt    DateTime?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  messages      Message[]
+
+  @@index([status, lastMessageAt])
 }
 
 enum MessageAuthor {
@@ -394,24 +409,35 @@ enum NotificationChannel {
 
 enum NotificationStatus {
   PENDING
+  PROCESSING
   SENT
   FAILED
 }
 
 model Notification {
-  id             String              @id @default(cuid())
+  id                String              @id @default(cuid())
   // Clé d'idempotence unique par événement : un événement ne notifie
   // qu'une fois, même si la job tourne plusieurs fois (§10, §14.4)
-  idempotencyKey String              @unique
-  recipient      String
-  channel        NotificationChannel @default(EMAIL)
-  templateKey    String
-  payload        Json
-  status         NotificationStatus  @default(PENDING)
-  sentAt         DateTime?
-  error          String?
-  createdAt      DateTime            @default(now())
+  idempotencyKey    String              @unique
+  recipient         String
+  channel           NotificationChannel @default(EMAIL)
+  templateKey       String
+  payload           Json
+  status            NotificationStatus  @default(PENDING)
+  attempts          Int                 @default(0)
+  lastAttemptAt     DateTime?
+  nextAttemptAt     DateTime?
+  readAt            DateTime?
+  // Lien direct vers la fiche concernée dans le dashboard
+  link              String?
+  providerMessageId String?
+  sentAt            DateTime?
+  error             String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
 
+  @@index([status, nextAttemptAt])
+  @@index([channel, readAt])
   @@index([status, createdAt])
 }
 
