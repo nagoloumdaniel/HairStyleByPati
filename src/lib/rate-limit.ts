@@ -5,9 +5,19 @@ interface Entry {
   resetAt: number;
 }
 const store = new Map<string, Entry>();
+let lastSweep = 0;
+
+function sweep(now: number): void {
+  if (now - lastSweep < 60_000) return;
+  lastSweep = now;
+  for (const [key, entry] of store) {
+    if (entry.resetAt <= now) store.delete(key);
+  }
+}
 
 export function rateLimit(key: string, { max, windowMs }: { max: number; windowMs: number }) {
   const now = Date.now();
+  sweep(now);
   const entry = store.get(key);
   if (!entry || now >= entry.resetAt) {
     store.set(key, { count: 1, resetAt: now + windowMs });

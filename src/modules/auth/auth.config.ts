@@ -12,6 +12,21 @@ export const authConfig = {
   session: {
     strategy: 'jwt',
   },
+  // P9.4 : cookie de session explicite, HttpOnly, SameSite Lax et Secure en production.
+  cookies: {
+    sessionToken: {
+      name:
+        process.env.NODE_ENV === 'production'
+          ? '__Secure-authjs.session-token'
+          : 'authjs.session-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+  },
   // Pas de provider ici : le middleware ne doit jamais importer Prisma
   providers: [],
   callbacks: {

@@ -1,4 +1,4 @@
-﻿import type { SalonSettings } from '@prisma/client';
+import type { SalonSettings } from '@prisma/client';
 import { db } from '@/lib/db';
 
 /* ============================================================
@@ -23,6 +23,8 @@ export interface SalonSettingsData {
   emailSignature: string | null;
   cancellationPolicy: string | null;
   bookingPolicy: string | null;
+  dataRetentionMonths: number;
+  photoRetentionDays: number;
 }
 
 export const DEFAULT_SALON_SETTINGS: SalonSettingsData = {
@@ -43,6 +45,8 @@ export const DEFAULT_SALON_SETTINGS: SalonSettingsData = {
   emailSignature: null,
   cancellationPolicy: null,
   bookingPolicy: null,
+  dataRetentionMonths: 36,
+  photoRetentionDays: 90,
 };
 
 export function mapSalonSettings(row: SalonSettings): SalonSettingsData {
@@ -64,6 +68,8 @@ export function mapSalonSettings(row: SalonSettings): SalonSettingsData {
     emailSignature: row.emailSignature,
     cancellationPolicy: row.cancellationPolicy,
     bookingPolicy: row.bookingPolicy,
+    dataRetentionMonths: row.dataRetentionMonths,
+    photoRetentionDays: row.photoRetentionDays,
   };
 }
 

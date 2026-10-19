@@ -88,6 +88,8 @@ export const settingsSchema = z.object({
   slotIntervalMinutes: z.coerce.number().int().min(5).max(120),
   maxAdvanceDays: z.coerce.number().int().min(1).max(365),
   minLeadTimeMinutes: z.coerce.number().int().min(0).max(10080),
+  dataRetentionMonths: z.coerce.number().int().min(1).max(120),
+  photoRetentionDays: z.coerce.number().int().min(7).max(3650),
   cancelReasonRequired: z.preprocess(
     (value) => value === 'on' || value === true || value === 'true',
     z.boolean().default(false),

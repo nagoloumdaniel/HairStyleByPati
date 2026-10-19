@@ -48,6 +48,9 @@ next-env.d.ts
 /playwright-report/
 /blob-report/
 
+# sauvegardes locales — jamais commitées
+/backups/
+
 # tooling
 /.husky/_
 /.worktrees/
