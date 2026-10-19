@@ -140,16 +140,17 @@
 ## PHASE 7 — NOTIFICATIONS & MESSAGERIE
 
 > Objectif : fiables, idempotentes, découplées (§10).
+> État : terminée le 19/10/2026. File d'attente e-mail avec fournisseur Resend et mode console local, reprise progressive, rappels H-24 idempotents, notifications dashboard avec liens directs, messagerie complète avec réponse e-mail et notes internes. Les modèles des demandes personnalisées seront branchés avec le module de la phase 8.
 
-- [ ] **P7.1** Service d'e-mail transactionnel (Resend/Brevo) avec abstraction fournisseur. — *skill : caveman*
-- [ ] **P7.2** File d'attente d'envoi + reprise sur échec ; l'envoi e-mail ne bloque et ne conditionne jamais l'enregistrement d'une réservation. — *skill : test-driven-development*
-- [ ] **P7.3** Modèles d'e-mail pour tous les événements §10.1 (réservation, attente, confirmation, évaluation, photo reçue, personnalisée, annulations, reprogrammation, infos, acceptation/refus, rappel), personnalisables. — *skill : caveman*
-- [ ] **P7.4** Idempotence des notifications (jamais de doublon même si relance technique). — *skill : test-driven-development*
-- [ ] **P7.5** Notifications Patricia : e-mail + notification dashboard avec lien direct vers la fiche concernée. — *skill : frontend-design*
-- [ ] **P7.6** Messagerie dashboard : boîte de réception (contact, renseignements, commentaires RDV, personnalisées, compatibilité), statuts (nouveau, en cours, attente réponse, traité, archivé), réponse e-mail, notes internes invisibles côté client. — *skill : frontend-design + test-driven-development*
-- [ ] **P7.7** Rappels automatiques H-24 (délai configurable), uniquement RDV valides, anti-doublon. — *skill : test-driven-development*
-- [ ] **P7.8** Visibilité des échecs d'envoi dans le dashboard + journaux. — *skill : caveman*
-- [ ] **P7.9** Tests scénarios §17 Messagerie et notifications. — *skill : verify-and-stop*
+- [x] **P7.1** Service d'e-mail transactionnel (Resend/Brevo) avec abstraction fournisseur. — *skill : caveman*
+- [x] **P7.2** File d'attente d'envoi + reprise sur échec ; l'envoi e-mail ne bloque et ne conditionne jamais l'enregistrement d'une réservation. — *skill : test-driven-development*
+- [x] **P7.3** Modèles d'e-mail pour les événements §10.1 : réservation, attente, confirmation, annulations, reprogrammation, rappel, contact et réponse. Les événements des demandes personnalisées seront ajoutés en phase 8. — *skill : caveman*
+- [x] **P7.4** Idempotence des notifications (jamais de doublon même si relance technique). — *skill : test-driven-development*
+- [x] **P7.5** Notifications Patricia : e-mail + notification dashboard avec lien direct vers la fiche concernée. — *skill : frontend-design*
+- [x] **P7.6** Messagerie dashboard : boîte de réception (contact, renseignements, commentaires RDV, personnalisées, compatibilité), statuts (nouveau, en cours, attente réponse, traité, archivé), réponse e-mail, notes internes invisibles côté client. — *skill : frontend-design + test-driven-development*
+- [x] **P7.7** Rappels automatiques H-24 (délai configurable), uniquement RDV valides, anti-doublon. — *skill : test-driven-development*
+- [x] **P7.8** Visibilité des échecs d'envoi dans le dashboard + journaux. — *skill : caveman*
+- [x] **P7.9** Tests scénarios §17 Messagerie et notifications. — *skill : verify-and-stop*
 
 ## PHASE 8 — DEMANDES PERSONNALISÉES & FONCTIONNALITÉS SUPPLÉMENTAIRES
 
