@@ -9,8 +9,11 @@ const NAV = [
   { href: '/dashboard/historique', label: 'Historique', key: 'history' },
   { href: '/dashboard/evaluations', label: 'Evaluations', key: 'evaluations' },
   { href: '/dashboard/reservations', label: 'Reservations', key: 'reservations' },
+  { href: '/dashboard/demandes', label: 'Demandes', key: 'demandes' },
+  { href: '/dashboard/clients', label: 'Clientes', key: 'clients' },
   { href: '/dashboard/notifications', label: 'Notifications', key: 'notifications' },
   { href: '/dashboard/messages', label: 'Messages', key: 'messages' },
+  { href: '/dashboard/statistiques', label: 'Statistiques', key: 'stats' },
   { href: '/dashboard/parametres', label: 'Parametres', key: 'settings' },
 ] as const;
 

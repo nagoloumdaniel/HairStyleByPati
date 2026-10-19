@@ -9,6 +9,7 @@ const LINKS = [
   { href: '/coiffures', label: 'Catalogue' },
   { href: '/salon', label: 'Le salon' },
   { href: '/faq', label: 'FAQ' },
+  { href: '/demandes-personnalisees', label: 'Sur mesure' },
   { href: '/contact', label: 'Contact' },
 ];
 

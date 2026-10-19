@@ -18,6 +18,11 @@ export interface SalonSettingsData {
   maxAdvanceDays: number;
   minLeadTimeMinutes: number;
   cancelReasonRequired: boolean;
+  logoUrl: string | null;
+  openingHours: unknown;
+  emailSignature: string | null;
+  cancellationPolicy: string | null;
+  bookingPolicy: string | null;
 }
 
 export const DEFAULT_SALON_SETTINGS: SalonSettingsData = {
@@ -33,6 +38,11 @@ export const DEFAULT_SALON_SETTINGS: SalonSettingsData = {
   maxAdvanceDays: 60,
   minLeadTimeMinutes: 120,
   cancelReasonRequired: false,
+  logoUrl: null,
+  openingHours: null,
+  emailSignature: null,
+  cancellationPolicy: null,
+  bookingPolicy: null,
 };
 
 export function mapSalonSettings(row: SalonSettings): SalonSettingsData {
@@ -49,6 +59,11 @@ export function mapSalonSettings(row: SalonSettings): SalonSettingsData {
     maxAdvanceDays: row.maxAdvanceDays,
     minLeadTimeMinutes: row.minLeadTimeMinutes,
     cancelReasonRequired: row.cancelReasonRequired,
+    logoUrl: row.logoUrl,
+    openingHours: row.openingHours,
+    emailSignature: row.emailSignature,
+    cancellationPolicy: row.cancellationPolicy,
+    bookingPolicy: row.bookingPolicy,
   };
 }
 

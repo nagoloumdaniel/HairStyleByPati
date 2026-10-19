@@ -236,6 +236,23 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Demande personnalisée */}
+      <section className="rounded-2xl border border-line bg-card p-8 text-center shadow-soft md:p-12">
+        <h2 className="font-heading text-3xl font-bold text-fg">
+          Une coiffure sur mesure en tête ?
+        </h2>
+        <p className="mx-auto mt-3 max-w-2xl text-ink-soft">
+          Décrivez votre projet et joignez jusqu’à trois photos de référence. Patricia étudie votre
+          demande et vous propose une prestation adaptée, sans réservation automatique.
+        </p>
+        <Link
+          href="/demandes-personnalisees"
+          className="mt-6 inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-7 py-3.5 text-lg font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
+        >
+          Demander une coiffure personnalisée
+        </Link>
+      </section>
+
       {/* Contact / Coordonnées */}
       <section id="contact" className="rounded-2xl bg-page p-8 md:p-12 reveal">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
