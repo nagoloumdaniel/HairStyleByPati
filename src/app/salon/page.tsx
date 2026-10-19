@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { IMAGE_BLUR_DATA_URL } from '@/lib/image-placeholder';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 
@@ -78,6 +79,10 @@ export default function SalonPage() {
             className="rounded-full shadow-lift ring-4 ring-accent-soft"
             width={360}
             height={360}
+            sizes="(max-width: 768px) 80vw, 40vw"
+            placeholder="blur"
+            blurDataURL={IMAGE_BLUR_DATA_URL}
+            quality={80}
             priority
           />
         </div>

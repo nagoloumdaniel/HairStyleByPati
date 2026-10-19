@@ -42,6 +42,9 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   // P4.4 : les photos de prestation sont envoyées via server action.
   // La limite applicative reste de 5 Mo par fichier (voir image-validation.ts).
+  // Évite le streaming des métadonnées dans le body pour les pages dynamiques.
+  // Les balises title/description restent dans <head> pour les crawlers et Lighthouse.
+  htmlLimitedBots: /.*/,
   experimental: {
     serverActions: {
       bodySizeLimit: '20mb',

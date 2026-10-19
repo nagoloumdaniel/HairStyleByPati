@@ -14,7 +14,10 @@ export const dynamic = 'force-dynamic';
 export default async function ConfidentialitePage() {
   const settings = await getSalonSettings();
   const contactEmail =
-    settings.contactEmail ?? process.env.ADMIN_EMAIL ?? 'contact@hairstylebypati.fr';
+    settings.contactEmail?.trim() ||
+    process.env.ADMIN_EMAIL?.trim() ||
+    process.env.AUTH_ADMIN_EMAIL?.trim() ||
+    'contact@hairstylebypati.fr';
   return (
     <main className="mx-auto w-full max-w-7xl space-y-12 px-4 py-8 sm:px-6 md:py-12">
       <nav aria-label="Fil d'Ariane" className="text-sm text-muted">

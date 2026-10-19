@@ -122,7 +122,7 @@ export default async function CataloguePage({
                 <span aria-hidden="true">←</span> Page précédente
               </Link>
             ) : (
-              <span aria-disabled="true" className="text-sm text-muted/60">
+              <span aria-disabled="true" className="text-sm text-muted">
                 <span aria-hidden="true">←</span> Page précédente
               </span>
             )}
@@ -140,7 +140,7 @@ export default async function CataloguePage({
                 Page suivante <span aria-hidden="true">→</span>
               </Link>
             ) : (
-              <span aria-disabled="true" className="text-sm text-muted/60">
+              <span aria-disabled="true" className="text-sm text-muted">
                 Page suivante <span aria-hidden="true">→</span>
               </span>
             )}

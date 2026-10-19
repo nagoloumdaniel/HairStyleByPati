@@ -6,6 +6,12 @@ export const metadata: Metadata = {
   title: 'Demande de coiffure personnalisée',
   description:
     'Décrivez votre coiffure sur mesure, ajoutez des photos de référence et recevez une réponse personnalisée de Patricia.',
+  alternates: { canonical: '/demandes-personnalisees' },
+  openGraph: {
+    title: 'Demande de coiffure personnalisée - Hairstyle by Patricia',
+    description: 'Décrivez votre coiffure sur mesure et recevez une réponse personnalisée.',
+    url: '/demandes-personnalisees',
+  },
 };
 
 export default function CustomRequestPage() {

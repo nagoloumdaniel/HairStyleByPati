@@ -17,7 +17,7 @@
   --color-surface: #ffffff; /* ancien token, conservé */
   --color-alert: #c94b4b; /* erreurs et alertes */
   --color-alert-soft: #fbe9e9; /* fond erreur */
-  --color-success: #3d8b5f; /* succès */
+  --color-success: #2f6f4a; /* succès, contraste AA sur fond doux */
   --color-success-soft: #e6f3ec; /* fond succès */
 
   /* Tokens sémantiques (thème clair / sombre) */

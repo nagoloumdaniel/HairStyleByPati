@@ -188,12 +188,13 @@
 - [x] **P9.11** Recette sécurité automatisée : dashboard bloqué, API admin 401, en-têtes, cookie, export RGPD, XSS échappé, cron de purge protégé. — *skill : verify-and-stop + security-audit*
 
 ## PHASE 10 — PERFORMANCE, ACCESSIBILITÉ, SEO (EXIGENCES §16)
+> État : terminée le 19/10/2026. Résultats détaillés dans [docs/performance.md](docs/performance.md).
 
-- [ ] **P10.1** Optimisation images : formats modernes, redimensionnement selon écran, lazy loading, images de repli pour lenteur réseau. — *skill : image*
-- [ ] **P10.2** Performance : Lighthouse mobile ≥ 90 sur toutes les pages principales, requêtes DB minimales, cache des pages publiques. — *skill : caveman + verification-before-completion*
-- [ ] **P10.3** Audit accessibilité complet : contrastes, libellés formulaires, clavier, textes alternatifs, erreurs compréhensibles, statuts texte. — *skill : web-design-guidelines*
-- [ ] **P10.4** Audit SEO final : indexation, sitemap, metadata, contenu, LocalBusiness. — *skill : seo-audit*
-- [ ] **P10.5** Parcours complet testé réellement sur Android, iPhone, tablette, ordinateur ; zéro défilement horizontal involontaire. — *skill : webapp-testing*
+- [x] **P10.1** Optimisation images : formats modernes, tailles responsives, lazy loading, placeholders et image de repli. — *skill : image*
+- [x] **P10.2** Performance : Lighthouse mobile 96 à 98 sur les pages principales, cache ISR des fiches prestation, requêtes DB limitées. — *skill : caveman + verification-before-completion*
+- [x] **P10.3** Audit accessibilité : axe-core sans violation sérieuse ou critique, contrastes, libellés, clavier, textes alternatifs. — *skill : web-design-guidelines*
+- [x] **P10.4** Audit SEO : canoniques, métadonnées, Open Graph, sitemap, robots, LocalBusiness, dashboard noindex. — *skill : seo-audit*
+- [x] **P10.5** Parcours responsive testé sur desktop, tablette, mobile Android et viewport iPhone (Chromium) sans débordement horizontal. Safari réel non testé. — *skill : webapp-testing*
 
 ## PHASE 11 — TESTS, RECETTE, REVUE
 

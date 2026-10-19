@@ -12,16 +12,16 @@ Document de référence pour l'exploitation et la revue de sécurité. Aucun sec
 
 ## Faiblesses corrigées pendant la phase 9
 
-| Sévérité | Sujet                                         | Correction                                                                                                                                     |
-| -------- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| Haute    | Connexion sans limitation de tentatives       | Limite par IP et par couple IP/e-mail dans `authorize` (`src/modules/auth/auth.ts`). Message d'erreur inchangé pour éviter l'énumération.      |
-| Moyenne  | Cookies de session implicites                 | Cookie `HttpOnly`, `SameSite=Lax`, `Secure` en production et nom `__Secure-` explicites (`src/modules/auth/auth.config.ts`).                   |
-| Moyenne  | Absence d'en-têtes navigateur                 | `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, COOP/CORP, HSTS et CSP en production (`next.config.ts`). |
-| Moyenne  | API d'export admin accessible hors middleware | Middleware `/api/admin/:path*` avec 401, plus contrôle `auth()` dans la route.                                                                 |
-| Moyenne  | Pas de procédure d'effacement RGPD            | Export JSON, rectification et anonymisation avec suppression des contenus privés (`src/modules/clients/rgpd.ts`).                              |
-| Basse    | Photos privées conservées indéfiniment        | Purge quotidienne configurable via `/api/cron/retention` et `photoRetentionDays`.                                                              |
-| Basse    | Liens d'annulation expirés encore stockés     | Suppression du jeton expiré lors de la purge de rétention.                                                                                     |
-| Basse    | Pas de sonde de santé                         | `/api/health` sans donnée personnelle, réponse 503 si la base est indisponible.                                                                |
+| Sévérité | Sujet                                         | Correction                                                                                                                                                                |
+| -------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Haute    | Connexion sans limitation de tentatives       | Limite par IP (20 tentatives) et par couple IP/e-mail (10 tentatives) dans `authorize` (`src/modules/auth/auth.ts`). Message d'erreur inchangé pour éviter l'énumération. |
+| Moyenne  | Cookies de session implicites                 | Cookie `HttpOnly`, `SameSite=Lax`, `Secure` en production et nom `__Secure-` explicites (`src/modules/auth/auth.config.ts`).                                              |
+| Moyenne  | Absence d'en-têtes navigateur                 | `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, COOP/CORP, HSTS et CSP en production (`next.config.ts`).                            |
+| Moyenne  | API d'export admin accessible hors middleware | Middleware `/api/admin/:path*` avec 401, plus contrôle `auth()` dans la route.                                                                                            |
+| Moyenne  | Pas de procédure d'effacement RGPD            | Export JSON, rectification et anonymisation avec suppression des contenus privés (`src/modules/clients/rgpd.ts`).                                                         |
+| Basse    | Photos privées conservées indéfiniment        | Purge quotidienne configurable via `/api/cron/retention` et `photoRetentionDays`.                                                                                         |
+| Basse    | Liens d'annulation expirés encore stockés     | Suppression du jeton expiré lors de la purge de rétention.                                                                                                                |
+| Basse    | Pas de sonde de santé                         | `/api/health` sans donnée personnelle, réponse 503 si la base est indisponible.                                                                                           |
 
 ## Mesures déjà en place et vérifiées
 

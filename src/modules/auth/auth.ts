@@ -26,9 +26,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // P9.3 : limitation des tentatives de connexion par IP et par e-mail.
         const forwarded = request?.headers?.get('x-forwarded-for');
         const ip = forwarded ? (forwarded.split(',')[0] ?? '').trim() : 'unknown';
-        const ipLimit = rateLimit(`login:ip:${ip}`, { max: 10, windowMs: 15 * 60_000 });
+        const ipLimit = rateLimit(`login:ip:${ip}`, { max: 20, windowMs: 15 * 60_000 });
         const emailLimit = rateLimit(`login:email:${parsed.data.email}:${ip}`, {
-          max: 5,
+          max: 10,
           windowMs: 15 * 60_000,
         });
         if (!ipLimit.allowed || !emailLimit.allowed) return null;
