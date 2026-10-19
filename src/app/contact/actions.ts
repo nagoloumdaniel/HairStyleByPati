@@ -1,11 +1,13 @@
 'use server';
 
 import { headers } from 'next/headers';
+import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 import { db } from '@/lib/db';
 import { parseInput } from '@/lib/errors';
 import { rateLimit } from '@/lib/rate-limit';
+import { adminNotificationRecipient } from '@/modules/notifications/service';
 
 const contactSchema = z.object({
   name: z.string().min(2, 'Nom requis (2 caractères minimum)').max(100),
@@ -51,21 +53,72 @@ export async function createConversation(
   }
 
   try {
-    await db.conversation.create({
-      data: {
-        subject: input.subject,
-        messages: {
-          create: {
-            author: 'CUSTOMER',
-            content:
-              `Nom : ${input.name}\n` +
-              `E-mail : ${input.email}\n` +
-              `Téléphone : ${input.phone || 'non renseigné'}\n\n` +
-              `${input.message}`,
+    const adminEmail = adminNotificationRecipient();
+
+    await db.$transaction(async (tx) => {
+      const customer = await tx.customer.upsert({
+        where: { email: input.email.toLowerCase() },
+        update: { name: input.name, phone: input.phone || '' },
+        create: {
+          name: input.name,
+          email: input.email.toLowerCase(),
+          phone: input.phone || '',
+        },
+      });
+
+      const conversation = await tx.conversation.create({
+        data: {
+          customerId: customer.id,
+          subject: input.subject,
+          source: 'CONTACT',
+          status: 'NEW',
+          lastMessageAt: new Date(),
+          messages: {
+            create: {
+              author: 'CUSTOMER',
+              content: input.message,
+            },
           },
         },
-      },
+      });
+
+      const payload = {
+        kind: 'conversation',
+        conversationId: conversation.id,
+        customerName: input.name,
+        customerEmail: input.email,
+        subject: input.subject,
+        message: input.message,
+        adminLink: `/dashboard/messages/${conversation.id}`,
+      } as const;
+
+      await tx.notification.createMany({
+        data: [
+          {
+            idempotencyKey: `conversation:${conversation.id}:contact:admin:email`,
+            recipient: adminEmail,
+            templateKey: 'admin_contact_message',
+            payload,
+          },
+          {
+            idempotencyKey: `conversation:${conversation.id}:contact:admin:inapp`,
+            recipient: adminEmail,
+            channel: 'IN_APP',
+            templateKey: 'admin_contact_message',
+            link: `/dashboard/messages/${conversation.id}`,
+            payload,
+          },
+          {
+            idempotencyKey: `conversation:${conversation.id}:contact:client`,
+            recipient: customer.email,
+            templateKey: 'contact_received',
+            payload,
+          },
+        ],
+        skipDuplicates: true,
+      });
     });
+    revalidatePath('/dashboard', 'layout');
     return { ok: true };
   } catch {
     return { ok: false, error: "Échec de l'enregistrement du message, réessayez." };
