@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { getSalonSettings } from '@/modules/disponibilites/queries';
 
 export const metadata: Metadata = {
   title: 'Politique de confidentialité RGPD',
@@ -8,7 +9,12 @@ export const metadata: Metadata = {
   alternates: { canonical: '/confidentialite' },
 };
 
-export default function ConfidentialitePage() {
+export const dynamic = 'force-dynamic';
+
+export default async function ConfidentialitePage() {
+  const settings = await getSalonSettings();
+  const contactEmail =
+    settings.contactEmail ?? process.env.ADMIN_EMAIL ?? 'contact@hairstylebypati.fr';
   return (
     <main className="mx-auto w-full max-w-7xl space-y-12 px-4 py-8 sm:px-6 md:py-12">
       <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
@@ -45,8 +51,8 @@ export default function ConfidentialitePage() {
         <p className="text-muted leading-relaxed">
           Le salon Hairstyle by Patricia (Patricia, gérante) est responsable du traitement des
           données personnelles collectées sur ce site. Contact :{' '}
-          <a href="mailto:contact@example.com" className="text-cacao underline">
-            contact@example.com
+          <a href={`mailto:${contactEmail}`} className="text-cacao underline">
+            {contactEmail}
           </a>
           .
         </p>
@@ -109,10 +115,17 @@ export default function ConfidentialitePage() {
         <ul className="list-disc list-inside space-y-2 text-muted leading-relaxed">
           <li>Messages de contact : 12 mois maximum après la dernière réponse.</li>
           <li>
+            Données clientes et historique : {settings.dataRetentionMonths} mois maximum, puis
+            anonymisation ou suppression.
+          </li>
+          <li>
             Données de réservation et client : durée de la relation client + délais légaux
             (facturation).
           </li>
-          <li>Photos d’évaluation : durée configurée par le salon, puis purge automatique.</li>
+          <li>
+            Photos privées d’évaluation et de demande : {settings.photoRetentionDays} jours maximum,
+            puis purge automatique.
+          </li>
           <li>
             Adresse IP (rate limiter) : conservé le temps de la fenêtre de rate limiting, puis
             supprimé.
@@ -161,8 +174,8 @@ export default function ConfidentialitePage() {
         </ul>
         <p className="text-muted leading-relaxed mt-4">
           Pour exercer ces droits ou poser une question, écrivez à{' '}
-          <a href="mailto:contact@example.com" className="text-cacao underline">
-            contact@example.com
+          <a href={`mailto:${contactEmail}`} className="text-cacao underline">
+            {contactEmail}
           </a>
           . Une pièce d’identité peut vous être demandée pour prévenir tout abus. En cas de
           désaccord persistant, vous pouvez introduire une réclamation auprès de la CNIL.

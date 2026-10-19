@@ -54,6 +54,8 @@ export interface BookingSettingsView {
   maxAdvanceDays: number;
   minLeadTimeMinutes: number;
   cancelReasonRequired: boolean;
+  dataRetentionMonths: number;
+  photoRetentionDays: number;
 }
 
 function timeValue(minutes: number): string {
@@ -403,6 +405,24 @@ export function BookingSettingsEditor({ settings }: { settings: BookingSettingsV
           min={0}
           max={10080}
           defaultValue={settings.minLeadTimeMinutes}
+        />
+        <Input
+          label="Conservation des données (mois)"
+          name="dataRetentionMonths"
+          type="number"
+          min={1}
+          max={120}
+          defaultValue={settings.dataRetentionMonths}
+          hint="Durée indicative pour les données clientes et l’historique."
+        />
+        <Input
+          label="Conservation des photos privées (jours)"
+          name="photoRetentionDays"
+          type="number"
+          min={7}
+          max={3650}
+          defaultValue={settings.photoRetentionDays}
+          hint="Les photos d’évaluation et de demande sont purgées après ce délai."
         />
       </div>
       <label className="flex items-center gap-2 text-sm font-semibold">

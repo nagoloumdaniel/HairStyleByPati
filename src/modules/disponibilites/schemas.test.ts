@@ -94,6 +94,8 @@ describe('settingsSchema', () => {
         maxAdvanceDays: '60',
         minLeadTimeMinutes: '120',
         cancelReasonRequired: 'on',
+        dataRetentionMonths: '36',
+        photoRetentionDays: '90',
       }).success,
     ).toBe(true);
   });
@@ -108,6 +110,8 @@ describe('settingsSchema', () => {
         slotIntervalMinutes: '2',
         maxAdvanceDays: '60',
         minLeadTimeMinutes: '120',
+        dataRetentionMonths: '36',
+        photoRetentionDays: '90',
       }).success,
     ).toBe(false);
   });

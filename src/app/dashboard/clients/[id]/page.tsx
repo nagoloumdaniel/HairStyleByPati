@@ -9,6 +9,8 @@ import { CUSTOM_REQUEST_STATUS_LABELS } from '@/modules/demandes/queries';
 import { LocalDateTime } from '@/components/shared/LocalDateTime';
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
+import { CustomerContactForm } from './customer-contact-form';
+import { CustomerRgpdActions } from './customer-rgpd-actions';
 
 export const metadata: Metadata = { title: 'Fiche cliente - Tableau de bord' };
 
@@ -55,6 +57,16 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           {customer.phone ? ` · ${customer.phone}` : ' · téléphone non renseigné'}
         </p>
       </div>
+
+      <Card className="mt-5">
+        <h2 className="font-heading text-xl font-bold text-fg">Coordonnées</h2>
+        <CustomerContactForm
+          customerId={customer.id}
+          name={customer.name}
+          email={customer.email}
+          phone={customer.phone}
+        />
+      </Card>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
@@ -184,6 +196,8 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           )}
         </Card>
       </div>
+
+      <CustomerRgpdActions customerId={customer.id} customerName={customer.name} />
 
       <p className="mt-6 text-xs text-ink-soft">
         Fiche créée le <LocalDateTime iso={customer.createdAt.toISOString()} />. Données capillaires

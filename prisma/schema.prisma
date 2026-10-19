@@ -520,5 +520,8 @@ model SalonSettings {
   emailSignature       String?
   cancellationPolicy   String?
   bookingPolicy        String?
+  // RGPD : conservation des données et des photos privées
+  dataRetentionMonths  Int      @default(36)
+  photoRetentionDays   Int      @default(90)
   updatedAt            DateTime @updatedAt
 }

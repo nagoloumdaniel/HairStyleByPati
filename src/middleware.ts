@@ -9,6 +9,11 @@ const { auth } = NextAuth(authConfig);
 export default auth((req) => {
   const isLoggedIn = !!req.auth?.user;
   const isOnDashboard = req.nextUrl.pathname.startsWith('/dashboard');
+  const isAdminApi = req.nextUrl.pathname.startsWith('/api/admin');
+
+  if (isAdminApi && !isLoggedIn) {
+    return NextResponse.json({ error: 'Non autorisé.' }, { status: 401 });
+  }
 
   if (isOnDashboard && !isLoggedIn) {
     const loginUrl = new URL('/connexion', req.nextUrl.origin);
@@ -24,5 +29,5 @@ export default auth((req) => {
 
 export const config = {
   // Toutes les routes dashboard, API admin comprises
-  matcher: ['/dashboard/:path*'],
+  matcher: ['/dashboard/:path*', '/api/admin/:path*'],
 };

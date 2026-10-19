@@ -4,11 +4,11 @@ Application web de réservation en ligne pour un salon de coiffure spécialisé 
 
 ## Statut
 
-Phase **8, demandes personnalisées et pilotage**, terminée le 19/10/2026 : formulaire public de coiffure sur mesure avec photos de référence privées, file de traitement avec décisions et historique, fiches clientes et historiques, paramètres d'identité et de politiques, tableau de bord opérationnel et statistiques aux définitions affichées. Les fonctionnalités explicitement hors v1 (liste d'attente, avis, galerie, promotions) restent non livrées. Vérifiée par 174 tests Vitest et 6 parcours Playwright dédiés, en plus des parcours des phases précédentes.
+Phase **9, sécurité, RGPD et fiabilité**, terminée le 19/10/2026 : limitation des tentatives de connexion, cookie de session explicite, en-têtes de sécurité et CSP en production, protection des API admin, export et anonymisation RGPD, purge automatique des photos privées, sonde de santé, scripts de sauvegarde et de restauration testés. Vérifiée par 179 tests Vitest et 7 parcours Playwright de sécurité dédiés.
 
 Le thème **clair / sombre** est disponible sur toutes les interfaces via l'icône du header. La préférence système est détectée au chargement, le choix est mémorisé dans le navigateur et appliqué avant le premier rendu pour éviter tout flash. Vérifié par 4 parcours Playwright desktop et mobile.
 
-Prochaine étape : phase **9, sécurité approfondie, RGPD et fiabilité**. Le seed crée des disponibilités par défaut du lundi au samedi, 9h-18h.
+Prochaine étape : phase **10, performance, accessibilité et SEO**. Le seed crée des disponibilités par défaut du lundi au samedi, 9h-18h.
 
 ### Notifications en local
 
@@ -27,7 +27,7 @@ curl -H "Authorization: Bearer ${CRON_SECRET}" http://localhost:3000/api/cron/re
 | Base de données | PostgreSQL (Neon) + Prisma                                 |
 | E-mails         | Resend                                                     |
 | Fichiers        | Cloudflare R2 (API S3)                                     |
-| Auth            | Auth.js (NextAuth) credentials + Argon2                    |
+| Auth            | Auth.js (NextAuth) credentials + bcryptjs (coût 12)        |
 | Hébergement     | Vercel                                                     |
 
 ## Documentation
@@ -40,6 +40,8 @@ curl -H "Authorization: Bearer ${CRON_SECRET}" http://localhost:3000/api/cron/re
 | [docs/plan-detaille.md](docs/plan-detaille.md) | Décomposition par module (§14.2)         |
 | [docs/stack.md](docs/stack.md)                 | Choix techniques et justification        |
 | [docs/architecture.md](docs/architecture.md)   | Arborescence par domaine + plan de pages |
+| [docs/security.md](docs/security.md)           | Revue sécurité, risques, sauvegarde      |
+| [docs/rgpd.md](docs/rgpd.md)                   | Registre, droits et procédures RGPD      |
 | [docs/git.md](docs/git.md)                     | Branches, conventions de commit, hooks   |
 | [.env.example](.env.example)                   | Variables d'environnement documentées    |
 
@@ -58,6 +60,8 @@ npm run db:seed:demo  # catalogue de démonstration (développement uniquement)
 npx playwright test tests/e2e/dashboard.spec.ts --project=desktop  # back-office (E2E_ADMIN_EMAIL/E2E_ADMIN_PASSWORD requis)
 npx playwright test tests/e2e/compatibilite.spec.ts --project=desktop  # compatibilité, photos privées et décisions
 npx playwright test tests/e2e/reservations.spec.ts --project=desktop --workers=1  # réservation, annulation, calendrier
+npx playwright test tests/e2e/security.spec.ts --project=desktop --workers=1  # sécurité, en-têtes, RGPD, purge
+node scripts/backup-db.mjs   # sauvegarde PostgreSQL dans backups/ (ignoré par Git)
 ```
 
 `npm run db:seed:demo` ajoute 12 prestations d'exemple publiées pour vérifier le site public. Ne jamais l'exécuter sur la base de production : le catalogue réel est saisi par Patricia depuis le dashboard (Phase 4).
