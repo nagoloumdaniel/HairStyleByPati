@@ -122,19 +122,20 @@
 ## PHASE 6 — RÉSERVATION, DISPONIBILITÉS, CALENDRIER
 
 > Objectif : zéro double réservation (§7, §8, §9).
+> État : terminée le 19/10/2026. Réservation publique en 8 étapes, verrou PostgreSQL anti double réservation, annulations client/admin, reprogrammation atomique, calendrier 4 vues et gestion des disponibilités avec alertes de conflit. Les notifications sont mises en file d'attente (envoi réel en phase 7).
 
-- [ ] **P6.1** Moteur de disponibilités : horaires configurés + durées prestations/options + pauses + fermetures + congés + indisponibilités exceptionnelles + créneaux spécifiques. — *skill : test-driven-development*
-- [ ] **P6.2** Protection anti double-réservation : transaction DB + contrainte d'exclusivité sur créneau, vérification au moment de l'enregistrement définitif. Test concurrence : 2 clients, même créneau, 1 seule réussite. — *skill : test-driven-development + security-audit*
-- [ ] **P6.3** Parcours de réservation 8 étapes (choix coiffure → infos capillaires → vérification → options → créneau → coordonnées → récapitulatif « Paiement sur place » → confirmation), chaque étape avec états d'attente/succès/erreur. — *skill : frontend-design*
-- [ ] **P6.4** Validation manuelle : statut « En attente de confirmation », créneau réservé temporairement avec durée max configurable et libération automatique. — *skill : test-driven-development*
-- [ ] **P6.5** Machine à statuts complète (en attente, confirmée, reprogrammée, annulée client, annulée admin, terminée, absent) avec transitions contrôlées côté serveur. — *skill : test-driven-development*
-- [ ] **P6.6** Annulation par Patricia : motif, libération créneau, notification client, enregistrement historique. — *skill : frontend-design*
-- [ ] **P6.7** Annulation par client via lien sécurisé signé à durée limitée ; conditions configurables (délai minimal, motif obligatoire, message hors délai). — *skill : security-audit*
-- [ ] **P6.8** Reprogrammation atomique : ancien créneau libéré seulement si nouveau valide, aucun doublon ni perte en cas d'échec. — *skill : test-driven-development*
-- [ ] **P6.9** Calendrier dashboard : vues jour/semaine/mois/liste, couleur par statut + libellé, fiche RDV cliquable (détails, statut, annuler, reprogrammer). — *skill : frontend-design*
-- [ ] **P6.10** Gestion des disponibilités dashboard : horaires habituels, exceptions, blocages ; alerte si modification impacte des RDV confirmés (action explicite exigée). — *skill : frontend-design + test-driven-development*
-- [ ] **P6.11** Instantanés tarif/durée figés sur chaque réservation (modification catalogue n'altère pas l'historique). — *skill : test-driven-development*
-- [ ] **P6.12** Tests scénarios §17 Réservation + Annulation complets. — *skill : webapp-testing + verify-and-stop*
+- [x] **P6.1** Moteur de disponibilités : horaires configurés + durées prestations/options + pauses + fermetures + congés + indisponibilités exceptionnelles + créneaux spécifiques. — *skill : test-driven-development*
+- [x] **P6.2** Protection anti double-réservation : transaction DB + verrou consultatif PostgreSQL, vérification au moment de l'enregistrement définitif. Test concurrence : 2 clientes, même créneau, 1 seule réussite. — *skill : test-driven-development + security-audit*
+- [x] **P6.3** Parcours de réservation 8 étapes (choix coiffure → infos capillaires → vérification → options → créneau → coordonnées → récapitulatif « Paiement sur place » → confirmation), chaque étape avec états d'attente/succès/erreur. — *skill : frontend-design*
+- [x] **P6.4** Validation manuelle : statut « En attente de confirmation », créneau réservé temporairement avec durée max configurable et libération automatique des attentes expirées. — *skill : test-driven-development*
+- [x] **P6.5** Machine à statuts complète (en attente, confirmée, reprogrammée, annulée client, annulée admin, terminée, absent) avec transitions contrôlées côté serveur. — *skill : test-driven-development*
+- [x] **P6.6** Annulation par Patricia : motif, libération créneau, notification mise en file, enregistrement historique. — *skill : frontend-design*
+- [x] **P6.7** Annulation par client via lien sécurisé à durée limitée ; conditions configurables (délai minimal, motif obligatoire, message hors délai). — *skill : security-audit*
+- [x] **P6.8** Reprogrammation atomique : ancien créneau libéré seulement si nouveau valide, aucun doublon ni perte en cas d'échec. — *skill : test-driven-development*
+- [x] **P6.9** Calendrier dashboard : vues jour/semaine/mois/liste, couleur par statut + libellé, fiche RDV cliquable (détails, statut, annuler, reprogrammer). — *skill : frontend-design*
+- [x] **P6.10** Gestion des disponibilités dashboard : horaires habituels, exceptions, blocages ; alerte si modification impacte des RDV confirmés (action explicite exigée). — *skill : frontend-design + test-driven-development*
+- [x] **P6.11** Instantanés tarif/durée figés sur chaque réservation (modification catalogue n'altère pas l'historique). — *skill : test-driven-development*
+- [x] **P6.12** Tests scénarios §17 Réservation + Annulation complets. — *skill : webapp-testing + verify-and-stop*
 
 ## PHASE 7 — NOTIFICATIONS & MESSAGERIE
 
