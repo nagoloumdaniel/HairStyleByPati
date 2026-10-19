@@ -27,9 +27,16 @@ function readablePayload(payload: unknown): { title: string; detail: string } {
   }
   const data = payload as Record<string, unknown>;
   const customer = typeof data.customerName === 'string' ? data.customerName : '';
+  const requester = typeof data.requesterName === 'string' ? data.requesterName : '';
+  const requestDescription = typeof data.description === 'string' ? data.description : '';
   const service = typeof data.serviceName === 'string' ? data.serviceName : '';
   const subject = typeof data.subject === 'string' ? data.subject : '';
   const reason = typeof data.reason === 'string' ? data.reason : '';
+  if (requester)
+    return {
+      title: 'Demande personnalisée',
+      detail: [requester, requestDescription].filter(Boolean).join(' · '),
+    };
   if (subject) return { title: subject, detail: customer };
   if (customer) {
     return {

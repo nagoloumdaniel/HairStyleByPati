@@ -16,7 +16,10 @@ export type NotificationTemplateKey =
   | 'admin_booking_rescheduled'
   | 'admin_contact_message'
   | 'contact_received'
-  | 'conversation_reply';
+  | 'conversation_reply'
+  | 'custom_request_received'
+  | 'admin_custom_request'
+  | 'custom_request_decision';
 
 export interface AppointmentEmailPayload {
   kind?: 'appointment';
@@ -42,7 +45,22 @@ export interface ConversationEmailPayload {
   adminLink?: string | null;
 }
 
-export type EmailPayload = AppointmentEmailPayload | ConversationEmailPayload;
+export interface CustomRequestEmailPayload {
+  kind?: 'custom';
+  requestId: string;
+  requesterName: string;
+  requesterEmail?: string;
+  description: string;
+  desiredDate?: string | null;
+  adminReply?: string | null;
+  estimatedPriceCents?: number | null;
+  proposedServiceName?: string | null;
+  proposedSlot?: string | null;
+  adminLink?: string | null;
+}
+
+export type EmailPayload =
+  AppointmentEmailPayload | ConversationEmailPayload | CustomRequestEmailPayload;
 
 export interface RenderedEmail {
   subject: string;
@@ -76,6 +94,10 @@ function formatDate(iso: string | undefined): string {
 
 function isConversation(payload: EmailPayload): payload is ConversationEmailPayload {
   return typeof (payload as ConversationEmailPayload).subject === 'string';
+}
+
+function isCustomRequest(payload: EmailPayload): payload is CustomRequestEmailPayload {
+  return (payload as CustomRequestEmailPayload).kind === 'custom';
 }
 
 interface LayoutInput {
@@ -330,9 +352,79 @@ function renderConversation(
   };
 }
 
+function renderCustomRequest(
+  key: NotificationTemplateKey,
+  payload: CustomRequestEmailPayload,
+): RenderedEmail | null {
+  const adminLink = payload.adminLink
+    ? `${APP_URL}${payload.adminLink}`
+    : `${APP_URL}/dashboard/demandes`;
+  const desired = payload.desiredDate ? formatDate(payload.desiredDate) : null;
+  if (key === 'custom_request_received') {
+    return {
+      subject: 'Votre demande de coiffure personnalisée a bien été reçue',
+      html: layout({
+        title: 'Demande bien reçue',
+        intro: `Bonjour ${payload.requesterName}, Patricia a bien reçu votre demande de coiffure personnalisée et vous répondra personnellement.`,
+        rows: [['Date souhaitée', desired ?? 'Non précisée']],
+        paragraphs: [payload.description],
+        note: 'Cette demande ne réserve pas encore de créneau. Patricia vous proposera une prestation ou un rendez-vous adapté.',
+      }),
+      text: `Bonjour ${payload.requesterName},\n\nVotre demande de coiffure personnalisée a bien été reçue. Patricia vous répondra personnellement.\n\n${SALON_NAME}`,
+    };
+  }
+  if (key === 'admin_custom_request') {
+    return {
+      subject: `Nouvelle demande personnalisée : ${payload.requesterName}`,
+      html: layout({
+        title: 'Nouvelle demande personnalisée',
+        intro: `${payload.requesterName} vous a envoyé une demande de coiffure hors catalogue.`,
+        rows: [
+          ['Demandeuse', payload.requesterName],
+          ['E-mail', payload.requesterEmail ?? 'Non renseigné'],
+          ['Date souhaitée', desired ?? 'Non précisée'],
+        ],
+        paragraphs: [payload.description],
+        ctaLabel: 'Ouvrir la demande',
+        ctaUrl: adminLink,
+      }),
+      text: `Nouvelle demande de ${payload.requesterName}.\n${payload.description}\n\n${adminLink}`,
+    };
+  }
+  if (key !== 'custom_request_decision') return null;
+  const price =
+    payload.estimatedPriceCents == null
+      ? null
+      : new Intl.NumberFormat('fr-FR', {
+          style: 'currency',
+          currency: 'EUR',
+          maximumFractionDigits: 2,
+        }).format(payload.estimatedPriceCents / 100);
+  const rows: Array<[string, string]> = [];
+  if (price) rows.push(['Prix estimé', price]);
+  if (payload.proposedServiceName) rows.push(['Prestation proposée', payload.proposedServiceName]);
+  if (payload.proposedSlot) rows.push(['Créneau proposé', formatDate(payload.proposedSlot)]);
+  return {
+    subject: 'Réponse à votre demande de coiffure personnalisée',
+    html: layout({
+      title: 'Réponse de Patricia',
+      intro: `Bonjour ${payload.requesterName}, voici la réponse à votre demande de coiffure personnalisée.`,
+      rows,
+      paragraphs: payload.adminReply ? [payload.adminReply] : [],
+      ctaLabel: 'Réserver un créneau',
+      ctaUrl: `${APP_URL}/reserver`,
+      note: 'Une proposition de créneau ne réserve pas automatiquement le rendez-vous : la réservation reste nécessaire.',
+    }),
+    text: `Bonjour ${payload.requesterName},\n\n${payload.adminReply ?? ''}\n${price ? `Prix estimé : ${price}\n` : ''}${payload.proposedServiceName ? `Prestation proposée : ${payload.proposedServiceName}\n` : ''}\n${SALON_NAME}`,
+  };
+}
+
 export function renderNotification(templateKey: string, payload: unknown): RenderedEmail | null {
   if (!payload || typeof payload !== 'object') return null;
   const key = templateKey as NotificationTemplateKey;
+  if (isCustomRequest(payload as EmailPayload)) {
+    return renderCustomRequest(key, payload as CustomRequestEmailPayload);
+  }
   if (isConversation(payload as EmailPayload)) {
     if (!['admin_contact_message', 'contact_received', 'conversation_reply'].includes(key)) {
       return null;
@@ -368,5 +460,8 @@ export function notificationTemplateExists(templateKey: string): boolean {
     'admin_contact_message',
     'contact_received',
     'conversation_reply',
+    'custom_request_received',
+    'admin_custom_request',
+    'custom_request_decision',
   ].includes(templateKey);
 }

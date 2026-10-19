@@ -1,0 +1,67 @@
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { CustomRequestForm } from './custom-request-form';
+
+export const metadata: Metadata = {
+  title: 'Demande de coiffure personnalisée',
+  description:
+    'Décrivez votre coiffure sur mesure, ajoutez des photos de référence et recevez une réponse personnalisée de Patricia.',
+};
+
+export default function CustomRequestPage() {
+  return (
+    <main className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 md:py-14">
+      <nav aria-label="Fil d'Ariane" className="text-sm text-ink-soft">
+        <ol className="flex flex-wrap items-center gap-2">
+          <li>
+            <Link href="/" className="transition hover:text-cacao">
+              Accueil
+            </Link>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li>
+            <span aria-current="page" className="font-medium text-fg">
+              Demande personnalisée
+            </span>
+          </li>
+        </ol>
+      </nav>
+
+      <header className="mt-4 max-w-3xl space-y-4">
+        <p className="text-sm font-semibold uppercase tracking-wide text-cacao">Sur mesure</p>
+        <h1 className="font-heading text-4xl font-bold text-fg md:text-5xl">
+          Une coiffure qui n’est pas au catalogue ?
+        </h1>
+        <p className="text-lg leading-relaxed text-ink-soft">
+          Décrivez votre projet, ajoutez jusqu’à 3 photos de référence et vos informations
+          capillaires. Patricia étudie chaque demande personnellement et vous répond avec une
+          proposition adaptée.
+        </p>
+        <div className="grid gap-3 text-sm text-ink-soft sm:grid-cols-3">
+          <p className="rounded-[var(--radius-md)] border border-line bg-card p-3">
+            <span className="font-semibold text-fg">1.</span> Décrivez votre coiffure
+          </p>
+          <p className="rounded-[var(--radius-md)] border border-line bg-card p-3">
+            <span className="font-semibold text-fg">2.</span> Patricia étudie la faisabilité
+          </p>
+          <p className="rounded-[var(--radius-md)] border border-line bg-card p-3">
+            <span className="font-semibold text-fg">3.</span> Vous réservez si la proposition vous
+            convient
+          </p>
+        </div>
+      </header>
+
+      <section className="mt-8" aria-labelledby="formulaire-demande">
+        <h2 id="formulaire-demande" className="font-heading text-2xl font-bold text-fg">
+          Votre demande
+        </h2>
+        <p className="mt-1 text-sm text-ink-soft">
+          Une demande ne réserve pas de créneau. Aucun paiement n’est demandé.
+        </p>
+        <div className="mt-5">
+          <CustomRequestForm />
+        </div>
+      </section>
+    </main>
+  );
+}

@@ -31,6 +31,7 @@ model User {
   blockedPeriods      BlockedPeriod[]
   auditLogs           AuditLog[]
   assessmentDecisions HairAssessment[] @relation("AssessmentDecider")
+  customRequestDecisions CustomRequestDecision[] @relation("CustomRequestDecisionAuthor")
 }
 
 // ============================================================
@@ -77,6 +78,7 @@ model Service {
   questions       QuestionDefinition[]
   appointments    Appointment[]
   assessments     HairAssessment[]
+  proposedCustomRequests CustomRequest[] @relation("CustomRequestProposedService")
 }
 
 model ServiceImage {
@@ -292,12 +294,46 @@ model CustomRequest {
   requesterPhone      String?
   description         String
   photoKeys           String[]            @default([]) // clés S3/R2 privées
+  hairInfo            Json? // réponses structurées (longueur, type, style actuel…)
+  desiredDate         DateTime?
   status              CustomRequestStatus @default(NEW)
   adminReply          String?
   estimatedPriceCents Int?
+  proposedServiceId   String?
+  proposedService     Service?            @relation("CustomRequestProposedService", fields: [proposedServiceId], references: [id])
+  proposedSlot        DateTime?
+  decidedAt           DateTime?
   createdAt           DateTime            @default(now())
   updatedAt           DateTime            @updatedAt
   assessments         HairAssessment[]
+  decisions           CustomRequestDecision[]
+
+  @@index([status, createdAt])
+}
+
+enum CustomRequestDecisionAction {
+  IN_REVIEW
+  INFO_REQUESTED
+  QUOTED
+  ACCEPTED
+  REFUSED
+  CLOSED
+}
+
+model CustomRequestDecision {
+  id                   String                     @id @default(cuid())
+  customRequestId      String
+  customRequest        CustomRequest              @relation(fields: [customRequestId], references: [id], onDelete: Cascade)
+  userId               String?
+  user                 User?                      @relation("CustomRequestDecisionAuthor", fields: [userId], references: [id])
+  action               CustomRequestDecisionAction
+  message              String?
+  priceCents           Int?
+  proposedServiceName  String?
+  proposedSlot         DateTime?
+  createdAt            DateTime                   @default(now())
+
+  @@index([customRequestId, createdAt])
 }
 
 // ============================================================
@@ -479,5 +515,10 @@ model SalonSettings {
   maxAdvanceDays       Int      @default(60)
   minLeadTimeMinutes   Int      @default(120)
   cancelReasonRequired Boolean  @default(false)
+  // Identité et communication (P8.4)
+  logoUrl              String?
+  emailSignature       String?
+  cancellationPolicy   String?
+  bookingPolicy        String?
   updatedAt            DateTime @updatedAt
 }
