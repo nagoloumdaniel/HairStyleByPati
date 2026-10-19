@@ -91,17 +91,18 @@
 ## PHASE 4 — BACK-OFFICE CATALOGUE
 
 > Objectif : Patricia autonome sur 100 % du catalogue (§6.4, §12.2).
+> État : terminée le 19/10/2026. Upload vérifié de bout en bout sur un bucket Cloudflare R2 réel (envoi, URL signée affichée, suppression du fichier).
 
-- [ ] **P4.1** Page catalogue dashboard : liste, statuts, recherche. — *skill : frontend-design*
-- [ ] **P4.2** CRUD catégories (créer, modifier, désactiver, réordonner). — *skill : test-driven-development*
-- [ ] **P4.3** CRUD coiffures : nom, description, catégorie, prix fixe / prix de départ / fourchette / « Prix à confirmer », durée, options payantes, statut actif/inactif. — *skill : test-driven-development*
-- [ ] **P4.4** Upload photos : formats/taille limités côté serveur, MIME vérifié, noms de fichiers non prévisibles, stockage S3, URLs signées pour accès privé. — *skill : security-audit*
-- [ ] **P4.5** Gestion galerie : réordonnancement, image principale, textes alternatifs. — *skill : frontend-design*
-- [ ] **P4.6** Publication / dépublication / archivage (jamais de suppression d'une coiffure ayant des réservations historiques). — *skill : test-driven-development*
-- [ ] **P4.7** Éditeur de règles de compatibilité par prestation (longueurs acceptées/non, locs requis, photo facultative/obligatoire, validation auto ou manuelle, messages par situation). — *skill : frontend-design*
-- [ ] **P4.8** Éditeur de questions capillaires par prestation (conditionnelles, ordre, types de réponses). — *skill : frontend-design*
-- [ ] **P4.9** Journalisation des actions catalogue dans l'historique. — *skill : caveman*
-- [ ] **P4.10** Tests de non-régression catalogue + scénarios §17 Catalogue. — *skill : webapp-testing + verify-and-stop*
+- [x] **P4.1** Page catalogue dashboard : liste, statuts, recherche, filtres, compteurs, affichage mobile sans débordement. — *skill : frontend-design*
+- [x] **P4.2** CRUD catégories (créer, modifier, désactiver, réordonner, supprimer une catégorie vide). — *skill : test-driven-development*
+- [x] **P4.3** CRUD coiffures : nom, description, catégorie, prix fixe / prix de départ / fourchette / « Prix à confirmer », durée, options payantes, statut actif/inactif. — *skill : test-driven-development*
+- [x] **P4.4** Upload photos : formats/taille limités côté serveur, MIME vérifié, noms de fichiers non prévisibles, stockage S3/R2 privé, URLs signées pour accès privé. — *skill : security-audit*
+- [x] **P4.5** Gestion galerie : réordonnancement, image principale, textes alternatifs. — *skill : frontend-design*
+- [x] **P4.6** Publication / dépublication / archivage (jamais de suppression d'une coiffure ayant des réservations historiques). — *skill : test-driven-development*
+- [x] **P4.7** Éditeur de règles de compatibilité par prestation (longueurs acceptées/non, locs requis, photo facultative/obligatoire, validation auto ou manuelle, messages par situation). — *skill : frontend-design*
+- [x] **P4.8** Éditeur de questions capillaires par prestation (conditionnelles, ordre, types de réponses). — *skill : frontend-design*
+- [x] **P4.9** Journalisation des actions catalogue dans l'historique. — *skill : caveman*
+- [x] **P4.10** Tests de non-régression catalogue + scénarios §17 Catalogue. — *skill : webapp-testing + verify-and-stop*
 
 ## PHASE 5 — MOTEUR DE COMPATIBILITÉ CAPILLAIRE
 

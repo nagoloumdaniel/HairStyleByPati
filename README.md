@@ -4,7 +4,9 @@ Application web de réservation en ligne pour un salon de coiffure spécialisé 
 
 ## Statut
 
-Phase **3 — Site public** en cours : accueil (P3.1), catalogue avec recherche, filtres et pagination (P3.2/P3.4) et fiche détaillée avec galerie (P3.3) livrés. Restent les pages éditoriales, le formulaire de contact, les pages légales et le SEO de la phase.
+Phase **4, back-office catalogue**, terminée le 19/10/2026 : liste et filtres du catalogue, CRUD catégories et prestations, options payantes, upload des photos sur Cloudflare R2 avec URLs signées, galerie (ordre, image principale, textes alternatifs), publication/archivage, règles de compatibilité, questions capillaires et historique des actions. Vérifiée par tests unitaires Vitest et tests de bout en bout Playwright, y compris un upload réel sur R2.
+
+Prochaine étape : phase **5, moteur de compatibilité capillaire**.
 
 ## Stack (figée — voir [docs/stack.md](docs/stack.md))
 
@@ -43,6 +45,7 @@ npm run format     # Prettier
 npm run clean      # supprime le cache .next
 npm run db:seed    # catégories de base + compte admin
 npm run db:seed:demo  # catalogue de démonstration (développement uniquement)
+npx playwright test tests/e2e/dashboard.spec.ts --project=desktop  # back-office (E2E_ADMIN_EMAIL/E2E_ADMIN_PASSWORD requis)
 ```
 
 `npm run db:seed:demo` ajoute 12 prestations d'exemple publiées pour vérifier le site public. Ne jamais l'exécuter sur la base de production : le catalogue réel est saisi par Patricia depuis le dashboard (Phase 4).

@@ -4,6 +4,7 @@ import Link from 'next/link';
 const NAV = [
   { href: '/dashboard', label: 'Vue d’ensemble' },
   { href: '/dashboard/catalogue', label: 'Catalogue' },
+  { href: '/dashboard/historique', label: 'Historique' },
   { href: '/dashboard/evaluations', label: 'Evaluations' },
   { href: '/dashboard/reservations', label: 'Reservations' },
   { href: '/dashboard/messages', label: 'Messages' },
@@ -14,7 +15,10 @@ export function Sidebar({ pathname }: { pathname?: string }) {
   return (
     <nav aria-label="Navigation administration" className="flex flex-col gap-1">
       {NAV.map((item) => {
-        const active = pathname === item.href;
+        // Les sous-pages (fiche prestation, etc.) gardent l'entrée active.
+        const active =
+          pathname === item.href ||
+          (item.href !== '/dashboard' && pathname?.startsWith(`${item.href}/`));
         return (
           <Link
             key={item.href}
