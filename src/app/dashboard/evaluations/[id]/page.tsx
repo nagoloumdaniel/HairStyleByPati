@@ -84,7 +84,7 @@ export default async function AssessmentDetailPage({
 
   return (
     <div className="p-6">
-      <nav aria-label="Fil d'Ariane" className="text-sm text-ink-soft">
+      <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
             <Link href="/dashboard/evaluations" className="transition hover:text-cacao">
@@ -93,7 +93,7 @@ export default async function AssessmentDetailPage({
           </li>
           <li aria-hidden="true">/</li>
           <li>
-            <span aria-current="page" className="font-medium text-ink">
+            <span aria-current="page" className="font-medium text-fg">
               {detail.customer?.name ?? 'Demande'}
             </span>
           </li>
@@ -110,7 +110,7 @@ export default async function AssessmentDetailPage({
               {ASSESSMENT_STATUS_LABELS[detail.status] ?? detail.status}
             </Badge>
           </div>
-          <p className="mt-1 text-sm text-ink-soft">
+          <p className="mt-1 text-sm text-muted">
             Demandée le {dateFormatter.format(detail.createdAt)} ·{' '}
             <Link
               href={`/dashboard/catalogue/prestations/${detail.serviceId}`}
@@ -127,7 +127,7 @@ export default async function AssessmentDetailPage({
             </Link>
           </p>
           {detail.decidedAt ? (
-            <p className="mt-1 text-sm text-ink-soft">
+            <p className="mt-1 text-sm text-muted">
               Décision du {dateFormatter.format(detail.decidedAt)}
               {detail.decidedByName ? ` par ${detail.decidedByName}` : ''}
             </p>
@@ -138,7 +138,7 @@ export default async function AssessmentDetailPage({
       <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <div className="space-y-6">
           <Card>
-            <h2 className="font-heading text-xl font-bold text-ink">Coordonnées de la cliente</h2>
+            <h2 className="font-heading text-xl font-bold text-fg">Coordonnées de la cliente</h2>
             {detail.customer ? (
               <dl className="mt-3 space-y-2 text-sm">
                 <div className="flex flex-wrap gap-2">
@@ -169,30 +169,30 @@ export default async function AssessmentDetailPage({
                 </div>
               </dl>
             ) : (
-              <p className="mt-2 text-sm text-ink-soft">Coordonnées non renseignées.</p>
+              <p className="mt-2 text-sm text-muted">Coordonnées non renseignées.</p>
             )}
           </Card>
 
           <Card>
-            <h2 className="font-heading text-xl font-bold text-ink">Réponses capillaires</h2>
+            <h2 className="font-heading text-xl font-bold text-fg">Réponses capillaires</h2>
             {answerRows.length === 0 ? (
-              <p className="mt-2 text-sm text-ink-soft">Aucune réponse enregistrée.</p>
+              <p className="mt-2 text-sm text-muted">Aucune réponse enregistrée.</p>
             ) : (
-              <dl className="mt-3 divide-y divide-cream-dark">
+              <dl className="mt-3 divide-y divide-line">
                 {answerRows.map((row) => (
                   <div
                     key={row.key}
                     className="flex flex-col gap-1 py-2 sm:flex-row sm:justify-between"
                   >
-                    <dt className="text-sm font-semibold text-ink">{row.label}</dt>
-                    <dd className="text-sm text-ink-soft sm:text-right">{row.value}</dd>
+                    <dt className="text-sm font-semibold text-fg">{row.label}</dt>
+                    <dd className="text-sm text-muted sm:text-right">{row.value}</dd>
                   </div>
                 ))}
               </dl>
             )}
 
             {detail.decisionNote ? (
-              <div className="mt-4 rounded-[var(--radius-md)] bg-cream-dark px-4 py-3 text-sm text-ink">
+              <div className="mt-4 rounded-[var(--radius-md)] bg-line px-4 py-3 text-sm text-fg">
                 <p className="font-semibold">Note / commentaire</p>
                 <p className="mt-1 whitespace-pre-line">{detail.decisionNote}</p>
               </div>
@@ -200,15 +200,15 @@ export default async function AssessmentDetailPage({
           </Card>
 
           <Card>
-            <h2 className="font-heading text-xl font-bold text-ink">Photos privées</h2>
+            <h2 className="font-heading text-xl font-bold text-fg">Photos privées</h2>
             {photos.length === 0 ? (
-              <p className="mt-2 text-sm text-ink-soft">Aucune photo envoyée.</p>
+              <p className="mt-2 text-sm text-muted">Aucune photo envoyée.</p>
             ) : (
               <ul className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {photos.map((photo, index) => (
                   <li
                     key={photo.key}
-                    className="overflow-hidden rounded-[var(--radius-md)] border border-cream-dark bg-cream-dark"
+                    className="overflow-hidden rounded-[var(--radius-md)] border border-line bg-line"
                   >
                     {photo.url ? (
                       <a href={photo.url} target="_blank" rel="noreferrer" className="block">
@@ -221,7 +221,7 @@ export default async function AssessmentDetailPage({
                         />
                       </a>
                     ) : (
-                      <p className="p-4 text-xs text-ink-soft">
+                      <p className="p-4 text-xs text-muted">
                         Aperçu indisponible (stockage non configuré ou URL expirée).
                       </p>
                     )}
@@ -229,7 +229,7 @@ export default async function AssessmentDetailPage({
                 ))}
               </ul>
             )}
-            <p className="mt-3 text-xs text-ink-soft">
+            <p className="mt-3 text-xs text-muted">
               Ces photos ne sont jamais publiées dans la galerie publique et ne sont accessibles
               qu’aux personnes habilitées.
             </p>
@@ -238,7 +238,7 @@ export default async function AssessmentDetailPage({
 
         <div className="space-y-6">
           <Card>
-            <h2 className="font-heading text-xl font-bold text-ink">Analyse automatique</h2>
+            <h2 className="font-heading text-xl font-bold text-fg">Analyse automatique</h2>
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <Badge
                 tone={
@@ -259,22 +259,22 @@ export default async function AssessmentDetailPage({
                 <Badge tone="neutral">Validation manuelle requise</Badge>
               ) : null}
             </div>
-            <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-ink-soft">
+            <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-muted">
               {engine.message}
             </p>
             {engine.conditionsNote ? (
-              <p className="mt-3 rounded-[var(--radius-md)] bg-accent-soft px-4 py-3 text-sm text-ink">
+              <p className="mt-3 rounded-[var(--radius-md)] bg-accent-soft px-4 py-3 text-sm text-fg">
                 {engine.conditionsNote}
               </p>
             ) : null}
           </Card>
 
           <Card>
-            <h2 className="font-heading text-xl font-bold text-ink">Décision</h2>
+            <h2 className="font-heading text-xl font-bold text-fg">Décision</h2>
             {detail.decisionMessage ? (
-              <div className="mt-3 rounded-[var(--radius-md)] bg-cream-dark px-4 py-3 text-sm">
-                <p className="font-semibold text-ink">Message transmis à la cliente</p>
-                <p className="mt-1 whitespace-pre-line text-ink-soft">{detail.decisionMessage}</p>
+              <div className="mt-3 rounded-[var(--radius-md)] bg-line px-4 py-3 text-sm">
+                <p className="font-semibold text-fg">Message transmis à la cliente</p>
+                <p className="mt-1 whitespace-pre-line text-muted">{detail.decisionMessage}</p>
               </div>
             ) : null}
             <div className="mt-4">
@@ -283,14 +283,14 @@ export default async function AssessmentDetailPage({
           </Card>
 
           <Card>
-            <h2 className="font-heading text-xl font-bold text-ink">Historique</h2>
+            <h2 className="font-heading text-xl font-bold text-fg">Historique</h2>
             {history.length === 0 ? (
-              <p className="mt-2 text-sm text-ink-soft">Aucune action enregistrée.</p>
+              <p className="mt-2 text-sm text-muted">Aucune action enregistrée.</p>
             ) : (
               <ol className="mt-3 space-y-3">
                 {history.map((entry) => (
-                  <li key={entry.id} className="border-b border-cream-dark pb-3 last:border-0">
-                    <p className="text-sm font-semibold text-ink">
+                  <li key={entry.id} className="border-b border-line pb-3 last:border-0">
+                    <p className="text-sm font-semibold text-fg">
                       {ACTION_LABELS[entry.action] ??
                         ASSESSMENT_DECISION_LABELS[
                           entry.action
@@ -299,7 +299,7 @@ export default async function AssessmentDetailPage({
                         ] ??
                         entry.action}
                     </p>
-                    <p className="text-xs text-ink-soft">
+                    <p className="text-xs text-muted">
                       {dateFormatter.format(entry.createdAt)}
                       {entry.userName ? ` · ${entry.userName}` : ''}
                     </p>

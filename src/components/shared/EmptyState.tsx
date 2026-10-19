@@ -16,7 +16,7 @@ export function EmptyState({
   onAction?: () => void;
 }) {
   return (
-    <div className="flex flex-col items-center rounded-[var(--radius-lg)] bg-surface px-6 py-12 text-center shadow-soft">
+    <div className="flex flex-col items-center rounded-[var(--radius-lg)] bg-card px-6 py-12 text-center shadow-soft">
       <span
         aria-hidden="true"
         className="inline-flex size-12 items-center justify-center rounded-full bg-accent-soft text-cacao"
@@ -36,12 +36,12 @@ export function EmptyState({
           <path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12" />
         </svg>
       </span>
-      <h2 className="mt-4 text-xl font-heading font-bold text-ink">{title}</h2>
-      <p className="mt-2 max-w-md text-ink-soft">{message}</p>
+      <h2 className="mt-4 text-xl font-heading font-bold text-fg">{title}</h2>
+      <p className="mt-2 max-w-md text-muted">{message}</p>
       {actionLabel && actionHref ? (
         <Link
           href={actionHref}
-          className="mt-6 inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-5 py-2.5 font-semibold text-ink shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
+          className="mt-6 inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-5 py-2.5 font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
         >
           {actionLabel}
         </Link>

@@ -16,7 +16,7 @@ export function Accordion({
         return (
           <div
             key={item.id}
-            className="rounded-[var(--radius-md)] border border-cream-dark bg-surface shadow-soft"
+            className="rounded-[var(--radius-md)] border border-line bg-card shadow-soft"
           >
             <button
               type="button"
@@ -31,7 +31,7 @@ export function Accordion({
               </span>
             </button>
             {open ? (
-              <p id={`accordion-${item.id}`} className="px-5 pb-5 text-ink-soft">
+              <p id={`accordion-${item.id}`} className="px-5 pb-5 text-muted">
                 {item.content}
               </p>
             ) : null}

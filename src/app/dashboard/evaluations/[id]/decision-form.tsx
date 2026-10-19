@@ -43,7 +43,7 @@ export function DecisionForm({
 
   if (terminal) {
     return (
-      <p className="rounded-[var(--radius-md)] bg-cream-dark px-4 py-3 text-sm text-ink-soft">
+      <p className="rounded-[var(--radius-md)] bg-line px-4 py-3 text-sm text-muted">
         Une décision définitive a déjà été enregistrée pour cette évaluation. L’historique
         ci-dessous conserve la décision et son message.
       </p>
@@ -63,7 +63,7 @@ export function DecisionForm({
           label: ASSESSMENT_DECISION_LABELS[value],
         }))}
       />
-      <p className="text-sm text-ink-soft">{DECISION_HINTS[decision]}</p>
+      <p className="text-sm text-muted">{DECISION_HINTS[decision]}</p>
 
       <Textarea
         label="Message transmis à la cliente"
@@ -100,7 +100,7 @@ export function DecisionForm({
         <Button type="submit" loading={pending}>
           Enregistrer la décision
         </Button>
-        <p className="text-sm text-ink-soft">Aucun rendez-vous n’est créé par cette action.</p>
+        <p className="text-sm text-muted">Aucun rendez-vous n’est créé par cette action.</p>
       </div>
     </form>
   );

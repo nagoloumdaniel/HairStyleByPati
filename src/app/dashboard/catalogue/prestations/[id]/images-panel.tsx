@@ -37,7 +37,7 @@ function UploadForm({ serviceId, storageReady }: { serviceId: string; storageRea
   return (
     <form
       action={formAction}
-      className="flex flex-col gap-3 rounded-[var(--radius-md)] border border-cream-dark p-4"
+      className="flex flex-col gap-3 rounded-[var(--radius-md)] border border-line p-4"
     >
       <input type="hidden" name="serviceId" value={serviceId} />
       <div className="flex flex-col gap-1.5">
@@ -52,7 +52,7 @@ function UploadForm({ serviceId, storageReady }: { serviceId: string; storageRea
           accept="image/jpeg,image/png,image/webp"
           required
           disabled={!storageReady}
-          className="w-full rounded-[var(--radius-md)] border border-cream-dark bg-surface px-4 py-2.5 text-sm file:mr-3 file:rounded-full file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-ink"
+          className="w-full rounded-[var(--radius-md)] border border-line bg-card px-4 py-2.5 text-sm file:mr-3 file:rounded-full file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-fg"
         />
       </div>
       <Input
@@ -141,7 +141,7 @@ function ReorderImageForm({
     return (
       <span
         aria-hidden="true"
-        className="inline-flex size-8 items-center justify-center rounded-[var(--radius-sm)] border border-cream-dark text-ink-soft/40"
+        className="inline-flex size-8 items-center justify-center rounded-[var(--radius-sm)] border border-line text-muted/40"
       >
         {direction === -1 ? '↑' : '↓'}
       </span>
@@ -242,8 +242,8 @@ function ImageCard({
   const [altOpen, setAltOpen] = useState(false);
 
   return (
-    <li className="flex flex-col gap-3 rounded-[var(--radius-md)] border border-cream-dark bg-surface p-3">
-      <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-sm)] bg-cream-dark">
+    <li className="flex flex-col gap-3 rounded-[var(--radius-md)] border border-line bg-card p-3">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-sm)] bg-line">
         {image.url ? (
           // URL signée à durée limitée, impossible à déclarer dans next/image.
           // eslint-disable-next-line @next/next/no-img-element
@@ -253,7 +253,7 @@ function ImageCard({
             className="size-full object-cover"
           />
         ) : (
-          <div className="flex size-full flex-col items-center justify-center gap-1 p-3 text-center text-xs text-ink-soft">
+          <div className="flex size-full flex-col items-center justify-center gap-1 p-3 text-center text-xs text-muted">
             <span aria-hidden="true" className="text-2xl">
               🖼
             </span>
@@ -267,7 +267,7 @@ function ImageCard({
         ) : null}
       </div>
 
-      <p className="line-clamp-2 min-h-10 text-sm text-ink-soft">
+      <p className="line-clamp-2 min-h-10 text-sm text-muted">
         {image.alt || "Aucun texte alternatif : ajoutez-en un pour l'accessibilité."}
       </p>
 
@@ -313,7 +313,7 @@ export function ImagesPanel({
       <UploadForm serviceId={serviceId} storageReady={storageReady} />
 
       {images.length === 0 ? (
-        <p className="rounded-[var(--radius-md)] border border-dashed border-cream-dark p-8 text-center text-ink-soft">
+        <p className="rounded-[var(--radius-md)] border border-dashed border-line p-8 text-center text-muted">
           Aucune photo. La première photo envoyée devient la photo principale.
         </p>
       ) : (

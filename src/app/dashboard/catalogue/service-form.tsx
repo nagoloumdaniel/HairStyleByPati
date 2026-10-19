@@ -123,10 +123,10 @@ export function ServiceForm({
         />
       </div>
 
-      <fieldset className="rounded-[var(--radius-md)] border border-cream-dark p-4">
+      <fieldset className="rounded-[var(--radius-md)] border border-line p-4">
         <legend className="px-2 text-sm font-semibold">Prix</legend>
         {priceMode === 'ON_REQUEST' ? (
-          <p className="text-sm text-ink-soft">
+          <p className="text-sm text-muted">
             Le prix sera affiché « Prix à confirmer » sur le site. Vous pourrez le préciser ensuite.
           </p>
         ) : (
@@ -154,7 +154,7 @@ export function ServiceForm({
             ) : null}
           </div>
         )}
-        <p className="mt-3 text-sm text-ink-soft">
+        <p className="mt-3 text-sm text-muted">
           {priceMode === 'FIXED'
             ? 'Un prix unique est affiché.'
             : priceMode === 'FROM'
@@ -206,7 +206,7 @@ export function ServiceForm({
         <Button type="submit" loading={pending}>
           {submitLabel}
         </Button>
-        <p className="text-sm text-ink-soft">
+        <p className="text-sm text-muted">
           Les modifications sont enregistrées immédiatement et journalisées.
         </p>
       </div>

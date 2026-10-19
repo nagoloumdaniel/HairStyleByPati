@@ -64,7 +64,7 @@ export default async function ServicePage({ params }: ServicePageProps) {
 
   return (
     <main className="mx-auto w-full max-w-7xl space-y-8 px-4 py-8 sm:px-6 md:py-12">
-      <nav aria-label="Fil d'Ariane" className="text-sm text-ink-soft">
+      <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
             <Link href="/" className="transition hover:text-cacao">
@@ -79,7 +79,7 @@ export default async function ServicePage({ params }: ServicePageProps) {
           </li>
           <li aria-hidden="true">/</li>
           <li>
-            <span aria-current="page" className="font-medium text-ink">
+            <span aria-current="page" className="font-medium text-fg">
               {service.name}
             </span>
           </li>
@@ -99,26 +99,26 @@ export default async function ServicePage({ params }: ServicePageProps) {
                 </Badge>
               ) : null}
             </div>
-            <h1 className="font-heading text-4xl font-bold text-ink md:text-5xl">{service.name}</h1>
+            <h1 className="font-heading text-4xl font-bold text-fg md:text-5xl">{service.name}</h1>
             {service.description ? (
-              <p className="whitespace-pre-line text-lg leading-relaxed text-ink-soft">
+              <p className="whitespace-pre-line text-lg leading-relaxed text-muted">
                 {service.description}
               </p>
             ) : null}
           </div>
 
-          <dl className="grid grid-cols-1 gap-4 rounded-[var(--radius-lg)] border border-cream-dark bg-surface p-5 shadow-soft sm:grid-cols-2">
+          <dl className="grid grid-cols-1 gap-4 rounded-[var(--radius-lg)] border border-line bg-card p-5 shadow-soft sm:grid-cols-2">
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-ink-soft">Tarif</dt>
-              <dd className="mt-1 font-heading text-2xl font-bold text-ink">
+              <dt className="text-xs font-semibold uppercase tracking-wide text-muted">Tarif</dt>
+              <dd className="mt-1 font-heading text-2xl font-bold text-fg">
                 {formatPrice(service)}
               </dd>
             </div>
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-ink-soft">
+              <dt className="text-xs font-semibold uppercase tracking-wide text-muted">
                 Durée estimée
               </dt>
-              <dd className="mt-1 font-heading text-2xl font-bold text-ink">
+              <dd className="mt-1 font-heading text-2xl font-bold text-fg">
                 {formatDuration(service.durationMinutes)}
               </dd>
             </div>
@@ -133,13 +133,13 @@ export default async function ServicePage({ params }: ServicePageProps) {
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link
               href={bookingHref(service.slug)}
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-6 py-3.5 text-lg font-semibold text-ink shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-6 py-3.5 text-lg font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
             >
               Réserver cette coiffure
             </Link>
             <Link
               href={`/coiffures?category=${encodeURIComponent(service.category.slug)}`}
-              className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] border border-cream-dark bg-surface px-6 py-3.5 font-semibold text-ink transition hover:border-cacao hover:bg-cream"
+              className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] border border-line bg-card px-6 py-3.5 font-semibold text-fg transition hover:border-cacao hover:bg-page"
             >
               Voir la catégorie
             </Link>
@@ -147,11 +147,11 @@ export default async function ServicePage({ params }: ServicePageProps) {
 
           <Link
             href={`/compatibilite?service=${encodeURIComponent(service.slug)}`}
-            className="flex items-center justify-between gap-3 rounded-[var(--radius-md)] border border-accent bg-accent-soft px-5 py-3 font-semibold text-ink transition hover:border-cacao"
+            className="flex items-center justify-between gap-3 rounded-[var(--radius-md)] border border-accent bg-accent-soft px-5 py-3 font-semibold text-fg transition hover:border-cacao"
           >
             <span>
               Vérifier ma compatibilité capillaire
-              <span className="block text-sm font-normal text-ink-soft">
+              <span className="block text-sm font-normal text-muted">
                 Quelques questions, sans engagement et sans réservation.
               </span>
             </span>
@@ -162,19 +162,19 @@ export default async function ServicePage({ params }: ServicePageProps) {
 
           {service.options.length > 0 ? (
             <section aria-labelledby="options-titre" className="space-y-3">
-              <h2 id="options-titre" className="font-heading text-2xl font-bold text-ink">
+              <h2 id="options-titre" className="font-heading text-2xl font-bold text-fg">
                 Options disponibles
               </h2>
-              <ul className="divide-y divide-cream-dark rounded-[var(--radius-lg)] border border-cream-dark bg-surface">
+              <ul className="divide-y divide-line rounded-[var(--radius-lg)] border border-line bg-card">
                 {service.options.map((option) => (
                   <li
                     key={option.id}
                     className="flex items-baseline justify-between gap-4 px-4 py-3"
                   >
                     <div>
-                      <p className="font-semibold text-ink">{option.name}</p>
+                      <p className="font-semibold text-fg">{option.name}</p>
                       {option.durationMinutes > 0 ? (
-                        <p className="text-sm text-ink-soft">
+                        <p className="text-sm text-muted">
                           +{formatDuration(option.durationMinutes)}
                         </p>
                       ) : null}
@@ -190,27 +190,27 @@ export default async function ServicePage({ params }: ServicePageProps) {
                   </li>
                 ))}
               </ul>
-              <p className="text-sm text-ink-soft">
+              <p className="text-sm text-muted">
                 Les options s’ajoutent au tarif de base et sont choisies pendant la réservation.
               </p>
             </section>
           ) : null}
 
           <section aria-labelledby="compatibilite-titre" className="space-y-3">
-            <h2 id="compatibilite-titre" className="font-heading text-2xl font-bold text-ink">
+            <h2 id="compatibilite-titre" className="font-heading text-2xl font-bold text-fg">
               Compatibilité capillaire
             </h2>
             {hasCompatibilityInfo ? (
-              <ul className="space-y-2 rounded-[var(--radius-lg)] border border-cream-dark bg-surface p-5 text-ink-soft">
+              <ul className="space-y-2 rounded-[var(--radius-lg)] border border-line bg-card p-5 text-muted">
                 {acceptedLengths.length > 0 ? (
                   <li>
-                    <span className="font-semibold text-ink">Longueurs acceptées : </span>
+                    <span className="font-semibold text-fg">Longueurs acceptées : </span>
                     {acceptedLengths.map((length) => HAIR_LENGTH_LABELS[length]).join(', ')}
                   </li>
                 ) : null}
                 {(compatibility?.acceptedHairTypes.length ?? 0) > 0 ? (
                   <li>
-                    <span className="font-semibold text-ink">Types de cheveux acceptés : </span>
+                    <span className="font-semibold text-fg">Types de cheveux acceptés : </span>
                     {compatibility?.acceptedHairTypes.join(', ')}
                   </li>
                 ) : null}
@@ -232,19 +232,19 @@ export default async function ServicePage({ params }: ServicePageProps) {
                   </li>
                 ) : null}
                 {compatibility?.uncertainMessage ? (
-                  <li className="rounded-[var(--radius-sm)] bg-accent-soft px-3 py-2 text-ink">
+                  <li className="rounded-[var(--radius-sm)] bg-accent-soft px-3 py-2 text-fg">
                     {compatibility.uncertainMessage}
                   </li>
                 ) : null}
                 {compatibility?.conditionsNote ? (
-                  <li className="rounded-[var(--radius-sm)] bg-cream-dark px-3 py-2 text-ink">
+                  <li className="rounded-[var(--radius-sm)] bg-line px-3 py-2 text-fg">
                     <span className="font-semibold">Conditions : </span>
                     {compatibility.conditionsNote}
                   </li>
                 ) : null}
               </ul>
             ) : (
-              <p className="rounded-[var(--radius-lg)] border border-cream-dark bg-surface p-5 text-ink-soft">
+              <p className="rounded-[var(--radius-lg)] border border-line bg-card p-5 text-muted">
                 Aucune restriction de compatibilité n’est renseignée pour cette prestation. Patricia
                 vérifie vos informations capillaires avant de confirmer le rendez-vous.
               </p>
@@ -252,10 +252,10 @@ export default async function ServicePage({ params }: ServicePageProps) {
           </section>
 
           <section aria-labelledby="infos-titre" className="space-y-3">
-            <h2 id="infos-titre" className="font-heading text-2xl font-bold text-ink">
+            <h2 id="infos-titre" className="font-heading text-2xl font-bold text-fg">
               Avant votre rendez-vous
             </h2>
-            <ul className="space-y-2 text-ink-soft">
+            <ul className="space-y-2 text-muted">
               <li>Le paiement s’effectue sur place ; aucun paiement en ligne n’est demandé.</li>
               <li>Merci d’arriver avec des cheveux propres et démêlés.</li>
               <li>Signalez toute allergie ou sensibilité du cuir chevelu avant la prestation.</li>
@@ -268,10 +268,10 @@ export default async function ServicePage({ params }: ServicePageProps) {
         </div>
       </div>
 
-      <div className="border-t border-cream-dark pt-6">
+      <div className="border-t border-line pt-6">
         <Link
           href="/coiffures"
-          className="inline-flex items-center gap-2 font-semibold text-cacao transition hover:text-ink"
+          className="inline-flex items-center gap-2 font-semibold text-cacao transition hover:text-fg"
         >
           <span aria-hidden="true">←</span> Retour au catalogue
         </Link>

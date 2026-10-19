@@ -18,7 +18,7 @@ export default async function NewServicePage() {
 
   return (
     <div className="p-6">
-      <nav aria-label="Fil d'Ariane" className="text-sm text-ink-soft">
+      <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
             <Link href="/dashboard/catalogue" className="transition hover:text-cacao">
@@ -27,7 +27,7 @@ export default async function NewServicePage() {
           </li>
           <li aria-hidden="true">/</li>
           <li>
-            <span aria-current="page" className="font-medium text-ink">
+            <span aria-current="page" className="font-medium text-fg">
               Nouvelle prestation
             </span>
           </li>
@@ -35,7 +35,7 @@ export default async function NewServicePage() {
       </nav>
 
       <h1 className="mt-3 text-2xl font-semibold">Nouvelle prestation</h1>
-      <p className="mt-1 text-ink-soft">
+      <p className="mt-1 text-muted">
         Créez la fiche, puis ajoutez ses photos, options, règles de compatibilité et questions
         capillaires.
       </p>

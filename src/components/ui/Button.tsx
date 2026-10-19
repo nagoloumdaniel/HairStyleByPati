@@ -13,10 +13,10 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 const VARIANTS: Record<ButtonVariant, string> = {
   // P2.3 : primaire jaune dore, texte ink (#191919) pour contraste AAA ~10.9:1.
   // Ne JAMAIS mettre de texte blanc sur accent (1.6:1).
-  primary: 'bg-accent text-ink hover:bg-accent-hover shadow-soft',
-  secondary: 'bg-surface text-ink border border-cream-dark hover:border-cacao shadow-soft',
+  primary: 'bg-accent text-accent-fg hover:bg-accent-hover shadow-soft',
+  secondary: 'bg-card text-fg border border-line hover:border-cacao shadow-soft',
   ghost: 'bg-transparent text-cacao hover:bg-accent-soft',
-  danger: 'bg-alert text-surface hover:brightness-95',
+  danger: 'bg-alert text-alert-fg hover:brightness-95',
 };
 
 const SIZES: Record<ButtonSize, string> = {
@@ -45,7 +45,7 @@ export function Button({
       {loading ? (
         <span
           aria-hidden="true"
-          className="inline-block size-4 animate-spin rounded-full border-2 border-ink border-t-transparent"
+          className="inline-block size-4 animate-spin rounded-full border-2 border-current border-t-transparent"
         />
       ) : null}
       {children}

@@ -130,9 +130,9 @@ function QuestionForm({
         </label>
       </div>
 
-      <fieldset className="rounded-[var(--radius-md)] border border-cream-dark p-4">
+      <fieldset className="rounded-[var(--radius-md)] border border-line p-4">
         <legend className="px-2 text-sm font-semibold">Affichage conditionnel (facultatif)</legend>
-        <p className="mb-3 text-sm text-ink-soft">
+        <p className="mb-3 text-sm text-muted">
           N’afficher cette question que si une autre question a une réponse donnée.
         </p>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -250,7 +250,7 @@ function ReorderQuestionButton({
     return (
       <span
         aria-hidden="true"
-        className="inline-flex size-8 items-center justify-center rounded-[var(--radius-sm)] border border-cream-dark text-ink-soft/40"
+        className="inline-flex size-8 items-center justify-center rounded-[var(--radius-sm)] border border-line text-muted/40"
       >
         {direction === -1 ? '↑' : '↓'}
       </span>
@@ -296,7 +296,7 @@ export function QuestionsPanel({
   return (
     <div className="flex flex-col gap-4 p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-ink-soft">
+        <p className="text-sm text-muted">
           Les réponses serviront à évaluer la compatibilité capillaire avant la réservation.
         </p>
         <Button type="button" size="sm" onClick={() => setCreateOpen(true)}>
@@ -315,7 +315,7 @@ export function QuestionsPanel({
       </Modal>
 
       {questions.length === 0 ? (
-        <p className="rounded-[var(--radius-md)] border border-dashed border-cream-dark p-8 text-center text-ink-soft">
+        <p className="rounded-[var(--radius-md)] border border-dashed border-line p-8 text-center text-muted">
           Aucune question. La réservation utilisera le questionnaire par défaut.
         </p>
       ) : (
@@ -325,7 +325,7 @@ export function QuestionsPanel({
             return (
               <li
                 key={question.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-md)] border border-cream-dark bg-surface p-3"
+                className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-md)] border border-line bg-card p-3"
               >
                 <div className="flex min-w-0 items-start gap-2">
                   <div className="flex flex-col gap-1">
@@ -352,12 +352,12 @@ export function QuestionsPanel({
                       )}
                       {question.active ? null : <Badge tone="alert">Inactive</Badge>}
                     </p>
-                    <p className="mt-1 text-sm text-ink-soft">
+                    <p className="mt-1 text-sm text-muted">
                       Clé : {question.key} · {TYPE_LABELS[question.type] ?? question.type} · ordre{' '}
                       {question.order}
                     </p>
                     {condition.dependsOn ? (
-                      <p className="mt-1 text-sm text-ink-soft">
+                      <p className="mt-1 text-sm text-muted">
                         Affichée si « {condition.dependsOn} » = « {condition.equals} »
                       </p>
                     ) : null}

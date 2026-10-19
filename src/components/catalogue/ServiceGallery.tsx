@@ -44,7 +44,7 @@ export function ServiceGallery({
             goTo(index + 1);
           }
         }}
-        className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-lg)] bg-cream-dark shadow-soft focus:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:aspect-[4/5] lg:aspect-[4/5]"
+        className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-lg)] bg-line shadow-soft focus:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:aspect-[4/5] lg:aspect-[4/5]"
       >
         <Image
           key={active.key}
@@ -62,7 +62,7 @@ export function ServiceGallery({
               type="button"
               onClick={() => goTo(index - 1)}
               aria-label="Photo précédente"
-              className="absolute left-3 top-1/2 inline-flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-surface/85 text-ink shadow-soft backdrop-blur transition hover:bg-surface focus-visible:ring-2 focus-visible:ring-accent"
+              className="absolute left-3 top-1/2 inline-flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-card/85 text-fg shadow-soft backdrop-blur transition hover:bg-card focus-visible:ring-2 focus-visible:ring-accent"
             >
               <span aria-hidden="true">←</span>
             </button>
@@ -70,13 +70,13 @@ export function ServiceGallery({
               type="button"
               onClick={() => goTo(index + 1)}
               aria-label="Photo suivante"
-              className="absolute right-3 top-1/2 inline-flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-surface/85 text-ink shadow-soft backdrop-blur transition hover:bg-surface focus-visible:ring-2 focus-visible:ring-accent"
+              className="absolute right-3 top-1/2 inline-flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-card/85 text-fg shadow-soft backdrop-blur transition hover:bg-card focus-visible:ring-2 focus-visible:ring-accent"
             >
               <span aria-hidden="true">→</span>
             </button>
             <p
               aria-live="polite"
-              className="absolute bottom-3 right-3 rounded-full bg-ink/75 px-3 py-1 text-xs font-semibold text-cream"
+              className="absolute bottom-3 right-3 rounded-full bg-ink/75 px-3 py-1 text-xs font-semibold text-panel-fg"
             >
               {index + 1} / {count}
             </p>

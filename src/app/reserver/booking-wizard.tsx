@@ -233,10 +233,10 @@ export function BookingWizard({
               aria-current={stepNumber === number ? 'step' : undefined}
               className={`inline-flex items-center gap-1.5 rounded-[var(--radius-full)] px-2.5 py-1.5 ${
                 stepNumber === number
-                  ? 'bg-ink font-semibold text-cream'
+                  ? 'bg-ink font-semibold text-panel-fg'
                   : stepNumber > number
                     ? 'bg-success-soft text-success'
-                    : 'bg-cream-dark text-ink-soft'
+                    : 'bg-line text-muted'
               }`}
             >
               <span aria-hidden="true" className="font-bold">
@@ -253,11 +253,11 @@ export function BookingWizard({
           <h2
             ref={headingRef}
             tabIndex={-1}
-            className="font-heading text-2xl font-bold text-ink outline-none"
+            className="font-heading text-2xl font-bold text-fg outline-none"
           >
             Vos informations capillaires
           </h2>
-          <p className="mt-2 text-ink-soft">
+          <p className="mt-2 text-muted">
             Patricia utilise ces réponses pour vérifier que la prestation est réalisable.
           </p>
           <form
@@ -317,18 +317,16 @@ export function BookingWizard({
             <h2
               ref={headingRef}
               tabIndex={-1}
-              className="font-heading text-2xl font-bold text-ink outline-none"
+              className="font-heading text-2xl font-bold text-fg outline-none"
             >
               La réservation en ligne ne peut pas continuer
             </h2>
           </div>
-          <p className="mt-4 whitespace-pre-line text-lg text-ink">
-            {previewState.preview.message}
-          </p>
+          <p className="mt-4 whitespace-pre-line text-lg text-fg">{previewState.preview.message}</p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
               href={`/compatibilite?service=${encodeURIComponent(service.slug)}`}
-              className="inline-flex items-center justify-center rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-ink shadow-soft transition hover:bg-accent-hover"
+              className="inline-flex items-center justify-center rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover"
             >
               Demander une évaluation à Patricia
             </Link>
@@ -343,7 +341,7 @@ export function BookingWizard({
               Modifier mes réponses
             </Button>
           </div>
-          <p className="mt-4 text-sm text-ink-soft">
+          <p className="mt-4 text-sm text-muted">
             Aucun créneau n’est réservé. Une évaluation acceptée permettra de reprendre la
             réservation.
           </p>
@@ -355,7 +353,7 @@ export function BookingWizard({
           <h2
             ref={headingRef}
             tabIndex={-1}
-            className="font-heading text-2xl font-bold text-ink outline-none"
+            className="font-heading text-2xl font-bold text-fg outline-none"
           >
             Options et précisions
           </h2>
@@ -366,7 +364,7 @@ export function BookingWizard({
           ) : null}
           <div className="mt-5 flex flex-col gap-3">
             {service.options.length === 0 ? (
-              <p className="text-ink-soft">Cette prestation n’a pas d’option supplémentaire.</p>
+              <p className="text-muted">Cette prestation n’a pas d’option supplémentaire.</p>
             ) : (
               service.options.map((option) => (
                 <label
@@ -374,7 +372,7 @@ export function BookingWizard({
                   className={`flex cursor-pointer items-center justify-between gap-4 rounded-[var(--radius-md)] border p-4 transition ${
                     optionIds.includes(option.id)
                       ? 'border-cacao bg-accent-soft'
-                      : 'border-cream-dark hover:border-cacao'
+                      : 'border-line hover:border-cacao'
                   }`}
                 >
                   <span className="flex items-center gap-3">
@@ -385,9 +383,9 @@ export function BookingWizard({
                       className="size-4"
                     />
                     <span>
-                      <span className="block font-semibold text-ink">{option.name}</span>
+                      <span className="block font-semibold text-fg">{option.name}</span>
                       {option.durationMinutes > 0 ? (
-                        <span className="text-sm text-ink-soft">
+                        <span className="text-sm text-muted">
                           +{formatMinutes(option.durationMinutes)}
                         </span>
                       ) : null}
@@ -400,7 +398,7 @@ export function BookingWizard({
               ))
             )}
           </div>
-          <div className="mt-5 rounded-[var(--radius-md)] bg-cream-dark px-4 py-3 text-sm text-ink">
+          <div className="mt-5 rounded-[var(--radius-md)] bg-line px-4 py-3 text-sm text-fg">
             Durée estimée : <strong>{formatMinutes(durationMinutes)}</strong> · Prix :{' '}
             <strong>{formatCents(priceCents)}</strong>
           </div>
@@ -420,11 +418,11 @@ export function BookingWizard({
           <h2
             ref={headingRef}
             tabIndex={-1}
-            className="font-heading text-2xl font-bold text-ink outline-none"
+            className="font-heading text-2xl font-bold text-fg outline-none"
           >
             Choisissez votre créneau
           </h2>
-          <p className="mt-2 text-ink-soft">
+          <p className="mt-2 text-muted">
             Seuls les créneaux réellement disponibles sont proposés, selon les horaires de Patricia.
           </p>
           <div className="mt-4 max-w-xs">
@@ -450,7 +448,7 @@ export function BookingWizard({
 
           <div className="mt-5" aria-live="polite">
             {slotPending ? (
-              <p className="text-ink-soft">Recherche des créneaux…</p>
+              <p className="text-muted">Recherche des créneaux…</p>
             ) : slotState.error ? (
               <p
                 role="alert"
@@ -459,8 +457,8 @@ export function BookingWizard({
                 {slotState.error}
               </p>
             ) : !slotState.slots || slotState.slots.length === 0 ? (
-              <div className="rounded-[var(--radius-md)] border border-dashed border-cream-dark p-6 text-center text-ink-soft">
-                <p className="font-semibold text-ink">Aucun créneau ce jour</p>
+              <div className="rounded-[var(--radius-md)] border border-dashed border-line p-6 text-center text-muted">
+                <p className="font-semibold text-fg">Aucun créneau ce jour</p>
                 <p className="mt-1 text-sm">
                   Essayez une autre date. Les créneaux dépendent des horaires et des rendez-vous
                   déjà enregistrés.
@@ -468,7 +466,7 @@ export function BookingWizard({
               </div>
             ) : (
               <div>
-                <p className="mb-3 text-sm text-ink-soft">
+                <p className="mb-3 text-sm text-muted">
                   {slotState.slots.length} créneau{slotState.slots.length > 1 ? 'x' : ''} disponible
                   {slotState.slots.length > 1 ? 's' : ''} · heure locale
                 </p>
@@ -487,8 +485,8 @@ export function BookingWizard({
                       }
                       className={`rounded-[var(--radius-md)] border px-3 py-2.5 text-sm font-semibold transition ${
                         selectedSlot?.startsAt === slot.startsAt
-                          ? 'border-cacao bg-cacao text-cream'
-                          : 'border-cream-dark bg-surface text-ink hover:border-cacao'
+                          ? 'border-cacao bg-cacao text-cacao-fg'
+                          : 'border-line bg-card text-fg hover:border-cacao'
                       }`}
                     >
                       {timeLabel(slot.startMinute)}
@@ -515,7 +513,7 @@ export function BookingWizard({
           <h2
             ref={headingRef}
             tabIndex={-1}
-            className="font-heading text-2xl font-bold text-ink outline-none"
+            className="font-heading text-2xl font-bold text-fg outline-none"
           >
             Vos coordonnées
           </h2>
@@ -610,48 +608,46 @@ export function BookingWizard({
           <h2
             ref={headingRef}
             tabIndex={-1}
-            className="font-heading text-2xl font-bold text-ink outline-none"
+            className="font-heading text-2xl font-bold text-fg outline-none"
           >
             Récapitulatif
           </h2>
-          <dl className="mt-4 divide-y divide-cream-dark">
+          <dl className="mt-4 divide-y divide-line">
             <div className="flex justify-between gap-4 py-2">
-              <dt className="text-ink-soft">Prestation</dt>
-              <dd className="text-right font-semibold text-ink">{service.name}</dd>
+              <dt className="text-muted">Prestation</dt>
+              <dd className="text-right font-semibold text-fg">{service.name}</dd>
             </div>
             <div className="flex justify-between gap-4 py-2">
-              <dt className="text-ink-soft">Date et heure</dt>
-              <dd className="text-right font-semibold text-ink">{formattedSlot}</dd>
+              <dt className="text-muted">Date et heure</dt>
+              <dd className="text-right font-semibold text-fg">{formattedSlot}</dd>
             </div>
             <div className="flex justify-between gap-4 py-2">
-              <dt className="text-ink-soft">Durée estimée</dt>
-              <dd className="text-right font-semibold text-ink">
-                {formatMinutes(durationMinutes)}
-              </dd>
+              <dt className="text-muted">Durée estimée</dt>
+              <dd className="text-right font-semibold text-fg">{formatMinutes(durationMinutes)}</dd>
             </div>
             <div className="flex justify-between gap-4 py-2">
-              <dt className="text-ink-soft">Options</dt>
-              <dd className="text-right font-semibold text-ink">
+              <dt className="text-muted">Options</dt>
+              <dd className="text-right font-semibold text-fg">
                 {selectedOptions.length > 0
                   ? selectedOptions.map((option) => option.name).join(', ')
                   : 'Aucune'}
               </dd>
             </div>
             <div className="flex justify-between gap-4 py-2">
-              <dt className="text-ink-soft">Prix</dt>
-              <dd className="text-right font-semibold text-ink">{formatCents(priceCents)}</dd>
+              <dt className="text-muted">Prix</dt>
+              <dd className="text-right font-semibold text-fg">{formatCents(priceCents)}</dd>
             </div>
             <div className="flex justify-between gap-4 py-2">
-              <dt className="text-ink-soft">Coordonnées</dt>
-              <dd className="text-right font-semibold text-ink">
+              <dt className="text-muted">Coordonnées</dt>
+              <dd className="text-right font-semibold text-fg">
                 {contactName}
-                <span className="block font-normal text-ink-soft">{contactEmail}</span>
-                <span className="block font-normal text-ink-soft">{contactPhone}</span>
+                <span className="block font-normal text-muted">{contactEmail}</span>
+                <span className="block font-normal text-muted">{contactPhone}</span>
               </dd>
             </div>
           </dl>
 
-          <div className="mt-4 rounded-[var(--radius-md)] bg-accent-soft px-4 py-3 text-sm text-ink">
+          <div className="mt-4 rounded-[var(--radius-md)] bg-accent-soft px-4 py-3 text-sm text-fg">
             <p className="font-semibold">Paiement sur place</p>
             <p className="mt-1">
               Aucun paiement en ligne n’est demandé. Annulation en ligne possible jusqu’à{' '}
@@ -700,18 +696,18 @@ export function BookingWizard({
           <h2
             ref={headingRef}
             tabIndex={-1}
-            className="font-heading text-2xl font-bold text-ink outline-none"
+            className="font-heading text-2xl font-bold text-fg outline-none"
           >
             {bookingState.success.status === 'CONFIRMED'
               ? 'Votre rendez-vous est confirmé'
               : 'Votre demande est enregistrée'}
           </h2>
-          <p className="mt-3 text-lg text-ink">
+          <p className="mt-3 text-lg text-fg">
             {bookingState.success.status === 'CONFIRMED'
               ? 'Votre créneau est réservé et protégé contre les doubles réservations.'
               : 'Le créneau est réservé temporairement, en attente de confirmation par Patricia.'}
           </p>
-          <dl className="mt-4 space-y-2 rounded-[var(--radius-md)] bg-cream-dark px-4 py-3 text-sm text-ink">
+          <dl className="mt-4 space-y-2 rounded-[var(--radius-md)] bg-line px-4 py-3 text-sm text-fg">
             <div className="flex justify-between gap-4">
               <dt>Référence</dt>
               <dd className="font-semibold">{bookingState.success.reference}</dd>
@@ -734,20 +730,20 @@ export function BookingWizard({
               <dd className="font-semibold">{formatCents(bookingState.success.priceCents)}</dd>
             </div>
           </dl>
-          <p className="mt-4 text-sm text-ink-soft">
+          <p className="mt-4 text-sm text-muted">
             Paiement sur place. Conservez le lien ci-dessous pour annuler votre rendez-vous si
             nécessaire.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link
               href={bookingState.success.cancelUrl}
-              className="inline-flex items-center justify-center rounded-[var(--radius-md)] border border-cream-dark bg-surface px-5 py-2.5 text-sm font-semibold text-ink transition hover:border-cacao"
+              className="inline-flex items-center justify-center rounded-[var(--radius-md)] border border-line bg-card px-5 py-2.5 text-sm font-semibold text-fg transition hover:border-cacao"
             >
               Gérer ou annuler mon rendez-vous
             </Link>
             <Link
               href="/coiffures"
-              className="inline-flex items-center justify-center rounded-[var(--radius-md)] bg-accent px-5 py-2.5 text-sm font-semibold text-ink shadow-soft transition hover:bg-accent-hover"
+              className="inline-flex items-center justify-center rounded-[var(--radius-md)] bg-accent px-5 py-2.5 text-sm font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover"
             >
               Retour au catalogue
             </Link>

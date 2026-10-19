@@ -76,7 +76,7 @@ export default function HomePage() {
     <main className="mx-auto max-w-7xl px-6 space-y-20">
       {/* Hero */}
       <section
-        className="relative rounded-2xl bg-cacao p-8 md:p-16 text-surface overflow-hidden reveal"
+        className="relative rounded-2xl bg-hero p-8 md:p-16 text-panel-fg overflow-hidden reveal"
         aria-labelledby="hero-title"
       >
         <div className="md:flex md:items-center gap-8">
@@ -89,20 +89,20 @@ export default function HomePage() {
               <br />
               avec Patricia
             </h1>
-            <p className="text-lg md:text-xl text-cream/90 max-w-md leading-relaxed">
+            <p className="text-lg md:text-xl text-panel-fg/90 max-w-md leading-relaxed">
               Coiffeuse spécialisée en tresses, vanilles et locs. Prenez rendez-vous en quelques
               clics pour une coiffure sur mesure.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="/reserver"
-                className="inline-flex items-center justify-center gap-2 font-semibold bg-accent text-ink hover:bg-accent-hover shadow-soft px-7 py-3.5 text-lg rounded-[var(--radius-md)] transition active:scale-[0.98]"
+                className="inline-flex items-center justify-center gap-2 font-semibold bg-accent text-accent-fg hover:bg-accent-hover shadow-soft px-7 py-3.5 text-lg rounded-[var(--radius-md)] transition active:scale-[0.98]"
               >
                 Réserver un créneau
               </Link>
               <Link
                 href="/coiffures"
-                className="inline-flex items-center justify-center gap-2 font-semibold bg-surface text-ink border border-cream-dark hover:border-cacao shadow-soft px-7 py-3.5 text-lg rounded-[var(--radius-md)] transition active:scale-[0.98]"
+                className="inline-flex items-center justify-center gap-2 font-semibold bg-card text-fg border border-line hover:border-cacao shadow-soft px-7 py-3.5 text-lg rounded-[var(--radius-md)] transition active:scale-[0.98]"
               >
                 Découvrir le catalogue
               </Link>
@@ -125,12 +125,12 @@ export default function HomePage() {
       <section id="coiffures" className="space-y-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h2 className="text-3xl font-heading font-bold text-ink">Coiffures populaires</h2>
-            <p className="text-ink-soft">Nos prestations les plus demandées.</p>
+            <h2 className="text-3xl font-heading font-bold text-fg">Coiffures populaires</h2>
+            <p className="text-muted">Nos prestations les plus demandées.</p>
           </div>
           <Link
             href="/coiffures"
-            className="inline-flex items-center justify-center gap-2 font-semibold bg-accent text-ink hover:bg-accent-hover shadow-soft px-7 py-3.5 text-lg rounded-[var(--radius-md)] transition active:scale-[0.98]"
+            className="inline-flex items-center justify-center gap-2 font-semibold bg-accent text-accent-fg hover:bg-accent-hover shadow-soft px-7 py-3.5 text-lg rounded-[var(--radius-md)] transition active:scale-[0.98]"
           >
             Voir toutes les coiffures
           </Link>
@@ -154,11 +154,11 @@ export default function HomePage() {
                   <Badge tone="neutral">{service.category}</Badge>
                   <Badge tone="accent">{service.price}</Badge>
                 </div>
-                <h3 className="text-xl font-heading font-bold text-ink mb-1">{service.title}</h3>
-                <p className="text-ink-soft text-sm mb-4">{service.duration}</p>
+                <h3 className="text-xl font-heading font-bold text-fg mb-1">{service.title}</h3>
+                <p className="text-muted text-sm mb-4">{service.duration}</p>
                 <Link
                   href={`/coiffures/${service.slug}`}
-                  className="inline-flex items-center justify-center gap-2 font-semibold bg-accent text-ink hover:bg-accent-hover shadow-soft px-3 py-1.5 text-sm rounded-[var(--radius-sm)] transition active:scale-[0.98]"
+                  className="inline-flex items-center justify-center gap-2 font-semibold bg-accent text-accent-fg hover:bg-accent-hover shadow-soft px-3 py-1.5 text-sm rounded-[var(--radius-sm)] transition active:scale-[0.98]"
                 >
                   Voir les détails
                 </Link>
@@ -170,15 +170,15 @@ export default function HomePage() {
 
       {/* Étapes de réservation */}
       <section id="etapes" className="space-y-8">
-        <h2 className="text-3xl font-heading font-bold text-ink">Comment ça marche</h2>
+        <h2 className="text-3xl font-heading font-bold text-fg">Comment ça marche</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {steps.map((step) => (
             <div key={step.number} className="text-center">
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent text-ink font-heading font-bold text-xl mb-4">
+              <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent text-accent-fg font-heading font-bold text-xl mb-4">
                 {step.number}
               </div>
-              <h3 className="text-xl font-heading font-bold text-ink mb-2">{step.title}</h3>
-              <p className="text-ink-soft leading-relaxed">{step.description}</p>
+              <h3 className="text-xl font-heading font-bold text-fg mb-2">{step.title}</h3>
+              <p className="text-muted leading-relaxed">{step.description}</p>
             </div>
           ))}
         </div>
@@ -197,14 +197,14 @@ export default function HomePage() {
           />
         </div>
         <div className="md:w-1/2 space-y-6">
-          <h2 className="text-3xl font-heading font-bold text-ink">À propos de Patricia</h2>
-          <p className="text-ink-soft leading-relaxed">
+          <h2 className="text-3xl font-heading font-bold text-fg">À propos de Patricia</h2>
+          <p className="text-muted leading-relaxed">
             Coiffeuse passionnée et expérimentée, Patricia met son savoir-faire au service de vos
             cheveux depuis plus de 10 ans. Spécialiste des tresses, vanilles et locs, elle vous
             accueille dans une ambiance chaleureuse et professionnelle pour sublimer votre
             chevelure.
           </p>
-          <p className="text-ink-soft leading-relaxed">
+          <p className="text-muted leading-relaxed">
             Chaque prestation est personnalisée : diagnostic capillaire, conseils d&apos;entretien
             et coiffure adaptée à votre nature de cheveux.
           </p>
@@ -213,47 +213,47 @@ export default function HomePage() {
 
       {/* Témoignages */}
       <section id="temoinages" className="space-y-8">
-        <h2 className="text-3xl font-heading font-bold text-ink">Elles nous font confiance</h2>
+        <h2 className="text-3xl font-heading font-bold text-fg">Elles nous font confiance</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <blockquote className="card p-6 italic text-ink-soft border-none bg-surface shadow-soft">
+          <blockquote className="card p-6 italic text-muted border-none bg-card shadow-soft">
             <p className="text-lg mb-4">
               « Des tresses magnifiques, tenu parfait pendant 4 semaines. »
             </p>
-            <footer className="text-sm font-semibold text-ink">— Marie L.</footer>
+            <footer className="text-sm font-semibold text-fg">— Marie L.</footer>
           </blockquote>
-          <blockquote className="card p-6 italic text-ink-soft border-none bg-surface shadow-soft">
+          <blockquote className="card p-6 italic text-muted border-none bg-card shadow-soft">
             <p className="text-lg mb-4">
               « Accueil chaleureux, Patricia prend le temps de comprendre ce qu&apos;on veut. »
             </p>
-            <footer className="text-sm font-semibold text-ink">— Sophie R.</footer>
+            <footer className="text-sm font-semibold text-fg">— Sophie R.</footer>
           </blockquote>
-          <blockquote className="card p-6 italic text-ink-soft border-none bg-surface shadow-soft">
+          <blockquote className="card p-6 italic text-muted border-none bg-card shadow-soft">
             <p className="text-lg mb-4">
               « Mes locs n&apos;ont jamais été aussi bien entretenus. Merci Patricia ! »
             </p>
-            <footer className="text-sm font-semibold text-ink">— Aïcha D.</footer>
+            <footer className="text-sm font-semibold text-fg">— Aïcha D.</footer>
           </blockquote>
         </div>
       </section>
 
       {/* Contact / Coordonnées */}
-      <section id="contact" className="rounded-2xl bg-cream p-8 md:p-12 reveal">
+      <section id="contact" className="rounded-2xl bg-page p-8 md:p-12 reveal">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           <div className="space-y-6">
-            <h2 className="text-3xl font-heading font-bold text-ink">Contactez-nous</h2>
-            <p className="text-ink-soft leading-relaxed">
+            <h2 className="text-3xl font-heading font-bold text-fg">Contactez-nous</h2>
+            <p className="text-muted leading-relaxed">
               Une question sur une prestation ou sur la disponibilité d&apos;un créneau ?
               Contactez-nous, nous vous répondrons rapidement.
             </p>
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center gap-2 font-semibold bg-accent text-ink hover:bg-accent-hover shadow-soft px-7 py-3.5 text-lg rounded-[var(--radius-md)] transition active:scale-[0.98]"
+              className="inline-flex items-center justify-center gap-2 font-semibold bg-accent text-accent-fg hover:bg-accent-hover shadow-soft px-7 py-3.5 text-lg rounded-[var(--radius-md)] transition active:scale-[0.98]"
             >
               Envoyer un message
             </Link>
           </div>
           <div className="space-y-4">
-            <p className="flex items-start gap-3 text-ink">
+            <p className="flex items-start gap-3 text-fg">
               <span className="text-accent font-bold">📍</span>
               <span>
                 Salon Hairstyle by Patricia
@@ -261,15 +261,15 @@ export default function HomePage() {
                 12 Rue de la Coiffure, 75000 Paris
               </span>
             </p>
-            <p className="flex items-start gap-3 text-ink">
+            <p className="flex items-start gap-3 text-fg">
               <span className="text-accent font-bold">📞</span>
               <span>01 23 45 67 89</span>
             </p>
-            <p className="flex items-start gap-3 text-ink">
+            <p className="flex items-start gap-3 text-fg">
               <span className="text-accent font-bold">✉️</span>
               <span>contact@hairstylebypati.fr</span>
             </p>
-            <p className="flex items-start gap-3 text-ink">
+            <p className="flex items-start gap-3 text-fg">
               <span className="text-accent font-bold">🕒</span>
               <span>Mardi – Samedi : 10h – 19h</span>
             </p>

@@ -53,7 +53,7 @@ export default async function AppointmentDetailPage({
 
   return (
     <div className="p-6">
-      <nav aria-label="Fil d'Ariane" className="text-sm text-ink-soft">
+      <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
             <Link href="/dashboard/reservations" className="transition hover:text-cacao">
@@ -62,7 +62,7 @@ export default async function AppointmentDetailPage({
           </li>
           <li aria-hidden="true">/</li>
           <li>
-            <span aria-current="page" className="font-medium text-ink">
+            <span aria-current="page" className="font-medium text-fg">
               {bookingReference(appointment.id)}
             </span>
           </li>
@@ -79,7 +79,7 @@ export default async function AppointmentDetailPage({
               {APPOINTMENT_STATUS_LABELS[appointment.status]}
             </Badge>
           </div>
-          <p className="mt-1 text-sm text-ink-soft">
+          <p className="mt-1 text-sm text-muted">
             <LocalDateTime iso={appointment.startsAt.toISOString()} /> · {appointment.service.name}{' '}
             · {appointment.durationMinutes} min
           </p>
@@ -92,7 +92,7 @@ export default async function AppointmentDetailPage({
         </div>
         <Link
           href="/dashboard/calendrier"
-          className="rounded-[var(--radius-md)] border border-cream-dark bg-surface px-4 py-2 text-sm font-semibold transition hover:border-cacao"
+          className="rounded-[var(--radius-md)] border border-line bg-card px-4 py-2 text-sm font-semibold transition hover:border-cacao"
         >
           Voir le calendrier
         </Link>
@@ -101,7 +101,7 @@ export default async function AppointmentDetailPage({
       <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <div className="space-y-6">
           <Card>
-            <h2 className="font-heading text-xl font-bold text-ink">Cliente</h2>
+            <h2 className="font-heading text-xl font-bold text-fg">Cliente</h2>
             <dl className="mt-3 space-y-2 text-sm">
               <div className="flex flex-wrap gap-2">
                 <dt className="font-semibold">Nom :</dt>
@@ -133,15 +133,15 @@ export default async function AppointmentDetailPage({
           </Card>
 
           <Card>
-            <h2 className="font-heading text-xl font-bold text-ink">Réservation</h2>
+            <h2 className="font-heading text-xl font-bold text-fg">Réservation</h2>
             <dl className="mt-3 space-y-2 text-sm">
               <div className="flex flex-wrap justify-between gap-2">
                 <dt className="font-semibold">Prestation</dt>
-                <dd className="text-ink-soft">{appointment.service.name}</dd>
+                <dd className="text-muted">{appointment.service.name}</dd>
               </div>
               <div className="flex flex-wrap justify-between gap-2">
                 <dt className="font-semibold">Prix figé</dt>
-                <dd className="text-ink-soft">
+                <dd className="text-muted">
                   {appointment.priceCents == null
                     ? 'À confirmer'
                     : euroFormatter.format(appointment.priceCents / 100)}
@@ -149,12 +149,12 @@ export default async function AppointmentDetailPage({
               </div>
               <div className="flex flex-wrap justify-between gap-2">
                 <dt className="font-semibold">Durée figée</dt>
-                <dd className="text-ink-soft">{appointment.durationMinutes} minutes</dd>
+                <dd className="text-muted">{appointment.durationMinutes} minutes</dd>
               </div>
               {appointment.selectedOptions.length > 0 ? (
                 <div>
                   <dt className="font-semibold">Options</dt>
-                  <dd className="mt-1 space-y-1 text-ink-soft">
+                  <dd className="mt-1 space-y-1 text-muted">
                     {appointment.selectedOptions.map((option) => (
                       <p key={option.optionId}>
                         {option.name} (+{euroFormatter.format(option.priceCents / 100)})
@@ -166,13 +166,13 @@ export default async function AppointmentDetailPage({
               {appointment.comments ? (
                 <div>
                   <dt className="font-semibold">Commentaire</dt>
-                  <dd className="mt-1 whitespace-pre-line text-ink-soft">{appointment.comments}</dd>
+                  <dd className="mt-1 whitespace-pre-line text-muted">{appointment.comments}</dd>
                 </div>
               ) : null}
               {appointment.rescheduledFrom ? (
                 <div className="flex flex-wrap justify-between gap-2">
                   <dt className="font-semibold">Ancien créneau</dt>
-                  <dd className="text-ink-soft">
+                  <dd className="text-muted">
                     <LocalDateTime iso={appointment.rescheduledFrom.toISOString()} />
                   </dd>
                 </div>
@@ -198,15 +198,15 @@ export default async function AppointmentDetailPage({
           </Card>
 
           <Card>
-            <h2 className="font-heading text-xl font-bold text-ink">Informations capillaires</h2>
+            <h2 className="font-heading text-xl font-bold text-fg">Informations capillaires</h2>
             {Object.keys(appointment.hairInfo).length === 0 ? (
-              <p className="mt-2 text-sm text-ink-soft">Aucune réponse enregistrée.</p>
+              <p className="mt-2 text-sm text-muted">Aucune réponse enregistrée.</p>
             ) : (
-              <dl className="mt-3 divide-y divide-cream-dark text-sm">
+              <dl className="mt-3 divide-y divide-line text-sm">
                 {Object.entries(appointment.hairInfo).map(([key, value]) => (
                   <div key={key} className="flex flex-wrap justify-between gap-2 py-2">
-                    <dt className="font-semibold text-ink">{key}</dt>
-                    <dd className="text-ink-soft">{formatAnswer(value)}</dd>
+                    <dt className="font-semibold text-fg">{key}</dt>
+                    <dd className="text-muted">{formatAnswer(value)}</dd>
                   </div>
                 ))}
               </dl>
@@ -216,24 +216,24 @@ export default async function AppointmentDetailPage({
 
         <div className="space-y-6">
           <Card>
-            <h2 className="font-heading text-xl font-bold text-ink">Actions</h2>
+            <h2 className="font-heading text-xl font-bold text-fg">Actions</h2>
             <div className="mt-3">
               <AppointmentActions appointmentId={appointment.id} status={appointment.status} />
             </div>
           </Card>
 
           <Card>
-            <h2 className="font-heading text-xl font-bold text-ink">Historique</h2>
+            <h2 className="font-heading text-xl font-bold text-fg">Historique</h2>
             {history.length === 0 ? (
-              <p className="mt-2 text-sm text-ink-soft">Aucune action enregistrée.</p>
+              <p className="mt-2 text-sm text-muted">Aucune action enregistrée.</p>
             ) : (
               <ol className="mt-3 space-y-3">
                 {history.map((entry) => (
-                  <li key={entry.id} className="border-b border-cream-dark pb-3 last:border-0">
-                    <p className="text-sm font-semibold text-ink">
+                  <li key={entry.id} className="border-b border-line pb-3 last:border-0">
+                    <p className="text-sm font-semibold text-fg">
                       {ACTION_LABELS[entry.action] ?? entry.action}
                     </p>
-                    <p className="text-xs text-ink-soft">
+                    <p className="text-xs text-muted">
                       <LocalDateTime iso={entry.createdAt.toISOString()} />
                       {entry.userName ? ` · ${entry.userName}` : ''}
                     </p>

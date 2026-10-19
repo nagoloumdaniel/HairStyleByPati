@@ -28,14 +28,22 @@ export const metadata: Metadata = {
   description: 'Salon de coiffure spécialisé tresses, vanilles et locs — réservation en ligne.',
 };
 
+/* Applique le thème avant le premier rendu pour éviter tout flash clair.
+   Priorité : choix enregistré, sinon préférence système. */
+const THEME_SCRIPT = `(function(){try{var s=localStorage.getItem('theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;var t=(s==='dark'||s==='light')?s:(d?'dark':'light');var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t;var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',t==='dark'?'#12100e':'#fff8e9');}catch(e){}})();`;
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="fr" className={`${manrope.variable} ${playfair.variable}`}>
+    <html lang="fr" className={`${manrope.variable} ${playfair.variable}`} suppressHydrationWarning>
+      <head>
+        <meta name="theme-color" content="#fff8e9" />
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      </head>
       <body>
         {/* P2.9 : lien d'evitement clavier */}
         <a
           href="#contenu"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-accent focus:px-4 focus:py-2 focus:font-semibold focus:text-ink"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-accent focus:px-4 focus:py-2 focus:font-semibold focus:text-accent-fg"
         >
           Aller au contenu
         </a>

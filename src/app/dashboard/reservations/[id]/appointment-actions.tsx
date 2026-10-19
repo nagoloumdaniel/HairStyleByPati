@@ -90,7 +90,7 @@ export function AppointmentActions({
 
   if (!isActiveAppointmentStatus(status)) {
     return (
-      <p className="rounded-[var(--radius-md)] bg-cream-dark px-4 py-3 text-sm text-ink-soft">
+      <p className="rounded-[var(--radius-md)] bg-line px-4 py-3 text-sm text-muted">
         Ce rendez-vous est clos. Les actions de modification ne sont plus disponibles.
       </p>
     );
@@ -133,8 +133,8 @@ export function AppointmentActions({
         ) : null}
       </div>
 
-      <section className="rounded-[var(--radius-md)] border border-cream-dark p-4">
-        <h3 className="font-semibold text-ink">Annuler le rendez-vous</h3>
+      <section className="rounded-[var(--radius-md)] border border-line p-4">
+        <h3 className="font-semibold text-fg">Annuler le rendez-vous</h3>
         <form action={cancelAction} className="mt-3 flex flex-col gap-3">
           <input type="hidden" name="appointmentId" value={appointmentId} />
           <Textarea
@@ -149,9 +149,9 @@ export function AppointmentActions({
         </form>
       </section>
 
-      <section className="rounded-[var(--radius-md)] border border-cream-dark p-4">
-        <h3 className="font-semibold text-ink">Reprogrammer</h3>
-        <p className="mt-1 text-sm text-ink-soft">
+      <section className="rounded-[var(--radius-md)] border border-line p-4">
+        <h3 className="font-semibold text-fg">Reprogrammer</h3>
+        <p className="mt-1 text-sm text-muted">
           L’ancien créneau n’est libéré qu’après validation du nouveau.
         </p>
         <div className="mt-3 max-w-xs">
@@ -173,9 +173,9 @@ export function AppointmentActions({
         </form>
         <div className="mt-3" aria-live="polite">
           {slotPending ? (
-            <p className="text-sm text-ink-soft">Recherche des créneaux…</p>
+            <p className="text-sm text-muted">Recherche des créneaux…</p>
           ) : !slotState.slots || slotState.slots.length === 0 ? (
-            <p className="text-sm text-ink-soft">Aucun créneau disponible ce jour.</p>
+            <p className="text-sm text-muted">Aucun créneau disponible ce jour.</p>
           ) : (
             <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
               {slotState.slots.map((slot) => (
@@ -188,8 +188,8 @@ export function AppointmentActions({
                   }
                   className={`rounded-[var(--radius-sm)] border px-2 py-2 text-sm font-semibold transition ${
                     selectedSlot?.startsAt === slot.startsAt
-                      ? 'border-cacao bg-cacao text-cream'
-                      : 'border-cream-dark hover:border-cacao'
+                      ? 'border-cacao bg-cacao text-cacao-fg'
+                      : 'border-line hover:border-cacao'
                   }`}
                 >
                   {timeLabel(slot.startMinute)}

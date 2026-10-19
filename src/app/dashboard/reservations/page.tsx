@@ -73,7 +73,7 @@ export default async function ReservationsPage({
     <div className="p-6">
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-semibold">Réservations</h1>
-        <p className="text-ink-soft">
+        <p className="text-muted">
           Rendez-vous à venir, historique et statuts. Chaque fiche permet de confirmer, annuler ou
           reprogrammer.
         </p>
@@ -84,12 +84,12 @@ export default async function ReservationsPage({
           <Link
             key={item}
             href={pageHref(item, 1, all)}
-            className={`rounded-[var(--radius-md)] border bg-surface px-3 py-2 text-sm shadow-soft transition hover:border-cacao ${
-              status === item ? 'border-cacao' : 'border-cream-dark'
+            className={`rounded-[var(--radius-md)] border bg-card px-3 py-2 text-sm shadow-soft transition hover:border-cacao ${
+              status === item ? 'border-cacao' : 'border-line'
             }`}
           >
-            <span className="text-ink-soft">{APPOINTMENT_STATUS_LABELS[item]} : </span>
-            <span className="font-semibold text-ink">{counts[item] ?? 0}</span>
+            <span className="text-muted">{APPOINTMENT_STATUS_LABELS[item]} : </span>
+            <span className="font-semibold text-fg">{counts[item] ?? 0}</span>
           </Link>
         ))}
       </div>
@@ -98,7 +98,7 @@ export default async function ReservationsPage({
         <form
           method="get"
           action="/dashboard/reservations"
-          className="flex flex-wrap items-end gap-3 border-b border-cream-dark p-4"
+          className="flex flex-wrap items-end gap-3 border-b border-line p-4"
         >
           <div className="min-w-56">
             <Select
@@ -144,24 +144,24 @@ export default async function ReservationsPage({
           </div>
         ) : (
           <>
-            <ul className="divide-y divide-cream-dark md:hidden">
+            <ul className="divide-y divide-line md:hidden">
               {result.items.map((appointment) => (
                 <li key={appointment.id} className="flex flex-col gap-2 p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="truncate font-semibold">{appointment.customerName}</p>
-                      <p className="truncate text-sm text-ink-soft">{appointment.serviceName}</p>
+                      <p className="truncate text-sm text-muted">{appointment.serviceName}</p>
                     </div>
                     <Badge tone={APPOINTMENT_STATUS_TONES[appointment.status]}>
                       {APPOINTMENT_STATUS_SHORT_LABELS[appointment.status]}
                     </Badge>
                   </div>
-                  <p className="text-sm text-ink-soft">
+                  <p className="text-sm text-muted">
                     <LocalDateTime iso={appointment.startsAt.toISOString()} />
                   </p>
                   <Link
                     href={`/dashboard/reservations/${appointment.id}`}
-                    className="self-start rounded-[var(--radius-sm)] border border-cream-dark px-3 py-1.5 text-sm font-semibold transition hover:border-cacao"
+                    className="self-start rounded-[var(--radius-sm)] border border-line px-3 py-1.5 text-sm font-semibold transition hover:border-cacao"
                   >
                     Ouvrir la fiche
                   </Link>
@@ -172,7 +172,7 @@ export default async function ReservationsPage({
             <div className="hidden overflow-x-auto md:block">
               <table className="w-full border-collapse text-left">
                 <thead>
-                  <tr className="border-b border-cream-dark">
+                  <tr className="border-b border-line">
                     <th scope="col" className="p-4 pb-3 text-sm font-semibold">
                       Date
                     </th>
@@ -198,13 +198,13 @@ export default async function ReservationsPage({
                 </thead>
                 <tbody>
                   {result.items.map((appointment) => (
-                    <tr key={appointment.id} className="border-b border-cream-dark">
+                    <tr key={appointment.id} className="border-b border-line">
                       <td className="p-4 text-sm">
                         <LocalDateTime iso={appointment.startsAt.toISOString()} />
                       </td>
                       <td className="p-4">
                         <p className="font-semibold">{appointment.customerName}</p>
-                        <p className="text-xs text-ink-soft">{appointment.customerEmail}</p>
+                        <p className="text-xs text-muted">{appointment.customerEmail}</p>
                       </td>
                       <td className="p-4 text-sm">{appointment.serviceName}</td>
                       <td className="p-4 text-sm">{appointment.durationMinutes} min</td>
@@ -244,26 +244,26 @@ export default async function ReservationsPage({
             <Link
               href={pageHref(status, result.page - 1, all)}
               rel="prev"
-              className="rounded-[var(--radius-md)] border border-cream-dark bg-surface px-4 py-2 text-sm font-semibold transition hover:border-cacao"
+              className="rounded-[var(--radius-md)] border border-line bg-card px-4 py-2 text-sm font-semibold transition hover:border-cacao"
             >
               Page précédente
             </Link>
           ) : (
-            <span className="text-sm text-ink-soft/60">Page précédente</span>
+            <span className="text-sm text-muted/60">Page précédente</span>
           )}
-          <p className="text-sm text-ink-soft">
+          <p className="text-sm text-muted">
             Page {result.page} sur {result.totalPages} · {result.total} rendez-vous
           </p>
           {result.page < result.totalPages ? (
             <Link
               href={pageHref(status, result.page + 1, all)}
               rel="next"
-              className="rounded-[var(--radius-md)] border border-cream-dark bg-surface px-4 py-2 text-sm font-semibold transition hover:border-cacao"
+              className="rounded-[var(--radius-md)] border border-line bg-card px-4 py-2 text-sm font-semibold transition hover:border-cacao"
             >
               Page suivante
             </Link>
           ) : (
-            <span className="text-sm text-ink-soft/60">Page suivante</span>
+            <span className="text-sm text-muted/60">Page suivante</span>
           )}
         </nav>
       ) : null}

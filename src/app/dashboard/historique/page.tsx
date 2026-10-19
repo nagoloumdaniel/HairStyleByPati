@@ -84,7 +84,7 @@ export default async function HistoriquePage({
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold">Historique du catalogue</h1>
-          <p className="mt-1 text-ink-soft">
+          <p className="mt-1 text-muted">
             Toutes les actions de Patricia sur les catégories, prestations, photos, options, règles
             et questions.
           </p>
@@ -110,7 +110,7 @@ export default async function HistoriquePage({
             />
           </div>
         ) : (
-          <ul className="divide-y divide-cream-dark">
+          <ul className="divide-y divide-line">
             {entries.map((entry) => (
               <li
                 key={entry.id}
@@ -119,16 +119,16 @@ export default async function HistoriquePage({
                 <div className="min-w-0">
                   <p className="font-semibold">
                     {ACTION_LABELS[entry.action] ?? entry.action}{' '}
-                    <span className="font-normal text-ink-soft">({entry.entityType})</span>
+                    <span className="font-normal text-muted">({entry.entityType})</span>
                   </p>
-                  <p className="text-sm text-ink-soft">
+                  <p className="text-sm text-muted">
                     {entry.userName ?? 'Utilisateur inconnu'}
                     {entry.entityId ? ` · référence ${entry.entityId}` : ''}
                   </p>
                 </div>
                 <time
                   dateTime={entry.createdAt.toISOString()}
-                  className="shrink-0 text-sm text-ink-soft"
+                  className="shrink-0 text-sm text-muted"
                 >
                   {dateFormatter.format(entry.createdAt)}
                 </time>
@@ -147,26 +147,26 @@ export default async function HistoriquePage({
             <Link
               href={pageHref(page - 1, entityId)}
               rel="prev"
-              className="rounded-[var(--radius-md)] border border-cream-dark bg-surface px-4 py-2 text-sm font-semibold transition hover:border-cacao"
+              className="rounded-[var(--radius-md)] border border-line bg-card px-4 py-2 text-sm font-semibold transition hover:border-cacao"
             >
               Page précédente
             </Link>
           ) : (
-            <span className="text-sm text-ink-soft/60">Page précédente</span>
+            <span className="text-sm text-muted/60">Page précédente</span>
           )}
-          <p className="text-sm text-ink-soft">
+          <p className="text-sm text-muted">
             Page {page} sur {totalPages} · {total} action{total > 1 ? 's' : ''}
           </p>
           {page < totalPages ? (
             <Link
               href={pageHref(page + 1, entityId)}
               rel="next"
-              className="rounded-[var(--radius-md)] border border-cream-dark bg-surface px-4 py-2 text-sm font-semibold transition hover:border-cacao"
+              className="rounded-[var(--radius-md)] border border-line bg-card px-4 py-2 text-sm font-semibold transition hover:border-cacao"
             >
               Page suivante
             </Link>
           ) : (
-            <span className="text-sm text-ink-soft/60">Page suivante</span>
+            <span className="text-sm text-muted/60">Page suivante</span>
           )}
         </nav>
       ) : null}

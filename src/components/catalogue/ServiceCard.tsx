@@ -32,7 +32,7 @@ export function ServiceCard({
 
   return (
     <Card className="group flex h-full flex-col overflow-hidden p-0 transition duration-300 hover:-translate-y-0.5 hover:shadow-lift">
-      <div className="relative aspect-[4/3] overflow-hidden bg-cream-dark">
+      <div className="relative aspect-[4/3] overflow-hidden bg-line">
         <Image
           src={image.src}
           alt={image.alt}
@@ -47,22 +47,20 @@ export function ServiceCard({
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-5">
-        <h3 className="font-heading text-xl font-bold text-ink">{service.name}</h3>
+        <h3 className="font-heading text-xl font-bold text-fg">{service.name}</h3>
 
         {service.description ? (
-          <p className="line-clamp-2 text-sm leading-relaxed text-ink-soft">
-            {service.description}
-          </p>
+          <p className="line-clamp-2 text-sm leading-relaxed text-muted">{service.description}</p>
         ) : null}
 
         <dl className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
           <div>
             <dt className="sr-only">Prix</dt>
-            <dd className="font-heading text-lg font-bold text-ink">{formatPrice(service)}</dd>
+            <dd className="font-heading text-lg font-bold text-fg">{formatPrice(service)}</dd>
           </div>
           <div>
             <dt className="sr-only">Durée estimée</dt>
-            <dd className="text-sm text-ink-soft">{formatDuration(service.durationMinutes)}</dd>
+            <dd className="text-sm text-muted">{formatDuration(service.durationMinutes)}</dd>
           </div>
         </dl>
 
@@ -73,13 +71,13 @@ export function ServiceCard({
         <div className="mt-auto flex flex-col gap-2 pt-2 sm:flex-row">
           <Link
             href={`/coiffures/${service.slug}`}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-cream-dark bg-surface px-4 py-2.5 text-sm font-semibold text-ink transition hover:border-cacao hover:bg-cream"
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-line bg-card px-4 py-2.5 text-sm font-semibold text-fg transition hover:border-cacao hover:bg-page"
           >
             Voir les détails
           </Link>
           <Link
             href={bookingHref(service.slug)}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-4 py-2.5 text-sm font-semibold text-ink shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-4 py-2.5 text-sm font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
           >
             Réserver
           </Link>

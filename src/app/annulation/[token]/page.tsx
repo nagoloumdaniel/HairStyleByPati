@@ -35,12 +35,12 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
       <main className="mx-auto w-full max-w-2xl px-4 py-12 sm:px-6">
         <div className="rounded-[var(--radius-lg)] border border-alert bg-alert-soft p-8 text-center">
           <h1 className="font-heading text-2xl font-bold text-alert">Lien d’annulation invalide</h1>
-          <p className="mt-3 text-ink">
+          <p className="mt-3 text-fg">
             Ce lien ne correspond à aucun rendez-vous. Vérifiez le lien reçu ou contactez le salon.
           </p>
           <Link
             href="/contact"
-            className="mt-6 inline-flex rounded-[var(--radius-md)] bg-accent px-5 py-2.5 font-semibold text-ink"
+            className="mt-6 inline-flex rounded-[var(--radius-md)] bg-accent px-5 py-2.5 font-semibold text-accent-fg"
           >
             Contacter le salon
           </Link>
@@ -61,7 +61,7 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
 
   return (
     <main className="mx-auto w-full max-w-2xl space-y-6 px-4 py-10 sm:px-6 md:py-14">
-      <nav aria-label="Fil d'Ariane" className="text-sm text-ink-soft">
+      <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
             <Link href="/" className="transition hover:text-cacao">
@@ -70,7 +70,7 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
           </li>
           <li aria-hidden="true">/</li>
           <li>
-            <span aria-current="page" className="font-medium text-ink">
+            <span aria-current="page" className="font-medium text-fg">
               Mon rendez-vous
             </span>
           </li>
@@ -84,41 +84,41 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
             {APPOINTMENT_STATUS_LABELS[appointment.status] ?? appointment.status}
           </Badge>
         </div>
-        <h1 className="font-heading text-3xl font-bold text-ink md:text-4xl">
+        <h1 className="font-heading text-3xl font-bold text-fg md:text-4xl">
           Gérer mon rendez-vous
         </h1>
-        <p className="text-lg text-ink-soft">
+        <p className="text-lg text-muted">
           Retrouvez ici les informations de votre rendez-vous et les conditions d’annulation.
         </p>
       </header>
 
-      <section className="rounded-[var(--radius-lg)] border border-cream-dark bg-surface p-6 shadow-soft">
+      <section className="rounded-[var(--radius-lg)] border border-line bg-card p-6 shadow-soft">
         <dl className="space-y-3 text-sm">
           <div className="flex flex-wrap justify-between gap-2">
-            <dt className="font-semibold text-ink">Date et heure</dt>
-            <dd className="text-ink-soft">
+            <dt className="font-semibold text-fg">Date et heure</dt>
+            <dd className="text-muted">
               <LocalDateTime iso={appointment.startsAt.toISOString()} />
             </dd>
           </div>
           <div className="flex flex-wrap justify-between gap-2">
-            <dt className="font-semibold text-ink">Durée</dt>
-            <dd className="text-ink-soft">{appointment.durationMinutes} minutes</dd>
+            <dt className="font-semibold text-fg">Durée</dt>
+            <dd className="text-muted">{appointment.durationMinutes} minutes</dd>
           </div>
           <div className="flex flex-wrap justify-between gap-2">
-            <dt className="font-semibold text-ink">Prix</dt>
-            <dd className="text-ink-soft">
+            <dt className="font-semibold text-fg">Prix</dt>
+            <dd className="text-muted">
               {appointment.priceCents == null
                 ? 'Prix à confirmer'
                 : euroFormatter.format(appointment.priceCents / 100)}
             </dd>
           </div>
           <div className="flex flex-wrap justify-between gap-2">
-            <dt className="font-semibold text-ink">Cliente</dt>
-            <dd className="text-ink-soft">{appointment.customer.name}</dd>
+            <dt className="font-semibold text-fg">Cliente</dt>
+            <dd className="text-muted">{appointment.customer.name}</dd>
           </div>
           <div className="flex flex-wrap justify-between gap-2">
-            <dt className="font-semibold text-ink">Paiement</dt>
-            <dd className="text-ink-soft">Sur place</dd>
+            <dt className="font-semibold text-fg">Paiement</dt>
+            <dd className="text-muted">Sur place</dd>
           </div>
         </dl>
       </section>
@@ -126,16 +126,16 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
       {!tokenValid ? (
         <section className="rounded-[var(--radius-lg)] border border-alert bg-alert-soft p-6">
           <h2 className="font-heading text-xl font-bold text-alert">Lien expiré</h2>
-          <p className="mt-2 text-ink">
+          <p className="mt-2 text-fg">
             Ce lien d’annulation n’est plus valide. Contactez le salon pour toute modification.
           </p>
         </section>
       ) : !active ? (
-        <section className="rounded-[var(--radius-lg)] border border-cream-dark bg-cream p-6">
-          <h2 className="font-heading text-xl font-bold text-ink">
+        <section className="rounded-[var(--radius-lg)] border border-line bg-page p-6">
+          <h2 className="font-heading text-xl font-bold text-fg">
             Ce rendez-vous n’est plus actif
           </h2>
-          <p className="mt-2 text-ink-soft">
+          <p className="mt-2 text-muted">
             Statut actuel : {APPOINTMENT_STATUS_LABELS[appointment.status] ?? appointment.status}.
             {appointment.cancelReason ? ` Motif : ${appointment.cancelReason}.` : ''}
           </p>
@@ -145,18 +145,18 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
           <h2 className="font-heading text-xl font-bold text-alert">
             Annulation en ligne indisponible
           </h2>
-          <p className="mt-2 text-ink">{policy.message}</p>
+          <p className="mt-2 text-fg">{policy.message}</p>
           <Link
             href="/contact"
-            className="mt-5 inline-flex rounded-[var(--radius-md)] bg-accent px-5 py-2.5 font-semibold text-ink"
+            className="mt-5 inline-flex rounded-[var(--radius-md)] bg-accent px-5 py-2.5 font-semibold text-accent-fg"
           >
             Contacter le salon
           </Link>
         </section>
       ) : (
-        <section className="rounded-[var(--radius-lg)] border border-cream-dark bg-surface p-6 shadow-soft">
-          <h2 className="font-heading text-xl font-bold text-ink">Annuler ce rendez-vous</h2>
-          <p className="mt-2 text-sm text-ink-soft">{policy.message}</p>
+        <section className="rounded-[var(--radius-lg)] border border-line bg-card p-6 shadow-soft">
+          <h2 className="font-heading text-xl font-bold text-fg">Annuler ce rendez-vous</h2>
+          <p className="mt-2 text-sm text-muted">{policy.message}</p>
           <div className="mt-4">
             <CancelForm token={token} reasonRequired={settings.cancelReasonRequired} />
           </div>

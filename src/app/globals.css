@@ -9,17 +9,30 @@
   --color-accent: #f4c542; /* jaune doré — CTA et highlights */
   --color-accent-hover: #e0ad2b; /* survol CTA */
   --color-accent-soft: #fdf0c8; /* fond doux accent */
-  --color-ink: #191919; /* texte principal */
-  --color-ink-soft: #4a4a4a; /* texte secondaire */
-  --color-cream: #fff8e9; /* fond crème */
-  --color-cream-dark: #f5ead0; /* fond crème appuyé */
+  --color-ink: #191919; /* panneaux sombres fixes (footer, sidebar) */
+  --color-cream: #fff8e9; /* texte clair sur panneaux sombres */
+  --color-cream-dark: #f5ead0; /* ancien token, conservé pour compatibilité */
   --color-cacao: #76513d; /* brun profond — accents */
-  --color-cacao-deep: #4e3428; /* cacao foncé (footer) */
-  --color-surface: #ffffff; /* surfaces blanches */
+  --color-cacao-deep: #4e3428; /* ancien footer, conservé */
+  --color-surface: #ffffff; /* ancien token, conservé */
   --color-alert: #c94b4b; /* erreurs et alertes */
   --color-alert-soft: #fbe9e9; /* fond erreur */
   --color-success: #3d8b5f; /* succès */
   --color-success-soft: #e6f3ec; /* fond succès */
+
+  /* Tokens sémantiques (thème clair / sombre) */
+  --color-page: #fff8e9; /* fond de page */
+  --color-card: #ffffff; /* cartes et surfaces */
+  --color-line: #f5ead0; /* bordures et séparateurs */
+  --color-fg: #191919; /* texte principal */
+  --color-muted: #4a4a4a; /* texte secondaire */
+  --color-panel: #191919; /* panneaux toujours sombres */
+  --color-panel-fg: #fff8e9; /* texte sur panneaux sombres */
+  --color-footer: #4e3428; /* pied de page */
+  --color-hero: #76513d; /* visuel d'accueil */
+  --color-accent-fg: #191919; /* texte sur bouton accent */
+  --color-cacao-fg: #fff8e9; /* texte sur fond cacao */
+  --color-alert-fg: #ffffff; /* texte sur fond alerte */
 
   /* Rayons — angles légèrement arrondis (P2.2) */
   --radius-sm: 0.5rem;
@@ -36,14 +49,58 @@
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
 }
 
+/* Thème sombre : surcharge des tokens sémantiques et des accents.
+   Le thème est appliqué sur <html data-theme="..."> avant le premier rendu. */
+html[data-theme='dark'] {
+  color-scheme: dark;
+  --color-page: #12100e;
+  --color-card: #1c1815;
+  --color-line: #302a24;
+  --color-fg: #f7ecdc;
+  --color-muted: #c9bcaa;
+  --color-panel: #0d0c0b;
+  --color-panel-fg: #f7ecdc;
+  --color-footer: #1b1410;
+  --color-hero: #2a1d16;
+  --color-accent-fg: #191919;
+  --color-cacao: #e0b892;
+  --color-cacao-fg: #191919;
+  --color-alert-fg: #2a0d0d;
+  --color-accent-soft: #3a3020;
+  --color-alert: #ff8f8f;
+  --color-alert-soft: #3a1f1f;
+  --color-success: #86d6a8;
+  --color-success-soft: #173025;
+  --shadow-soft: 0 2px 12px rgb(0 0 0 / 0.45);
+  --shadow-lift: 0 8px 30px rgb(0 0 0 / 0.55);
+}
+
 /* Contraste §2.2 : texte des boutons accent = ink (#191919 sur #F4C542
    ≈ 10.9:1, AAA). Ne JAMAIS mettre de texte blanc sur le jaune (1.6:1). */
 
+html {
+  background-color: var(--color-page);
+}
+
+input[type='checkbox'],
+input[type='radio'] {
+  accent-color: var(--color-accent);
+}
+
 body {
-  background-color: var(--color-cream);
-  color: var(--color-ink);
+  background-color: var(--color-page);
+  color: var(--color-fg);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    transition: none;
+  }
 }
 
 h1,
@@ -73,13 +130,24 @@ h4 {
 .skeleton {
   background: linear-gradient(
     90deg,
-    var(--color-cream-dark) 25%,
-    var(--color-surface) 50%,
-    var(--color-cream-dark) 75%
+    var(--color-line) 25%,
+    var(--color-card) 50%,
+    var(--color-line) 75%
   );
   background-size: 200px 100%;
   animation: skeleton-shimmer 1.4s ease-in-out infinite;
   border-radius: var(--radius-md);
+}
+
+/* Icônes du sélecteur de thème : une seule visible selon le thème actif. */
+.theme-icon-dark {
+  display: none;
+}
+html[data-theme='dark'] .theme-icon-dark {
+  display: inline-flex;
+}
+html[data-theme='dark'] .theme-icon-light {
+  display: none;
 }
 
 /* Reveal discret au scroll (P2.8) — désactivé si reduced motion */

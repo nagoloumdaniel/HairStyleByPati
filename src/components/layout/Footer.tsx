@@ -3,7 +3,7 @@ import Link from 'next/link';
 /* P2.5 : pied de page coordonnees, reseaux, liens legaux. Distinct du dashboard. */
 export function Footer() {
   return (
-    <footer className="mt-16 bg-cacao-deep text-cream">
+    <footer className="mt-16 bg-footer text-panel-fg">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-3 sm:px-6">
         <div>
           <p className="font-heading text-lg font-bold">Hairstyle by Patricia</p>
@@ -86,7 +86,7 @@ export function Footer() {
           </ul>
         </div>
       </div>
-      <p className="border-t border-cream/20 py-4 text-center text-xs opacity-70">
+      <p className="border-t border-panel-fg/20 py-4 text-center text-xs opacity-70">
         © {new Date().getFullYear()} Hairstyle by Patricia. Tous droits reserves.
       </p>
     </footer>

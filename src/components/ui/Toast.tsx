@@ -16,7 +16,7 @@ export function useToast() {
 const TONES: Record<ToastTone, string> = {
   success: 'bg-success-soft text-success border border-success',
   error: 'bg-alert-soft text-alert border border-alert',
-  info: 'bg-accent-soft text-ink border border-accent',
+  info: 'bg-accent-soft text-fg border border-accent',
 };
 
 /* P2.4 : toasts sans dependance (sonner evite pour rester lean, zero dependance).

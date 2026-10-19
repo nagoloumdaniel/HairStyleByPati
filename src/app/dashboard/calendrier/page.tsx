@@ -13,7 +13,7 @@ export default async function CalendrierPage() {
     <div className="p-6">
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-semibold">Calendrier</h1>
-        <p className="text-ink-soft">
+        <p className="text-muted">
           Vue jour, semaine, mois et liste des rendez-vous. Cliquez sur un rendez-vous pour ouvrir
           sa fiche.
         </p>

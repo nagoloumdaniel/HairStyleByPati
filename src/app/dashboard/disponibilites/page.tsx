@@ -54,7 +54,7 @@ export default async function DisponibilitesPage() {
     <div className="p-6">
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-semibold">Disponibilités</h1>
-        <p className="text-ink-soft">
+        <p className="text-muted">
           Horaires habituels, exceptions, pauses et paramètres de réservation. Toute modification
           qui touche des rendez-vous existants demande une confirmation explicite.
         </p>
@@ -62,32 +62,32 @@ export default async function DisponibilitesPage() {
 
       <div className="mt-6 grid gap-6 xl:grid-cols-2">
         <Card>
-          <h2 className="font-heading text-xl font-bold text-ink">Horaires habituels</h2>
-          <p className="mb-4 mt-1 text-sm text-ink-soft">
+          <h2 className="font-heading text-xl font-bold text-fg">Horaires habituels</h2>
+          <p className="mb-4 mt-1 text-sm text-muted">
             Un jour non coché est fermé. Une date spécifique remplace les horaires habituels.
           </p>
           <WeeklyScheduleEditor rules={weekly} />
         </Card>
 
         <Card>
-          <h2 className="font-heading text-xl font-bold text-ink">Dates spécifiques</h2>
-          <p className="mb-4 mt-1 text-sm text-ink-soft">
+          <h2 className="font-heading text-xl font-bold text-fg">Dates spécifiques</h2>
+          <p className="mb-4 mt-1 text-sm text-muted">
             Pour un horaire différent ou une ouverture exceptionnelle à une date précise.
           </p>
           <SpecificDatesEditor rules={specific} />
         </Card>
 
         <Card>
-          <h2 className="font-heading text-xl font-bold text-ink">Indisponibilités</h2>
-          <p className="mb-4 mt-1 text-sm text-ink-soft">
+          <h2 className="font-heading text-xl font-bold text-fg">Indisponibilités</h2>
+          <p className="mb-4 mt-1 text-sm text-muted">
             Pauses, congés et blocages exceptionnels. Ils retirent les créneaux correspondants.
           </p>
           <BlockedPeriodsEditor periods={blocked} />
         </Card>
 
         <Card>
-          <h2 className="font-heading text-xl font-bold text-ink">Paramètres de réservation</h2>
-          <p className="mb-4 mt-1 text-sm text-ink-soft">
+          <h2 className="font-heading text-xl font-bold text-fg">Paramètres de réservation</h2>
+          <p className="mb-4 mt-1 text-sm text-muted">
             Ces valeurs pilotent les créneaux, la validation manuelle et les annulations.
           </p>
           <BookingSettingsEditor settings={settings} />

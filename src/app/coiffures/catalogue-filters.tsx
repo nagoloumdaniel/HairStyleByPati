@@ -71,7 +71,7 @@ export function CatalogueFilters({
   return (
     <section
       aria-labelledby="filtres-titre"
-      className="space-y-5 rounded-[var(--radius-lg)] border border-surface/70 bg-surface/80 p-5 shadow-soft backdrop-blur-md md:p-6"
+      className="space-y-5 rounded-[var(--radius-lg)] border border-card/70 bg-card/80 p-5 shadow-soft backdrop-blur-md md:p-6"
     >
       <h2 id="filtres-titre" className="sr-only">
         Rechercher et filtrer les coiffures
@@ -93,7 +93,7 @@ export function CatalogueFilters({
           </label>
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-soft"
+            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted"
           >
             <svg
               width="18"
@@ -116,7 +116,7 @@ export function CatalogueFilters({
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Tresses, vanilles, locs…"
             autoComplete="off"
-            className="w-full rounded-[var(--radius-md)] border border-cream-dark bg-surface py-2.5 pl-10 pr-10 text-ink placeholder:text-ink-soft/70 focus:outline-none focus:ring-2 focus:ring-accent"
+            className="w-full rounded-[var(--radius-md)] border border-line bg-card py-2.5 pl-10 pr-10 text-fg placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent"
           />
           {isPending ? (
             <span
@@ -138,8 +138,8 @@ export function CatalogueFilters({
           aria-current={initialCategory === '' ? 'page' : undefined}
           className={`inline-flex items-center gap-1.5 rounded-[var(--radius-full)] border px-3.5 py-1.5 text-sm font-medium transition ${
             initialCategory === ''
-              ? 'border-cacao bg-cacao text-cream'
-              : 'border-cream-dark bg-surface text-ink hover:border-cacao hover:bg-cream'
+              ? 'border-cacao bg-cacao text-cacao-fg'
+              : 'border-line bg-card text-fg hover:border-cacao hover:bg-page'
           }`}
         >
           Toutes
@@ -154,19 +154,19 @@ export function CatalogueFilters({
               aria-current={active ? 'page' : undefined}
               className={`inline-flex items-center gap-1.5 rounded-[var(--radius-full)] border px-3.5 py-1.5 text-sm font-medium transition ${
                 active
-                  ? 'border-cacao bg-cacao text-cream'
-                  : 'border-cream-dark bg-surface text-ink hover:border-cacao hover:bg-cream'
+                  ? 'border-cacao bg-cacao text-cacao-fg'
+                  : 'border-line bg-card text-fg hover:border-cacao hover:bg-page'
               }`}
             >
               {category.name}
-              <span className={active ? 'text-cream/80' : 'text-ink-soft'}>{category.count}</span>
+              <span className={active ? 'text-cacao-fg/80' : 'text-muted'}>{category.count}</span>
             </Link>
           );
         })}
       </nav>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-cream-dark/70 pt-3">
-        <p className="text-sm text-ink-soft" aria-live="polite">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line/70 pt-3">
+        <p className="text-sm text-muted" aria-live="polite">
           {isPending ? 'Mise à jour des résultats…' : resultLabel}
         </p>
         {hasFilters ? (

@@ -53,7 +53,7 @@ const approach = [
 export default function SalonPage() {
   return (
     <main className="mx-auto w-full max-w-7xl space-y-16 px-4 py-8 sm:px-6 md:py-12">
-      <nav aria-label="Fil d'Ariane" className="text-sm text-ink-soft">
+      <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
             <Link href="/" className="transition hover:text-cacao">
@@ -62,7 +62,7 @@ export default function SalonPage() {
           </li>
           <li aria-hidden="true">/</li>
           <li>
-            <span aria-current="page" className="font-medium text-ink">
+            <span aria-current="page" className="font-medium text-fg">
               Le salon
             </span>
           </li>
@@ -83,10 +83,10 @@ export default function SalonPage() {
         </div>
         <div className="space-y-6 md:w-3/5">
           <p className="text-sm font-semibold uppercase tracking-[0.14em] text-cacao">Le salon</p>
-          <h1 className="font-heading text-4xl font-bold text-ink md:text-5xl">
+          <h1 className="font-heading text-4xl font-bold text-fg md:text-5xl">
             Un salon à taille humaine, un savoir-faire sur mesure
           </h1>
-          <p className="text-lg leading-relaxed text-ink-soft">
+          <p className="text-lg leading-relaxed text-muted">
             Depuis plus de dix ans, Patricia accueille sa clientèle dans un espace chaleureux dédié
             aux cheveux texturés : tresses, vanilles, locs et coiffures protectrices. Ici, chaque
             rendez-vous commence par un vrai diagnostic capillaire.
@@ -94,13 +94,13 @@ export default function SalonPage() {
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link
               href="/reserver"
-              className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-ink shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
+              className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
             >
               Prendre rendez-vous
             </Link>
             <Link
               href="/coiffures"
-              className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] border border-cream-dark bg-surface px-6 py-3 font-semibold text-ink shadow-soft transition hover:border-cacao hover:bg-cream"
+              className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] border border-line bg-card px-6 py-3 font-semibold text-fg shadow-soft transition hover:border-cacao hover:bg-page"
             >
               Voir le catalogue
             </Link>
@@ -110,14 +110,14 @@ export default function SalonPage() {
 
       {/* Histoire */}
       <section className="max-w-3xl space-y-6">
-        <h2 className="font-heading text-3xl font-bold text-ink">Notre histoire</h2>
-        <p className="leading-relaxed text-ink-soft">
+        <h2 className="font-heading text-3xl font-bold text-fg">Notre histoire</h2>
+        <p className="leading-relaxed text-muted">
           Patricia s&apos;est formée auprès de coiffeuses expertes des cheveux africains avant
           d&apos;ouvrir son propre salon. L&apos;idée était simple : offrir un lieu où l&apos;on
           prend le temps, le temps d&apos;écouter, de comprendre la nature de vos cheveux, puis de
           créer la coiffure qui vous ressemble.
         </p>
-        <p className="leading-relaxed text-ink-soft">
+        <p className="leading-relaxed text-muted">
           Le salon a grandi par le bouche-à-oreille. Aujourd&apos;hui, certaines clientes viennent
           depuis l&apos;ouverture, et d&apos;autres font le déplacement pour une tresse BOX ou un
           rétissage de locs.
@@ -126,18 +126,18 @@ export default function SalonPage() {
 
       {/* Approche en 3 étapes */}
       <section className="space-y-8">
-        <h2 className="font-heading text-3xl font-bold text-ink">Une approche sur mesure</h2>
+        <h2 className="font-heading text-3xl font-bold text-fg">Une approche sur mesure</h2>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           {approach.map((step) => (
             <div key={step.number} className="border-t-2 border-accent pt-5">
               <div
                 aria-hidden="true"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent font-heading text-xl font-bold text-ink"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent font-heading text-xl font-bold text-accent-fg"
               >
                 {step.number}
               </div>
-              <h3 className="mt-4 font-heading text-xl font-bold text-ink">{step.title}</h3>
-              <p className="mt-2 leading-relaxed text-ink-soft">{step.description}</p>
+              <h3 className="mt-4 font-heading text-xl font-bold text-fg">{step.title}</h3>
+              <p className="mt-2 leading-relaxed text-muted">{step.description}</p>
             </div>
           ))}
         </div>
@@ -145,31 +145,31 @@ export default function SalonPage() {
 
       {/* Valeurs : liste à bordure gauche, pas de cartes génériques */}
       <section className="space-y-8">
-        <h2 className="font-heading text-3xl font-bold text-ink">Nos valeurs</h2>
+        <h2 className="font-heading text-3xl font-bold text-fg">Nos valeurs</h2>
         <dl className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {values.map((value) => (
             <div key={value.title} className="border-l-4 border-accent pl-5">
-              <dt className="font-heading text-xl font-bold text-ink">{value.title}</dt>
-              <dd className="mt-1 leading-relaxed text-ink-soft">{value.description}</dd>
+              <dt className="font-heading text-xl font-bold text-fg">{value.title}</dt>
+              <dd className="mt-1 leading-relaxed text-muted">{value.description}</dd>
             </div>
           ))}
         </dl>
       </section>
 
       {/* Infos pratiques (aperçu) */}
-      <section className="rounded-2xl bg-cream p-8 md:p-12">
+      <section className="rounded-2xl bg-page p-8 md:p-12">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           <div>
-            <h2 className="font-heading text-2xl font-bold text-ink">Horaires</h2>
-            <p className="mt-3 text-ink-soft">
+            <h2 className="font-heading text-2xl font-bold text-fg">Horaires</h2>
+            <p className="mt-3 text-muted">
               Mardi – Samedi : 10h – 19h
               <br />
               Fermé dimanche et lundi
             </p>
           </div>
           <div>
-            <h2 className="font-heading text-2xl font-bold text-ink">Adresse</h2>
-            <p className="mt-3 text-ink-soft">
+            <h2 className="font-heading text-2xl font-bold text-fg">Adresse</h2>
+            <p className="mt-3 text-muted">
               12 Rue de la Coiffure
               <br />
               75000 Paris
@@ -178,7 +178,7 @@ export default function SalonPage() {
           <div className="flex items-center">
             <Link
               href="/infos-pratiques"
-              className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-ink shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
+              className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
             >
               Toutes les infos pratiques
             </Link>
