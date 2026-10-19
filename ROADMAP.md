@@ -107,16 +107,17 @@
 ## PHASE 5 — MOTEUR DE COMPATIBILITÉ CAPILLAIRE
 
 > Objectif : cœur intelligent du projet (§5), 100 % vérifié côté serveur.
+> État : terminée le 19/10/2026. Moteur pur testé, parcours public conditionnel, évaluations privées et décisions dashboard. La garde de réservation P5.7/P5.8 est prête et sera branchée sur le parcours de réservation en phase 6.
 
-- [ ] **P5.1** Modèle de données des règles : CompatibilityRule, QuestionDefinition, AssessmentStatus (reçue, en cours, infos demandées, acceptée, refusée, réservation en attente, confirmée). — *skill : writing-plans*
-- [ ] **P5.2** Moteur d'évaluation pur et testable : entrée (réponses client + règles prestation) → compatible / incompatible / incertain + message configuré. — *skill : test-driven-development*
-- [ ] **P5.3** Parcours questions conditionnelles côté client (aucun champ inutile affiché ; longueur, locs, état, type, repousse, coupe courte, infos complémentaires). — *skill : react-best-practices*
-- [ ] **P5.4** Cas « Je ne suis pas sûr(e) » : proposition photo + commentaire, statut « En attente d'évaluation ». — *skill : frontend-design*
-- [ ] **P5.5** Upload photo d'évaluation : stockage privé, jamais publié dans la galerie publique, accès restreint. — *skill : security-audit*
-- [ ] **P5.6** Espace dashboard évaluations : file d'attente, visualisation photo, décisions (accepter, refuser, demander infos, proposer autre coiffure, autoriser sous conditions) + message client + historique. — *skill : frontend-design*
-- [ ] **P5.7** Règle d'or : l'acceptation d'une évaluation ne crée JAMAIS de réservation sans re-vérification de disponibilité. — *skill : test-driven-development*
-- [ ] **P5.8** Re-vérification des règles au moment final de la réservation (côté serveur, jamais seulement à l'affichage). — *skill : security-audit*
-- [ ] **P5.9** Tests des scénarios §5.3 (tresses incompatibles cheveux courts), §5.4, §5.5. — *skill : verify-and-stop*
+- [x] **P5.1** Modèle de données des règles : CompatibilityRule, QuestionDefinition, AssessmentStatus (reçue, en cours, infos demandées, acceptée, refusée, réservation en attente, confirmée). Champs ajoutés : types de cheveux acceptés, conditions particulières, options de questions, lien évaluation-prestation, message et auteur de décision. — *skill : writing-plans*
+- [x] **P5.2** Moteur d'évaluation pur et testable : entrée (réponses client + règles prestation) → compatible / incompatible / incertain + message configuré. — *skill : test-driven-development*
+- [x] **P5.3** Parcours questions conditionnelles côté client (aucun champ inutile affiché ; longueur, locs, coupe courte, type de cheveux, questions libres configurables pour l'état et la repousse). — *skill : react-best-practices*
+- [x] **P5.4** Cas « Je ne suis pas sûr(e) » : proposition photo + commentaire, statut « En attente d'évaluation ». — *skill : frontend-design*
+- [x] **P5.5** Upload photo d'évaluation : stockage privé, jamais publié dans la galerie publique, accès restreint par URL signée. — *skill : security-audit*
+- [x] **P5.6** Espace dashboard évaluations : file d'attente, visualisation photo, décisions (accepter, refuser, demander infos, proposer autre coiffure, autoriser sous conditions) + message client + historique. — *skill : frontend-design*
+- [x] **P5.7** Règle d'or : l'acceptation d'une évaluation ne crée JAMAIS de réservation sans re-vérification de disponibilité. Garde pure testée, aucun Appointment créé par la décision. — *skill : test-driven-development*
+- [x] **P5.8** Re-vérification des règles au moment final de la réservation (côté serveur, jamais seulement à l'affichage). Fonction `verifyCompatibilityForBooking` prête pour la phase 6. — *skill : security-audit*
+- [x] **P5.9** Tests des scénarios §5.3 (tresses incompatibles cheveux courts), §5.4, §5.5. — *skill : verify-and-stop*
 
 ## PHASE 6 — RÉSERVATION, DISPONIBILITÉS, CALENDRIER
 
