@@ -22,8 +22,13 @@ yarn-error.log*
 
 # logs locaux de dev (non committés)
 build.log
+build-*.log
 lint.log
 playwright-*.log
+dev_*.log
+dev-*.log
+git-push.log
+ci-*.log
 
 # local env files — never commit real secrets
 .env
