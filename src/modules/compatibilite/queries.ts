@@ -17,6 +17,7 @@ export interface CompatibilityService {
   id: string;
   name: string;
   slug: string;
+  categoryId: string;
   categoryName: string;
   durationMinutes: number | null;
   rule: CompatibilityRuleData | null;
@@ -60,6 +61,7 @@ export async function getCompatibilityServiceBySlug(
       name: true,
       slug: true,
       durationMinutes: true,
+      categoryId: true,
       category: { select: { name: true } },
       compatibility: true,
       questions: {
@@ -84,6 +86,7 @@ export async function getCompatibilityServiceBySlug(
     id: service.id,
     name: service.name,
     slug: service.slug,
+    categoryId: service.categoryId,
     categoryName: service.category.name,
     durationMinutes: service.durationMinutes,
     rule: mapCompatibilityRule(service.compatibility),

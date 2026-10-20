@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
+import { getApprovedReviews } from '@/modules/avis/queries';
 
 export const metadata: Metadata = {
   title: 'Hairstyle by Patricia — Coiffures texturées, tresses, vanilles et locs à Paris',
@@ -73,7 +74,8 @@ const steps = [
   },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const reviews = await getApprovedReviews(3);
   return (
     <main className="mx-auto max-w-7xl px-6 space-y-20">
       {/* Hero */}
@@ -225,30 +227,26 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Témoignages */}
-      <section id="temoinages" className="space-y-8">
-        <h2 className="text-3xl font-heading font-bold text-fg">Elles nous font confiance</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <blockquote className="card p-6 italic text-muted border-none bg-card shadow-soft">
-            <p className="text-lg mb-4">
-              « Des tresses magnifiques, tenu parfait pendant 4 semaines. »
-            </p>
-            <footer className="text-sm font-semibold text-fg">— Marie L.</footer>
-          </blockquote>
-          <blockquote className="card p-6 italic text-muted border-none bg-card shadow-soft">
-            <p className="text-lg mb-4">
-              « Accueil chaleureux, Patricia prend le temps de comprendre ce qu&apos;on veut. »
-            </p>
-            <footer className="text-sm font-semibold text-fg">— Sophie R.</footer>
-          </blockquote>
-          <blockquote className="card p-6 italic text-muted border-none bg-card shadow-soft">
-            <p className="text-lg mb-4">
-              « Mes locs n&apos;ont jamais été aussi bien entretenus. Merci Patricia ! »
-            </p>
-            <footer className="text-sm font-semibold text-fg">— Aïcha D.</footer>
-          </blockquote>
-        </div>
-      </section>
+      {/* Témoignages (P8.10) : avis réels approuvés uniquement, jamais inventés. */}
+      {reviews.length > 0 ? (
+        <section id="temoinages" className="space-y-8">
+          <h2 className="text-3xl font-heading font-bold text-fg">Elles nous font confiance</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {reviews.map((review) => (
+              <blockquote
+                key={review.id}
+                className="card p-6 italic text-muted border-none bg-card shadow-soft"
+              >
+                {review.comment ? <p className="text-lg mb-4">« {review.comment} »</p> : null}
+                <footer className="text-sm font-semibold text-fg not-italic">
+                  — {review.customer.name.split(' ')[0]} · {review.service.name}
+                  {review.rating ? ` · ${review.rating}/5` : ''}
+                </footer>
+              </blockquote>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       {/* Demande personnalisée */}
       <section className="rounded-2xl border border-line bg-card p-8 text-center shadow-soft md:p-12">

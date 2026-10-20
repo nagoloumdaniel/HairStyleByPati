@@ -16,7 +16,8 @@ import {
   type CompatibilityVerdict,
 } from './engine';
 import { buildPublicQuestions, isQuestionVisible, normalizeAnswers } from './questions';
-import { getCompatibilityServiceBySlug } from './queries';
+import { getCompatibilityServiceBySlug, mapCompatibilityRule } from './queries';
+import { suggestCompatibleServices } from './suggestions';
 import {
   assessmentDecisionSchema,
   assessmentPreviewSchema,
@@ -71,6 +72,7 @@ export interface CompatibilityPreview {
   requiresManualReview: boolean;
   conditionsNote: string | null;
   missingAnswers: string[];
+  suggestions: { id: string; name: string; slug: string }[];
 }
 
 export type CompatibilityPreviewState = {
@@ -123,10 +125,29 @@ export async function previewCompatibility(
     return { error: 'Répondez aux questions obligatoires avant de continuer.' };
   }
 
-  const result = evaluateCompatibility({
-    rule: service.rule,
-    answers: normalizeAnswers(answers),
-  });
+  const normalizedAnswers = normalizeAnswers(answers);
+  const result = evaluateCompatibility({ rule: service.rule, answers: normalizedAnswers });
+
+  let suggestions: CompatibilityPreview['suggestions'] = [];
+  if (result.verdict === 'INCOMPATIBLE') {
+    const candidates = await db.service.findMany({
+      where: { status: 'PUBLISHED', category: { active: true }, id: { not: service.id } },
+      select: { id: true, name: true, slug: true, categoryId: true, compatibility: true },
+      take: 30,
+    });
+    suggestions = suggestCompatibleServices(
+      candidates.map((c) => ({
+        id: c.id,
+        name: c.name,
+        slug: c.slug,
+        categoryId: c.categoryId,
+        rule: mapCompatibilityRule(c.compatibility),
+      })),
+      service.id,
+      service.categoryId,
+      normalizedAnswers,
+    );
+  }
 
   return {
     serviceName: service.name,
@@ -139,6 +160,7 @@ export async function previewCompatibility(
       requiresManualReview: result.requiresManualReview,
       conditionsNote: result.conditionsNote,
       missingAnswers: result.missingAnswers,
+      suggestions,
     },
   };
 }

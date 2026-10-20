@@ -2,6 +2,17 @@ import type { NextConfig } from 'next';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
+/** Domaine du bucket S3/R2 (P4.4, P8.11) : présent seulement si configuré. */
+function storageHostname(): string | null {
+  const endpoint = process.env.S3_ENDPOINT;
+  if (!endpoint) return null;
+  try {
+    return new URL(endpoint).hostname;
+  } catch {
+    return null;
+  }
+}
+
 const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'X-Frame-Options', value: 'DENY' },
@@ -51,14 +62,16 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
-    // Photos de démonstration en attendant les uploads S3 (P4.4).
-    // Ajouter le domaine de stockage (R2/S3) ici quand les photos réelles arrivent.
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'images.pexels.com',
         pathname: '/**',
       },
+      // URLs signées du bucket S3/R2 (P4.4, P8.11) : photos réelles de catalogue et de galerie.
+      ...(storageHostname()
+        ? [{ protocol: 'https' as const, hostname: storageHostname()!, pathname: '/**' }]
+        : []),
     ],
   },
   async headers() {

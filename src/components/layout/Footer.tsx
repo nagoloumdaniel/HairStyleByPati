@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { LogoMark } from '@/components/shared/Logo';
 
 /* P2.5 : pied de page coordonnees, reseaux, liens legaux. Distinct du dashboard. */
 export function Footer() {
@@ -6,7 +7,10 @@ export function Footer() {
     <footer className="mt-16 bg-footer text-panel-fg">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-3 sm:px-6">
         <div>
-          <p className="font-heading text-lg font-bold">Hairstyle by Patricia</p>
+          <p className="flex items-center gap-2 font-heading text-lg font-bold">
+            <LogoMark className="h-8 w-auto text-panel-fg" />
+            Hairstyle by Patricia
+          </p>
           <p className="mt-2 text-sm opacity-80">
             Tresses, vanilles, locs et coiffures protectrices. Reservation en ligne.
           </p>

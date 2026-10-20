@@ -399,6 +399,26 @@ export function CompatibilityWizard({
             </Button>
           </div>
 
+          {preview.verdict === 'INCOMPATIBLE' && preview.suggestions.length > 0 ? (
+            <div className="mt-6 rounded-[var(--radius-md)] border border-line bg-page p-5">
+              <h3 className="font-heading text-lg font-bold text-fg">
+                Ces coiffures sont compatibles avec vos réponses
+              </h3>
+              <ul className="mt-3 flex flex-wrap gap-2">
+                {preview.suggestions.map((suggestion) => (
+                  <li key={suggestion.id}>
+                    <Link
+                      href={`/coiffures/${suggestion.slug}`}
+                      className="inline-flex items-center rounded-[var(--radius-md)] border border-line bg-card px-4 py-2 font-semibold text-fg transition hover:border-cacao"
+                    >
+                      {suggestion.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
           {preview.nextStep !== 'BOOK' ? (
             <p className="mt-4 text-sm text-muted">
               Aucune réservation n’est créée à cette étape. Patricia examine votre demande et vous

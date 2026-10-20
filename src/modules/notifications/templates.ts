@@ -19,7 +19,9 @@ export type NotificationTemplateKey =
   | 'conversation_reply'
   | 'custom_request_received'
   | 'admin_custom_request'
-  | 'custom_request_decision';
+  | 'custom_request_decision'
+  | 'waitlist_slot_available'
+  | 'review_request';
 
 export interface AppointmentEmailPayload {
   kind?: 'appointment';
@@ -59,8 +61,28 @@ export interface CustomRequestEmailPayload {
   adminLink?: string | null;
 }
 
+export interface WaitlistEmailPayload {
+  kind?: 'waitlist';
+  customerName: string;
+  serviceName: string;
+  startsAt: string;
+  confirmUrl: string;
+  expiresAt: string;
+}
+
+export interface ReviewEmailPayload {
+  kind?: 'review';
+  customerName: string;
+  serviceName: string;
+  reviewUrl: string;
+}
+
 export type EmailPayload =
-  AppointmentEmailPayload | ConversationEmailPayload | CustomRequestEmailPayload;
+  | AppointmentEmailPayload
+  | ConversationEmailPayload
+  | CustomRequestEmailPayload
+  | WaitlistEmailPayload
+  | ReviewEmailPayload;
 
 export interface RenderedEmail {
   subject: string;
@@ -98,6 +120,43 @@ function isConversation(payload: EmailPayload): payload is ConversationEmailPayl
 
 function isCustomRequest(payload: EmailPayload): payload is CustomRequestEmailPayload {
   return (payload as CustomRequestEmailPayload).kind === 'custom';
+}
+
+function isWaitlist(payload: EmailPayload): payload is WaitlistEmailPayload {
+  return (payload as WaitlistEmailPayload).kind === 'waitlist';
+}
+
+function isReview(payload: EmailPayload): payload is ReviewEmailPayload {
+  return (payload as ReviewEmailPayload).kind === 'review';
+}
+
+function renderWaitlist(payload: WaitlistEmailPayload): RenderedEmail {
+  return {
+    subject: `Une place s’est libérée : ${payload.serviceName}`,
+    html: layout({
+      title: 'Un créneau s’est libéré',
+      intro: `Bonjour ${payload.customerName}, le créneau que vous attendiez pour ${payload.serviceName} vient de se libérer.`,
+      rows: [['Créneau', formatDate(payload.startsAt)]],
+      ctaLabel: 'Confirmer ma réservation',
+      ctaUrl: payload.confirmUrl,
+      note: `Ce lien est valable jusqu’au ${formatDate(payload.expiresAt)}. Passé ce délai, la place sera proposée à la personne suivante.`,
+    }),
+    text: `Bonjour ${payload.customerName},\n\nLe créneau du ${formatDate(payload.startsAt)} pour ${payload.serviceName} est disponible.\nConfirmez votre réservation : ${payload.confirmUrl}\nLien valable jusqu’au ${formatDate(payload.expiresAt)}.\n\n${SALON_NAME}`,
+  };
+}
+
+function renderReview(payload: ReviewEmailPayload): RenderedEmail {
+  return {
+    subject: 'Votre avis compte pour Patricia',
+    html: layout({
+      title: 'Comment s’est passé votre rendez-vous ?',
+      intro: `Bonjour ${payload.customerName}, Patricia espère que votre prestation « ${payload.serviceName} » vous a plu. Votre avis aide d’autres clientes à faire leur choix.`,
+      ctaLabel: 'Laisser un avis',
+      ctaUrl: payload.reviewUrl,
+      note: 'Votre avis est relu par Patricia avant toute publication.',
+    }),
+    text: `Bonjour ${payload.customerName},\n\nVotre avis sur ${payload.serviceName} compte pour Patricia.\nLaisser un avis : ${payload.reviewUrl}\n\n${SALON_NAME}`,
+  };
 }
 
 interface LayoutInput {
@@ -422,6 +481,14 @@ function renderCustomRequest(
 export function renderNotification(templateKey: string, payload: unknown): RenderedEmail | null {
   if (!payload || typeof payload !== 'object') return null;
   const key = templateKey as NotificationTemplateKey;
+  if (isWaitlist(payload as EmailPayload)) {
+    return key === 'waitlist_slot_available'
+      ? renderWaitlist(payload as WaitlistEmailPayload)
+      : null;
+  }
+  if (isReview(payload as EmailPayload)) {
+    return key === 'review_request' ? renderReview(payload as ReviewEmailPayload) : null;
+  }
   if (isCustomRequest(payload as EmailPayload)) {
     return renderCustomRequest(key, payload as CustomRequestEmailPayload);
   }
@@ -463,5 +530,7 @@ export function notificationTemplateExists(templateKey: string): boolean {
     'custom_request_received',
     'admin_custom_request',
     'custom_request_decision',
+    'waitlist_slot_available',
+    'review_request',
   ].includes(templateKey);
 }

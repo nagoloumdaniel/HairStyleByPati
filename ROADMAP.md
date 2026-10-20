@@ -164,11 +164,11 @@
 - [x] **P8.5** Tableau de bord principal : RDV du jour, prochains, en attente, nouvelles demandes, évaluations photo, messages non lus, annulations récentes, indisponibilités, indicateurs. — *skill : frontend-design*
 - [x] **P8.6** Statistiques : réservations, annulations, terminées, prestations populaires, demandes personnalisées, revenus estimés et ticket moyen, avec définitions affichées. Le taux de remplissage reste à définir avec Patricia. — *skill : analytics*
 - [x] **P8.7** Gestion des absences (no-show) + impact statistique sans bannissement automatique. — *skill : test-driven-development*
-- [ ] **P8.8** Liste d'attente : alerte si créneau libéré, confirmation client obligatoire + re-vérification à la réservation. — *skill : writing-plans* (hors v1 §19)
-- [ ] **P8.9** Suggestions de coiffures compatibles (jamais contournement d'une restriction). — *skill : test-driven-development* (post-v1)
-- [ ] **P8.10** Avis clients : e-mail post-RDV, modération, affichage uniquement avis vérifiés. — *skill : frontend-design* (hors v1 §19)
-- [ ] **P8.11** Galerie de réalisations publique (photo → catégorie/préstation, autorisations clients). — *skill : frontend-design* (hors v1 §19)
-- [ ] **P8.12** Promotions : offres temporaires, conditions, dates de validité. — *skill : frontend-design* (hors v1 §19)
+- [x] **P8.8** Liste d'attente : créneau exact (pas de date "libre", aucune logique de fuseau serveur), alerte e-mail à la libération, lien de confirmation à durée limitée (2h, cron `/api/cron/liste-attente`), re-vérification complète via `createBooking` à la confirmation (aucune création d'Appointment en dehors du flux standard). — *skill : writing-plans + test-driven-development* (hors v1 §19, livré en phase 12)
+- [x] **P8.9** Suggestions de coiffures compatibles affichées quand une prestation est incompatible : ne proposent que des prestations `COMPATIBLE` + `BOOK` d'après le moteur (`suggestCompatibleServices`, testé) — jamais de contournement d'une restriction. — *skill : test-driven-development* (hors v1 §19, livré en phase 12)
+- [x] **P8.10** Avis clients : demande envoyée automatiquement quand un RDV passe à « terminé », lien à durée limitée (60 jours), soumission libre, modération obligatoire (`dashboard/avis`) avant affichage public ; témoignages de la page d'accueil remplacés par les avis réellement approuvés (plus de citations inventées). — *skill : frontend-design + test-driven-development* (hors v1 §19, livré en phase 12)
+- [x] **P8.11** Galerie de réalisations publique (`/galerie`) : upload dashboard avec confirmation explicite d'autorisation de la cliente obligatoire avant publication, URLs signées calculées à la lecture (bucket privé). — *skill : frontend-design* (hors v1 §19, livré en phase 12)
+- [x] **P8.12** Promotions : réduction % ou montant fixe par prestation, période de validité, appliquée automatiquement et de façon figée (`promotionId`/`discountCents` instantanés sur l'Appointment) au moment de la réservation — testé (`applyPromotion`, `findActivePromotion`). — *skill : frontend-design + test-driven-development* (hors v1 §19, livré en phase 12)
 
 ## PHASE 9 — SÉCURITÉ APPROFONDIE, RGPD, FIABILITÉ
 

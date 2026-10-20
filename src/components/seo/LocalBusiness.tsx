@@ -47,10 +47,12 @@ export const LOCAL_BUSINESS: LocalBusinessData = {
  * Le composant est un Server Component : le script est rendu statiquement dans le HTML.
  */
 export default function LocalBusiness({ data }: { data: LocalBusinessData }) {
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000').replace(/\/$/, '');
   const jsonLd: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'HealthAndBeautyBusiness',
     name: data.name,
+    logo: `${appUrl}/brand/logo-mark-og.png`,
     image:
       'https://images.pexels.com/photos/10825829/pexels-photo-10825829.jpeg?auto=compress&cs=tinysrgb&w=400',
     address: {

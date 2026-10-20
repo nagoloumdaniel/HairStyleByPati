@@ -1,0 +1,78 @@
+import type { Metadata } from 'next';
+import { db } from '@/lib/db';
+import { isNotifyTokenValid } from '@/modules/liste-attente/engine';
+import { LocalDateTime } from '@/components/shared/LocalDateTime';
+import { ConfirmForm } from './confirm-form';
+
+export const metadata: Metadata = {
+  title: 'Confirmer ma réservation',
+  robots: { index: false, follow: false },
+};
+
+export default async function WaitlistTokenPage({
+  params,
+}: {
+  params: Promise<{ token: string }>;
+}) {
+  const { token } = await params;
+  const entry = await db.waitlistEntry.findUnique({
+    where: { notifyToken: token },
+    include: { service: { select: { slug: true, name: true } } },
+  });
+
+  if (!entry) {
+    return (
+      <main className="mx-auto w-full max-w-2xl px-4 py-12 sm:px-6">
+        <div className="rounded-[var(--radius-lg)] border border-alert bg-alert-soft p-8 text-center">
+          <h1 className="font-heading text-2xl font-bold text-alert">Lien invalide</h1>
+          <p className="mt-3 text-fg">Ce lien ne correspond à aucune demande de liste d’attente.</p>
+        </div>
+      </main>
+    );
+  }
+
+  const valid =
+    entry.status === 'NOTIFIED' && isNotifyTokenValid(entry.notifyTokenExpiresAt, new Date());
+
+  if (!valid) {
+    return (
+      <main className="mx-auto w-full max-w-2xl px-4 py-12 sm:px-6">
+        <div className="rounded-[var(--radius-lg)] border border-line bg-card p-8 text-center">
+          <h1 className="font-heading text-2xl font-bold text-fg">
+            {entry.status === 'CONFIRMED' ? 'Déjà confirmée' : 'Lien expiré'}
+          </h1>
+          <p className="mt-3 text-muted">
+            {entry.status === 'CONFIRMED'
+              ? 'Cette réservation a déjà été confirmée.'
+              : 'Ce lien a expiré. La place a été proposée à la personne suivante sur la liste d’attente.'}
+          </p>
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <main className="mx-auto w-full max-w-2xl px-4 py-12 sm:px-6">
+      <div className="rounded-[var(--radius-lg)] border border-line bg-card p-8 shadow-soft">
+        <h1 className="font-heading text-2xl font-bold text-fg">
+          Une place s’est libérée pour « {entry.service.name} »
+        </h1>
+        <p className="mt-2 text-muted">
+          Créneau du <LocalDateTime iso={entry.desiredStartsAt.toISOString()} />. Confirmez votre
+          réservation ci-dessous : la disponibilité est vérifiée à nouveau au moment de la
+          confirmation.
+        </p>
+        <div className="mt-6">
+          <ConfirmForm
+            token={token}
+            serviceSlug={entry.service.slug}
+            startsAtISO={entry.desiredStartsAt.toISOString()}
+            defaultName={entry.customerName}
+            defaultEmail={entry.customerEmail}
+            defaultPhone={entry.customerPhone}
+          />
+        </div>
+      </div>
+    </main>
+  );
+}

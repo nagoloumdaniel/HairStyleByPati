@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { Logo } from '@/components/shared/Logo';
 import { ThemeToggle } from './ThemeToggle';
 
 /* P2.5 : header public mobile-first, navigation clavier, menu hamburger accessible. */
@@ -18,8 +19,8 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-page/95 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-        <Link href="/" className="font-heading text-xl font-bold text-fg">
-          Hairstyle <span className="text-cacao">by Patricia</span>
+        <Link href="/" className="shrink-0">
+          <Logo markClassName="h-9 w-auto text-fg" />
         </Link>
         <nav aria-label="Navigation principale" className="hidden items-center gap-6 md:flex">
           {LINKS.map((l) => (
