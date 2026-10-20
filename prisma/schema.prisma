@@ -21,17 +21,18 @@ enum Role {
 }
 
 model User {
-  id                  String           @id @default(cuid())
-  name                String
-  email               String           @unique
-  passwordHash        String
-  role                Role             @default(ADMIN)
-  createdAt           DateTime         @default(now())
-  updatedAt           DateTime         @updatedAt
-  blockedPeriods      BlockedPeriod[]
-  auditLogs           AuditLog[]
-  assessmentDecisions HairAssessment[] @relation("AssessmentDecider")
+  id                     String                  @id @default(cuid())
+  name                   String
+  email                  String                  @unique
+  passwordHash           String
+  role                   Role                    @default(ADMIN)
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  blockedPeriods         BlockedPeriod[]
+  auditLogs              AuditLog[]
+  assessmentDecisions    HairAssessment[]        @relation("AssessmentDecider")
   customRequestDecisions CustomRequestDecision[] @relation("CustomRequestDecisionAuthor")
+  reviewModerations      Review[]                @relation("ReviewModerator")
 }
 
 // ============================================================
@@ -57,28 +58,32 @@ enum ServiceStatus {
 }
 
 model Service {
-  id              String               @id @default(cuid())
-  name            String
-  slug            String               @unique
-  description     String?
-  categoryId      String
-  category        Category             @relation(fields: [categoryId], references: [id])
+  id                     String               @id @default(cuid())
+  name                   String
+  slug                   String               @unique
+  description            String?
+  categoryId             String
+  category               Category             @relation(fields: [categoryId], references: [id])
   // Prix en centimes (entiers = pas d'erreur d'arrondi)
-  priceFromCents  Int?
-  priceToCents    Int?
-  priceOnRequest  Boolean              @default(false) // « Prix à confirmer »
-  durationMinutes Int?
-  status          ServiceStatus        @default(DRAFT)
-  order           Int                  @default(0)
-  createdAt       DateTime             @default(now())
-  updatedAt       DateTime             @updatedAt
-  images          ServiceImage[]
-  options         ServiceOption[]
-  compatibility   CompatibilityRule?
-  questions       QuestionDefinition[]
-  appointments    Appointment[]
-  assessments     HairAssessment[]
-  proposedCustomRequests CustomRequest[] @relation("CustomRequestProposedService")
+  priceFromCents         Int?
+  priceToCents           Int?
+  priceOnRequest         Boolean              @default(false) // « Prix à confirmer »
+  durationMinutes        Int?
+  status                 ServiceStatus        @default(DRAFT)
+  order                  Int                  @default(0)
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+  images                 ServiceImage[]
+  options                ServiceOption[]
+  compatibility          CompatibilityRule?
+  questions              QuestionDefinition[]
+  appointments           Appointment[]
+  assessments            HairAssessment[]
+  proposedCustomRequests CustomRequest[]      @relation("CustomRequestProposedService")
+  waitlistEntries        WaitlistEntry[]
+  reviews                Review[]
+  galleryPhotos          GalleryPhoto[]
+  promotions             PromotionService[]
 }
 
 model ServiceImage {
@@ -218,6 +223,7 @@ model Customer {
   conversations  Conversation[]
   customRequests CustomRequest[]
   assessments    HairAssessment[]
+  reviews        Review[]
 
   @@unique([email])
 }
@@ -246,6 +252,11 @@ model Appointment {
   priceCents           Int?
   durationMinutes      Int
   selectedOptions      Json? // [{ optionId, name, priceCents }]
+  // Promotion appliquée, instantané figé (§14.4) : traçabilité uniquement,
+  // pas de relation forte vers Promotion (qui peut être modifiée/supprimée)
+  promotionId          String?
+  promotionName        String?
+  discountCents        Int?
   // Réponses aux questions capillaires au moment de la réservation
   hairInfo             Json?
   comments             String?
@@ -261,6 +272,7 @@ model Appointment {
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
   assessments          HairAssessment[]
+  review               Review?
 
   // Anti double-réservation : un créneau ne peut être occupé qu'une
   // fois par prestation (renforcé par transaction + verrou P6.2)
@@ -285,26 +297,26 @@ enum CustomRequestStatus {
 }
 
 model CustomRequest {
-  id                  String              @id @default(cuid())
+  id                  String                  @id @default(cuid())
   customerId          String?
-  customer            Customer?           @relation(fields: [customerId], references: [id])
+  customer            Customer?               @relation(fields: [customerId], references: [id])
   // Coordonnées du demandeur si pas encore de Customer
   requesterName       String
   requesterEmail      String
   requesterPhone      String?
   description         String
-  photoKeys           String[]            @default([]) // clés S3/R2 privées
+  photoKeys           String[]                @default([]) // clés S3/R2 privées
   hairInfo            Json? // réponses structurées (longueur, type, style actuel…)
   desiredDate         DateTime?
-  status              CustomRequestStatus @default(NEW)
+  status              CustomRequestStatus     @default(NEW)
   adminReply          String?
   estimatedPriceCents Int?
   proposedServiceId   String?
-  proposedService     Service?            @relation("CustomRequestProposedService", fields: [proposedServiceId], references: [id])
+  proposedService     Service?                @relation("CustomRequestProposedService", fields: [proposedServiceId], references: [id])
   proposedSlot        DateTime?
   decidedAt           DateTime?
-  createdAt           DateTime            @default(now())
-  updatedAt           DateTime            @updatedAt
+  createdAt           DateTime                @default(now())
+  updatedAt           DateTime                @updatedAt
   assessments         HairAssessment[]
   decisions           CustomRequestDecision[]
 
@@ -321,17 +333,17 @@ enum CustomRequestDecisionAction {
 }
 
 model CustomRequestDecision {
-  id                   String                     @id @default(cuid())
-  customRequestId      String
-  customRequest        CustomRequest              @relation(fields: [customRequestId], references: [id], onDelete: Cascade)
-  userId               String?
-  user                 User?                      @relation("CustomRequestDecisionAuthor", fields: [userId], references: [id])
-  action               CustomRequestDecisionAction
-  message              String?
-  priceCents           Int?
-  proposedServiceName  String?
-  proposedSlot         DateTime?
-  createdAt            DateTime                   @default(now())
+  id                  String                      @id @default(cuid())
+  customRequestId     String
+  customRequest       CustomRequest               @relation(fields: [customRequestId], references: [id], onDelete: Cascade)
+  userId              String?
+  user                User?                       @relation("CustomRequestDecisionAuthor", fields: [userId], references: [id])
+  action              CustomRequestDecisionAction
+  message             String?
+  priceCents          Int?
+  proposedServiceName String?
+  proposedSlot        DateTime?
+  createdAt           DateTime                    @default(now())
 
   @@index([customRequestId, createdAt])
 }
@@ -492,6 +504,131 @@ model AuditLog {
   createdAt  DateTime @default(now())
 
   @@index([entityType, entityId])
+}
+
+// ============================================================
+// Liste d'attente (§19, P8.8) — hors v1 initial
+// ============================================================
+
+enum WaitlistStatus {
+  WAITING
+  NOTIFIED
+  CONFIRMED
+  EXPIRED
+  CANCELLED
+}
+
+model WaitlistEntry {
+  id                     String         @id @default(cuid())
+  serviceId              String
+  service                Service        @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  // Créneau exact souhaité (UTC) — pas de date "libre" : évite toute
+  // logique de fuseau côté serveur (P1.5), cohérent avec Appointment.startsAt.
+  desiredStartsAt        DateTime
+  customerName           String
+  customerEmail          String
+  customerPhone          String
+  status                 WaitlistStatus @default(WAITING)
+  notifyToken            String?        @unique
+  notifyTokenExpiresAt   DateTime?
+  notifiedAt             DateTime?
+  confirmedAppointmentId String?
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+
+  @@index([serviceId, desiredStartsAt, status])
+  @@index([status, notifyTokenExpiresAt])
+}
+
+// ============================================================
+// Avis clients (§19, P8.10) — hors v1 initial
+// ============================================================
+
+enum ReviewStatus {
+  PENDING // lien envoyé, pas encore répondu
+  SUBMITTED // soumis par la cliente, en attente de modération
+  APPROVED
+  REJECTED
+}
+
+model Review {
+  id             String       @id @default(cuid())
+  appointmentId  String       @unique
+  appointment    Appointment  @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  customerId     String
+  customer       Customer     @relation(fields: [customerId], references: [id])
+  serviceId      String
+  service        Service      @relation(fields: [serviceId], references: [id])
+  token          String       @unique
+  tokenExpiresAt DateTime
+  rating         Int?
+  comment        String?
+  status         ReviewStatus @default(PENDING)
+  submittedAt    DateTime?
+  moderatedById  String?
+  moderatedBy    User?        @relation("ReviewModerator", fields: [moderatedById], references: [id])
+  moderatedAt    DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([status, createdAt])
+  @@index([serviceId, status])
+}
+
+// ============================================================
+// Galerie de réalisations publique (§19, P8.11) — hors v1 initial
+// ============================================================
+
+model GalleryPhoto {
+  id               String   @id @default(cuid())
+  key              String // clé S3/R2 publique
+  alt              String   @default("")
+  serviceId        String?
+  service          Service? @relation(fields: [serviceId], references: [id])
+  // Confirmation explicite par Patricia que la cliente autorise l'usage public
+  consentConfirmed Boolean  @default(false)
+  published        Boolean  @default(false)
+  order            Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([published, order])
+}
+
+// ============================================================
+// Promotions (§19, P8.12) — hors v1 initial
+// ============================================================
+
+enum PromotionKind {
+  PERCENT
+  FIXED
+}
+
+model Promotion {
+  id        String             @id @default(cuid())
+  name      String
+  kind      PromotionKind
+  // Pourcentage (1-100) ou montant fixe en centimes selon `kind`
+  value     Int
+  startsAt  DateTime
+  endsAt    DateTime
+  active    Boolean            @default(true)
+  services  PromotionService[]
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  @@index([active, startsAt, endsAt])
+}
+
+model PromotionService {
+  id          String    @id @default(cuid())
+  promotionId String
+  promotion   Promotion @relation(fields: [promotionId], references: [id], onDelete: Cascade)
+  serviceId   String
+  service     Service   @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@unique([promotionId, serviceId])
+  @@index([serviceId])
 }
 
 // ============================================================

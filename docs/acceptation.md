@@ -85,7 +85,7 @@ Chaque critère porte un identifiant stable utilisé dans les recettes P11.3 et 
 
 Inclus dans v1 : site public, catalogue administrable multi-photos, règles de compatibilité par prestation, parcours de réservation, envoi de photos pour évaluation, demandes personnalisées, dashboard admin, calendrier + disponibilités, annulations/reprogrammations, notifications e-mail + dashboard, messagerie centralisée, sécurisation des accès, informations légales/RGPD.
 
-Hors v1 (post-validation, §19 / §13) : avis clients, liste d'attente, promotions, statistiques avancées, galerie de réalisations.
+Hors v1 initial (§19 / §13), livrées en phase 12 à la demande du client : avis clients, liste d'attente, promotions, galerie de réalisations. Restent hors périmètre : statistiques avancées.
 
 **Principe final (§20) :** aucune réservation confirmée sur créneau indisponible, aucune règle de compatibilité contournée, aucune notification annonçant un statut différent du statut réellement enregistré.
 

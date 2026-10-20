@@ -30,6 +30,7 @@ const BOOKABLE_SERVICE_SELECT = {
   priceFromCents: true,
   priceToCents: true,
   priceOnRequest: true,
+  categoryId: true,
   category: { select: { name: true } },
   options: {
     where: { active: true },
@@ -64,6 +65,7 @@ function mapBookableService(row: BookableServiceRow): BookableService {
     name: row.name,
     slug: row.slug,
     description: row.description,
+    categoryId: row.categoryId,
     categoryName: row.category.name,
     durationMinutes: row.durationMinutes,
     priceFromCents: row.priceFromCents,

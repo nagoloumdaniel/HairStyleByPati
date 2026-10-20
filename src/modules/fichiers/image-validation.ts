@@ -95,3 +95,8 @@ export function buildServiceImageKey(serviceId: string, extension: ValidatedImag
   }
   return `services/${serviceId}/${randomUUID()}.${extension}`;
 }
+
+/** Clé objet pour la galerie de réalisations (P8.11), même règle d'imprévisibilité. */
+export function buildGalleryImageKey(extension: ValidatedImage['extension']) {
+  return `gallery/${randomUUID()}.${extension}`;
+}

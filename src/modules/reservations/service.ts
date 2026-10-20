@@ -17,12 +17,19 @@ import { logAudit } from '@/modules/stats/audit';
 import { getBookableServiceBySlug, type BookableService } from './queries';
 import { computeBookingSnapshot, type SelectedOptionSnapshot } from './pricing';
 import {
+  applyPromotion,
+  findActivePromotion,
+  type PromotionCandidate,
+} from '@/modules/promotions/pricing';
+import {
   buildCancellationExpiry,
   evaluateCancellationPolicy,
   isCancellationTokenValid,
 } from './policy';
 import { assertTransition } from './status';
 import { queueAppointmentNotifications } from './notifications';
+import { notifyWaitlistForFreedSlot } from '@/modules/liste-attente/service';
+import { createReviewRequest } from '@/modules/avis/service';
 import { bookingReference } from './schemas';
 import { expirePendingHolds } from './expiry';
 
@@ -49,6 +56,29 @@ async function settingsInTx(tx: Prisma.TransactionClient): Promise<SalonSettings
   return row ? mapSalonSettings(row) : DEFAULT_SALON_SETTINGS;
 }
 
+/** Promotion active (P8.12) pour une prestation, au moment de la réservation. */
+async function activePromotionInTx(
+  tx: Prisma.TransactionClient,
+  serviceId: string,
+  now: Date,
+): Promise<PromotionCandidate | null> {
+  const rows = await tx.promotion.findMany({
+    where: { active: true, startsAt: { lte: now }, endsAt: { gte: now } },
+    include: { services: { select: { serviceId: true } } },
+  });
+  const candidates = rows.map((row) => ({
+    id: row.id,
+    name: row.name,
+    kind: row.kind,
+    value: row.value,
+    startsAt: row.startsAt,
+    endsAt: row.endsAt,
+    active: row.active,
+    serviceIds: row.services.map((s) => s.serviceId),
+  }));
+  return findActivePromotion(candidates, serviceId, now);
+}
+
 async function serviceInTx(
   tx: Prisma.TransactionClient,
   slug: string,
@@ -64,6 +94,7 @@ async function serviceInTx(
       priceFromCents: true,
       priceToCents: true,
       priceOnRequest: true,
+      categoryId: true,
       category: { select: { name: true } },
       options: {
         where: { active: true },
@@ -94,6 +125,7 @@ async function serviceInTx(
     name: row.name,
     slug: row.slug,
     description: row.description,
+    categoryId: row.categoryId,
     categoryName: row.category.name,
     durationMinutes: row.durationMinutes,
     priceFromCents: row.priceFromCents,
@@ -255,6 +287,8 @@ export interface CreateBookingInput {
   comment: string;
   answers: Record<string, unknown>;
   optionIds: string[];
+  /** Confirmation depuis un lien de liste d'attente (P8.8), facultatif. */
+  waitlistToken?: string | null;
 }
 
 export interface CreatedBooking {
@@ -295,6 +329,12 @@ export async function createBooking(input: CreateBookingInput): Promise<CreatedB
       }
       const settings = await settingsInTx(tx);
       const snapshot = computeBookingSnapshot(service, input.optionIds, service.options);
+      const promotion =
+        snapshot.priceCents != null ? await activePromotionInTx(tx, service.id, now) : null;
+      const discount =
+        promotion && snapshot.priceCents != null
+          ? applyPromotion(snapshot.priceCents, promotion)
+          : null;
       if (snapshot.invalidOptionIds.length > 0) {
         throw new AppError('INVALID_OPTION', 'Une option sélectionnée n’est plus disponible.', 409);
       }
@@ -387,7 +427,10 @@ export async function createBooking(input: CreateBookingInput): Promise<CreatedB
           startsAt: slot.startsAt,
           endsAt: slot.endsAt,
           status,
-          priceCents: snapshot.priceCents,
+          priceCents: discount ? discount.finalPriceCents : snapshot.priceCents,
+          promotionId: discount?.promotionId ?? null,
+          promotionName: discount?.promotionName ?? null,
+          discountCents: discount?.discountCents ?? null,
           durationMinutes: snapshot.durationMinutes,
           selectedOptions: snapshot.selectedOptions as unknown as Prisma.InputJsonValue,
           hairInfo: input.answers as Prisma.InputJsonValue,
@@ -405,6 +448,13 @@ export async function createBooking(input: CreateBookingInput): Promise<CreatedB
             appointmentId: appointment.id,
             status: status === 'CONFIRMED' ? 'CONFIRMED' : 'BOOKING_PENDING',
           },
+        });
+      }
+
+      if (input.waitlistToken) {
+        await tx.waitlistEntry.updateMany({
+          where: { notifyToken: input.waitlistToken, status: 'NOTIFIED' },
+          data: { status: 'CONFIRMED', confirmedAppointmentId: appointment.id },
         });
       }
 
@@ -560,6 +610,12 @@ export async function rescheduleAppointment(input: {
         settings,
         idempotencySuffix: slot.startsAt.toISOString(),
       });
+      await notifyWaitlistForFreedSlot(
+        tx,
+        appointment.serviceId,
+        appointment.startsAt,
+        appointment.service.name,
+      );
 
       return { appointmentId: result.id, startsAt: result.startsAt, status: result.status };
     },
@@ -619,6 +675,17 @@ export async function updateAppointmentStatus(input: {
         settings,
       });
     }
+    if (input.status === 'COMPLETED') {
+      await createReviewRequest(tx, {
+        id: appointment.id,
+        customerId: appointment.customerId,
+        serviceId: appointment.serviceId,
+        endsAt: appointment.endsAt,
+        customerEmail: appointment.customer.email,
+        customerName: appointment.customer.name,
+        serviceName: appointment.service.name,
+      });
+    }
   });
 
   await logAudit({
@@ -668,6 +735,12 @@ export async function cancelAppointmentByAdmin(input: {
       reason: input.reason || null,
       settings,
     });
+    await notifyWaitlistForFreedSlot(
+      tx,
+      appointment.serviceId,
+      appointment.startsAt,
+      appointment.service.name,
+    );
   });
 
   await logAudit({
@@ -731,6 +804,12 @@ export async function cancelAppointmentByCustomer(input: {
       reason: input.reason || null,
       settings,
     });
+    await notifyWaitlistForFreedSlot(
+      tx,
+      appointment.serviceId,
+      appointment.startsAt,
+      appointment.service.name,
+    );
   });
 
   await logAudit({
