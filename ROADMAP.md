@@ -215,7 +215,7 @@
 - [x] **P12.3** Monitoring erreurs production + alerting e-mail. Procédure de branchement documentée dans [docs/maintenance.md](docs/maintenance.md#monitoring-p123--à-activer-lors-du-branchement-de-lhébergeur) (aucun service externe réel branché, limite déjà actée en phase 9). — *skill : caveman*
 - [x] **P12.4** Documentation : README d'installation (déjà à jour), guide d'administration pour Patricia ([docs/guide-admin.md](docs/guide-admin.md)), variables d'environnement ([.env.example](.env.example)), runbook de restauration (déjà dans [docs/security.md](docs/security.md#sauvegarde-et-restauration)). — *skill : caveman*
 - [x] **P12.5** Changelog v1.0 ([CHANGELOG.md](CHANGELOG.md)). Tag Git `v1.0.0` à créer après le merge de la PR #13 (nécessite accord explicite, voir P12.6). — *skill : changelog-generator*
-- [ ] **P12.6** Merge branche finale + nettoyage. — *skill : finishing-a-development-branch* (nécessite accord explicite de merge, voir PR #13)
+- [x] **P12.6** Merge branche finale + nettoyage (PR #16 fusionnée le 2026-10-20, production Vercel déployée : https://hairstylebypati.vercel.app). — *skill : finishing-a-development-branch* (nécessite accord explicite de merge, voir PR #13)
 - [x] **P12.7** Export PDF du cahier des charges + roadmap pour archivage client — `docs/archivage/Cahier-de-charge-v1.0.pdf`, `docs/archivage/ROADMAP.pdf`. — *skill : markdown-to-pdf*
 - [x] **P12.8** Passerelle maintenance : plan de mises à jour dépendances, sauvegardes vérifiées périodiquement, procédure d'ajout de fonctionnalité sans casser les modules — [docs/maintenance.md](docs/maintenance.md#plan-de-maintenance-p128). — *skill : caveman*
 
