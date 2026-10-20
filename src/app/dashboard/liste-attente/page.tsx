@@ -1,3 +1,4 @@
+import { Hourglass } from 'lucide-react';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/modules/auth/guards';
@@ -28,7 +29,10 @@ export default async function WaitlistPage() {
   return (
     <div className="p-6">
       <div>
-        <h1 className="text-2xl font-semibold">Liste d’attente</h1>
+        <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
+          <Hourglass aria-hidden="true" className="size-6 text-accent" />
+          Liste d’attente
+        </h1>
         <p className="mt-1 text-ink-soft">
           Clientes prévenues automatiquement par e-mail quand leur créneau se libère (hors v1
           initial, §19). La confirmation reste manuelle : la cliente doit réserver elle-même via le

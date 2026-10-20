@@ -1,3 +1,4 @@
+import { Wand2 } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -48,7 +49,10 @@ export default async function CustomRequestsPage({
   return (
     <div className="p-6">
       <div>
-        <h1 className="text-2xl font-semibold">Demandes personnalisées</h1>
+        <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
+          <Wand2 aria-hidden="true" className="size-6 text-accent" />
+          Demandes personnalisées
+        </h1>
         <p className="mt-1 text-ink-soft">
           Coiffures hors catalogue, photos de référence et décisions. Une demande acceptée propose
           un créneau, sans jamais le réserver automatiquement.

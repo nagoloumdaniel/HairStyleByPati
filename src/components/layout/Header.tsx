@@ -25,6 +25,8 @@ export function Header() {
     setOpen(false);
   }, [pathname]);
 
+  if (pathname.startsWith('/connexion') || pathname.startsWith('/dashboard')) return null;
+
   return (
     <>
       {/* Réserve la hauteur de la navbar fixe pour ne pas masquer le contenu. */}

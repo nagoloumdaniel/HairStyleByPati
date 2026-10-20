@@ -1,3 +1,4 @@
+import { Scissors } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -254,7 +255,10 @@ export default async function CataloguePage({
   return (
     <div className="p-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold">Catalogue des prestations</h1>
+        <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
+          <Scissors aria-hidden="true" className="size-6 text-accent" />
+          Catalogue des prestations
+        </h1>
         <p className="text-muted">
           Gérez vos catégories, vos prestations, leurs photos et leurs règles de compatibilité.
         </p>

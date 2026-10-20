@@ -1,3 +1,4 @@
+import { Tag } from 'lucide-react';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/modules/auth/guards';
@@ -19,7 +20,10 @@ export default async function PromotionsPage() {
   return (
     <div className="p-6">
       <div>
-        <h1 className="text-2xl font-semibold">Promotions</h1>
+        <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
+          <Tag aria-hidden="true" className="size-6 text-accent" />
+          Promotions
+        </h1>
         <p className="mt-1 text-ink-soft">
           Réductions temporaires appliquées automatiquement au moment de la réservation (hors v1
           initial, §19).

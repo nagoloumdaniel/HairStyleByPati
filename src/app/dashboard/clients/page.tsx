@@ -1,3 +1,4 @@
+import { Users } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -39,7 +40,10 @@ export default async function CustomersPage({
   return (
     <div className="p-6">
       <div>
-        <h1 className="text-2xl font-semibold">Clientes</h1>
+        <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
+          <Users aria-hidden="true" className="size-6 text-accent" />
+          Clientes
+        </h1>
         <p className="mt-1 text-ink-soft">
           Coordonnées, historique de rendez-vous, évaluations, demandes et conversations. Accès
           réservé à l’administration.

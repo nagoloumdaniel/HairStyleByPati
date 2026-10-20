@@ -1,4 +1,25 @@
+import {
+  Bell,
+  CalendarDays,
+  CalendarOff,
+  ChartNoAxesColumn,
+  ClipboardList,
+  ExternalLink,
+  Hourglass,
+  Images,
+  LayoutDashboard,
+  type LucideIcon,
+  MessageSquare,
+  Scissors,
+  Settings,
+  Star,
+  Tag,
+  Users,
+  Wand2,
+  History,
+} from 'lucide-react';
 import Link from 'next/link';
+import { ThemeToggle } from './ThemeToggle';
 
 /* P2.6 : sidebar dashboard, identite sobre distincte du public (fond ink, accents or). */
 const NAV = [
@@ -20,6 +41,26 @@ const NAV = [
   { href: '/dashboard/statistiques', label: 'Statistiques', key: 'stats' },
   { href: '/dashboard/parametres', label: 'Parametres', key: 'settings' },
 ] as const;
+
+const ICONS: Record<(typeof NAV)[number]['key'], LucideIcon> = {
+  home: LayoutDashboard,
+  calendar: CalendarDays,
+  catalogue: Scissors,
+  availability: CalendarOff,
+  history: History,
+  evaluations: Star,
+  reservations: ClipboardList,
+  demandes: Wand2,
+  clients: Users,
+  waitlist: Hourglass,
+  reviews: Star,
+  gallery: Images,
+  promotions: Tag,
+  notifications: Bell,
+  messages: MessageSquare,
+  stats: ChartNoAxesColumn,
+  settings: Settings,
+};
 
 export function Sidebar({
   pathname,
@@ -44,6 +85,7 @@ export function Sidebar({
             : item.key === 'notifications'
               ? badges.notifications
               : 0;
+        const Icon = ICONS[item.key];
         return (
           <Link
             key={item.href}
@@ -55,7 +97,10 @@ export function Sidebar({
                 : 'text-panel-fg/85 hover:bg-panel-fg/10 hover:text-panel-fg'
             }`}
           >
-            <span>{item.label}</span>
+            <span className="flex items-center gap-2.5">
+              <Icon aria-hidden="true" className="size-4 shrink-0 lg:size-5" />
+              {item.label}
+            </span>
             {badge && badge > 0 ? (
               <span
                 aria-label={`${badge} non lu${badge > 1 ? 's' : ''}`}
@@ -69,6 +114,16 @@ export function Sidebar({
           </Link>
         );
       })}
+      <div className="flex items-center gap-1 lg:mt-3 lg:justify-between lg:border-t lg:border-panel-fg/15 lg:pt-3">
+        <Link
+          href="/"
+          className="flex items-center gap-2.5 whitespace-nowrap rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-panel-fg/85 transition hover:bg-panel-fg/10 hover:text-panel-fg lg:px-4 lg:text-base"
+        >
+          <ExternalLink aria-hidden="true" className="size-4 shrink-0 lg:size-5" />
+          Voir le site
+        </Link>
+        <ThemeToggle />
+      </div>
     </nav>
   );
 }

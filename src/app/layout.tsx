@@ -1,6 +1,7 @@
 import { ToastProvider } from '@/components/ui/Toast';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { HideOnAuth } from '@/components/layout/HideOnAuth';
 import LocalBusiness from '@/components/seo/LocalBusiness';
 import { LOCAL_BUSINESS } from '@/components/seo/LocalBusiness';
 import type { Metadata } from 'next';
@@ -96,7 +97,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <ToastProvider>
           <Header />
           <div id="contenu">{children}</div>
-          <Footer />
+          <HideOnAuth>
+            <Footer />
+          </HideOnAuth>
         </ToastProvider>
       </body>
     </html>

@@ -1,3 +1,4 @@
+import { Bell } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -57,7 +58,10 @@ export default async function NotificationsPage({
     <div className="p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Notifications</h1>
+          <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
+            <Bell aria-hidden="true" className="size-6 text-accent" />
+            Notifications
+          </h1>
           <p className="mt-1 text-ink-soft">
             Messages du dashboard, e-mails envoyés et échecs d’envoi. Chaque notification renvoie
             vers la fiche concernée.

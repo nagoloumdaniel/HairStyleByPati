@@ -1,3 +1,4 @@
+import { CalendarOff } from 'lucide-react';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/modules/auth/guards';
@@ -53,7 +54,10 @@ export default async function DisponibilitesPage() {
   return (
     <div className="p-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold">Disponibilités</h1>
+        <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
+          <CalendarOff aria-hidden="true" className="size-6 text-accent" />
+          Disponibilités
+        </h1>
         <p className="text-muted">
           Horaires habituels, exceptions, pauses et paramètres de réservation. Toute modification
           qui touche des rendez-vous existants demande une confirmation explicite.

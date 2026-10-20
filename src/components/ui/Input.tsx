@@ -1,6 +1,10 @@
+'use client';
+
 import {
   AtSign,
   Banknote,
+  Eye,
+  EyeOff,
   Hash,
   Lock,
   Mail,
@@ -10,7 +14,7 @@ import {
   User,
   type LucideIcon,
 } from 'lucide-react';
-import type { ChangeEvent, InputHTMLAttributes } from 'react';
+import { useState, type ChangeEvent, type InputHTMLAttributes } from 'react';
 import { DateField } from './DateField';
 import { DateTimeField } from './DateTimeField';
 import { Field, autoPlaceholder } from './Field';
@@ -45,6 +49,7 @@ function autoIcon(type: string | undefined, name: string | undefined): LucideIco
 /* Champ texte avec icône. Les types date / heure / date-heure utilisent les sélecteurs
    personnalisés (calendrier, menu d'heures) à la place des contrôles natifs. */
 export function Input({ label, error, hint, id, required, icon, type, ...rest }: InputProps) {
+  const [visible, setVisible] = useState(false);
   if (type === 'date') {
     return (
       <DateField
@@ -98,6 +103,7 @@ export function Input({ label, error, hint, id, required, icon, type, ...rest }:
   const describedBy = [error ? `${inputId}-error` : null, hint ? `${inputId}-hint` : null]
     .filter(Boolean)
     .join(' ');
+  const isPassword = type === 'password';
   const Icon = icon === null ? null : (icon ?? autoIcon(type, rest.name));
   return (
     <Field id={inputId} label={label} required={required} error={error} hint={hint}>
@@ -116,15 +122,30 @@ export function Input({ label, error, hint, id, required, icon, type, ...rest }:
               ? undefined
               : autoPlaceholder(label, type, rest.name))
           }
-          type={type}
+          type={isPassword && visible ? 'text' : type}
           id={inputId}
           required={required}
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy || undefined}
-          className={`w-full rounded-[var(--radius-md)] border bg-card py-2.5 pr-4 text-fg placeholder:text-muted transition ${
+          className={`w-full rounded-[var(--radius-md)] border bg-card py-2.5 text-fg placeholder:text-muted transition ${
             Icon ? 'pl-10' : 'pl-4'
-          } ${error ? 'border-alert' : 'border-line focus:border-cacao'}`}
+          } ${isPassword ? 'pr-11' : 'pr-4'} ${error ? 'border-alert' : 'border-line focus:border-cacao'}`}
         />
+        {isPassword ? (
+          <button
+            type="button"
+            onClick={() => setVisible((v) => !v)}
+            aria-label={visible ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+            aria-pressed={visible}
+            className="absolute right-2 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-cacao hover:bg-accent-soft"
+          >
+            {visible ? (
+              <EyeOff aria-hidden="true" className="size-4" />
+            ) : (
+              <Eye aria-hidden="true" className="size-4" />
+            )}
+          </button>
+        ) : null}
       </div>
     </Field>
   );

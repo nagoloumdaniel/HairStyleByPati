@@ -1,3 +1,4 @@
+import { ClipboardList } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -72,7 +73,10 @@ export default async function ReservationsPage({
   return (
     <div className="p-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold">Réservations</h1>
+        <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
+          <ClipboardList aria-hidden="true" className="size-6 text-accent" />
+          Réservations
+        </h1>
         <p className="text-muted">
           Rendez-vous à venir, historique et statuts. Chaque fiche permet de confirmer, annuler ou
           reprogrammer.

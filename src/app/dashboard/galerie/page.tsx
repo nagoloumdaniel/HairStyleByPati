@@ -1,3 +1,4 @@
+import { Images } from 'lucide-react';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/modules/auth/guards';
@@ -19,7 +20,10 @@ export default async function GaleriePage() {
   return (
     <div className="p-6">
       <div>
-        <h1 className="text-2xl font-semibold">Galerie de réalisations</h1>
+        <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
+          <Images aria-hidden="true" className="size-6 text-accent" />
+          Galerie de réalisations
+        </h1>
         <p className="mt-1 text-ink-soft">
           Photos publiques des réalisations (hors v1 initial, §19). Une photo n’est publiée que si
           la cliente a explicitement autorisé son usage.

@@ -1,3 +1,4 @@
+import { ChartNoAxesColumn } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -21,7 +22,10 @@ export default async function StatisticsPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-semibold">Statistiques</h1>
+      <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
+        <ChartNoAxesColumn aria-hidden="true" className="size-6 text-accent" />
+        Statistiques
+      </h1>
       <p className="mt-1 text-ink-soft">
         Indicateurs de réservation et de demandes. Tous les montants sont estimés à partir des prix
         figés au moment de la réservation.

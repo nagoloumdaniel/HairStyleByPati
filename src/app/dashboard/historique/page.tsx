@@ -1,3 +1,4 @@
+import { History } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -83,7 +84,10 @@ export default async function HistoriquePage({
     <div className="p-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">Historique du catalogue</h1>
+          <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
+            <History aria-hidden="true" className="size-6 text-accent" />
+            Historique du catalogue
+          </h1>
           <p className="mt-1 text-muted">
             Toutes les actions de Patricia sur les catégories, prestations, photos, options, règles
             et questions.

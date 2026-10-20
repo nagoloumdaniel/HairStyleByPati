@@ -136,10 +136,17 @@ h4 {
 }
 
 /* Focus visible — accessibilité P2.9 : anneau or toujours perceptible */
-:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+:where(a, button, [tabindex]):focus-visible {
   outline: 3px solid var(--color-accent);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
+}
+
+/* Champs de formulaire : pas d'anneau, seule la bordure change au focus */
+:where(input, select, textarea):focus,
+:where(input, select, textarea):focus-visible {
+  outline: none;
+  box-shadow: none;
 }
 
 /* Squelettes de chargement (P2.7) */

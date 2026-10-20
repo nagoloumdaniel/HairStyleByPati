@@ -6,7 +6,7 @@ import { createConversation } from './actions';
 
 const inputClasses =
   'w-full rounded-[var(--radius-md)] border border-line bg-card px-4 py-2.5 text-fg ' +
-  'focus:outline-none focus:ring-2 focus:ring-accent transition';
+  'focus:outline-none focus:border-cacao transition';
 
 const btnBase =
   'inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] ' +

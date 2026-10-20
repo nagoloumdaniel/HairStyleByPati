@@ -1,4 +1,17 @@
-import { ArrowRight } from 'lucide-react';
+import {
+  ArrowRight,
+  Bell,
+  CalendarCheck,
+  CalendarClock,
+  CalendarOff,
+  ChartNoAxesColumn,
+  ClipboardCheck,
+  Hourglass,
+  LogOut,
+  MessageSquare,
+  Wand2,
+  XCircle,
+} from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -31,36 +44,42 @@ export default async function DashboardPage() {
   const indicators = [
     {
       label: 'Rendez-vous aujourd’hui',
+      icon: CalendarCheck,
       value: overview.todayAppointments,
       href: '/dashboard/calendrier',
       tone: 'accent' as const,
     },
     {
       label: 'En attente de confirmation',
+      icon: Hourglass,
       value: overview.pendingAppointments,
       href: '/dashboard/reservations?status=PENDING',
       tone: overview.pendingAppointments > 0 ? ('alert' as const) : ('neutral' as const),
     },
     {
       label: 'Nouvelles demandes',
+      icon: Wand2,
       value: overview.newCustomRequests,
       href: '/dashboard/demandes?status=NEW',
       tone: overview.newCustomRequests > 0 ? ('accent' as const) : ('neutral' as const),
     },
     {
       label: 'Évaluations à traiter',
+      icon: ClipboardCheck,
       value: overview.pendingAssessments,
       href: '/dashboard/evaluations',
       tone: overview.pendingAssessments > 0 ? ('alert' as const) : ('neutral' as const),
     },
     {
       label: 'Messages non lus',
+      icon: MessageSquare,
       value: overview.unreadMessages,
       href: '/dashboard/messages',
       tone: overview.unreadMessages > 0 ? ('accent' as const) : ('neutral' as const),
     },
     {
       label: 'Notifications non lues',
+      icon: Bell,
       value: overview.unreadNotifications,
       href: '/dashboard/notifications',
       tone: overview.unreadNotifications > 0 ? ('accent' as const) : ('neutral' as const),
@@ -78,6 +97,7 @@ export default async function DashboardPage() {
         </div>
         <form action={logout}>
           <Button type="submit" variant="secondary" size="sm">
+            <LogOut aria-hidden="true" className="size-4" />
             Se déconnecter
           </Button>
         </form>
@@ -90,7 +110,10 @@ export default async function DashboardPage() {
             href={indicator.href}
             className="rounded-[var(--radius-lg)] border border-line bg-card p-4 shadow-soft transition hover:border-cacao"
           >
-            <p className="text-sm text-ink-soft">{indicator.label}</p>
+            <p className="flex items-center gap-2 text-sm text-ink-soft">
+              <indicator.icon aria-hidden="true" className="size-4 text-accent" />
+              {indicator.label}
+            </p>
             <p className="mt-1 font-heading text-3xl font-bold text-fg">{indicator.value}</p>
             <span className="mt-2 inline-block">
               <Badge tone={indicator.tone}>Voir</Badge>
@@ -102,7 +125,10 @@ export default async function DashboardPage() {
       <div className="grid items-start gap-6 xl:grid-cols-2">
         <Card>
           <div className="flex items-center justify-between gap-2">
-            <h2 className="font-heading text-xl font-bold text-fg">Prochains rendez-vous</h2>
+            <h2 className="flex items-center gap-2 font-heading text-xl font-bold text-fg">
+              <CalendarClock aria-hidden="true" className="size-5 text-accent" />
+              Prochains rendez-vous
+            </h2>
             <Link
               href="/dashboard/calendrier"
               className="text-sm font-semibold text-cacao hover:underline"
@@ -140,7 +166,10 @@ export default async function DashboardPage() {
 
         <Card>
           <div className="flex items-center justify-between gap-2">
-            <h2 className="font-heading text-xl font-bold text-fg">Indicateurs</h2>
+            <h2 className="flex items-center gap-2 font-heading text-xl font-bold text-fg">
+              <ChartNoAxesColumn aria-hidden="true" className="size-5 text-accent" />
+              Indicateurs
+            </h2>
             <Link
               href="/dashboard/statistiques"
               className="text-sm font-semibold text-cacao hover:underline"
@@ -177,7 +206,10 @@ export default async function DashboardPage() {
         </Card>
 
         <Card>
-          <h2 className="font-heading text-xl font-bold text-fg">Prochaines indisponibilités</h2>
+          <h2 className="flex items-center gap-2 font-heading text-xl font-bold text-fg">
+            <CalendarOff aria-hidden="true" className="size-5 text-accent" />
+            Prochaines indisponibilités
+          </h2>
           {overview.nextBlocked.length === 0 ? (
             <p className="mt-2 text-sm text-ink-soft">Aucune indisponibilité à venir.</p>
           ) : (
@@ -197,7 +229,10 @@ export default async function DashboardPage() {
         </Card>
 
         <Card>
-          <h2 className="font-heading text-xl font-bold text-fg">Annulations récentes</h2>
+          <h2 className="flex items-center gap-2 font-heading text-xl font-bold text-fg">
+            <XCircle aria-hidden="true" className="size-5 text-accent" />
+            Annulations récentes
+          </h2>
           {overview.recentCancelled.length === 0 ? (
             <p className="mt-2 text-sm text-ink-soft">
               Aucune annulation sur les 7 derniers jours.

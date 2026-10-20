@@ -1,3 +1,4 @@
+import { ClipboardCheck } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -74,7 +75,10 @@ export default async function EvaluationsPage({
   return (
     <div className="p-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold">Évaluations capillaires</h1>
+        <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
+          <ClipboardCheck aria-hidden="true" className="size-6 text-accent" />
+          Évaluations capillaires
+        </h1>
         <p className="text-muted">
           Demandes envoyées depuis le site public. Une décision ne crée jamais de réservation : le
           créneau reste vérifié séparément.

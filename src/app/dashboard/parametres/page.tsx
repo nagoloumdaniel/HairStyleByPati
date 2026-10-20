@@ -1,3 +1,4 @@
+import { Settings } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -15,7 +16,10 @@ export default async function SettingsPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-semibold">Paramètres</h1>
+      <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
+        <Settings aria-hidden="true" className="size-6 text-accent" />
+        Paramètres
+      </h1>
       <p className="mt-1 text-ink-soft">
         Identité, coordonnées, horaires affichés et messages de politique. Les règles de créneaux et
         d’annulation se règlent dans{' '}

@@ -116,7 +116,7 @@ export function CatalogueFilters({
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Tresses, vanilles, locs…"
             autoComplete="off"
-            className="w-full rounded-[var(--radius-md)] border border-line bg-card py-2.5 pl-10 pr-10 text-fg placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-accent"
+            className="w-full rounded-[var(--radius-md)] border border-line bg-card py-2.5 pl-10 pr-10 text-fg placeholder:text-muted/70 focus:outline-none focus:border-cacao"
           />
           {isPending ? (
             <span

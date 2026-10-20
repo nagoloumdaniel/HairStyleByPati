@@ -1,3 +1,4 @@
+import { CalendarDays } from 'lucide-react';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/modules/auth/guards';
@@ -12,7 +13,10 @@ export default async function CalendrierPage() {
   return (
     <div className="p-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold">Calendrier</h1>
+        <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
+          <CalendarDays aria-hidden="true" className="size-6 text-accent" />
+          Calendrier
+        </h1>
         <p className="text-muted">
           Vue jour, semaine, mois et liste des rendez-vous. Cliquez sur un rendez-vous pour ouvrir
           sa fiche.
