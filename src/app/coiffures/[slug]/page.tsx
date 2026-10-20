@@ -21,11 +21,17 @@ type ServicePageProps = { params: Promise<{ slug: string }> };
 export const revalidate = 300;
 
 export async function generateStaticParams() {
-  const services = await db.service.findMany({
-    where: { status: 'PUBLISHED', category: { active: true } },
-    select: { slug: true },
-  });
-  return services.map((service) => ({ slug: service.slug }));
+  // Build sans base joignable (aperçu Vercel sans DATABASE_URL) : aucune page
+  // pré-générée, les fiches se génèrent alors à la première visite (ISR).
+  try {
+    const services = await db.service.findMany({
+      where: { status: 'PUBLISHED', category: { active: true } },
+      select: { slug: true },
+    });
+    return services.map((service) => ({ slug: service.slug }));
+  } catch {
+    return [];
+  }
 }
 
 function truncate(text: string | null, maxLength: number): string {
