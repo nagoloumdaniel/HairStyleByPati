@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getBookableServiceBySlug, listBookableServices } from '@/modules/reservations/queries';
-import { getSalonSettings } from '@/modules/disponibilites/queries';
+import { getCachedSalonSettings } from '@/lib/public-cache';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { Badge } from '@/components/ui/Badge';
 import { BookingWizard } from './booking-wizard';
@@ -28,7 +28,10 @@ export default async function ReserverPage({
   const slug = firstValue(params.service).trim();
 
   if (slug === '') {
-    const [services, settings] = await Promise.all([listBookableServices(), getSalonSettings()]);
+    const [services, settings] = await Promise.all([
+      listBookableServices(),
+      getCachedSalonSettings(),
+    ]);
     return (
       <main className="mx-auto w-full max-w-5xl space-y-8 px-4 py-8 sm:px-6 md:py-12">
         <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
@@ -102,7 +105,7 @@ export default async function ReserverPage({
 
   const service = await getBookableServiceBySlug(slug);
   if (!service) notFound();
-  const settings = await getSalonSettings();
+  const settings = await getCachedSalonSettings();
 
   return (
     <main className="mx-auto w-full max-w-4xl space-y-8 px-4 py-8 sm:px-6 md:py-12">

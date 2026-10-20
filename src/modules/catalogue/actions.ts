@@ -1,7 +1,7 @@
 'use server';
 
 import { Prisma, ServiceStatus } from '@prisma/client';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import type { z } from 'zod';
 import { requireAdmin } from '@/modules/auth/guards';
@@ -91,6 +91,7 @@ function idFrom(formData: FormData): string {
 }
 
 function revalidateCatalogue(service?: { id?: string; slug?: string }) {
+  revalidateTag('catalogue');
   revalidatePath('/dashboard/catalogue');
   revalidatePath('/dashboard/historique');
   if (service?.id) revalidatePath(`/dashboard/catalogue/prestations/${service.id}`);

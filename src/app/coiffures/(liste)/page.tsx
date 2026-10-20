@@ -3,7 +3,8 @@ import Link from 'next/link';
 import { ServiceCard } from '@/components/catalogue/ServiceCard';
 import { CardCarousel } from '@/components/catalogue/CardCarousel';
 import { EmptyState } from '@/components/shared/EmptyState';
-import { getPublishedCategories, getPublishedServices, parseCatalogueQuery } from '@/lib/catalogue';
+import { parseCatalogueQuery } from '@/lib/catalogue';
+import { getCachedCategories, getCachedServices } from '@/lib/public-cache';
 import { CatalogueFilters } from '../catalogue-filters';
 import { Title } from '@/components/ui/Title';
 
@@ -29,10 +30,7 @@ export default async function CataloguePage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const query = parseCatalogueQuery(await searchParams);
-  const [categories, result] = await Promise.all([
-    getPublishedCategories(),
-    getPublishedServices(query),
-  ]);
+  const [categories, result] = await Promise.all([getCachedCategories(), getCachedServices(query)]);
 
   const { services, total, page, totalPages, pageSize } = result;
   const search = query.search ?? '';

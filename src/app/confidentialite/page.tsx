@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { getSalonSettings } from '@/modules/disponibilites/queries';
+import { getCachedSalonSettings } from '@/lib/public-cache';
 import { Title } from '@/components/ui/Title';
 
 export const metadata: Metadata = {
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function ConfidentialitePage() {
-  const settings = await getSalonSettings();
+  const settings = await getCachedSalonSettings();
   const contactEmail =
     settings.contactEmail?.trim() ||
     process.env.ADMIN_EMAIL?.trim() ||
