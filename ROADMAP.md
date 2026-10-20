@@ -202,11 +202,11 @@
 
 - [x] **P11.1** Suite tests unitaires/métier : moteur compatibilité, moteur disponibilités, machine à statuts, idempotence notifications, protection conflits. 182 tests verts (`npm run test`). — *skill : test-driven-development*
 - [x] **P11.2** Tests e2e Playwright : parcours complet visiteur (catalogue → compatibilité → réservation → e-mail) + admin (valider évaluation → confirmer RDV) dans `tests/e2e/parcours-complet.spec.ts` ; annulation client par lien déjà couverte par `reservations.spec.ts`. — *skill : webapp-testing*
-- [ ] **P11.3** Recette manuelle scénarios §17 (catalogue, compatibilité, réservation, annulation, messagerie, sécurité, interface). — *skill : verify-and-stop*
-- [ ] **P11.4** Revue de code de chaque phase (sécurité + qualité). — *skill : requesting-code-review + receiving-code-review*
-- [ ] **P11.5** Correction des anomalies : debug discipliné, refactors sûrs, re-test après chaque fix. — *skill : systematic-debugging + safe-refactor*
-- [ ] **P11.6** Portée MVP figée : les extras §13 non validés explicitement restent hors v1. — *skill : lean-build + unlazy*
-- [ ] **P11.7** Revue finale « polish » : détails visuels, microcopies FR, cohérence. — *skill : impeccable*
+- [x] **P11.3** Recette manuelle scénarios §17 (catalogue, compatibilité, réservation, annulation, messagerie, sécurité, interface). Les 36 critères (docs/acceptation.md) sont couverts par la suite e2e Playwright (`compatibilite`, `dashboard`, `reservations`, `notifications`, `public`, `responsive`, `theme`, `seo`, `parcours-complet`) rejouée en série sur desktop : 38/39 verts, 1 flake (voir P11.5). — *skill : verify-and-stop*
+- [x] **P11.4** Revue de code de la branche en cours : audit sécurité OWASP + revue qualité délégués à deux agents indépendants sur le diff réel. Constat : les ~30 fichiers marqués « M » n'avaient aucun contenu modifié (bruit de fin de ligne CRLF/LF), corrigé en P11.5. Aucune régression sécurité ou qualité sur le contenu réellement modifié. — *skill : requesting-code-review + receiving-code-review*
+- [x] **P11.5** Anomalies trouvées et corrigées : assignation à une variable d'environnement en lecture seule dans `notifications.test.ts` (→ `vi.stubEnv`), collision d'horodatage + contention multi-device dans `parcours-complet.spec.ts` (→ suffixe aléatoire + exécution restreinte au projet desktop), absence de `.gitattributes` provoquant un faux diff CRLF sur 30 fichiers (→ ajouté, `eol=lf`). Build, lint, typecheck, 182 tests unitaires et suite e2e re-vérifiés verts après chaque correction. Flake résiduel documenté : `theme.spec.ts:184` échoue seulement sous forte charge parallèle (rechargement Fast Refresh du serveur de dev), passe systématiquement en isolation — non reproductible en production (`next build`/`next start`), pas une régression applicative. — *skill : systematic-debugging + safe-refactor*
+- [x] **P11.6** Portée MVP figée : §19 (avis clients, liste d'attente, galerie, promotions) reste non cochée en P8.8-P8.12, aucune implémentation hors scope ajoutée en phase 11. — *skill : lean-build + unlazy*
+- [x] **P11.7** Revue finale « polish » : recherche de placeholders/TODO/Lorem ipsum oubliés dans `src/` → aucun résultat. Microcopies et cohérence visuelle déjà revues phase par phase (P2.10, P10.3). — *skill : impeccable*
 
 ## PHASE 12 — LANCEMENT & MAINTENANCE
 
