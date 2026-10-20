@@ -18,7 +18,7 @@ export default async function ConfidentialitePage() {
     settings.contactEmail?.trim() ||
     process.env.ADMIN_EMAIL?.trim() ||
     process.env.AUTH_ADMIN_EMAIL?.trim() ||
-    'contact@hairstylebypati.fr';
+    'zepatricia7@gmail.com';
   return (
     <main className="page-main space-y-12">
       <nav aria-label="Fil d'Ariane" className="text-sm text-muted">

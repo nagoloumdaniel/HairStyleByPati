@@ -28,7 +28,7 @@ export const LOCAL_BUSINESS: LocalBusinessData = {
     addressCountry: 'SN',
   },
   telephone: '+221770000000',
-  email: 'contact@hairstylebypati.fr',
+  email: 'zepatricia7@gmail.com',
   priceRange: 'FCFA',
   servesCity: 'Dakar',
   openingHours: [

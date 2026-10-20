@@ -15,9 +15,7 @@ export { MAX_EMAIL_ATTEMPTS, retryDelayMinutes } from './retry';
 
 export function adminNotificationRecipient(fallback?: string | null): string {
   return (
-    (fallback && fallback.trim()) ||
-    process.env.ADMIN_EMAIL?.trim() ||
-    'admin@hairstylebypati.local'
+    (fallback && fallback.trim()) || process.env.ADMIN_EMAIL?.trim() || 'zepatricia7@gmail.com'
   );
 }
 

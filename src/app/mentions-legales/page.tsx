@@ -63,8 +63,8 @@ export default function MentionsLegalesPage() {
               <dt className="font-medium text-fg mb-1">Contact</dt>
               <dd>
                 E-mail :
-                <a href="mailto:contact@example.com" className="text-cacao underline">
-                  contact@example.com
+                <a href="mailto:zepatricia7@gmail.com" className="text-cacao underline">
+                  zepatricia7@gmail.com
                 </a>
               </dd>
             </div>
@@ -110,8 +110,8 @@ export default function MentionsLegalesPage() {
           </Link>
           . Conformément au RGPD, vous disposez d’un droit d’accès, de rectification, de suppression
           et d’opposition sur vos données. Pour exercer ces droits, écrivez à{' '}
-          <a href="mailto:contact@example.com" className="text-cacao underline">
-            contact@example.com
+          <a href="mailto:zepatricia7@gmail.com" className="text-cacao underline">
+            zepatricia7@gmail.com
           </a>
           .
         </p>

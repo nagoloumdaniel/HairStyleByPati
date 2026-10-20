@@ -286,7 +286,7 @@ export default async function HomePage() {
             </p>
             <p className="flex items-start gap-3 text-fg">
               <Mail aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-accent" />
-              <span>contact@hairstylebypati.fr</span>
+              <span>zepatricia7@gmail.com</span>
             </p>
             <p className="flex items-start gap-3 text-fg">
               <Clock aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-accent" />

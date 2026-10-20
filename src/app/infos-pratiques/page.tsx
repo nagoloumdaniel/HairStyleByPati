@@ -91,7 +91,7 @@ export default function InfosPratiquesPage() {
           <p className="text-muted">
             <span className="font-semibold text-fg">E-mail</span>
             <br />
-            contact@hairstylebypati.fr
+            zepatricia7@gmail.com
           </p>
         </div>
         <div className="space-y-6 rounded-2xl bg-card p-8 shadow-soft">

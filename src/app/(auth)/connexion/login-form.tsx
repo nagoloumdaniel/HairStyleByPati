@@ -15,7 +15,7 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
         <input
           type="email"
           name="email"
-          placeholder="admin@exemple.com"
+          placeholder="zepatricia7@gmail.com"
           required
           autoComplete="email"
           className="rounded-lg border border-cacao/30 bg-card px-3 py-2 focus:outline-2 focus:outline-accent"
