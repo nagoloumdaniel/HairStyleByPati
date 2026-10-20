@@ -1,3 +1,4 @@
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ServiceCard } from '@/components/catalogue/ServiceCard';
@@ -117,11 +118,11 @@ export default async function CataloguePage({
                 rel="prev"
                 className="inline-flex items-center gap-2 rounded-[var(--radius-md)] border border-line bg-card px-4 py-2.5 text-sm font-semibold text-fg transition hover:border-cacao hover:bg-page"
               >
-                <span aria-hidden="true">←</span> Page précédente
+                <ArrowLeft aria-hidden="true" className="size-4" /> Page précédente
               </Link>
             ) : (
               <span aria-disabled="true" className="text-sm text-muted">
-                <span aria-hidden="true">←</span> Page précédente
+                <ArrowLeft aria-hidden="true" className="size-4" /> Page précédente
               </span>
             )}
 
@@ -135,11 +136,11 @@ export default async function CataloguePage({
                 rel="next"
                 className="inline-flex items-center gap-2 rounded-[var(--radius-md)] border border-line bg-card px-4 py-2.5 text-sm font-semibold text-fg transition hover:border-cacao hover:bg-page"
               >
-                Page suivante <span aria-hidden="true">→</span>
+                Page suivante <ArrowRight aria-hidden="true" className="size-4" />
               </Link>
             ) : (
               <span aria-disabled="true" className="text-sm text-muted">
-                Page suivante <span aria-hidden="true">→</span>
+                Page suivante <ArrowRight aria-hidden="true" className="size-4" />
               </span>
             )}
           </nav>

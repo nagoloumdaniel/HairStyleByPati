@@ -1,3 +1,4 @@
+import { ArrowRight } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -86,9 +87,7 @@ export default async function ReserverPage({
                       <span className="block font-semibold text-fg">{service.name}</span>
                       <span className="text-sm text-muted">{service.categoryName}</span>
                     </span>
-                    <span aria-hidden="true" className="text-cacao">
-                      →
-                    </span>
+                    <ArrowRight aria-hidden="true" className="size-4 text-cacao" />
                   </Link>
                 </li>
               ))}

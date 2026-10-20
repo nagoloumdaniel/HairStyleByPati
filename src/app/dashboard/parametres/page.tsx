@@ -15,7 +15,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-semibold">Paramètres du salon</h1>
+      <h1 className="text-2xl font-semibold">Paramètres</h1>
       <p className="mt-1 text-ink-soft">
         Identité, coordonnées, horaires affichés et messages de politique. Les règles de créneaux et
         d’annulation se règlent dans{' '}

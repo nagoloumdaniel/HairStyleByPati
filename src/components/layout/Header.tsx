@@ -1,5 +1,6 @@
 'use client';
 
+import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -10,7 +11,6 @@ import { ThemeToggle } from './ThemeToggle';
    menu mobile déployé dans la même capsule. Règles : DESIGN-RULES.md. */
 const LINKS = [
   { href: '/coiffures', label: 'Catalogue' },
-  { href: '/salon', label: 'Le salon' },
   { href: '/faq', label: 'FAQ' },
   { href: '/demandes-personnalisees', label: 'Sur mesure' },
   { href: '/contact', label: 'Contact' },
@@ -67,7 +67,11 @@ export function Header() {
               className="flex h-10 w-10 items-center justify-center rounded-full text-fg hover:bg-accent-soft md:hidden"
             >
               <span aria-hidden="true" className="text-xl leading-none">
-                {open ? '✕' : '☰'}
+                {open ? (
+                  <X aria-hidden="true" className="size-5" />
+                ) : (
+                  <Menu aria-hidden="true" className="size-5" />
+                )}
               </span>
             </button>
           </div>

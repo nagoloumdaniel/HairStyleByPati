@@ -227,7 +227,7 @@ const CATEGORY_PLACEHOLDERS: Record<string, Placeholder[]> = {
   tresses: [
     {
       src: pexels(36441633),
-      alt: 'Tresses africaines en cours de réalisation dans un salon (photo de démonstration)',
+      alt: 'Tresses africaines en cours de réalisation à domicile (photo de démonstration)',
     },
     {
       src: pexels(33664383),

@@ -1,3 +1,4 @@
+import { Clock, Mail, MapPin, Phone } from 'lucide-react';
 import Image from 'next/image';
 import { IMAGE_BLUR_DATA_URL } from '@/lib/image-placeholder';
 import Link from 'next/link';
@@ -12,7 +13,7 @@ import { bookingHref } from '@/lib/catalogue';
 export const metadata: Metadata = {
   title: 'Hairstyle by Patricia — Coiffures texturées, tresses, vanilles et locs à Dakar',
   description:
-    'Salon de coiffure spécialisé en tresses, vanilles et locs. Diagnostic capillaire sur mesure et réservation en ligne. Dakar, Sénégal.',
+    'Coiffure à domicile spécialisée en tresses, vanilles et locs. Diagnostic capillaire sur mesure et réservation en ligne. Dakar, Sénégal.',
   alternates: { canonical: '/' },
   openGraph: {
     title: 'Hairstyle by Patricia — Sublimez vos cheveux avec Patricia',
@@ -112,7 +113,7 @@ export default async function HomePage() {
           <div className="md:w-1/2 flex justify-center">
             <Image
               src="https://images.pexels.com/photos/33664383/pexels-photo-33664383.jpeg?auto=compress&cs=tinysrgb&w=900"
-              alt="Coiffure tressée réalisée en salon (photo de démonstration)"
+              alt="Coiffure tressée réalisée à domicile (photo de démonstration)"
               className="rounded-xl shadow-lift"
               width={600}
               height={600}
@@ -269,23 +270,23 @@ export default async function HomePage() {
           </div>
           <div className="space-y-4">
             <p className="flex items-start gap-3 text-fg">
-              <span className="text-accent font-bold">📍</span>
+              <MapPin aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-accent" />
               <span>
-                Salon Hairstyle by Patricia
+                Hairstyle by Patricia
                 <br />
                 Dakar, Sénégal
               </span>
             </p>
             <p className="flex items-start gap-3 text-fg">
-              <span className="text-accent font-bold">📞</span>
+              <Phone aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-accent" />
               <span>01 23 45 67 89</span>
             </p>
             <p className="flex items-start gap-3 text-fg">
-              <span className="text-accent font-bold">✉️</span>
+              <Mail aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-accent" />
               <span>contact@hairstylebypati.fr</span>
             </p>
             <p className="flex items-start gap-3 text-fg">
-              <span className="text-accent font-bold">🕒</span>
+              <Clock aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-accent" />
               <span>Mardi – Samedi : 10h – 19h</span>
             </p>
           </div>

@@ -24,11 +24,6 @@ export function Footer() {
               </Link>
             </li>
             <li>
-              <Link href="/salon" className="opacity-80 hover:opacity-100 hover:underline">
-                Le salon
-              </Link>
-            </li>
-            <li>
               <Link href="/faq" className="opacity-80 hover:opacity-100 hover:underline">
                 FAQ
               </Link>

@@ -46,7 +46,7 @@
 
 ## Page 404
 
-- Plein écran, sans carte englobante (`src/app/not-found.tsx`).
+- Plein écran (`fixed inset-0`), sans scroll, sans carte englobante (`src/app/not-found.tsx`). Même fond (dégradé) derrière la navbar que derrière le 404.
 
 ## Consignes par interface
 
@@ -58,3 +58,4 @@
 - animation des etats de chargements
 - evite les hovers scale sur les cards et boutons
 - Global : navbar flottante verre. Page 404 : `src/app/not-found.tsx` (dégradé + verre).
+- Contenu : Patricia coiffe **à domicile** (pas de salon). Aucune page/lien/texte « salon » ; page `/salon` supprimée.

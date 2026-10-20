@@ -34,7 +34,7 @@ export default async function AvisTokenPage({ params }: { params: Promise<{ toke
           </Title>
           <p className="mt-3 text-muted">
             {review.status === 'PENDING'
-              ? 'Ce lien d’avis a expiré. Contactez le salon si vous souhaitez tout de même laisser un avis.'
+              ? 'Ce lien d’avis a expiré. Contactez Patricia si vous souhaitez tout de même laisser un avis.'
               : 'Merci, votre avis a déjà été transmis.'}
           </p>
         </div>

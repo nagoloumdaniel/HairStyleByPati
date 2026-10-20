@@ -9,10 +9,13 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <main className="bg-gradient-soft flex min-h-[calc(100svh-6rem)] w-full flex-col items-center justify-center px-6 py-16 text-center">
+    <main
+      data-fullscreen
+      className="bg-gradient-soft fixed inset-0 z-30 flex flex-col items-center justify-center overflow-hidden px-6 pb-6 pt-24 text-center"
+    >
       <p
         aria-hidden="true"
-        className="text-gradient-primary font-heading text-[clamp(7rem,32vw,20rem)] font-black italic leading-none"
+        className="text-gradient-primary font-heading text-[clamp(5rem,min(28vw,28svh),16rem)] font-black italic leading-none"
       >
         404
       </p>
@@ -21,9 +24,9 @@ export default function NotFound() {
       </Title>
       <p className="mt-4 max-w-md text-lg text-muted">
         Cette page n’existe pas ou n’est plus disponible. Le catalogue reste accessible pour
-        découvrir les prestations du salon.
+        découvrir les prestations de Patricia.
       </p>
-      <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <Link
           href="/coiffures"
           className="bg-gradient-primary inline-flex items-center justify-center rounded-full px-8 py-3.5 font-bold text-accent-fg shadow-soft transition hover:brightness-110 active:scale-[0.98]"

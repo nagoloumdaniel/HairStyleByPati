@@ -1,5 +1,6 @@
 'use client';
 
+import { ArrowDown, ArrowUp, ImageOff } from 'lucide-react';
 import { useActionState, useEffect, useRef, useState } from 'react';
 import type { AdminServiceImage } from '@/lib/catalogue-admin';
 import { Badge } from '@/components/ui/Badge';
@@ -143,7 +144,11 @@ function ReorderImageForm({
         aria-hidden="true"
         className="inline-flex size-8 items-center justify-center rounded-[var(--radius-sm)] border border-line text-muted/40"
       >
-        {direction === -1 ? '↑' : '↓'}
+        {direction === -1 ? (
+          <ArrowUp aria-hidden="true" className="size-4" />
+        ) : (
+          <ArrowDown aria-hidden="true" className="size-4" />
+        )}
       </span>
     );
   }
@@ -167,7 +172,11 @@ function ReorderImageForm({
         aria-label={`${direction === -1 ? 'Monter' : 'Descendre'} la photo`}
         title={direction === -1 ? 'Monter' : 'Descendre'}
       >
-        {direction === -1 ? '↑' : '↓'}
+        {direction === -1 ? (
+          <ArrowUp aria-hidden="true" className="size-4" />
+        ) : (
+          <ArrowDown aria-hidden="true" className="size-4" />
+        )}
       </Button>
       {state.error ? (
         <span role="alert" className="text-xs text-alert">
@@ -254,9 +263,7 @@ function ImageCard({
           />
         ) : (
           <div className="flex size-full flex-col items-center justify-center gap-1 p-3 text-center text-xs text-muted">
-            <span aria-hidden="true" className="text-2xl">
-              🖼
-            </span>
+            <ImageOff aria-hidden="true" className="size-6" />
             Aperçu indisponible (stockage non configuré ou URL expirée).
           </div>
         )}

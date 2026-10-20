@@ -1,5 +1,6 @@
 'use client';
 
+import { ArrowRight } from 'lucide-react';
 import { useActionState, useEffect, useState } from 'react';
 import {
   adminCreateBlockedPeriod,
@@ -306,7 +307,9 @@ export function BlockedPeriodsEditor({ periods }: { periods: BlockedPeriodView[]
             >
               <div className="text-sm">
                 <p className="font-semibold">
-                  <LocalDateTime iso={period.startsAt} /> → <LocalDateTime iso={period.endsAt} />
+                  <LocalDateTime iso={period.startsAt} />{' '}
+                  <ArrowRight aria-hidden="true" className="inline size-4" />{' '}
+                  <LocalDateTime iso={period.endsAt} />
                 </p>
                 <p className="text-muted">
                   {period.reason || 'Sans motif'}

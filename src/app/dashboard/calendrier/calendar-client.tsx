@@ -1,5 +1,6 @@
 'use client';
 
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useActionState, useEffect, useRef, useState } from 'react';
 import type { AppointmentStatus } from '@prisma/client';
@@ -146,7 +147,7 @@ export function CalendarClient() {
             aria-label="Période précédente"
             onClick={() => go(-1)}
           >
-            ←
+            <ArrowLeft aria-hidden="true" className="size-4" />
           </Button>
           <Button
             type="button"
@@ -155,7 +156,7 @@ export function CalendarClient() {
             aria-label="Période suivante"
             onClick={() => go(1)}
           >
-            →
+            <ArrowRight aria-hidden="true" className="size-4" />
           </Button>
           <p className="ml-2 font-heading text-lg font-bold text-fg">
             {view === 'month'

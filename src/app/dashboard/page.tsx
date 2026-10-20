@@ -1,3 +1,4 @@
+import { ArrowRight } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -72,7 +73,7 @@ export default async function DashboardPage() {
         <div>
           <h1 className="text-3xl font-semibold">Bonjour {user.name}</h1>
           <p className="mt-1 text-ink-soft">
-            Vue d’ensemble du salon, des rendez-vous et des demandes en cours.
+            Vue d’ensemble de l’activité, des rendez-vous et des demandes en cours.
           </p>
         </div>
         <form action={logout}>
@@ -184,7 +185,8 @@ export default async function DashboardPage() {
               {overview.nextBlocked.map((block) => (
                 <li key={block.id} className="py-2 text-sm">
                   <p className="font-semibold text-fg">
-                    <LocalDateTime iso={block.startsAt.toISOString()} /> →{' '}
+                    <LocalDateTime iso={block.startsAt.toISOString()} />{' '}
+                    <ArrowRight aria-hidden="true" className="inline size-4" />{' '}
                     <LocalDateTime iso={block.endsAt.toISOString()} />
                   </p>
                   <p className="text-xs text-ink-soft">{block.reason ?? 'Sans motif'}</p>

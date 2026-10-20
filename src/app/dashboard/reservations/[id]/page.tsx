@@ -25,7 +25,7 @@ const ACTION_LABELS: Record<string, string> = {
   'appointment.confirmed': 'Rendez-vous confirmé',
   'appointment.completed': 'Rendez-vous terminé',
   'appointment.no_show': 'Cliente absente',
-  'appointment.cancel_admin': 'Annulation par le salon',
+  'appointment.cancel_admin': 'Annulation par Patricia',
   'appointment.cancel_customer': 'Annulation par la cliente',
   'appointment.reschedule': 'Reprogrammation',
   'appointment.auto_expire': 'Libération automatique du créneau',

@@ -285,7 +285,7 @@ function renderAppointment(
         subject: 'Votre rendez-vous est annulé',
         html: layout({
           title: 'Votre rendez-vous est annulé',
-          intro: `Bonjour ${customer}, votre rendez-vous pour ${service} a été annulé${key === 'booking_cancelled_admin' ? ' par le salon' : ''}.`,
+          intro: `Bonjour ${customer}, votre rendez-vous pour ${service} a été annulé${key === 'booking_cancelled_admin' ? ' par Patricia' : ''}.`,
           rows,
           paragraphs: [
             'Le créneau a été libéré. Vous pouvez réserver un nouveau rendez-vous depuis le site.',

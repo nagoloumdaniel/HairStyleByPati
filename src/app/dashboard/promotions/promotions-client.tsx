@@ -1,5 +1,6 @@
 'use client';
 
+import { ArrowRight } from 'lucide-react';
 import { useActionState, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -181,7 +182,8 @@ export function PromotionsClient({
                   </p>
                   <p className="text-sm text-muted">
                     {formatValue(promotion.kind, promotion.value)} ·{' '}
-                    <LocalDateTime iso={promotion.startsAt.toISOString()} /> →{' '}
+                    <LocalDateTime iso={promotion.startsAt.toISOString()} />{' '}
+                    <ArrowRight aria-hidden="true" className="inline size-4" />{' '}
                     <LocalDateTime iso={promotion.endsAt.toISOString()} />
                   </p>
                   <p className="mt-1 text-xs text-muted">

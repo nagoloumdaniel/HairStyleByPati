@@ -30,7 +30,7 @@ export function SalonProfileForm({
     <form action={formAction} className="space-y-5">
       <div className="grid gap-4 sm:grid-cols-2">
         <Input
-          label="Nom du salon"
+          label="Nom de l’entreprise"
           name="name"
           defaultValue={settings.name}
           required

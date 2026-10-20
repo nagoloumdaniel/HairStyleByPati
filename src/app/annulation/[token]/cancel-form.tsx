@@ -35,7 +35,7 @@ export function CancelForm({ token, reasonRequired }: { token: string; reasonReq
         name="reason"
         required={reasonRequired}
         rows={3}
-        hint="Ce motif aide Patricia à mieux organiser le salon."
+        hint="Ce motif aide Patricia à mieux organiser ses rendez-vous."
       />
       {state.error ? (
         <p
@@ -53,7 +53,7 @@ export function CancelForm({ token, reasonRequired }: { token: string; reasonReq
           href="/contact"
           className="inline-flex items-center rounded-[var(--radius-md)] border border-line bg-card px-5 py-2.5 text-sm font-semibold text-fg transition hover:border-cacao"
         >
-          Contacter le salon
+          Contacter Patricia
         </a>
       </div>
     </form>

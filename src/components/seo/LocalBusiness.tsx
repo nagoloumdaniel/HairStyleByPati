@@ -1,6 +1,6 @@
 /**
- * P3.8 — Données structurées LocalBusiness (JSON-LD) pour le salon.
- * Aide les moteurs de recherche à afficher les infos du salon (nom, adresse,
+ * P3.8 — Données structurées LocalBusiness (JSON-LD) pour Patricia.
+ * Aide les moteurs de recherche à afficher les infos de l’activité (nom, adresse,
  * horaires, téléphone) dans les résultats enrichis.
  */
 

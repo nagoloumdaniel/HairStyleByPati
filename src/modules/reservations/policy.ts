@@ -23,7 +23,7 @@ export function evaluateCancellationPolicy(input: {
     return {
       allowed: false,
       hoursBefore,
-      message: 'Ce rendez-vous est déjà passé. Contactez le salon si vous avez besoin d’aide.',
+      message: 'Ce rendez-vous est déjà passé. Contactez Patricia si vous avez besoin d’aide.',
     };
   }
 
@@ -31,7 +31,7 @@ export function evaluateCancellationPolicy(input: {
     return {
       allowed: false,
       hoursBefore,
-      message: `L’annulation en ligne est fermée à moins de ${notice} h du rendez-vous. Contactez le salon pour toute modification.`,
+      message: `L’annulation en ligne est fermée à moins de ${notice} h du rendez-vous. Contactez Patricia pour toute modification.`,
     };
   }
 

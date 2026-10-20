@@ -1,5 +1,6 @@
 'use client';
 
+import { Check } from 'lucide-react';
 import Link from 'next/link';
 import { useActionState, useEffect, useRef, useState } from 'react';
 import type { BookableService } from '@/modules/reservations/queries';
@@ -241,7 +242,7 @@ export function BookingWizard({
               }`}
             >
               <span aria-hidden="true" className="font-bold">
-                {stepNumber > number ? '✓' : number}
+                {stepNumber > number ? <Check aria-hidden="true" className="size-4" /> : number}
               </span>
               {label}
             </li>

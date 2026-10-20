@@ -7,7 +7,7 @@ import { Title } from '@/components/ui/Title';
 export const metadata: Metadata = {
   title: 'Contact',
   description:
-    'Contactez le salon Hairstyle by Patricia : questions, réservation, informations pratiques. Réponse rapide.',
+    'Contactez Patricia Hairstyle by Patricia : questions, réservation, informations pratiques. Réponse rapide.',
   alternates: { canonical: '/contact' },
 };
 
@@ -50,7 +50,7 @@ export default function ContactPage() {
           Retrouvez-nous aussi
         </Title>
         <p className="mx-auto mt-3 max-w-md text-muted">
-          Salon Hairstyle by Patricia – coiffures texturées, tresses, vanilles, locs et coiffures
+          Hairstyle by Patricia – coiffures texturées, tresses, vanilles, locs et coiffures
           protectrices.
         </p>
         <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">

@@ -1,5 +1,6 @@
 'use client';
 
+import { ArrowDown, ArrowUp } from 'lucide-react';
 import { useActionState, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -210,7 +211,11 @@ function ReorderButton({
         aria-hidden="true"
         className="inline-flex size-8 items-center justify-center rounded-[var(--radius-sm)] border border-line text-muted/40"
       >
-        {direction === -1 ? '↑' : '↓'}
+        {direction === -1 ? (
+          <ArrowUp aria-hidden="true" className="size-4" />
+        ) : (
+          <ArrowDown aria-hidden="true" className="size-4" />
+        )}
       </span>
     );
   }
@@ -233,7 +238,13 @@ function ReorderButton({
         aria-label={`${direction === -1 ? 'Monter' : 'Descendre'} ${current.name}`}
         title={direction === -1 ? 'Monter' : 'Descendre'}
       >
-        {pending ? '…' : direction === -1 ? '↑' : '↓'}
+        {pending ? (
+          '…'
+        ) : direction === -1 ? (
+          <ArrowUp aria-hidden="true" className="size-4" />
+        ) : (
+          <ArrowDown aria-hidden="true" className="size-4" />
+        )}
       </Button>
       {state.error ? (
         <span role="alert" className="text-xs text-alert">

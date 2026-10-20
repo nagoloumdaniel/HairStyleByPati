@@ -6,7 +6,7 @@ import { Title } from '@/components/ui/Title';
 export const metadata: Metadata = {
   title: 'Politique de confidentialité RGPD',
   description:
-    'Politique de confidentialité du salon Hairstyle by Patricia : données collectées, finalités, conservation, droits et cookies.',
+    'Politique de confidentialité de Hairstyle by Patricia : données collectées, finalités, conservation, droits et cookies.',
   alternates: { canonical: '/confidentialite' },
 };
 
@@ -55,8 +55,8 @@ export default async function ConfidentialitePage() {
           1. Responsable du traitement
         </Title>
         <p className="text-muted leading-relaxed">
-          Le salon Hairstyle by Patricia (Patricia, gérante) est responsable du traitement des
-          données personnelles collectées sur ce site. Contact :{' '}
+          Hairstyle by Patricia (Patricia, gérante) est responsable du traitement des données
+          personnelles collectées sur ce site. Contact :{' '}
           <a href={`mailto:${contactEmail}`} className="text-cacao underline">
             {contactEmail}
           </a>
@@ -110,7 +110,7 @@ export default async function ConfidentialitePage() {
             </tr>
             <tr>
               <td className="py-3">Protéger le formulaire contre les spams</td>
-              <td className="py-3">Intérêt légitime du salon</td>
+              <td className="py-3">Intérêt légitime de Patricia</td>
             </tr>
             <tr>
               <td className="py-3">Évaluer la compatibilité capillaire</td>
@@ -213,7 +213,7 @@ export default async function ConfidentialitePage() {
           8. Sécurité
         </Title>
         <p className="text-muted leading-relaxed">
-          Le salon met en œuvre des mesures de sécurité adaptées pour protéger vos données contre
+          Patricia met en œuvre des mesures de sécurité adaptées pour protéger vos données contre
           toute destruction, perte, altération ou accès non autorisé : authentification protégée
           côté serveur pour le dashboard, mots de passe hashés, requêtes minimales et validation des
           entrées côté serveur.

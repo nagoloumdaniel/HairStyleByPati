@@ -10,7 +10,7 @@ import { logAudit } from '@/modules/stats/audit';
 export type SalonProfileState = { success?: string; error?: string };
 
 const profileSchema = z.object({
-  name: z.string().trim().min(2, 'Nom du salon requis.').max(120),
+  name: z.string().trim().min(2, 'Nom de l’entreprise requis.').max(120),
   contactEmail: z.string().trim().email('E-mail invalide.').max(200).optional().or(z.literal('')),
   phone: z.string().trim().max(30).optional().default(''),
   address: z.string().trim().max(300).optional().default(''),
@@ -88,7 +88,7 @@ export async function adminSaveSalonProfile(
     revalidateTag('salon-settings');
     revalidatePath('/dashboard/parametres');
     revalidatePath('/dashboard', 'layout');
-    return { success: 'Identité et paramètres du salon enregistrés.' };
+    return { success: 'Identité et paramètres enregistrés.' };
   } catch (error) {
     return handleError(error);
   }

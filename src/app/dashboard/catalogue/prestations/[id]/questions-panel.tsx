@@ -1,5 +1,6 @@
 'use client';
 
+import { ArrowDown, ArrowUp } from 'lucide-react';
 import { useActionState, useEffect, useRef, useState } from 'react';
 import type { AdminQuestion } from '@/lib/catalogue-admin';
 import { Badge } from '@/components/ui/Badge';
@@ -252,7 +253,11 @@ function ReorderQuestionButton({
         aria-hidden="true"
         className="inline-flex size-8 items-center justify-center rounded-[var(--radius-sm)] border border-line text-muted/40"
       >
-        {direction === -1 ? '↑' : '↓'}
+        {direction === -1 ? (
+          <ArrowUp aria-hidden="true" className="size-4" />
+        ) : (
+          <ArrowDown aria-hidden="true" className="size-4" />
+        )}
       </span>
     );
   }
@@ -273,7 +278,11 @@ function ReorderQuestionButton({
         aria-label={`${direction === -1 ? 'Monter' : 'Descendre'} la question`}
         title={direction === -1 ? 'Monter' : 'Descendre'}
       >
-        {direction === -1 ? '↑' : '↓'}
+        {direction === -1 ? (
+          <ArrowUp aria-hidden="true" className="size-4" />
+        ) : (
+          <ArrowDown aria-hidden="true" className="size-4" />
+        )}
       </Button>
       {state.error ? (
         <span role="alert" className="text-xs text-alert">

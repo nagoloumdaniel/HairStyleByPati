@@ -37,13 +37,13 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
         <div className="rounded-[var(--radius-lg)] border border-alert bg-alert-soft p-8 text-center">
           <h1 className="font-heading text-2xl font-bold text-alert">Lien d’annulation invalide</h1>
           <p className="mt-3 text-fg">
-            Ce lien ne correspond à aucun rendez-vous. Vérifiez le lien reçu ou contactez le salon.
+            Ce lien ne correspond à aucun rendez-vous. Vérifiez le lien reçu ou contactez Patricia.
           </p>
           <Link
             href="/contact"
             className="mt-6 inline-flex rounded-[var(--radius-md)] bg-accent px-5 py-2.5 font-semibold text-accent-fg"
           >
-            Contacter le salon
+            Contacter Patricia
           </Link>
         </div>
       </main>
@@ -128,7 +128,7 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
         <section className="rounded-[var(--radius-lg)] border border-alert bg-alert-soft p-6">
           <h2 className="font-heading text-xl font-bold text-alert">Lien expiré</h2>
           <p className="mt-2 text-fg">
-            Ce lien d’annulation n’est plus valide. Contactez le salon pour toute modification.
+            Ce lien d’annulation n’est plus valide. Contactez Patricia pour toute modification.
           </p>
         </section>
       ) : !active ? (
@@ -151,7 +151,7 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
             href="/contact"
             className="mt-5 inline-flex rounded-[var(--radius-md)] bg-accent px-5 py-2.5 font-semibold text-accent-fg"
           >
-            Contacter le salon
+            Contacter Patricia
           </Link>
         </section>
       ) : (

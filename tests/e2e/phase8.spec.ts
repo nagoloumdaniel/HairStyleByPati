@@ -331,7 +331,7 @@ test.describe('Demandes personnalisées, clientes et pilotage', () => {
     test.skip(ADMIN_EMAIL === '' || ADMIN_PASSWORD === '', 'Identifiants admin absents.');
     await login(page, '/dashboard/parametres');
     await page.goto('/dashboard/parametres');
-    await page.getByLabel('Nom du salon').fill(`Salon E2E ${stamp}`);
+    await page.getByLabel('Nom de l’entreprise').fill(`Salon E2E ${stamp}`);
     await page.getByLabel('E-mail public').fill(`${prefix}-salon@example.com`);
     await page.getByLabel('Téléphone', { exact: true }).fill('01 23 45 67 89');
     await page.getByLabel('Adresse').fill('12 rue de Test, Dakar');
@@ -339,7 +339,7 @@ test.describe('Demandes personnalisées, clientes et pilotage', () => {
     await page.getByLabel('Règles de réservation affichées').fill('Paiement sur place.');
     await page.getByLabel('Signature des e-mails').fill('À bientôt, Patricia');
     await page.getByRole('button', { name: 'Enregistrer l’identité' }).click();
-    await expect(page.getByText('Identité et paramètres du salon enregistrés.')).toBeVisible();
+    await expect(page.getByText('Identité et paramètres enregistrés.')).toBeVisible();
 
     const settings = await db.salonSettings.findUnique({ where: { id: 1 } });
     expect(settings.name).toBe(`Salon E2E ${stamp}`);

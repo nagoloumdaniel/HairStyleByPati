@@ -375,3 +375,8 @@ html[data-theme='dark'] {
   inset: 0;
   z-index: 1;
 }
+
+/* Page plein écran (404) : pas de défilement, le fond couvre aussi derrière la navbar. */
+body:has([data-fullscreen]) {
+  overflow: hidden;
+}

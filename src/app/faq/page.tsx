@@ -6,7 +6,7 @@ import { Title } from '@/components/ui/Title';
 export const metadata: Metadata = {
   title: 'FAQ',
   description:
-    "Questions fréquentes sur les prestations, la réservation, l'annulation et les cheveux au salon Hairstyle by Patricia.",
+    "Questions fréquentes sur les prestations, la réservation, l'annulation et les cheveux avec Hairstyle by Patricia.",
   alternates: { canonical: '/faq' },
 };
 
@@ -27,7 +27,7 @@ const faqItems = [
     id: 'cheveux',
     title: 'Quels types de cheveux accueillez-vous ?',
     content:
-      'Le salon est spécialisé dans les cheveux texturés : tresses, vanilles, locs, départ de locs, coiffures protectrices et coupes. Chaque prestation est adaptée à votre nature de cheveux après un diagnostic capillaire.',
+      'Patricia est spécialisée dans les cheveux texturés : tresses, vanilles, locs, départ de locs, coiffures protectrices et coupes. Chaque prestation est adaptée à votre nature de cheveux après un diagnostic capillaire.',
   },
   {
     id: 'preparation',
@@ -39,7 +39,7 @@ const faqItems = [
     id: 'duree',
     title: 'Combien de temps dure une prestation ?',
     content:
-      'La durée dépend de la coiffure et de votre longueur de cheveux. Chaque fiche du catalogue indique une durée indicative ; la durée réelle est confirmée lors du diagnostic au salon.',
+      'La durée dépend de la coiffure et de votre longueur de cheveux. Chaque fiche du catalogue indique une durée indicative ; la durée réelle est confirmée lors du diagnostic à votre domicile.',
   },
   {
     id: 'prix',
@@ -51,7 +51,7 @@ const faqItems = [
     id: 'annulation',
     title: 'Quelle est la politique d’annulation ?',
     content:
-      'Vous pouvez annuler ou déplacer votre rendez-vous gratuitement jusqu’à 24 heures avant l’heure convenue, via le lien sécurisé reçu par e-mail. Passé ce délai ou en cas d’absence, le salon applique les conditions détaillées dans les informations pratiques.',
+      'Vous pouvez annuler ou déplacer votre rendez-vous gratuitement jusqu’à 24 heures avant l’heure convenue, via le lien sécurisé reçu par e-mail. Passé ce délai ou en cas d’absence, Patricia applique les conditions détaillées dans les informations pratiques.',
   },
   {
     id: 'options',

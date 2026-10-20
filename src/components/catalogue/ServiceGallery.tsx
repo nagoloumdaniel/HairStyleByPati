@@ -1,5 +1,6 @@
 'use client';
 
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import { IMAGE_BLUR_DATA_URL } from '@/lib/image-placeholder';
 import { useState } from 'react';
@@ -68,7 +69,7 @@ export function ServiceGallery({
               aria-label="Photo précédente"
               className="absolute left-3 top-1/2 inline-flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-card/85 text-fg shadow-soft backdrop-blur transition hover:bg-card focus-visible:ring-2 focus-visible:ring-accent"
             >
-              <span aria-hidden="true">←</span>
+              <ArrowLeft aria-hidden="true" className="size-4" />
             </button>
             <button
               type="button"
@@ -76,7 +77,7 @@ export function ServiceGallery({
               aria-label="Photo suivante"
               className="absolute right-3 top-1/2 inline-flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-card/85 text-fg shadow-soft backdrop-blur transition hover:bg-card focus-visible:ring-2 focus-visible:ring-accent"
             >
-              <span aria-hidden="true">→</span>
+              <ArrowRight aria-hidden="true" className="size-4" />
             </button>
             <p
               aria-live="polite"

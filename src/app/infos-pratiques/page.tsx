@@ -1,3 +1,4 @@
+import { Check } from 'lucide-react';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { Title } from '@/components/ui/Title';
@@ -5,7 +6,7 @@ import { Title } from '@/components/ui/Title';
 export const metadata: Metadata = {
   title: 'Informations pratiques',
   description:
-    "Horaires, préparation du rendez-vous et politique d'annulation du salon Hairstyle by Patricia.",
+    "Horaires, préparation du rendez-vous et politique d'annulation de Hairstyle by Patricia.",
   alternates: { canonical: '/infos-pratiques' },
 };
 
@@ -30,10 +31,10 @@ const annulationRules = [
   {
     label: 'Absence',
     description:
-      'En cas d’absence sans préavis, le salon se réserve le droit de demander un acompte pour toute réservation ultérieure.',
+      'En cas d’absence sans préavis, Patricia se réserve le droit de demander un acompte pour toute réservation ultérieure.',
   },
   {
-    label: 'Annulation par le salon',
+    label: 'Annulation par Patricia',
     description:
       'Si Patricia doit annuler pour un motif personnel (maladie, urgence), vous serez contactée sans délai et un nouveau rendez-vous vous sera proposé en priorité, sans frais.',
   },
@@ -117,9 +118,7 @@ export default function InfosPratiquesPage() {
         <ul className="max-w-3xl space-y-3">
           {preparation.map((item) => (
             <li key={item} className="flex items-start gap-3 text-muted">
-              <span aria-hidden="true" className="mt-1 font-bold text-accent">
-                ✓
-              </span>
+              <Check aria-hidden="true" className="mt-1 size-4 shrink-0 text-accent" />
               <span>{item}</span>
             </li>
           ))}

@@ -1,4 +1,6 @@
-﻿'use client';
+'use client';
+
+import { Check } from 'lucide-react';
 
 import Link from 'next/link';
 import { useActionState, useEffect, useRef, useState } from 'react';
@@ -251,7 +253,7 @@ export function CompatibilityWizard({
             }`}
           >
             <span aria-hidden="true" className="font-bold">
-              {step > item.number ? '✓' : item.number}
+              {step > item.number ? <Check aria-hidden="true" className="size-4" /> : item.number}
             </span>
             {item.label}
           </li>
