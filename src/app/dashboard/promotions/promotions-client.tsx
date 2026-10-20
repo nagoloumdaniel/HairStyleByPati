@@ -26,7 +26,7 @@ type PromotionRow = {
 function formatValue(kind: 'PERCENT' | 'FIXED', value: number): string {
   return kind === 'PERCENT'
     ? `-${value} %`
-    : `-${new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(value / 100)}`;
+    : `-${new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'XOF' }).format(value / 100)}`;
 }
 
 function NewPromotionForm({ services }: { services: { id: string; name: string }[] }) {
@@ -67,7 +67,7 @@ function NewPromotionForm({ services }: { services: { id: string; name: string }
         </div>
         <div className="max-w-40">
           <Input
-            label={kind === 'PERCENT' ? 'Pourcentage (1-100)' : 'Montant (€)'}
+            label={kind === 'PERCENT' ? 'Pourcentage (1-100)' : 'Montant (FCFA)'}
             name="value"
             type="number"
             min={0}

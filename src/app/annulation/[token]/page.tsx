@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 
 const euroFormatter = new Intl.NumberFormat('fr-FR', {
   style: 'currency',
-  currency: 'EUR',
+  currency: 'XOF',
   minimumFractionDigits: 0,
   maximumFractionDigits: 2,
 });

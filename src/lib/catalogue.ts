@@ -331,9 +331,9 @@ export function serviceImage(service: Pick<CatalogueService, 'slug' | 'images' |
 
 const euroFormatter = new Intl.NumberFormat('fr-FR', {
   style: 'currency',
-  currency: 'EUR',
+  currency: 'XOF',
   minimumFractionDigits: 0,
-  maximumFractionDigits: 2,
+  maximumFractionDigits: 0,
 });
 
 function formatEuros(cents: number): string {

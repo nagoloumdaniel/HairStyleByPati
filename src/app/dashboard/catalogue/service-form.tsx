@@ -132,7 +132,7 @@ export function ServiceForm({
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
             <Input
-              label={priceMode === 'RANGE' ? 'Prix minimum (€)' : 'Prix (€)'}
+              label={priceMode === 'RANGE' ? 'Prix minimum (FCFA)' : 'Prix (FCFA)'}
               name="priceFromEuros"
               type="number"
               min={0}
@@ -143,7 +143,7 @@ export function ServiceForm({
             />
             {priceMode === 'RANGE' ? (
               <Input
-                label="Prix maximum (€)"
+                label="Prix maximum (FCFA)"
                 name="priceToEuros"
                 type="number"
                 min={0}

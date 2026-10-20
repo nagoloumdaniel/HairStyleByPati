@@ -5,27 +5,27 @@ import { deviceTimeToUtc } from '@/lib/dates';
  * P8.5 / P8.6 : indicateurs du tableau de bord.
  * Définitions :
  * - rendez-vous du jour : créneaux dont le début est dans la journée
- *   locale Europe/Paris ;
+ *   locale Africa/Dakar ;
  * - revenus estimés : somme des prix figés des rendez-vous terminés ;
  * - annulations récentes : annulations client ou admin sur 7 jours ;
  * - taux de remplissage : non calculé dans cette version, voir ROADMAP.
  * ============================================================ */
 
-const PARIS = 'Europe/Paris';
+const SALON_TZ = 'Africa/Dakar';
 const ACTIVE_STATUSES = ['PENDING', 'CONFIRMED', 'RESCHEDULED'] as const;
 
 function parisDateISO(date: Date): string {
   return new Intl.DateTimeFormat('en-CA', {
-    timeZone: PARIS,
+    timeZone: SALON_TZ,
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
   }).format(date);
 }
 
-export function parisDayBounds(now = new Date()): { start: Date; end: Date } {
+export function salonDayBounds(now = new Date()): { start: Date; end: Date } {
   const dateISO = parisDateISO(now);
-  const start = deviceTimeToUtc(dateISO, 0, PARIS);
+  const start = deviceTimeToUtc(dateISO, 0, SALON_TZ);
   const end = new Date(start.getTime() + 24 * 3_600_000);
   return { start, end };
 }
@@ -58,7 +58,7 @@ export interface DashboardOverview {
 }
 
 export async function getDashboardOverview(now = new Date()): Promise<DashboardOverview> {
-  const { start, end } = parisDayBounds(now);
+  const { start, end } = salonDayBounds(now);
   const weekAgo = new Date(now.getTime() - 7 * 24 * 3_600_000);
 
   const [

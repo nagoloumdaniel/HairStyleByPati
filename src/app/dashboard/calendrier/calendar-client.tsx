@@ -80,7 +80,7 @@ interface CalendarEntry {
 export function CalendarClient() {
   const [view, setView] = useState<View>('week');
   const [dateISO, setDateISO] = useState('');
-  const [timeZone, setTimeZone] = useState('Europe/Paris');
+  const [timeZone, setTimeZone] = useState('Africa/Dakar');
   const [state, formAction, pending] = useActionState<CalendarState, FormData>(
     loadCalendarData,
     {},
@@ -90,9 +90,9 @@ export function CalendarClient() {
   useEffect(() => {
     setDateISO(isoFromDate(new Date()));
     try {
-      setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Paris');
+      setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone || 'Africa/Dakar');
     } catch {
-      setTimeZone('Europe/Paris');
+      setTimeZone('Africa/Dakar');
     }
   }, []);
 

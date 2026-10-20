@@ -10,9 +10,9 @@ import { PrestationCard } from '@/components/catalogue/PrestationCard';
 import { bookingHref } from '@/lib/catalogue';
 
 export const metadata: Metadata = {
-  title: 'Hairstyle by Patricia — Coiffures texturées, tresses, vanilles et locs à Paris',
+  title: 'Hairstyle by Patricia — Coiffures texturées, tresses, vanilles et locs à Dakar',
   description:
-    'Salon de coiffure spécialisé en tresses, vanilles et locs. Diagnostic capillaire sur mesure et réservation en ligne. Paris 12e.',
+    'Salon de coiffure spécialisé en tresses, vanilles et locs. Diagnostic capillaire sur mesure et réservation en ligne. Dakar, Sénégal.',
   alternates: { canonical: '/' },
   openGraph: {
     title: 'Hairstyle by Patricia — Sublimez vos cheveux avec Patricia',
@@ -27,7 +27,7 @@ const popularServices = [
   {
     title: 'Tresses BOX',
     slug: 'tresses-box',
-    price: 'À partir de 80 €',
+    price: 'À partir de 20 000 FCFA',
     duration: '3h00',
     category: 'Tresses',
     image:
@@ -37,7 +37,7 @@ const popularServices = [
   {
     title: 'Vanilles légères',
     slug: 'vanilles-legeres',
-    price: 'À partir de 60 €',
+    price: 'À partir de 15 000 FCFA',
     duration: '2h30',
     category: 'Vanilles',
     image:
@@ -47,7 +47,7 @@ const popularServices = [
   {
     title: 'Rétissage de locs',
     slug: 'retissage-de-locs',
-    price: 'À partir de 100 €',
+    price: 'À partir de 25 000 FCFA',
     duration: '2h00',
     category: 'Locs',
     image:
@@ -153,7 +153,6 @@ export default async function HomePage() {
               title={service.title}
               price={service.price}
               duration={service.duration}
-              optionsLabel="Sur mesure"
             />
           ))}
         </CardCarousel>
@@ -274,7 +273,7 @@ export default async function HomePage() {
               <span>
                 Salon Hairstyle by Patricia
                 <br />
-                12 Rue de la Coiffure, 75000 Paris
+                Dakar, Sénégal
               </span>
             </p>
             <p className="flex items-start gap-3 text-fg">

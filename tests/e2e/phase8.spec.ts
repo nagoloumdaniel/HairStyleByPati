@@ -257,7 +257,7 @@ test.describe('Demandes personnalisées, clientes et pilotage', () => {
     await expect(page.getByText(subjectDescription)).toBeVisible();
 
     await page.getByLabel('Décision').selectOption('ACCEPTED');
-    await page.getByLabel('Prix estimatif (€, facultatif)').fill('150');
+    await page.getByLabel('Prix estimatif (FCFA, facultatif)').fill('150');
     await page.getByLabel('Prestation existante à proposer (facultatif)').selectOption(serviceId);
     await page.getByLabel('Créneau proposé (facultatif)').fill(`${desiredDateISO()}T10:00`);
     await page
@@ -334,7 +334,7 @@ test.describe('Demandes personnalisées, clientes et pilotage', () => {
     await page.getByLabel('Nom du salon').fill(`Salon E2E ${stamp}`);
     await page.getByLabel('E-mail public').fill(`${prefix}-salon@example.com`);
     await page.getByLabel('Téléphone', { exact: true }).fill('01 23 45 67 89');
-    await page.getByLabel('Adresse').fill('12 rue de Test, 75000 Paris');
+    await page.getByLabel('Adresse').fill('12 rue de Test, Dakar');
     await page.getByLabel('Règles d’annulation affichées').fill('Annulation au moins 24 h avant.');
     await page.getByLabel('Règles de réservation affichées').fill('Paiement sur place.');
     await page.getByLabel('Signature des e-mails').fill('À bientôt, Patricia');
@@ -363,7 +363,7 @@ test.describe('Demandes personnalisées, clientes et pilotage', () => {
     await page.goto('/dashboard/statistiques');
     await expect(page.getByRole('heading', { name: 'Statistiques' })).toBeVisible();
     await expect(page.getByText(/somme des prix figés/)).toBeVisible();
-    await expect(page.getByText(/50,00\s*€/).first()).toBeVisible();
+    await expect(page.getByText(/50[\s  ]*F[\s  ]*CFA/).first()).toBeVisible();
     await page.screenshot({
       path: 'tests/e2e/screenshots/statistiques-desktop.png',
       fullPage: true,

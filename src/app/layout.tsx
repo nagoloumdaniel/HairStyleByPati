@@ -36,12 +36,12 @@ export const metadata: Metadata = {
     locale: 'fr_FR',
     siteName: 'Hairstyle by Patricia',
     title: 'Hairstyle by Patricia',
-    description: 'Tresses, vanilles et locs sur mesure à Paris. Réservez votre créneau en ligne.',
+    description: 'Tresses, vanilles et locs sur mesure à Dakar. Réservez votre créneau en ligne.',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Hairstyle by Patricia',
-    description: 'Tresses, vanilles et locs sur mesure à Paris. Réservez votre créneau en ligne.',
+    description: 'Tresses, vanilles et locs sur mesure à Dakar. Réservez votre créneau en ligne.',
   },
   robots: { index: true, follow: true },
 };

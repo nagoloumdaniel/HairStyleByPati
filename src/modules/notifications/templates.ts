@@ -110,7 +110,7 @@ function formatDate(iso: string | undefined): string {
   return new Intl.DateTimeFormat('fr-FR', {
     dateStyle: 'full',
     timeStyle: 'short',
-    timeZone: 'Europe/Paris',
+    timeZone: 'Africa/Dakar',
   }).format(date);
 }
 
@@ -456,7 +456,7 @@ function renderCustomRequest(
       ? null
       : new Intl.NumberFormat('fr-FR', {
           style: 'currency',
-          currency: 'EUR',
+          currency: 'XOF',
           maximumFractionDigits: 2,
         }).format(payload.estimatedPriceCents / 100);
   const rows: Array<[string, string]> = [];

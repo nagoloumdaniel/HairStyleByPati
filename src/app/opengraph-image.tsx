@@ -45,7 +45,7 @@ export default function OpenGraphImage() {
           Tresses, vanilles et locs sur mesure
         </div>
         <div style={{ fontSize: 30, color: '#5A5224' }}>
-          Réservation en ligne · Paiement sur place · Paris
+          Réservation en ligne · Paiement sur place · Dakar
         </div>
       </div>
       <div

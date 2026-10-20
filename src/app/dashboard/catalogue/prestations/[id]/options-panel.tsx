@@ -21,7 +21,7 @@ import {
 
 const euroFormatter = new Intl.NumberFormat('fr-FR', {
   style: 'currency',
-  currency: 'EUR',
+  currency: 'XOF',
   minimumFractionDigits: 0,
   maximumFractionDigits: 2,
 });
@@ -58,7 +58,7 @@ function OptionForm({
       <Input label="Nom de l'option" name="name" required defaultValue={initial?.name ?? ''} />
       <div className="grid gap-4 sm:grid-cols-2">
         <Input
-          label="Prix (€)"
+          label="Prix (FCFA)"
           name="priceEuros"
           type="number"
           min={0}

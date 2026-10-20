@@ -10,7 +10,7 @@ export type PrestationCardProps = {
   subtitle?: string;
   price: string;
   duration: string;
-  optionsLabel: string;
+  optionsLabel?: string;
   priority?: boolean;
 };
 
@@ -29,7 +29,7 @@ export function PrestationCard({
   priority = false,
 }: PrestationCardProps) {
   return (
-    <article className="prestation-card group relative isolate aspect-[4/5] overflow-hidden rounded-[var(--radius-xl)] bg-line text-[#fff8d8] transition duration-300 focus-within:ring-4 focus-within:ring-accent hover:-translate-y-1">
+    <article className="prestation-card group relative isolate aspect-[4/5] overflow-hidden rounded-[var(--radius-xl)] bg-line text-[#fff8d8] focus-within:ring-4 focus-within:ring-accent">
       <CardImages images={images} priority={priority} />
       <div aria-hidden="true" className="card-blur pointer-events-none absolute inset-0" />
       <div aria-hidden="true" className="card-scrim pointer-events-none absolute inset-0" />
@@ -56,10 +56,12 @@ export function PrestationCard({
             <span className="font-light text-[#fff8d8]/70">Durée : </span>
             <span className="font-bold">{duration}</span>
           </p>
-          <p className="hidden font-light text-[#fff8d8]/70 min-[380px]:block">{optionsLabel}</p>
+          {optionsLabel ? (
+            <p className="hidden font-light text-[#fff8d8]/70 min-[380px]:block">{optionsLabel}</p>
+          ) : null}
           <Link
             href={bookHref}
-            className="relative z-[3] rounded-full bg-[#ffd84d] px-3.5 py-1.5 text-xs font-black text-[#17150b] transition hover:brightness-110 active:scale-95"
+            className="relative z-[3] rounded-full bg-[#ffd84d] px-3.5 py-1.5 text-xs font-black text-[#17150b] transition hover:brightness-110"
           >
             Réserver
           </Link>

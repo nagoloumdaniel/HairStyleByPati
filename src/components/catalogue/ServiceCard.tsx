@@ -26,7 +26,7 @@ export function ServiceCard({
       subtitle={service.description ?? undefined}
       price={formatPrice(service)}
       duration={formatDuration(service.durationMinutes)}
-      optionsLabel={count === 0 ? 'Sur mesure' : count === 1 ? '1 option' : `${count} options`}
+      optionsLabel={count === 0 ? undefined : count === 1 ? '1 option' : `${count} options`}
       priority={priority}
     />
   );

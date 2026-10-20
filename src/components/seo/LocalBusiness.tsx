@@ -10,7 +10,6 @@ export interface LocalBusinessData {
     streetAddress: string;
     addressLocality: string;
     addressRegion: string;
-    postalCode: string;
     addressCountry: string;
   };
   telephone: string;
@@ -23,16 +22,15 @@ export interface LocalBusinessData {
 export const LOCAL_BUSINESS: LocalBusinessData = {
   name: 'Hairstyle by Patricia',
   address: {
-    streetAddress: '12 Rue de la Coiffure',
-    addressLocality: 'Paris',
-    addressRegion: 'Île-de-France',
-    postalCode: '75000',
-    addressCountry: 'FR',
+    streetAddress: 'Dakar',
+    addressLocality: 'Dakar',
+    addressRegion: 'Dakar',
+    addressCountry: 'SN',
   },
-  telephone: '+33123456789',
+  telephone: '+221770000000',
   email: 'contact@hairstylebypati.fr',
-  priceRange: '€€',
-  servesCity: 'Paris',
+  priceRange: 'FCFA',
+  servesCity: 'Dakar',
   openingHours: [
     { dayOfWeek: 'https://schema.org/Tuesday', opens: '10:00', closes: '19:00' },
     { dayOfWeek: 'https://schema.org/Wednesday', opens: '10:00', closes: '19:00' },
@@ -60,7 +58,6 @@ export default function LocalBusiness({ data }: { data: LocalBusinessData }) {
       streetAddress: data.address.streetAddress,
       addressLocality: data.address.addressLocality,
       addressRegion: data.address.addressRegion,
-      postalCode: data.address.postalCode,
       addressCountry: data.address.addressCountry,
     },
     telephone: data.telephone,

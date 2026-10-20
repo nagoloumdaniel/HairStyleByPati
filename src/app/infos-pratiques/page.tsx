@@ -80,7 +80,7 @@ export default function InfosPratiquesPage() {
             <br />
             12 Rue de la Coiffure
             <br />
-            75000 Paris
+            Dakar, Sénégal
           </p>
           <p className="text-muted">
             <span className="font-semibold text-fg">Téléphone</span>

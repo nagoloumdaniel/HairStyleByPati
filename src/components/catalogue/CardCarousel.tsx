@@ -34,7 +34,7 @@ export function CardCarousel({ children, label }: { children: ReactNode; label: 
   }
 
   const arrow =
-    'glass-strong absolute top-1/2 z-10 flex size-12 -translate-y-1/2 items-center justify-center rounded-full text-fg transition hover:scale-105 active:scale-95';
+    'glass-strong absolute top-1/2 z-10 flex size-12 -translate-y-1/2 items-center justify-center rounded-full text-fg transition active:opacity-80';
 
   return (
     <div className="relative">

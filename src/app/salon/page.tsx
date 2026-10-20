@@ -188,7 +188,7 @@ export default function SalonPage() {
             <p className="mt-3 text-muted">
               12 Rue de la Coiffure
               <br />
-              75000 Paris
+              Dakar, Sénégal
             </p>
           </div>
           <div className="flex items-center">

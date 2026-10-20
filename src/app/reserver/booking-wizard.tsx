@@ -44,7 +44,7 @@ const STEPS = [
 
 const euroFormatter = new Intl.NumberFormat('fr-FR', {
   style: 'currency',
-  currency: 'EUR',
+  currency: 'XOF',
   minimumFractionDigits: 0,
   maximumFractionDigits: 2,
 });
@@ -93,7 +93,7 @@ export function BookingWizard({
   const [answers, setAnswers] = useState<Record<string, unknown>>({});
   const [optionIds, setOptionIds] = useState<string[]>([]);
   const [dateISO, setDateISO] = useState('');
-  const [timeZone, setTimeZone] = useState('Europe/Paris');
+  const [timeZone, setTimeZone] = useState('Africa/Dakar');
   const [selectedSlot, setSelectedSlot] = useState<{
     startsAt: string;
     endsAt: string;
@@ -127,9 +127,9 @@ export function BookingWizard({
     now.setDate(now.getDate() + 1);
     setDateISO(localDateISO(now));
     try {
-      setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Paris');
+      setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone || 'Africa/Dakar');
     } catch {
-      setTimeZone('Europe/Paris');
+      setTimeZone('Africa/Dakar');
     }
   }, []);
 

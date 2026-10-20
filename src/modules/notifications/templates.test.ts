@@ -50,12 +50,12 @@ describe('renderNotification', () => {
       requesterEmail: 'amina@example.com',
       description: 'Tresses personnalisées pour un mariage.',
       adminReply: 'Votre projet est réalisable.',
-      estimatedPriceCents: 15000,
+      estimatedPriceCents: 1500000,
       proposedServiceName: 'Tresses BOX',
       proposedSlot: '2026-11-20T09:00:00.000Z',
     });
     expect(rendered?.subject).toContain('demande');
-    expect(rendered?.html).toContain('150,00');
+    expect(rendered?.html).toMatch(/15[\s  ]000/);
     expect(rendered?.html).toContain('Tresses BOX');
     expect(rendered?.html).toContain('/reserver');
   });
