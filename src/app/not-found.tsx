@@ -15,7 +15,7 @@ export default function NotFound() {
     >
       <p
         aria-hidden="true"
-        className="text-gradient-primary font-heading text-[clamp(5rem,min(28vw,28svh),16rem)] font-black italic leading-none"
+        className="text-gradient-primary px-[0.15em] pb-[0.05em] font-heading text-[clamp(5rem,min(28vw,28svh),16rem)] font-black italic leading-none"
       >
         404
       </p>

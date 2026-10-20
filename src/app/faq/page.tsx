@@ -81,13 +81,13 @@ export default function FaqPage() {
       </nav>
 
       <header className="max-w-3xl space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-[0.14em] text-cacao">
+        <p className="hidden text-sm font-semibold uppercase tracking-[0.14em] text-cacao md:block">
           Questions fréquentes
         </p>
         <Title as="h1" size="display" className="">
           Vos questions, nos réponses
         </Title>
-        <p className="text-lg leading-relaxed text-muted">
+        <p className="hidden text-lg leading-relaxed text-muted md:block">
           Réservation, préparation, prix, annulation : retrouvez les réponses aux questions les plus
           courantes. Une question reste sans réponse ? Contactez-nous, nous vous répondrons
           rapidement.

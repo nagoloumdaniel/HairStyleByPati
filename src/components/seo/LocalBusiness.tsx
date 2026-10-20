@@ -30,11 +30,13 @@ export const LOCAL_BUSINESS: LocalBusinessData = {
   priceRange: 'FCFA',
   servesCity: 'Dakar',
   openingHours: [
-    { dayOfWeek: 'https://schema.org/Tuesday', opens: '10:00', closes: '19:00' },
-    { dayOfWeek: 'https://schema.org/Wednesday', opens: '10:00', closes: '19:00' },
-    { dayOfWeek: 'https://schema.org/Thursday', opens: '10:00', closes: '19:00' },
-    { dayOfWeek: 'https://schema.org/Friday', opens: '10:00', closes: '19:00' },
-    { dayOfWeek: 'https://schema.org/Saturday', opens: '10:00', closes: '19:00' },
+    { dayOfWeek: 'https://schema.org/Monday', opens: '05:00', closes: '22:00' },
+    { dayOfWeek: 'https://schema.org/Tuesday', opens: '05:00', closes: '22:00' },
+    { dayOfWeek: 'https://schema.org/Wednesday', opens: '05:00', closes: '22:00' },
+    { dayOfWeek: 'https://schema.org/Thursday', opens: '05:00', closes: '22:00' },
+    { dayOfWeek: 'https://schema.org/Friday', opens: '05:00', closes: '22:00' },
+    { dayOfWeek: 'https://schema.org/Saturday', opens: '05:00', closes: '22:00' },
+    { dayOfWeek: 'https://schema.org/Sunday', opens: '05:00', closes: '22:00' },
   ],
 };
 

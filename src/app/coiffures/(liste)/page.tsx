@@ -58,11 +58,13 @@ export default async function CataloguePage({
       </nav>
 
       <header className="max-w-3xl space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-[0.14em] text-cacao">Catalogue</p>
+        <p className="hidden text-sm font-semibold uppercase tracking-[0.14em] text-cacao md:block">
+          Catalogue
+        </p>
         <Title as="h1" size="display" className="">
           Coiffures et prestations
         </Title>
-        <p className="text-lg leading-relaxed text-muted">
+        <p className="hidden text-lg leading-relaxed text-muted md:block">
           Chaque prestation est réalisée sur mesure par Patricia, selon votre nature de cheveux et
           vos envies. Prix, durée et options sont affichés avant la réservation.
         </p>

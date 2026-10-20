@@ -20,7 +20,7 @@ export default async function ListeAttentePage() {
       <Title as="h1" size="display" className="">
         Liste d’attente
       </Title>
-      <p className="mt-2 text-muted">
+      <p className="mt-2 hidden text-muted md:block">
         Aucun créneau disponible à la date souhaitée ? Laissez vos coordonnées : vous serez prévenue
         par e-mail si ce créneau exact se libère. La confirmation reste à votre initiative, avec une
         nouvelle vérification complète de la disponibilité.

@@ -19,7 +19,7 @@ export default async function GaleriePage() {
       <Title as="h1" size="display" className="">
         Galerie de réalisations
       </Title>
-      <p className="mt-2 max-w-2xl text-muted">
+      <p className="mt-2 hidden max-w-2xl text-muted md:block">
         Un aperçu de réalisations de Patricia, partagées avec l’autorisation explicite des clientes
         concernées.
       </p>

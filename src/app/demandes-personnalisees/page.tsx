@@ -35,11 +35,13 @@ export default function CustomRequestPage() {
       </nav>
 
       <header className="mt-4 max-w-3xl space-y-4">
-        <p className="text-sm font-semibold uppercase tracking-wide text-cacao">Sur mesure</p>
+        <p className="hidden text-sm font-semibold uppercase tracking-wide text-cacao md:block">
+          Sur mesure
+        </p>
         <Title as="h1" size="display" className="">
           Une coiffure qui n’est pas au catalogue ?
         </Title>
-        <p className="text-lg leading-relaxed text-ink-soft">
+        <p className="hidden text-lg leading-relaxed text-ink-soft md:block">
           Décrivez votre projet, ajoutez jusqu’à 3 photos de référence et vos informations
           capillaires. Patricia étudie chaque demande personnellement et vous répond avec une
           proposition adaptée.
