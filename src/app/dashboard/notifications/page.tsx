@@ -1,34 +1,126 @@
-import { Bell } from 'lucide-react';
+import { Bell, ChevronRight } from 'lucide-react';
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/modules/auth/guards';
 import {
+  countUnreadNotifications,
   listAdminNotifications,
   listFailedEmails,
   notificationDeliveryStats,
+  type AdminNotificationView,
 } from '@/modules/notifications/queries';
-import {
-  markAllNotificationsReadForm,
-  markNotificationReadForm,
-  retryNotificationForm,
-} from '@/modules/notifications/actions';
+import { openNotificationForm } from '@/modules/notifications/actions';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { LocalDateTime } from '@/components/shared/LocalDateTime';
 import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { EmptyState } from '@/components/shared/EmptyState';
+import { FilterChips } from '../_inbox/FilterChips';
+import { Pagination } from '../_inbox/Pagination';
+import { RowCard, rowLinkClass } from '../_inbox/RowCard';
+import {
+  NotificationRowActions,
+  NotificationsHeaderActions,
+  RetryEmailButton,
+} from './notification-actions';
 
 export const metadata: Metadata = { title: 'Notifications - Tableau de bord' };
 
-const FILTERS = [
+type Filter = 'all' | 'unread' | 'failed';
+
+const FILTERS: ReadonlyArray<{ value: Filter; label: string }> = [
   { value: 'all', label: 'Notifications' },
   { value: 'unread', label: 'Non lues' },
   { value: 'failed', label: 'Échecs e-mail' },
-] as const;
+];
 
 function first(value: string | string[] | undefined): string {
   return Array.isArray(value) ? (value[0] ?? '') : (value ?? '');
+}
+
+const hrefFor = (filter: Filter, page = 1) => {
+  const query = new URLSearchParams();
+  if (filter !== 'all') query.set('filter', filter);
+  if (page > 1) query.set('page', String(page));
+  const value = query.toString();
+  return value ? `/dashboard/notifications?${value}` : '/dashboard/notifications';
+};
+
+/* Carte d'une alerte : entièrement cliquable vers l'objet lié (ouvre + marque comme lue). */
+function NotificationRow({ notification }: { notification: AdminNotificationView }) {
+  const isInApp = notification.channel === 'IN_APP';
+  const unread = isInApp && !notification.readAt;
+  const failedEmail = notification.channel === 'EMAIL' && notification.status === 'FAILED';
+  const team =
+    notification.templateKey.includes('admin') ||
+    notification.templateKey === 'conversation_reply_sent';
+
+  const title = (
+    <span className={`truncate ${unread ? 'font-bold' : 'font-semibold'} text-fg`}>
+      {notification.title}
+    </span>
+  );
+
+  return (
+    <RowCard
+      highlighted={unread}
+      actions={
+        isInApp ? (
+          <NotificationRowActions id={notification.id} read={!unread} />
+        ) : failedEmail ? (
+          <RetryEmailButton id={notification.id} />
+        ) : null
+      }
+    >
+      <div className="flex items-start gap-2.5">
+        <span
+          aria-hidden="true"
+          className={`mt-2 size-2 shrink-0 rounded-full ${unread ? 'bg-accent' : 'bg-line'}`}
+        />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            {isInApp && notification.link ? (
+              <form action={openNotificationForm} className="min-w-0 flex-1">
+                <input type="hidden" name="id" value={notification.id} />
+                <button type="submit" className={`block max-w-full text-left ${rowLinkClass}`}>
+                  {title}
+                </button>
+              </form>
+            ) : (
+              <p className="min-w-0 flex-1 truncate">{title}</p>
+            )}
+            {isInApp && notification.link ? (
+              <ChevronRight aria-hidden="true" className="size-4 shrink-0 text-muted" />
+            ) : null}
+          </div>
+          {notification.detail ? (
+            <p className="line-clamp-2 text-sm text-muted">{notification.detail}</p>
+          ) : null}
+          {failedEmail ? (
+            <p className="text-sm text-muted">
+              {notification.recipient} · {notification.attempts} tentative
+              {notification.attempts > 1 ? 's' : ''}
+              {notification.error ? ` · ${notification.error}` : ''}
+            </p>
+          ) : null}
+          <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted">
+            <LocalDateTime
+              iso={notification.createdAt.toISOString()}
+              dateStyle="short"
+              timeStyle="short"
+            />
+            <span aria-hidden="true">·</span>
+            <span>{isInApp ? 'Dashboard' : 'E-mail'}</span>
+            <Badge
+              tone={failedEmail ? 'alert' : team ? 'accent' : 'neutral'}
+              className="px-2! py-0.5! text-xs!"
+            >
+              {failedEmail ? 'Échec' : team ? 'Équipe' : 'Cliente'}
+            </Badge>
+          </p>
+        </div>
+      </div>
+    </RowCard>
+  );
 }
 
 export default async function NotificationsPage({
@@ -40,197 +132,98 @@ export default async function NotificationsPage({
   if (!user) redirect('/connexion?callbackUrl=/dashboard/notifications');
 
   const params = await searchParams;
-  const filter = (['all', 'unread', 'failed'] as const).includes(
-    first(params.filter) as 'all' | 'unread' | 'failed',
-  )
-    ? (first(params.filter) as 'all' | 'unread' | 'failed')
+  const rawFilter = first(params.filter);
+  const filter: Filter = FILTERS.some((item) => item.value === rawFilter)
+    ? (rawFilter as Filter)
     : 'all';
   const rawPage = Number.parseInt(first(params.page), 10);
   const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
 
-  const [result, failed, stats] = await Promise.all([
+  const [result, failed, stats, unreadCount] = await Promise.all([
     listAdminNotifications({ filter, page }),
-    listFailedEmails(),
+    filter === 'failed' ? Promise.resolve([]) : listFailedEmails(),
     notificationDeliveryStats(),
+    countUnreadNotifications(),
   ]);
+  const hasRead = result.items.some((item) => item.channel === 'IN_APP' && item.readAt);
 
   return (
-    <div className="p-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
-            <Bell aria-hidden="true" className="size-6 text-accent" />
-            Notifications
-          </h1>
-          <p className="mt-1 text-ink-soft">
-            Messages du dashboard, e-mails envoyés et échecs d’envoi. Chaque notification renvoie
-            vers la fiche concernée.
+    <div>
+      <PageHeader
+        icon={Bell}
+        title="Notifications"
+        description="Alertes du dashboard, e-mails envoyés et échecs. Chaque alerte ouvre la fiche concernée."
+        actions={<NotificationsHeaderActions hasUnread={unreadCount > 0} hasRead={hasRead} />}
+      />
+
+      <div className="mb-3 flex flex-wrap gap-1.5">
+        <Badge tone="accent" className="px-2.5! py-0.5! text-xs!">
+          E-mails en attente : {stats.pending}
+        </Badge>
+        <Badge tone="success" className="px-2.5! py-0.5! text-xs!">
+          Envoyés : {stats.sent}
+        </Badge>
+        <Badge tone={stats.failed > 0 ? 'alert' : 'neutral'} className="px-2.5! py-0.5! text-xs!">
+          Échecs : {stats.failed}
+        </Badge>
+      </div>
+
+      <FilterChips
+        label="Filtrer les notifications"
+        items={FILTERS.map((item) => ({
+          href: hrefFor(item.value),
+          label: item.label,
+          count: item.value === 'unread' ? unreadCount : undefined,
+          active: filter === item.value,
+        }))}
+      />
+
+      {result.items.length === 0 ? (
+        <EmptyState
+          title={filter === 'unread' ? 'Tout est lu' : 'Aucune notification'}
+          message={
+            filter === 'failed'
+              ? 'Aucun échec d’envoi. La file fonctionne normalement.'
+              : filter === 'unread'
+                ? 'Aucune alerte en attente de lecture.'
+                : 'Les nouvelles réservations et les messages de contact apparaîtront ici.'
+          }
+        />
+      ) : (
+        <ul className="flex flex-col gap-2">
+          {result.items.map((notification) => (
+            <li key={notification.id}>
+              <NotificationRow notification={notification} />
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <Pagination
+        page={result.page}
+        totalPages={result.totalPages}
+        hrefFor={(nextPage) => hrefFor(filter, nextPage)}
+        label="Pagination des notifications"
+      />
+
+      {failed.length > 0 ? (
+        <section className="mt-6" aria-labelledby="failed-title">
+          <h2 id="failed-title" className="font-heading text-lg font-bold text-fg">
+            Derniers échecs d’envoi
+          </h2>
+          <p className="mb-2 mt-0.5 text-sm text-muted">
+            Un échec est réessayé automatiquement avec un délai progressif. Relancez à la main après
+            vérification.
           </p>
-        </div>
-        <form action={markAllNotificationsReadForm}>
-          <Button type="submit" variant="secondary" size="sm">
-            Tout marquer comme lu
-          </Button>
-        </form>
-      </div>
-
-      <div className="mt-5 flex flex-wrap gap-3 text-sm">
-        <Badge tone="accent">En attente : {stats.pending}</Badge>
-        <Badge tone="success">Envoyés : {stats.sent}</Badge>
-        <Badge tone={stats.failed > 0 ? 'alert' : 'neutral'}>Échecs : {stats.failed}</Badge>
-      </div>
-
-      <div className="mt-5 flex flex-wrap gap-2" role="navigation" aria-label="Filtres">
-        {FILTERS.map((item) => (
-          <Link
-            key={item.value}
-            href={
-              item.value === 'all'
-                ? '/dashboard/notifications'
-                : `/dashboard/notifications?filter=${item.value}`
-            }
-            aria-current={filter === item.value ? 'page' : undefined}
-            className={`rounded-[var(--radius-full)] border px-4 py-1.5 text-sm font-semibold transition ${
-              filter === item.value
-                ? 'border-cacao bg-cacao text-cacao-fg'
-                : 'border-line bg-card text-fg hover:border-cacao'
-            }`}
-          >
-            {item.label}
-          </Link>
-        ))}
-      </div>
-
-      <Card className="mt-5 p-0">
-        {result.items.length === 0 ? (
-          <div className="p-4">
-            <EmptyState
-              title="Aucune notification"
-              message={
-                filter === 'failed'
-                  ? 'Aucun échec d’envoi. La file fonctionne normalement.'
-                  : 'Les nouvelles réservations et les messages de contact apparaîtront ici.'
-              }
-            />
-          </div>
-        ) : (
-          <ul className="divide-y divide-line">
-            {result.items.map((notification) => (
-              <li
-                key={notification.id}
-                className={`flex flex-col gap-2 p-4 sm:flex-row sm:items-start sm:justify-between ${
-                  notification.readAt ? '' : 'bg-accent-soft/40'
-                }`}
-              >
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span
-                      aria-hidden="true"
-                      className={`size-2 rounded-full ${notification.readAt ? 'bg-line' : 'bg-accent'}`}
-                    />
-                    <p className="font-semibold text-fg">{notification.title}</p>
-                    <Badge
-                      tone={notification.templateKey.startsWith('admin') ? 'accent' : 'neutral'}
-                    >
-                      {notification.templateKey.includes('admin') ||
-                      notification.templateKey === 'conversation_reply_sent'
-                        ? 'Équipe'
-                        : 'Cliente'}
-                    </Badge>
-                    {notification.link ? (
-                      <Link
-                        href={notification.link}
-                        className="text-sm font-semibold text-cacao underline-offset-4 hover:underline"
-                      >
-                        Ouvrir la fiche
-                      </Link>
-                    ) : null}
-                  </div>
-                  {notification.detail ? (
-                    <p className="mt-1 text-sm text-ink-soft">{notification.detail}</p>
-                  ) : null}
-                  <p className="mt-1 text-xs text-ink-soft">
-                    <LocalDateTime iso={notification.createdAt.toISOString()} /> ·{' '}
-                    {notification.channel === 'IN_APP' ? 'Dashboard' : 'E-mail'}
-                  </p>
-                </div>
-                {!notification.readAt ? (
-                  <form action={markNotificationReadForm}>
-                    <input type="hidden" name="id" value={notification.id} />
-                    <Button type="submit" variant="ghost" size="sm">
-                      Marquer comme lu
-                    </Button>
-                  </form>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        )}
-      </Card>
-
-      {result.totalPages > 1 ? (
-        <nav aria-label="Pagination notifications" className="mt-4 flex justify-between text-sm">
-          {result.page > 1 ? (
-            <Link
-              href={`/dashboard/notifications?filter=${filter}&page=${result.page - 1}`}
-              className="font-semibold text-cacao hover:underline"
-            >
-              Précédent
-            </Link>
-          ) : (
-            <span />
-          )}
-          <span className="text-ink-soft">
-            Page {result.page} sur {result.totalPages}
-          </span>
-          {result.page < result.totalPages ? (
-            <Link
-              href={`/dashboard/notifications?filter=${filter}&page=${result.page + 1}`}
-              className="font-semibold text-cacao hover:underline"
-            >
-              Suivant
-            </Link>
-          ) : (
-            <span />
-          )}
-        </nav>
-      ) : null}
-
-      <section className="mt-8">
-        <h2 className="font-heading text-xl font-bold text-fg">Derniers échecs d’envoi</h2>
-        <p className="mt-1 text-sm text-ink-soft">
-          Un échec est réessayé automatiquement avec un délai progressif. Vous pouvez relancer
-          manuellement après vérification.
-        </p>
-        {failed.length === 0 ? (
-          <p className="mt-3 text-sm text-ink-soft">Aucun échec à signaler.</p>
-        ) : (
-          <ul className="mt-3 space-y-2">
+          <ul className="flex flex-col gap-2">
             {failed.map((item) => (
-              <li
-                key={item.id}
-                className="flex flex-wrap items-start justify-between gap-3 rounded-[var(--radius-md)] border border-alert/40 bg-alert-soft p-3"
-              >
-                <div className="min-w-0 text-sm">
-                  <p className="font-semibold text-alert">{item.title}</p>
-                  <p className="text-ink-soft">
-                    {item.recipient} · {item.attempts} tentative(s)
-                  </p>
-                  {item.error ? (
-                    <p className="mt-1 break-words text-xs text-ink-soft">{item.error}</p>
-                  ) : null}
-                </div>
-                <form action={retryNotificationForm}>
-                  <input type="hidden" name="id" value={item.id} />
-                  <Button type="submit" variant="secondary" size="sm">
-                    Relancer
-                  </Button>
-                </form>
+              <li key={item.id}>
+                <NotificationRow notification={item} />
               </li>
             ))}
           </ul>
-        )}
-      </section>
+        </section>
+      ) : null}
     </div>
   );
 }

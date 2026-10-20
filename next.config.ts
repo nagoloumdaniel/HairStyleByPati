@@ -50,6 +50,8 @@ if (isProduction) {
 }
 
 const nextConfig: NextConfig = {
+  // Dossier de build alternatif (tests E2E) pour ne pas écraser le serveur de dev.
+  distDir: process.env.NEXT_DIST_DIR || '.next',
   poweredByHeader: false,
   // P4.4 : les photos de prestation sont envoyées via server action.
   // La limite applicative reste de 5 Mo par fichier (voir image-validation.ts).

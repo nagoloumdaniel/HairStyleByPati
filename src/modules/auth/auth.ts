@@ -11,6 +11,8 @@ const credentialsSchema = z.object({
   password: z.string().min(1, 'Mot de passe requis'),
 });
 
+const DUMMY_HASH = '$2b$10$TkaaGaapCpXjproisoFh8ODsB3AT.QiuJFDYXqcE/XWE3V.sFUwma';
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   providers: [
@@ -36,10 +38,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const user = await db.user.findUnique({
           where: { email: parsed.data.email.toLowerCase() },
         });
-        if (!user) return null;
-
-        const valid = await compare(parsed.data.password, user.passwordHash);
-        if (!valid) return null;
+        // Comparaison systématique (hash factice) : pas d'énumération par le temps de réponse.
+        const valid = await compare(parsed.data.password, user?.passwordHash ?? DUMMY_HASH);
+        if (!user || !valid) return null;
 
         return { id: user.id, name: user.name, email: user.email, role: user.role };
       },

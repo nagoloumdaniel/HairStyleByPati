@@ -52,6 +52,13 @@ export interface CustomerDataExport {
     createdAt: string;
     messages: Array<{ author: string; content: string; sentAt: string }>;
   }>;
+  reviews: Array<{
+    id: string;
+    status: string;
+    rating: number | null;
+    comment: string | null;
+    submittedAt: string | null;
+  }>;
 }
 
 /** Export lisible par la personne concernée. Les notes internes sont exclues. */
@@ -76,6 +83,9 @@ export async function collectCustomerData(id: string): Promise<CustomerDataExpor
             orderBy: { sentAt: 'asc' },
           },
         },
+      },
+      reviews: {
+        select: { id: true, status: true, rating: true, comment: true, submittedAt: true },
       },
     },
   });
@@ -128,6 +138,13 @@ export async function collectCustomerData(id: string): Promise<CustomerDataExpor
         sentAt: message.sentAt.toISOString(),
       })),
     })),
+    reviews: customer.reviews.map((review) => ({
+      id: review.id,
+      status: review.status,
+      rating: review.rating,
+      comment: review.comment,
+      submittedAt: review.submittedAt?.toISOString() ?? null,
+    })),
   };
 }
 
@@ -139,7 +156,10 @@ export interface AnonymizationSummary {
   photosDeleted: number;
 }
 
-export async function anonymizeCustomerData(id: string): Promise<AnonymizationSummary | null> {
+export async function anonymizeCustomerData(
+  id: string,
+  actorId?: string,
+): Promise<AnonymizationSummary | { alreadyAnonymized: true } | null> {
   const customer = await db.customer.findUnique({
     where: { id },
     include: {
@@ -149,6 +169,7 @@ export async function anonymizeCustomerData(id: string): Promise<AnonymizationSu
     },
   });
   if (!customer) return null;
+  if (customer.email.endsWith('@invalid.local')) return { alreadyAnonymized: true };
 
   const photoKeys = [
     ...customer.assessments.flatMap((assessment) => assessment.photoKeys),
@@ -162,6 +183,17 @@ export async function anonymizeCustomerData(id: string): Promise<AnonymizationSu
     await tx.conversation.deleteMany({ where: { customerId: customer.id } });
     await tx.hairAssessment.deleteMany({ where: { customerId: customer.id } });
     await tx.customRequest.deleteMany({ where: { customerId: customer.id } });
+    // Avis (commentaire libre + jeton) : données personnelles, supprimés avec la fiche.
+    await tx.review.deleteMany({ where: { customerId: customer.id } });
+    // Notifications contenant l'e-mail / le nom de la cliente (file d'envoi et alertes dashboard).
+    await tx.notification.deleteMany({
+      where: {
+        OR: [
+          { recipient: customer.email },
+          { payload: { path: ['customerEmail'], equals: customer.email } },
+        ],
+      },
+    });
     await tx.appointment.updateMany({
       where: { customerId: customer.id },
       data: {
@@ -178,6 +210,7 @@ export async function anonymizeCustomerData(id: string): Promise<AnonymizationSu
     });
     await tx.auditLog.create({
       data: {
+        userId: actorId ?? null,
         action: 'customer.anonymize',
         entityType: 'Customer',
         entityId: customer.id,

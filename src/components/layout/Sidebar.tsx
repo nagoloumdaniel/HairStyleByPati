@@ -1,129 +1,152 @@
+'use client';
+
 import {
-  Bell,
   CalendarDays,
   CalendarOff,
   ChartNoAxesColumn,
+  ClipboardCheck,
   ClipboardList,
-  ExternalLink,
+  Ellipsis,
+  History,
   Hourglass,
   Images,
   LayoutDashboard,
   type LucideIcon,
-  MessageSquare,
+  MessageSquareQuote,
   Scissors,
   Settings,
-  Star,
   Tag,
   Users,
   Wand2,
-  History,
 } from 'lucide-react';
 import Link from 'next/link';
-import { ThemeToggle } from './ThemeToggle';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { Modal } from '@/components/ui/Modal';
 
-/* P2.6 : sidebar dashboard, identite sobre distincte du public (fond ink, accents or). */
-const NAV = [
-  { href: '/dashboard', label: 'Vue d’ensemble', key: 'home' },
-  { href: '/dashboard/calendrier', label: 'Calendrier', key: 'calendar' },
-  { href: '/dashboard/catalogue', label: 'Catalogue', key: 'catalogue' },
-  { href: '/dashboard/disponibilites', label: 'Disponibilites', key: 'availability' },
-  { href: '/dashboard/historique', label: 'Historique', key: 'history' },
-  { href: '/dashboard/evaluations', label: 'Evaluations', key: 'evaluations' },
-  { href: '/dashboard/reservations', label: 'Reservations', key: 'reservations' },
-  { href: '/dashboard/demandes', label: 'Demandes', key: 'demandes' },
-  { href: '/dashboard/clients', label: 'Clientes', key: 'clients' },
-  { href: '/dashboard/liste-attente', label: 'Liste d’attente', key: 'waitlist' },
-  { href: '/dashboard/avis', label: 'Avis', key: 'reviews' },
-  { href: '/dashboard/galerie', label: 'Galerie', key: 'gallery' },
-  { href: '/dashboard/promotions', label: 'Promotions', key: 'promotions' },
-  { href: '/dashboard/notifications', label: 'Notifications', key: 'notifications' },
-  { href: '/dashboard/messages', label: 'Messages', key: 'messages' },
-  { href: '/dashboard/statistiques', label: 'Statistiques', key: 'stats' },
-  { href: '/dashboard/parametres', label: 'Parametres', key: 'settings' },
-] as const;
+type NavItem = { href: string; label: string; icon: LucideIcon; primary?: boolean };
 
-const ICONS: Record<(typeof NAV)[number]['key'], LucideIcon> = {
-  home: LayoutDashboard,
-  calendar: CalendarDays,
-  catalogue: Scissors,
-  availability: CalendarOff,
-  history: History,
-  evaluations: Star,
-  reservations: ClipboardList,
-  demandes: Wand2,
-  clients: Users,
-  waitlist: Hourglass,
-  reviews: Star,
-  gallery: Images,
-  promotions: Tag,
-  notifications: Bell,
-  messages: MessageSquare,
-  stats: ChartNoAxesColumn,
-  settings: Settings,
-};
+/* Navigation du dashboard. `primary` : entrées de la barre d'onglets mobile (le reste dans « Menu »). */
+const NAV: ReadonlyArray<NavItem> = [
+  { href: '/dashboard', label: 'Accueil', icon: LayoutDashboard, primary: true },
+  { href: '/dashboard/calendrier', label: 'Calendrier', icon: CalendarDays, primary: true },
+  { href: '/dashboard/reservations', label: 'Réservations', icon: ClipboardList, primary: true },
+  { href: '/dashboard/clients', label: 'Clientes', icon: Users, primary: true },
+  { href: '/dashboard/demandes', label: 'Demandes', icon: Wand2 },
+  { href: '/dashboard/evaluations', label: 'Évaluations', icon: ClipboardCheck },
+  { href: '/dashboard/catalogue', label: 'Catalogue', icon: Scissors },
+  { href: '/dashboard/disponibilites', label: 'Disponibilités', icon: CalendarOff },
+  { href: '/dashboard/liste-attente', label: 'Liste d’attente', icon: Hourglass },
+  { href: '/dashboard/avis', label: 'Avis', icon: MessageSquareQuote },
+  { href: '/dashboard/galerie', label: 'Galerie', icon: Images },
+  { href: '/dashboard/promotions', label: 'Promotions', icon: Tag },
+  { href: '/dashboard/statistiques', label: 'Statistiques', icon: ChartNoAxesColumn },
+  { href: '/dashboard/historique', label: 'Historique', icon: History },
+  { href: '/dashboard/parametres', label: 'Paramètres', icon: Settings },
+];
 
-export function Sidebar({
-  pathname,
-  badges = {},
-}: {
-  pathname?: string;
-  badges?: { messages?: number; notifications?: number };
-}) {
+function isActive(pathname: string | null, href: string) {
+  // Les sous-pages (fiche prestation, etc.) gardent l'entrée active.
+  return pathname === href || (href !== '/dashboard' && !!pathname?.startsWith(`${href}/`));
+}
+
+/* Desktop : liste verticale dans la sidebar. */
+export function Sidebar() {
+  const pathname = usePathname();
   return (
-    <nav
-      aria-label="Navigation administration"
-      className="flex w-full min-w-0 flex-row gap-1 overflow-x-auto pb-1 lg:flex-col lg:overflow-visible lg:pb-0"
-    >
+    <nav aria-label="Navigation administration" className="flex flex-col gap-0.5">
       {NAV.map((item) => {
-        // Les sous-pages (fiche prestation, etc.) gardent l'entrée active.
-        const active =
-          pathname === item.href ||
-          (item.href !== '/dashboard' && pathname?.startsWith(`${item.href}/`));
-        const badge =
-          item.key === 'messages'
-            ? badges.messages
-            : item.key === 'notifications'
-              ? badges.notifications
-              : 0;
-        const Icon = ICONS[item.key];
+        const active = isActive(pathname, item.href);
         return (
           <Link
             key={item.href}
             href={item.href}
             aria-current={active ? 'page' : undefined}
-            className={`flex items-center justify-between gap-2 whitespace-nowrap rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium transition lg:px-4 lg:py-2.5 lg:text-base ${
+            className={`flex h-10 items-center gap-3 rounded-[var(--radius-md)] px-3 text-sm transition ${
               active
                 ? 'bg-accent font-semibold text-accent-fg'
                 : 'text-panel-fg/85 hover:bg-panel-fg/10 hover:text-panel-fg'
             }`}
           >
-            <span className="flex items-center gap-2.5">
-              <Icon aria-hidden="true" className="size-4 shrink-0 lg:size-5" />
-              {item.label}
-            </span>
-            {badge && badge > 0 ? (
-              <span
-                aria-label={`${badge} non lu${badge > 1 ? 's' : ''}`}
-                className={`inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-xs font-bold ${
-                  active ? 'bg-accent-fg text-accent' : 'bg-accent text-accent-fg'
-                }`}
-              >
-                {badge > 99 ? '99+' : badge}
-              </span>
-            ) : null}
+            <item.icon aria-hidden="true" className="size-[18px] shrink-0" />
+            {item.label}
           </Link>
         );
       })}
-      <div className="flex items-center gap-1 lg:mt-3 lg:justify-between lg:border-t lg:border-panel-fg/15 lg:pt-3">
-        <Link
-          href="/"
-          className="flex items-center gap-2.5 whitespace-nowrap rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-panel-fg/85 transition hover:bg-panel-fg/10 hover:text-panel-fg lg:px-4 lg:text-base"
-        >
-          <ExternalLink aria-hidden="true" className="size-4 shrink-0 lg:size-5" />
-          Voir le site
-        </Link>
-        <ThemeToggle />
-      </div>
     </nav>
+  );
+}
+
+/* Mobile : barre d'onglets fixe (4 entrées + Menu) ; le menu ouvre toutes les pages en grille d'icônes. */
+export function MobileTabBar() {
+  const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
+  const primary = NAV.filter((item) => item.primary);
+  const secondaryActive = NAV.some((item) => !item.primary && isActive(pathname, item.href));
+
+  const tab =
+    'flex h-12 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-[var(--radius-md)] text-[11px] font-medium transition';
+
+  return (
+    <>
+      <nav
+        aria-label="Navigation administration"
+        className="fixed inset-x-0 bottom-0 z-40 flex gap-1 border-t border-panel-fg/15 bg-ink px-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] pt-1.5 text-panel-fg lg:hidden"
+      >
+        {primary.map((item) => {
+          const active = isActive(pathname, item.href);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              aria-current={active ? 'page' : undefined}
+              className={`${tab} ${active ? 'bg-accent text-accent-fg' : 'text-panel-fg/80'}`}
+            >
+              <item.icon aria-hidden="true" className="size-5" />
+              <span className="max-w-full truncate px-0.5">{item.label}</span>
+            </Link>
+          );
+        })}
+        <button
+          type="button"
+          onClick={() => setMenuOpen(true)}
+          aria-haspopup="dialog"
+          aria-expanded={menuOpen}
+          className={`${tab} ${secondaryActive ? 'bg-accent text-accent-fg' : 'text-panel-fg/80'}`}
+        >
+          <Ellipsis aria-hidden="true" className="size-5" />
+          Menu
+        </button>
+      </nav>
+      <Modal open={menuOpen} onClose={() => setMenuOpen(false)} title="Menu" size="sm">
+        <ul className="grid grid-cols-3 gap-2">
+          {NAV.map((item) => {
+            const active = isActive(pathname, item.href);
+            return (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  onClick={() => setMenuOpen(false)}
+                  aria-current={active ? 'page' : undefined}
+                  className={`flex h-20 flex-col items-center justify-center gap-1.5 rounded-[var(--radius-md)] border px-1 text-center text-xs font-medium transition ${
+                    active
+                      ? 'border-accent bg-accent text-accent-fg'
+                      : 'border-line bg-page text-fg hover:border-cacao'
+                  }`}
+                >
+                  <item.icon aria-hidden="true" className="size-5" />
+                  <span className="leading-tight">{item.label}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </Modal>
+    </>
   );
 }

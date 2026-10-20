@@ -1,13 +1,24 @@
 'use client';
 
-import { ArrowDown, ArrowUp } from 'lucide-react';
-import { useActionState, useEffect, useRef, useState } from 'react';
+import {
+  GitBranch,
+  KeyRound,
+  List,
+  ListChecks,
+  MessageCircleQuestion,
+  Pencil,
+  Plus,
+  Save,
+  Trash2,
+} from 'lucide-react';
+import { useState } from 'react';
 import type { AdminQuestion } from '@/lib/catalogue-admin';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { useConfirm } from '@/components/ui/Confirm';
 import { Input } from '@/components/ui/Input';
-import { Select } from '@/components/ui/Select';
 import { Modal } from '@/components/ui/Modal';
+import { Select } from '@/components/ui/Select';
 import {
   adminCreateQuestion,
   adminDeleteQuestion,
@@ -15,11 +26,21 @@ import {
   adminUpdateQuestion,
   type CatalogueActionState,
 } from '@/modules/catalogue/actions';
+import {
+  CheckboxField,
+  EmptyBlock,
+  FormError,
+  ReorderButtons,
+  formDataOf,
+  useFormAction,
+  useReorderableList,
+  useRunAction,
+} from '../../catalogue-ui';
 
 /* ============================================================
  * P4.8 — Éditeur des questions capillaires par prestation.
  * Les questions peuvent être conditionnelles (affichées selon
- * la réponse à une autre question).
+ * la réponse à une autre question). L'ordre se règle avec les flèches.
  * ============================================================ */
 
 const ANSWER_TYPES = [
@@ -57,239 +78,196 @@ function QuestionForm({
   serviceId: string;
   initial?: AdminQuestion;
   submitLabel: string;
+  /** Ordre d'une nouvelle question (en fin de liste). */
   defaultOrder: number;
-  onDone?: () => void;
+  onDone: () => void;
 }) {
-  const [state, formAction, pending] = useActionState<CatalogueActionState, FormData>(action, {});
-  const doneRef = useRef(onDone);
-  doneRef.current = onDone;
+  const { state, onSubmit, pending } = useFormAction(action, onDone);
+  const [type, setType] = useState<string>(initial?.type ?? 'SINGLE_CHOICE');
   const condition = conditionOf(initial?.condition);
-
-  useEffect(() => {
-    if (state.success) doneRef.current?.();
-  }, [state.success]);
+  const hasChoices = type === 'SINGLE_CHOICE' || type === 'MULTI_CHOICE';
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
+    <form onSubmit={onSubmit} className="flex flex-col gap-3">
       <input type="hidden" name="serviceId" value={serviceId} />
       {initial?.id ? <input type="hidden" name="id" value={initial.id} /> : null}
+      <input type="hidden" name="order" value={initial?.order ?? defaultOrder} />
 
-      <Input
-        label="Clé technique"
-        name="key"
-        required
-        defaultValue={initial?.key ?? ''}
-        hint="Minuscules, chiffres et tirets bas. Exemple : longueur_actuelle."
-      />
       <Input
         label="Question posée à la cliente"
         name="label"
+        icon={MessageCircleQuestion}
         required
+        autoFocus
         defaultValue={initial?.label ?? ''}
         hint="Formulation claire et directe."
       />
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Input
+          label="Clé technique"
+          name="key"
+          icon={KeyRound}
+          required
+          defaultValue={initial?.key ?? ''}
+          hint="Minuscules, chiffres, tirets bas. Ex. longueur_actuelle."
+        />
         <Select
           label="Type de réponse"
           name="type"
-          defaultValue={initial?.type ?? 'SINGLE_CHOICE'}
-          options={ANSWER_TYPES.map((type) => ({ value: type.value, label: type.label }))}
+          icon={ListChecks}
+          value={type}
+          onChange={(event) => setType(event.target.value)}
+          options={ANSWER_TYPES.map((item) => ({ value: item.value, label: item.label }))}
         />
+      </div>
+
+      {hasChoices ? (
         <Input
-          label="Ordre d'affichage"
-          name="order"
-          type="number"
-          min={0}
-          defaultValue={String(initial?.order ?? defaultOrder)}
+          label="Choix proposés"
+          name="options"
+          icon={List}
+          defaultValue={initial?.options?.join(', ') ?? ''}
+          hint="Séparez les choix par des virgules."
+        />
+      ) : null}
+
+      <div className="flex flex-wrap gap-x-6 gap-y-2">
+        <CheckboxField
+          name="required"
+          label="Réponse obligatoire"
+          defaultChecked={initial?.required ?? true}
+        />
+        <CheckboxField
+          name="active"
+          label="Question active"
+          defaultChecked={initial?.active ?? true}
         />
       </div>
 
-      <Input
-        label="Choix proposés"
-        name="options"
-        defaultValue={initial?.options?.join(', ') ?? ''}
-        hint="Pour les types Choix unique et Choix multiple : séparez les choix par des virgules. Laissez vide pour un champ libre."
-      />
-      <div className="flex flex-wrap gap-4">
-        <label className="flex items-center gap-2 text-sm font-semibold">
-          <input
-            type="checkbox"
-            name="required"
-            defaultChecked={initial?.required ?? true}
-            className="size-4"
-          />
-          Réponse obligatoire
-        </label>
-        <label className="flex items-center gap-2 text-sm font-semibold">
-          <input
-            type="checkbox"
-            name="active"
-            defaultChecked={initial?.active ?? true}
-            className="size-4"
-          />
-          Question active
-        </label>
-      </div>
-
-      <fieldset className="rounded-[var(--radius-md)] border border-line p-4">
+      <fieldset className="rounded-[var(--radius-md)] border border-line p-3">
         <legend className="px-2 text-sm font-semibold">Affichage conditionnel (facultatif)</legend>
         <p className="mb-3 text-sm text-muted">
           N’afficher cette question que si une autre question a une réponse donnée.
         </p>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2">
           <Input
             label="Clé de la question de départ"
             name="conditionDependsOn"
+            icon={GitBranch}
             defaultValue={condition.dependsOn}
             hint="Exemple : porte_des_locs"
           />
           <Input
             label="Valeur attendue"
             name="conditionEquals"
+            icon={GitBranch}
             defaultValue={condition.equals}
             hint="Exemple : oui"
           />
         </div>
       </fieldset>
 
-      {state.error ? (
-        <p
-          role="alert"
-          className="rounded-[var(--radius-md)] bg-alert-soft px-4 py-3 text-sm font-medium text-alert"
-        >
-          {state.error}
-        </p>
-      ) : null}
-      {state.success ? (
-        <p
-          role="status"
-          className="rounded-[var(--radius-md)] bg-success-soft px-4 py-3 text-sm font-medium text-success"
-        >
-          {state.success}
-        </p>
-      ) : null}
-      <Button type="submit" loading={pending}>
+      <FormError message={state.error} />
+      <Button type="submit" icon={Save} loading={pending} className="self-end">
         {submitLabel}
       </Button>
     </form>
   );
 }
 
-function EditQuestionButton({
+function QuestionRow({
   serviceId,
   question,
+  index,
+  count,
+  pendingOrder,
+  onMove,
 }: {
   serviceId: string;
   question: AdminQuestion;
+  index: number;
+  count: number;
+  pendingOrder: boolean;
+  onMove: (index: number, direction: -1 | 1) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const confirm = useConfirm();
+  const remove = useRunAction();
+  const condition = conditionOf(question.condition);
+
+  async function onDelete() {
+    const ok = await confirm({
+      title: 'Supprimer cette question ?',
+      message: `« ${question.label} » sera retirée du questionnaire.`,
+    });
+    if (!ok) return;
+    remove.run(() => adminDeleteQuestion({}, formDataOf({ id: question.id })));
+  }
+
   return (
-    <>
-      <Button type="button" variant="secondary" size="sm" onClick={() => setOpen(true)}>
-        Modifier
+    <li className="flex items-center gap-2 rounded-[var(--radius-md)] border border-line bg-card p-2 sm:gap-3 sm:p-3">
+      <ReorderButtons
+        index={index}
+        count={count}
+        pending={pendingOrder}
+        onMove={(direction) => onMove(index, direction)}
+        label={question.label}
+      />
+      {/* Toute la zone texte ouvre la modification. */}
+      <button
+        type="button"
+        onClick={() => setEditOpen(true)}
+        aria-label={`Modifier la question ${question.label}`}
+        className="group flex min-w-0 flex-1 items-center gap-3 rounded-[var(--radius-sm)] p-1 text-left transition hover:bg-accent-soft/50"
+      >
+        <span className="min-w-0 flex-1">
+          <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="font-semibold">{question.label}</span>
+            {question.required ? (
+              <Badge tone="accent">Obligatoire</Badge>
+            ) : (
+              <Badge tone="neutral">Facultative</Badge>
+            )}
+            {question.active ? null : <Badge tone="alert">Inactive</Badge>}
+          </span>
+          <span className="mt-0.5 block text-sm text-muted">
+            {question.key} · {TYPE_LABELS[question.type] ?? question.type}
+          </span>
+          {condition.dependsOn ? (
+            <span className="mt-0.5 block text-sm text-muted">
+              Affichée si « {condition.dependsOn} » = « {condition.equals} »
+            </span>
+          ) : null}
+        </span>
+        <Pencil
+          aria-hidden="true"
+          className="size-4 shrink-0 text-muted transition group-hover:text-accent"
+        />
+      </button>
+      <Button
+        type="button"
+        variant="danger"
+        size="sm"
+        iconOnly
+        icon={Trash2}
+        loading={remove.pending}
+        onClick={onDelete}
+        aria-label={`Supprimer la question ${question.label}`}
+        title="Supprimer"
+      >
+        Supprimer
       </Button>
-      <Modal open={open} onClose={() => setOpen(false)} title={`Modifier « ${question.label} »`}>
+      <Modal open={editOpen} onClose={() => setEditOpen(false)} title="Modifier la question">
         <QuestionForm
           action={adminUpdateQuestion}
           serviceId={serviceId}
           initial={question}
           submitLabel="Enregistrer"
           defaultOrder={question.order}
-          onDone={() => setOpen(false)}
+          onDone={() => setEditOpen(false)}
         />
       </Modal>
-    </>
-  );
-}
-
-function DeleteQuestionForm({ question }: { question: AdminQuestion }) {
-  const [state, formAction, pending] = useActionState<CatalogueActionState, FormData>(
-    adminDeleteQuestion,
-    {},
-  );
-  return (
-    <form
-      action={formAction}
-      onSubmit={(event) => {
-        if (!window.confirm(`Supprimer la question « ${question.label} » ?`)) {
-          event.preventDefault();
-        }
-      }}
-    >
-      <input type="hidden" name="id" value={question.id} />
-      <Button type="submit" variant="danger" size="sm" loading={pending}>
-        Supprimer
-      </Button>
-      {state.error ? (
-        <p role="alert" className="text-xs text-alert">
-          {state.error}
-        </p>
-      ) : null}
-    </form>
-  );
-}
-
-function ReorderQuestionButton({
-  serviceId,
-  questions,
-  index,
-  direction,
-}: {
-  serviceId: string;
-  questions: AdminQuestion[];
-  index: number;
-  direction: -1 | 1;
-}) {
-  const [state, formAction, pending] = useActionState<CatalogueActionState, FormData>(
-    adminReorderQuestions,
-    {},
-  );
-  const target = index + direction;
-  const current = questions[index];
-  const swap = questions[target];
-  if (!current || !swap) {
-    return (
-      <span
-        aria-hidden="true"
-        className="inline-flex size-8 items-center justify-center rounded-[var(--radius-sm)] border border-line text-muted/40"
-      >
-        {direction === -1 ? (
-          <ArrowUp aria-hidden="true" className="size-4" />
-        ) : (
-          <ArrowDown aria-hidden="true" className="size-4" />
-        )}
-      </span>
-    );
-  }
-  const reordered = [...questions];
-  reordered[index] = swap;
-  reordered[target] = current;
-  const items = reordered.map((question, order) => ({ id: question.id, order }));
-
-  return (
-    <form action={formAction}>
-      <input type="hidden" name="serviceId" value={serviceId} />
-      <input type="hidden" name="items" value={JSON.stringify(items)} />
-      <Button
-        type="submit"
-        variant="ghost"
-        size="sm"
-        loading={pending}
-        aria-label={`${direction === -1 ? 'Monter' : 'Descendre'} la question`}
-        title={direction === -1 ? 'Monter' : 'Descendre'}
-      >
-        {direction === -1 ? (
-          <ArrowUp aria-hidden="true" className="size-4" />
-        ) : (
-          <ArrowDown aria-hidden="true" className="size-4" />
-        )}
-      </Button>
-      {state.error ? (
-        <span role="alert" className="text-xs text-alert">
-          {state.error}
-        </span>
-      ) : null}
-    </form>
+    </li>
   );
 }
 
@@ -301,14 +279,23 @@ export function QuestionsPanel({
   questions: AdminQuestion[];
 }) {
   const [createOpen, setCreateOpen] = useState(false);
+  const { list, move, pending } = useReorderableList(questions, (orderedIds) =>
+    adminReorderQuestions(serviceId, orderedIds),
+  );
 
   return (
-    <div className="flex flex-col gap-4 p-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="flex flex-col gap-3 rounded-[var(--radius-lg)] bg-card p-3 shadow-soft sm:p-4">
+      <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-muted">
-          Les réponses serviront à évaluer la compatibilité capillaire avant la réservation.
+          Les réponses servent à évaluer la compatibilité capillaire avant la réservation.
         </p>
-        <Button type="button" size="sm" onClick={() => setCreateOpen(true)}>
+        <Button
+          type="button"
+          size="sm"
+          icon={Plus}
+          iconOnly="mobile"
+          onClick={() => setCreateOpen(true)}
+        >
           Ajouter une question
         </Button>
       </div>
@@ -323,62 +310,23 @@ export function QuestionsPanel({
         />
       </Modal>
 
-      {questions.length === 0 ? (
-        <p className="rounded-[var(--radius-md)] border border-dashed border-line p-8 text-center text-muted">
+      {list.length === 0 ? (
+        <EmptyBlock>
           Aucune question. La réservation utilisera le questionnaire par défaut.
-        </p>
+        </EmptyBlock>
       ) : (
         <ol className="flex flex-col gap-2">
-          {questions.map((question, index) => {
-            const condition = conditionOf(question.condition);
-            return (
-              <li
-                key={question.id}
-                className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-md)] border border-line bg-card p-3"
-              >
-                <div className="flex min-w-0 items-start gap-2">
-                  <div className="flex flex-col gap-1">
-                    <ReorderQuestionButton
-                      serviceId={serviceId}
-                      questions={questions}
-                      index={index}
-                      direction={-1}
-                    />
-                    <ReorderQuestionButton
-                      serviceId={serviceId}
-                      questions={questions}
-                      index={index}
-                      direction={1}
-                    />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="flex flex-wrap items-center gap-2 font-semibold">
-                      <span className="truncate">{question.label}</span>
-                      {question.required ? (
-                        <Badge tone="accent">Obligatoire</Badge>
-                      ) : (
-                        <Badge tone="neutral">Facultative</Badge>
-                      )}
-                      {question.active ? null : <Badge tone="alert">Inactive</Badge>}
-                    </p>
-                    <p className="mt-1 text-sm text-muted">
-                      Clé : {question.key} · {TYPE_LABELS[question.type] ?? question.type} · ordre{' '}
-                      {question.order}
-                    </p>
-                    {condition.dependsOn ? (
-                      <p className="mt-1 text-sm text-muted">
-                        Affichée si « {condition.dependsOn} » = « {condition.equals} »
-                      </p>
-                    ) : null}
-                  </div>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <EditQuestionButton serviceId={serviceId} question={question} />
-                  <DeleteQuestionForm question={question} />
-                </div>
-              </li>
-            );
-          })}
+          {list.map((question, index) => (
+            <QuestionRow
+              key={question.id}
+              serviceId={serviceId}
+              question={question}
+              index={index}
+              count={list.length}
+              pendingOrder={pending}
+              onMove={move}
+            />
+          ))}
         </ol>
       )}
     </div>

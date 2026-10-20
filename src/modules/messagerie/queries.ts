@@ -63,6 +63,7 @@ export interface ConversationMessage {
 }
 
 export interface ConversationDetail extends ConversationListItem {
+  customerId: string | null;
   customerPhone: string | null;
   messages: ConversationMessage[];
 }
@@ -74,7 +75,13 @@ const LIST_SELECT = {
   source: true,
   lastMessageAt: true,
   customer: { select: { name: true, email: true } },
-  messages: { orderBy: { sentAt: 'desc' }, take: 1, select: { content: true } },
+  // Aperçu = dernier message visible de la cliente / de Patricia (jamais une note interne).
+  messages: {
+    where: { isInternal: false },
+    orderBy: { sentAt: 'desc' },
+    take: 1,
+    select: { content: true },
+  },
 } satisfies Prisma.ConversationSelect;
 
 type ListRow = Prisma.ConversationGetPayload<{ select: typeof LIST_SELECT }>;
@@ -138,7 +145,7 @@ export async function getConversationAdmin(id: string): Promise<ConversationDeta
   const row = await db.conversation.findUnique({
     where: { id },
     include: {
-      customer: true,
+      customer: { select: { id: true, name: true, email: true, phone: true } },
       messages: { orderBy: { sentAt: 'asc' } },
     },
   });
@@ -154,9 +161,10 @@ export async function getConversationAdmin(id: string): Promise<ConversationDeta
     lastMessageAt: row.lastMessageAt,
     customerName: row.customer?.name ?? 'Contact sans fiche',
     customerEmail: row.customer?.email ?? null,
+    customerId: row.customer?.id ?? null,
     customerPhone: row.customer?.phone ?? null,
     unreadCount,
-    lastMessage: row.messages.at(-1)?.content ?? '',
+    lastMessage: row.messages.findLast((message) => !message.isInternal)?.content ?? '',
     messages: row.messages.map((message) => ({
       id: message.id,
       author: message.author,

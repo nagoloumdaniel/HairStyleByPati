@@ -36,6 +36,34 @@ function revalidate() {
   revalidatePath('/coiffures');
 }
 
+/* Lit et valide le formulaire création / édition (dates en jours civils Dakar = UTC). */
+async function readPromotionForm(formData: FormData) {
+  const parsed = parseForm(promotionSchema, {
+    name: String(formData.get('name') ?? ''),
+    kind: String(formData.get('kind') ?? ''),
+    value: String(formData.get('value') ?? ''),
+    startsAt: String(formData.get('startsAt') ?? ''),
+    endsAt: String(formData.get('endsAt') ?? ''),
+    serviceIds: formData.getAll('serviceIds').map(String),
+  });
+  if ('error' in parsed) return { error: parsed.error };
+  const input = parsed.data;
+
+  // La promotion couvre les journées entières, jour de fin inclus.
+  const startsAt = new Date(`${input.startsAt}T00:00:00.000Z`);
+  const endsAt = new Date(`${input.endsAt}T23:59:59.999Z`);
+  if (endsAt.getTime() <= startsAt.getTime()) {
+    return { error: 'La date de fin doit être après la date de début.' };
+  }
+  const serviceIds = [...new Set(input.serviceIds)];
+  const found = await db.service.count({ where: { id: { in: serviceIds } } });
+  if (found !== serviceIds.length) return { error: 'Une prestation sélectionnée est introuvable.' };
+
+  // Pourcentage : entier 1-100 ; montant fixe : FCFA → 1/100 FCFA (unité interne).
+  const value = input.kind === 'PERCENT' ? input.value : input.value * 100;
+  return { data: { name: input.name, kind: input.kind, value, startsAt, endsAt, serviceIds } };
+}
+
 export async function adminCreatePromotion(
   _prev: PromotionActionState,
   formData: FormData,
@@ -43,40 +71,13 @@ export async function adminCreatePromotion(
   const user = await requireAdmin();
   if (!user) return { error: 'Accès interdit.' };
 
-  const parsed = parseForm(promotionSchema, {
-    name: formData.get('name'),
-    kind: formData.get('kind'),
-    value: formData.get('value'),
-    startsAt: formData.get('startsAt'),
-    endsAt: formData.get('endsAt'),
-    serviceIds: formData.getAll('serviceIds'),
-  });
-  if ('error' in parsed) return { error: parsed.error };
-  const input = parsed.data;
-
-  const startsAt = new Date(input.startsAt);
-  const endsAt = new Date(input.endsAt);
-  if (Number.isNaN(startsAt.getTime()) || Number.isNaN(endsAt.getTime())) {
-    return { error: 'Dates invalides.' };
-  }
-  if (endsAt.getTime() <= startsAt.getTime()) {
-    return { error: 'La date de fin doit être après la date de début.' };
-  }
-  const value =
-    input.kind === 'PERCENT'
-      ? Math.min(100, Math.round(input.value))
-      : Math.round(input.value * 100);
+  const read = await readPromotionForm(formData);
+  if ('error' in read) return { error: read.error };
+  const { serviceIds, ...fields } = read.data;
 
   try {
     const promotion = await db.promotion.create({
-      data: {
-        name: input.name,
-        kind: input.kind,
-        value,
-        startsAt,
-        endsAt,
-        services: { create: input.serviceIds.map((serviceId) => ({ serviceId })) },
-      },
+      data: { ...fields, services: { create: serviceIds.map((serviceId) => ({ serviceId })) } },
     });
     await logAudit({
       userId: user.id,
@@ -87,6 +88,42 @@ export async function adminCreatePromotion(
     });
     revalidate();
     return { success: 'Promotion créée.' };
+  } catch (error) {
+    return handleError(error);
+  }
+}
+
+export async function adminUpdatePromotion(
+  _prev: PromotionActionState,
+  formData: FormData,
+): Promise<PromotionActionState> {
+  const user = await requireAdmin();
+  if (!user) return { error: 'Accès interdit.' };
+
+  const id = parseForm(promotionIdSchema, { id: String(formData.get('id') ?? '') });
+  if ('error' in id) return { error: id.error };
+  const read = await readPromotionForm(formData);
+  if ('error' in read) return { error: read.error };
+  const { serviceIds, ...fields } = read.data;
+
+  try {
+    // Remplace les prestations liées en une seule transaction (pas d'état intermédiaire).
+    await db.$transaction([
+      db.promotionService.deleteMany({ where: { promotionId: id.data.id } }),
+      db.promotion.update({
+        where: { id: id.data.id },
+        data: { ...fields, services: { create: serviceIds.map((serviceId) => ({ serviceId })) } },
+      }),
+    ]);
+    await logAudit({
+      userId: user.id,
+      action: 'promotion.update',
+      entityType: 'Promotion',
+      entityId: id.data.id,
+      metadata: { name: fields.name },
+    });
+    revalidate();
+    return { success: 'Promotion mise à jour.' };
   } catch (error) {
     return handleError(error);
   }

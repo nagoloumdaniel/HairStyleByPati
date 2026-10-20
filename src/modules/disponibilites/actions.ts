@@ -21,7 +21,13 @@ import {
  * une confirmation explicite de Patricia.
  * ============================================================ */
 
-export type AvailabilityActionState = { error?: string; success?: string };
+/* `conflictCount` : nombre de rendez-vous actifs touchés ; l'interface demande alors une
+   confirmation puis renvoie le formulaire avec `confirmConflicts`. */
+export type AvailabilityActionState = {
+  error?: string;
+  success?: string;
+  conflictCount?: number;
+};
 
 function parseForm<T extends z.ZodType>(
   schema: T,
@@ -68,7 +74,11 @@ async function futureActiveAppointments() {
 }
 
 function conflictMessage(count: number): string {
-  return `Cette modification affecte ${count} rendez-vous actif(s) déjà enregistrés. Cochez la confirmation pour continuer malgré tout.`;
+  return `Cette modification affecte ${count} rendez-vous actif${count > 1 ? 's' : ''} déjà enregistré${count > 1 ? 's' : ''}.`;
+}
+
+function conflictState(count: number): AvailabilityActionState {
+  return { error: conflictMessage(count), conflictCount: count };
 }
 
 export async function adminSaveWeeklyRule(
@@ -82,26 +92,26 @@ export async function adminSaveWeeklyRule(
   const { weekday, start, end, active, timeZone, confirmConflicts } = parsed.data;
 
   try {
-    if (active) {
-      const [appointments, specificRules] = await Promise.all([
-        futureActiveAppointments(),
-        db.availabilityRule.findMany({
-          where: { kind: 'SPECIFIC', active: true, date: { not: null } },
-          select: { date: true },
-        }),
-      ]);
-      const overriddenDates = new Set(
-        specificRules.map((rule) => rule.date).filter((date): date is string => Boolean(date)),
-      );
-      const conflicts = appointments.filter((appointment) => {
-        const parts = utcToDeviceParts(appointment.startsAt, timeZone);
-        if (parts.weekday !== weekday) return false;
-        if (overriddenDates.has(parts.dateISO)) return false;
-        return parts.minute < start || parts.minute + appointment.durationMinutes > end;
-      });
-      if (conflicts.length > 0 && !confirmConflicts) {
-        return { error: conflictMessage(conflicts.length) };
-      }
+    const [appointments, specificRules] = await Promise.all([
+      futureActiveAppointments(),
+      db.availabilityRule.findMany({
+        where: { kind: 'SPECIFIC', active: true, date: { not: null } },
+        select: { date: true },
+      }),
+    ]);
+    const overriddenDates = new Set(
+      specificRules.map((rule) => rule.date).filter((date): date is string => Boolean(date)),
+    );
+    // Jour fermé : tous les rendez-vous de ce jour de semaine sont touchés.
+    const conflicts = appointments.filter((appointment) => {
+      const parts = utcToDeviceParts(appointment.startsAt, timeZone);
+      if (parts.weekday !== weekday) return false;
+      if (overriddenDates.has(parts.dateISO)) return false;
+      if (!active) return true;
+      return parts.minute < start || parts.minute + appointment.durationMinutes > end;
+    });
+    if (conflicts.length > 0 && !confirmConflicts) {
+      return conflictState(conflicts.length);
     }
 
     await db.$transaction(async (tx) => {
@@ -145,7 +155,7 @@ export async function adminSaveSpecificRule(
         return parts.minute < start || parts.minute + appointment.durationMinutes > end;
       });
       if (conflicts.length > 0 && !confirmConflicts) {
-        return { error: conflictMessage(conflicts.length) };
+        return conflictState(conflicts.length);
       }
     }
 
@@ -186,7 +196,11 @@ export async function adminDeleteSpecificRule(
   const parsed = parseForm(idSchema, Object.fromEntries(formData));
   if ('error' in parsed) return { error: parsed.error };
   try {
-    await db.availabilityRule.delete({ where: { id: parsed.data.id } });
+    // Seules les exceptions de date sont supprimables ici (pas les horaires hebdomadaires).
+    const removed = await db.availabilityRule.deleteMany({
+      where: { id: parsed.data.id, kind: 'SPECIFIC' },
+    });
+    if (removed.count === 0) return { error: 'Exception introuvable.' };
     await logAudit({
       userId: user.id,
       action: 'availability.specific.delete',
@@ -233,7 +247,7 @@ export async function adminCreateBlockedPeriod(
       select: { id: true, startsAt: true },
     });
     if (conflicts.length > 0 && !confirmConflicts) {
-      return { error: conflictMessage(conflicts.length) };
+      return conflictState(conflicts.length);
     }
 
     const blocked = await db.blockedPeriod.create({
@@ -267,7 +281,8 @@ export async function adminDeleteBlockedPeriod(
   const parsed = parseForm(idSchema, Object.fromEntries(formData));
   if ('error' in parsed) return { error: parsed.error };
   try {
-    await db.blockedPeriod.delete({ where: { id: parsed.data.id } });
+    const removed = await db.blockedPeriod.deleteMany({ where: { id: parsed.data.id } });
+    if (removed.count === 0) return { error: 'Blocage introuvable.' };
     await logAudit({
       userId: user.id,
       action: 'availability.block.delete',

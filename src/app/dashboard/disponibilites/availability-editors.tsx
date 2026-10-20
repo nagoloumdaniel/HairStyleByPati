@@ -1,7 +1,7 @@
 'use client';
 
-import { ArrowRight } from 'lucide-react';
-import { useActionState, useEffect, useState } from 'react';
+import { ArrowRight, CalendarPlus, Ban, Save, Trash2 } from 'lucide-react';
+import { useCallback, useState, useTransition, type FormEvent } from 'react';
 import {
   adminCreateBlockedPeriod,
   adminDeleteBlockedPeriod,
@@ -14,12 +14,16 @@ import {
 import { LocalDateTime } from '@/components/shared/LocalDateTime';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { useConfirm } from '@/components/ui/Confirm';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
+import { useToast } from '@/components/ui/Toast';
 
 /* ============================================================
- * P6.10 : édition des disponibilités et paramètres de réservation.
- * Les avertissements de conflit sont renvoyés par le serveur.
+ * Édition des disponibilités et paramètres de réservation.
+ * Les conflits avec des rendez-vous existants sont détectés par le
+ * serveur : l'interface demande alors une confirmation puis renvoie
+ * le formulaire avec `confirmConflicts`.
  * ============================================================ */
 
 const WEEKDAYS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
@@ -59,6 +63,11 @@ export interface BookingSettingsView {
   photoRetentionDays: number;
 }
 
+type ServerAction = (
+  prev: AvailabilityActionState,
+  formData: FormData,
+) => Promise<AvailabilityActionState>;
+
 function timeValue(minutes: number): string {
   return `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(
     2,
@@ -66,185 +75,164 @@ function timeValue(minutes: number): string {
   )}`;
 }
 
-function useDeviceTimeZone(): string {
-  const [timeZone, setTimeZone] = useState('Africa/Dakar');
-  useEffect(() => {
-    try {
-      setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone || 'Africa/Dakar');
-    } catch {
-      setTimeZone('Africa/Dakar');
-    }
-  }, []);
-  return timeZone;
+function deviceTimeZone(): string {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || 'Africa/Dakar';
+  } catch {
+    return 'Africa/Dakar';
+  }
 }
 
-function ConflictCheckbox() {
-  return (
-    <label className="flex items-start gap-2 text-xs text-muted">
-      <input type="checkbox" name="confirmConflicts" className="mt-0.5 size-3.5" />
-      Confirmer même si des rendez-vous existent déjà sur ce créneau.
-    </label>
+/* Lance une action serveur : fuseau de l'appareil, confirmation si des rendez-vous sont
+   touchés, toast de résultat. `pending` bloque le double envoi. */
+function useAvailabilityAction() {
+  const confirm = useConfirm();
+  const { notify } = useToast();
+  const [pending, startTransition] = useTransition();
+
+  const run = useCallback(
+    (action: ServerAction, data: FormData, onSuccess?: () => void) => {
+      data.set('timeZone', deviceTimeZone());
+      startTransition(async () => {
+        try {
+          let state = await action({}, data);
+          if (state.conflictCount) {
+            const ok = await confirm({
+              title: 'Des rendez-vous sont concernés',
+              message:
+                `${state.error ?? ''} Les rendez-vous ne sont pas annulés automatiquement. Continuer malgré tout ?`.trim(),
+              confirmLabel: 'Continuer',
+              tone: 'danger',
+            });
+            if (!ok) return;
+            data.set('confirmConflicts', 'on');
+            state = await action({}, data);
+          }
+          if (state.error) {
+            notify(state.error, 'error');
+            return;
+          }
+          notify(state.success ?? 'Enregistré.', 'success');
+          onSuccess?.();
+        } catch {
+          notify('Connexion impossible. Réessayez.', 'error');
+        }
+      });
+    },
+    [confirm, notify],
   );
+
+  return { run, pending };
 }
 
-function Feedback({ state }: { state: AvailabilityActionState }) {
-  return (
-    <>
-      {state.error ? (
-        <p
-          role="alert"
-          className="mt-2 rounded-[var(--radius-sm)] bg-alert-soft px-3 py-2 text-xs font-medium text-alert"
-        >
-          {state.error}
-        </p>
-      ) : null}
-      {state.success ? (
-        <p
-          role="status"
-          className="mt-2 rounded-[var(--radius-sm)] bg-success-soft px-3 py-2 text-xs font-medium text-success"
-        >
-          {state.success}
-        </p>
-      ) : null}
-    </>
-  );
-}
+const checkboxClass = 'size-4 accent-accent';
 
-function WeekdayForm({
-  weekday,
-  rule,
-  timeZone,
-}: {
-  weekday: number;
-  rule: WeeklyRuleView | null;
-  timeZone: string;
-}) {
-  const [state, formAction, pending] = useActionState<AvailabilityActionState, FormData>(
-    adminSaveWeeklyRule,
-    {},
-  );
+function WeekdayForm({ weekday, rule }: { weekday: number; rule: WeeklyRuleView | null }) {
+  const { run, pending } = useAvailabilityAction();
   const [active, setActive] = useState(Boolean(rule));
 
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    data.set('weekday', String(weekday));
+    run(adminSaveWeeklyRule, data);
+  }
+
   return (
-    <form action={formAction} className="rounded-[var(--radius-md)] border border-line p-3">
-      <input type="hidden" name="weekday" value={weekday} />
-      <input type="hidden" name="timeZone" value={timeZone} />
-      <div className="flex flex-wrap items-end gap-3">
-        <div className="w-32">
-          <Input
-            label="Début"
-            name="start"
-            type="time"
-            defaultValue={timeValue(rule?.startMinute ?? 540)}
-            required
-          />
-        </div>
-        <div className="w-32">
-          <Input
-            label="Fin"
-            name="end"
-            type="time"
-            defaultValue={timeValue(rule?.endMinute ?? 1080)}
-            required
-          />
-        </div>
-        <label className="flex items-center gap-2 pb-2 text-sm font-semibold">
+    <form onSubmit={onSubmit} className="rounded-[var(--radius-md)] border border-line p-3">
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <p className="font-semibold text-fg">{WEEKDAYS[weekday]}</p>
+        <label className="inline-flex items-center gap-2 text-sm font-semibold">
           <input
             type="checkbox"
             name="active"
             checked={active}
             onChange={(event) => setActive(event.target.checked)}
-            className="size-4"
+            className={checkboxClass}
           />
           Ouvert
         </label>
-        <Button type="submit" variant="secondary" size="sm" loading={pending}>
-          Enregistrer
+      </div>
+      <div
+        className={`grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-end gap-2 transition-opacity ${
+          active ? '' : 'opacity-50'
+        }`}
+      >
+        <Input
+          label="Début"
+          name="start"
+          type="time"
+          defaultValue={timeValue(rule?.startMinute ?? 540)}
+        />
+        <Input
+          label="Fin"
+          name="end"
+          type="time"
+          defaultValue={timeValue(rule?.endMinute ?? 1080)}
+        />
+        <Button type="submit" variant="secondary" icon={Save} iconOnly loading={pending}>
+          {`Enregistrer ${WEEKDAYS[weekday]?.toLowerCase()}`}
         </Button>
       </div>
-      <div className="mt-2">
-        <ConflictCheckbox />
-      </div>
-      <Feedback state={state} />
     </form>
   );
 }
 
 export function WeeklyScheduleEditor({ rules }: { rules: WeeklyRuleView[] }) {
-  const timeZone = useDeviceTimeZone();
   return (
-    <div className="flex flex-col gap-2">
+    <div className="grid gap-2">
       {WEEKDAYS.map((label, weekday) => (
-        <div key={label}>
-          <p className="mb-1 text-sm font-semibold text-fg">{label}</p>
-          <WeekdayForm
-            weekday={weekday}
-            rule={rules.find((rule) => rule.weekday === weekday) ?? null}
-            timeZone={timeZone}
-          />
-        </div>
+        <WeekdayForm
+          key={label}
+          weekday={weekday}
+          rule={rules.find((rule) => rule.weekday === weekday) ?? null}
+        />
       ))}
     </div>
   );
 }
 
 export function SpecificDatesEditor({ rules }: { rules: SpecificRuleView[] }) {
-  const timeZone = useDeviceTimeZone();
-  const [state, formAction, pending] = useActionState<AvailabilityActionState, FormData>(
-    adminSaveSpecificRule,
-    {},
-  );
+  const { run, pending } = useAvailabilityAction();
   const [active, setActive] = useState(true);
+  const [formKey, setFormKey] = useState(0);
+
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    run(adminSaveSpecificRule, new FormData(event.currentTarget), () => setFormKey((k) => k + 1));
+  }
 
   return (
-    <div className="flex flex-col gap-4">
-      <form action={formAction} className="flex flex-wrap items-end gap-3">
-        <input type="hidden" name="timeZone" value={timeZone} />
-        <div className="w-40">
-          <Input label="Date" name="dateISO" type="date" required />
+    <div className="grid gap-4">
+      <form key={formKey} onSubmit={onSubmit} className="grid gap-3">
+        <Input label="Date" name="dateISO" type="date" required />
+        <div className="grid grid-cols-2 gap-2">
+          <Input label="Début" name="start" type="time" defaultValue="09:00" />
+          <Input label="Fin" name="end" type="time" defaultValue="18:00" />
         </div>
-        <div className="w-32">
-          <Input label="Début" name="start" type="time" defaultValue="09:00" required />
+        <div className="flex items-center justify-between gap-3">
+          <label className="inline-flex items-center gap-2 text-sm font-semibold">
+            <input
+              type="checkbox"
+              name="active"
+              checked={active}
+              onChange={(event) => setActive(event.target.checked)}
+              className={checkboxClass}
+            />
+            Ouvert ce jour-là
+          </label>
+          <Button type="submit" icon={CalendarPlus} loading={pending}>
+            Ajouter
+          </Button>
         </div>
-        <div className="w-32">
-          <Input label="Fin" name="end" type="time" defaultValue="18:00" required />
-        </div>
-        <label className="flex items-center gap-2 pb-2 text-sm font-semibold">
-          <input
-            type="checkbox"
-            name="active"
-            checked={active}
-            onChange={(event) => setActive(event.target.checked)}
-            className="size-4"
-          />
-          Ouvert
-        </label>
-        <Button type="submit" size="sm" loading={pending}>
-          Enregistrer l’exception
-        </Button>
       </form>
-      <ConflictCheckbox />
-      <Feedback state={state} />
 
       {rules.length === 0 ? (
-        <p className="text-sm text-muted">Aucune exception de date.</p>
+        <p className="text-sm text-muted">Aucune exception de date à venir.</p>
       ) : (
-        <ul className="flex flex-col gap-2">
+        <ul className="grid gap-2">
           {rules.map((rule) => (
-            <li
-              key={rule.id}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-md)] border border-line bg-card p-3"
-            >
-              <p className="text-sm">
-                <span className="font-semibold">
-                  {new Intl.DateTimeFormat('fr-FR', { dateStyle: 'full' }).format(
-                    new Date(`${rule.date}T12:00:00`),
-                  )}
-                </span>{' '}
-                · {timeValue(rule.startMinute)} – {timeValue(rule.endMinute)}
-              </p>
-              <DeleteSpecificButton id={rule.id} />
-            </li>
+            <SpecificRow key={rule.id} rule={rule} />
           ))}
         </ul>
       )}
@@ -252,75 +240,93 @@ export function SpecificDatesEditor({ rules }: { rules: SpecificRuleView[] }) {
   );
 }
 
-function DeleteSpecificButton({ id }: { id: string }) {
-  const [state, formAction, pending] = useActionState<AvailabilityActionState, FormData>(
-    adminDeleteSpecificRule,
-    {},
+function SpecificRow({ rule }: { rule: SpecificRuleView }) {
+  const confirm = useConfirm();
+  const { notify } = useToast();
+  const [pending, startTransition] = useTransition();
+  const label = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'full' }).format(
+    new Date(`${rule.date}T12:00:00`),
   );
+
+  async function remove() {
+    const ok = await confirm({
+      title: 'Supprimer cette exception ?',
+      message: `Les horaires habituels s’appliqueront de nouveau le ${label}.`,
+      confirmLabel: 'Supprimer',
+    });
+    if (!ok) return;
+    const data = new FormData();
+    data.set('id', rule.id);
+    startTransition(async () => {
+      try {
+        const state = await adminDeleteSpecificRule({}, data);
+        if (state.error) notify(state.error, 'error');
+        else notify(state.success ?? 'Exception supprimée.', 'success');
+      } catch {
+        notify('Connexion impossible. Réessayez.', 'error');
+      }
+    });
+  }
+
   return (
-    <form action={formAction}>
-      <input type="hidden" name="id" value={id} />
-      <Button type="submit" variant="danger" size="sm" loading={pending}>
-        Supprimer
+    <li className="flex items-center justify-between gap-3 rounded-[var(--radius-md)] border border-line bg-card p-3">
+      <p className="min-w-0 text-sm">
+        <span className="font-semibold">{label}</span>
+        <span className="block text-muted">
+          {timeValue(rule.startMinute)} – {timeValue(rule.endMinute)}
+        </span>
+      </p>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        icon={Trash2}
+        iconOnly
+        loading={pending}
+        onClick={() => void remove()}
+      >
+        {`Supprimer l’exception du ${label}`}
       </Button>
-      <Feedback state={state} />
-    </form>
+    </li>
   );
 }
 
 export function BlockedPeriodsEditor({ periods }: { periods: BlockedPeriodView[] }) {
-  const timeZone = useDeviceTimeZone();
-  const [state, formAction, pending] = useActionState<AvailabilityActionState, FormData>(
-    adminCreateBlockedPeriod,
-    {},
-  );
+  const { run, pending } = useAvailabilityAction();
+  const [formKey, setFormKey] = useState(0);
+
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    run(adminCreateBlockedPeriod, new FormData(event.currentTarget), () =>
+      setFormKey((k) => k + 1),
+    );
+  }
 
   return (
-    <div className="flex flex-col gap-4">
-      <form action={formAction} className="flex flex-col gap-3">
-        <input type="hidden" name="timeZone" value={timeZone} />
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Input label="Début" name="startsAtLocal" type="datetime-local" required />
-          <Input label="Fin" name="endsAtLocal" type="datetime-local" required />
-        </div>
+    <div className="grid gap-4">
+      <form key={formKey} onSubmit={onSubmit} className="grid gap-3">
+        <Input label="Début" name="startsAtLocal" type="datetime-local" required />
+        <Input label="Fin" name="endsAtLocal" type="datetime-local" required />
         <Textarea
           label="Motif (facultatif)"
           name="reason"
           rows={2}
-          hint="Exemple : pause déjeuner, congé, rendez-vous personnel."
+          maxLength={200}
+          hint="Ex. pause déjeuner, congé, rendez-vous personnel."
         />
-        <ConflictCheckbox />
-        <Button type="submit" size="sm" loading={pending} className="self-start">
-          Bloquer cette période
-        </Button>
+        <div>
+          <Button type="submit" icon={Ban} loading={pending}>
+            Bloquer cette période
+          </Button>
+        </div>
       </form>
-      <Feedback state={state} />
 
       {periods.length === 0 ? (
         <p className="text-sm text-muted">Aucune indisponibilité enregistrée.</p>
       ) : (
-        <ul className="flex flex-col gap-2">
+        <ul className="grid gap-2">
           {periods.map((period) => (
-            <li
-              key={period.id}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-md)] border border-line bg-card p-3"
-            >
-              <div className="text-sm">
-                <p className="font-semibold">
-                  <LocalDateTime iso={period.startsAt} />{' '}
-                  <ArrowRight aria-hidden="true" className="inline size-4" />{' '}
-                  <LocalDateTime iso={period.endsAt} />
-                </p>
-                <p className="text-muted">
-                  {period.reason || 'Sans motif'}
-                  {period.createdByName ? ` · ${period.createdByName}` : ''}
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge tone="alert">Indisponible</Badge>
-                <DeleteBlockedButton id={period.id} />
-              </div>
-            </li>
+            <BlockedRow key={period.id} period={period} />
           ))}
         </ul>
       )}
@@ -328,32 +334,85 @@ export function BlockedPeriodsEditor({ periods }: { periods: BlockedPeriodView[]
   );
 }
 
-function DeleteBlockedButton({ id }: { id: string }) {
-  const [state, formAction, pending] = useActionState<AvailabilityActionState, FormData>(
-    adminDeleteBlockedPeriod,
-    {},
-  );
+function BlockedRow({ period }: { period: BlockedPeriodView }) {
+  const confirm = useConfirm();
+  const { notify } = useToast();
+  const [pending, startTransition] = useTransition();
+
+  async function remove() {
+    const ok = await confirm({
+      title: 'Supprimer ce blocage ?',
+      message: 'Les créneaux de cette période redeviennent réservables.',
+      confirmLabel: 'Supprimer',
+    });
+    if (!ok) return;
+    const data = new FormData();
+    data.set('id', period.id);
+    startTransition(async () => {
+      try {
+        const state = await adminDeleteBlockedPeriod({}, data);
+        if (state.error) notify(state.error, 'error');
+        else notify(state.success ?? 'Blocage supprimé.', 'success');
+      } catch {
+        notify('Connexion impossible. Réessayez.', 'error');
+      }
+    });
+  }
+
   return (
-    <form action={formAction}>
-      <input type="hidden" name="id" value={id} />
-      <Button type="submit" variant="ghost" size="sm" loading={pending}>
-        Supprimer
+    <li className="flex items-center justify-between gap-3 rounded-[var(--radius-md)] border border-line bg-card p-3">
+      <div className="min-w-0 text-sm">
+        <p className="flex flex-wrap items-center gap-x-1.5 font-semibold">
+          <LocalDateTime iso={period.startsAt} dateStyle="medium" />
+          <ArrowRight aria-hidden="true" className="size-4 shrink-0" />
+          <LocalDateTime iso={period.endsAt} dateStyle="medium" />
+        </p>
+        <p className="mt-0.5 flex flex-wrap items-center gap-2 text-muted">
+          <Badge tone="alert">Indisponible</Badge>
+          <span className="min-w-0 truncate">
+            {period.reason || 'Sans motif'}
+            {period.createdByName ? ` · ${period.createdByName}` : ''}
+          </span>
+        </p>
+      </div>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        icon={Trash2}
+        iconOnly
+        loading={pending}
+        onClick={() => void remove()}
+      >
+        Supprimer ce blocage
       </Button>
-      <Feedback state={state} />
-    </form>
+    </li>
   );
 }
 
 export function BookingSettingsEditor({ settings }: { settings: BookingSettingsView }) {
-  const [state, formAction, pending] = useActionState<AvailabilityActionState, FormData>(
-    adminSaveSettings,
-    {},
-  );
+  const { notify } = useToast();
+  const [pending, startTransition] = useTransition();
+
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    startTransition(async () => {
+      try {
+        const state = await adminSaveSettings({}, data);
+        if (state.error) notify(state.error, 'error');
+        else notify(state.success ?? 'Paramètres enregistrés.', 'success');
+      } catch {
+        notify('Connexion impossible. Réessayez.', 'error');
+      }
+    });
+  }
+
   return (
-    <form action={formAction} className="flex flex-col gap-4">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <form onSubmit={onSubmit} className="grid gap-4">
+      <div className="grid gap-3 sm:grid-cols-2">
         <Input
-          label="Durée de maintien d’un créneau en attente (min)"
+          label="Maintien d’un créneau en attente (min)"
           name="holdSlotMinutes"
           type="number"
           min={0}
@@ -416,32 +475,31 @@ export function BookingSettingsEditor({ settings }: { settings: BookingSettingsV
           min={1}
           max={120}
           defaultValue={settings.dataRetentionMonths}
-          hint="Durée indicative pour les données clientes et l’historique."
+          hint="Données clientes et historique."
         />
         <Input
-          label="Conservation des photos privées (jours)"
+          label="Conservation des photos (jours)"
           name="photoRetentionDays"
           type="number"
           min={7}
           max={3650}
           defaultValue={settings.photoRetentionDays}
-          hint="Les photos d’évaluation et de demande sont purgées après ce délai."
+          hint="Photos d’évaluation et de demande, purgées ensuite."
         />
       </div>
-      <label className="flex items-center gap-2 text-sm font-semibold">
+      <label className="inline-flex items-center gap-2 text-sm font-semibold">
         <input
           type="checkbox"
           name="cancelReasonRequired"
           defaultChecked={settings.cancelReasonRequired}
-          className="size-4"
+          className={checkboxClass}
         />
-        Motif obligatoire pour l’annulation client
+        Motif obligatoire pour l’annulation par la cliente
       </label>
-      <div className="flex flex-wrap items-center gap-3">
-        <Button type="submit" loading={pending}>
+      <div>
+        <Button type="submit" icon={Save} loading={pending}>
           Enregistrer les paramètres
         </Button>
-        <Feedback state={state} />
       </div>
     </form>
   );

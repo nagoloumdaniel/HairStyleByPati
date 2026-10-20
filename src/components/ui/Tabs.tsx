@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useId, useState, type ReactNode } from 'react';
 
 /* P2.3 + P2.9 : onglets clavier (role tablist, aria-selected). */
 export function Tabs({
@@ -11,6 +11,7 @@ export function Tabs({
   defaultIndex?: number;
 }) {
   const [active, setActive] = useState(defaultIndex);
+  const uid = useId();
   return (
     <div>
       <div role="tablist" aria-label="Onglets" className="flex flex-wrap gap-2">
@@ -18,12 +19,14 @@ export function Tabs({
           <button
             key={t.id}
             role="tab"
-            id={`tab-${t.id}`}
+            id={`${uid}-tab-${t.id}`}
             aria-selected={i === active}
-            aria-controls={`panel-${t.id}`}
+            aria-controls={`${uid}-panel-${t.id}`}
             onClick={() => setActive(i)}
-            className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-              i === active ? 'bg-ink text-panel-fg' : 'bg-line text-fg hover:bg-accent-soft'
+            className={`h-9 rounded-[var(--radius-md)] px-3.5 text-sm font-semibold transition ${
+              i === active
+                ? 'bg-accent text-accent-fg'
+                : 'bg-card text-fg border border-line hover:border-cacao'
             }`}
           >
             {t.label}
@@ -32,8 +35,8 @@ export function Tabs({
       </div>
       <div
         role="tabpanel"
-        id={`panel-${tabs[active]?.id}`}
-        aria-labelledby={`tab-${tabs[active]?.id}`}
+        id={`${uid}-panel-${tabs[active]?.id}`}
+        aria-labelledby={`${uid}-tab-${tabs[active]?.id}`}
         className="mt-4"
       >
         {tabs[active]?.content}

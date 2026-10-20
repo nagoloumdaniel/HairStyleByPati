@@ -68,3 +68,16 @@
 - Horaires : Lundi – Dimanche, 5h – 22h (partout). Landing : mêmes polices que le reste du site (Playfair Display + Lato), aucune exception.
 - Boutons « Réserver » (navbar, landing, contact, infos) → `/coiffures`. `/reserver` sans `?service=` redirige vers le catalogue (plus de liste de noms) ; `/reserver?service=slug` reste le parcours de réservation.
 - Dashboard admin : SANS navbar publique ni footer (masqués sous `/dashboard`). Sidebar avec icônes lucide, « Voir le site » et bascule de thème ; chaque titre de page dashboard a son icône.
+- Dashboard : plein écran (pas de `max-w` global ni de marges autour), sidebar collée à gauche pleine hauteur (`lg:h-dvh`, sticky), contenu qui remplit toute la largeur restante ; responsive (mobile : barre de navigation horizontale en haut, contenu pleine largeur).
+- Dashboard mobile = app mobile : barre d’'app en haut (titre, voir le site, thème) + barre d’onglets fixe en bas (icône + libellé, défilement horizontal, safe-area), contenu avec marge basse.
+- Dashboard : navbar (DashboardTopbar) avec Messages, Notifications (badges), Voir le site, thème, Déconnexion ; la sidebar ne garde que les pages de gestion.
+- **Refonte dashboard (consignes utilisateur)** :
+  - Thème unique : le dashboard est toujours en thème clair (`DashboardThemeLock`), plus de bascule clair/sombre. Aucune couleur en dur.
+  - Sidebar : pas de texte « Administration ». Mobile : barre d’onglets fixe (4 entrées + « Menu » qui ouvre toutes les pages en grille d’icônes).
+  - Marges mobiles réduites au minimum (`px-3`), cartes `p-4`.
+  - Cartes entièrement cliquables (`CardLink`) : jamais de bouton « Voir plus » / « Détails » sur une carte.
+  - Tailles uniformes : `Button`/`ButtonLink`/champs/`Select` = h-9 (sm), h-10 (md, défaut), h-12 (lg). Pas de classes de bouton ad hoc : utiliser `Button`, `ButtonLink` (`src/components/ui/Button.tsx`).
+  - Mobile : boutons en icône seule (`iconOnly="mobile"` + `icon`), libellé en `sr-only` + `title`. Libellé visible dès `sm`.
+  - Icône dans chaque champ (`Input`, `Select icon`, `Textarea`).
+  - Popups : `Modal` (portail, fond flouté, bouton ✕, Échap, clic extérieur, focus piégé, page non scrollable derrière). Pas de `window.confirm` : utiliser `useConfirm()` (`src/components/ui/Confirm.tsx`).
+  - En-tête de page : `PageHeader` (icône + titre + description + actions).

@@ -650,17 +650,36 @@ export async function updateAppointmentStatus(input: {
   });
   if (!appointment) throw new AppError('NOT_FOUND', 'Rendez-vous introuvable.', 404);
   assertTransition(appointment.status, input.status);
+  // Terminer / marquer absente n'a de sens qu'une fois le rendez-vous commencé.
+  if (
+    (input.status === 'COMPLETED' || input.status === 'NO_SHOW') &&
+    appointment.startsAt.getTime() > Date.now()
+  ) {
+    throw new AppError(
+      'NOT_STARTED',
+      'Ce rendez-vous n’a pas encore commencé : impossible de le clôturer.',
+      409,
+    );
+  }
   const settings = await getSalonSettingsForSlots();
 
   await db.$transaction(async (tx) => {
-    await tx.appointment.update({
-      where: { id: appointment.id },
+    // Garde de concurrence : le statut ne doit pas avoir changé depuis la lecture.
+    const updated = await tx.appointment.updateMany({
+      where: { id: appointment.id, status: appointment.status },
       data: {
         status: input.status,
         holdExpiresAt: null,
         ...(input.status === 'CONFIRMED' ? { cancelledAt: null, cancelReason: null } : {}),
       },
     });
+    if (updated.count === 0) {
+      throw new AppError(
+        'CONFLICT',
+        'Ce rendez-vous vient d’être modifié. Rechargez la page puis réessayez.',
+        409,
+      );
+    }
     if (input.status === 'CONFIRMED') {
       await queueAppointmentNotifications(tx, 'confirmed', {
         appointmentId: appointment.id,
@@ -714,14 +733,22 @@ export async function cancelAppointmentByAdmin(input: {
   const settings = await getSalonSettingsForSlots();
 
   await db.$transaction(async (tx) => {
-    await tx.appointment.update({
-      where: { id: appointment.id },
+    // Garde de concurrence : évite d'annuler un rendez-vous déjà clos entre-temps.
+    const updated = await tx.appointment.updateMany({
+      where: { id: appointment.id, status: appointment.status },
       data: {
         status: 'CANCELLED_BY_ADMIN',
         cancelledAt: new Date(),
         cancelReason: input.reason || null,
       },
     });
+    if (updated.count === 0) {
+      throw new AppError(
+        'CONFLICT',
+        'Ce rendez-vous vient d’être modifié. Rechargez la page puis réessayez.',
+        409,
+      );
+    }
     await queueAppointmentNotifications(tx, 'cancelled_by_admin', {
       appointmentId: appointment.id,
       customerName: appointment.customer.name,

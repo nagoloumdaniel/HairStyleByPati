@@ -43,7 +43,7 @@ export function Field({
 }
 
 export const fieldBox = (error?: string) =>
-  `w-full rounded-[var(--radius-md)] border bg-card px-4 py-2.5 text-fg transition ${
+  `h-10 w-full rounded-[var(--radius-md)] border bg-card px-3.5 text-sm text-fg transition ${
     error ? 'border-alert' : 'border-line focus:border-cacao'
   }`;
 

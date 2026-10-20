@@ -100,6 +100,8 @@ export async function getImageSignedUrl(
   key: string,
   expiresInSeconds = 3600,
 ): Promise<string | null> {
+  // Photos de démonstration : la clé est déjà une URL publique, pas un objet du bucket.
+  if (/^(https?:)?\/\//.test(key) || key.startsWith('/')) return key;
   const config = readStorageConfig();
   if (!config || !key) return null;
   const command = new GetObjectCommand({ Bucket: config.bucket, Key: key });

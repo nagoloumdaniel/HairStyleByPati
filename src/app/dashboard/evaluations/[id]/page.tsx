@@ -1,3 +1,4 @@
+import { ClipboardCheck, ExternalLink, Mail, Phone } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
@@ -10,6 +11,9 @@ import {
 } from '@/modules/compatibilite/schemas';
 import { listAuditLogsForEntity } from '@/modules/stats/audit';
 import { signedPrivatePhotos } from '@/modules/fichiers/private-images';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { BackButton } from '@/components/shared/BackButton';
+import { LocalDateTime } from '@/components/shared/LocalDateTime';
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { DecisionForm } from './decision-form';
@@ -25,11 +29,6 @@ const STATUS_TONES: Record<string, 'accent' | 'success' | 'alert' | 'neutral'> =
   BOOKING_PENDING: 'neutral',
   CONFIRMED: 'success',
 };
-
-const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
-  dateStyle: 'short',
-  timeStyle: 'short',
-});
 
 const ACTION_LABELS: Record<string, string> = {
   'assessment.submit': 'Demande envoyée par la cliente',
@@ -83,106 +82,82 @@ export default async function AssessmentDetailPage({
   });
 
   return (
-    <div className="p-6">
-      <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
-        <ol className="flex flex-wrap items-center gap-2">
-          <li>
-            <Link href="/dashboard/evaluations" className="transition hover:text-cacao">
-              Évaluations
-            </Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li>
-            <span aria-current="page" className="font-medium text-fg">
-              {detail.customer?.name ?? 'Demande'}
-            </span>
-          </li>
-        </ol>
-      </nav>
-
-      <div className="mt-3 flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-2xl font-semibold">
-              Évaluation pour {detail.customer?.name ?? 'une cliente'}
-            </h1>
+    <div>
+      <PageHeader
+        icon={ClipboardCheck}
+        back={<BackButton fallbackHref="/dashboard/evaluations" />}
+        title={`Évaluation de ${detail.customer?.name ?? 'une cliente'}`}
+        description={
+          <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
             <Badge tone={STATUS_TONES[detail.status] ?? 'neutral'}>
               {ASSESSMENT_STATUS_LABELS[detail.status] ?? detail.status}
             </Badge>
-          </div>
-          <p className="mt-1 text-sm text-muted">
-            Demandée le {dateFormatter.format(detail.createdAt)} ·{' '}
             <Link
               href={`/dashboard/catalogue/prestations/${detail.serviceId}`}
-              className="font-semibold text-cacao underline-offset-4 hover:underline"
+              className="font-semibold text-accent underline-offset-4 hover:underline"
             >
               {detail.serviceName}
-            </Link>{' '}
-            ·{' '}
-            <Link
-              href={`/compatibilite?service=${detail.serviceSlug}`}
-              className="underline-offset-4 hover:underline"
-            >
-              parcours public
             </Link>
-          </p>
-          {detail.decidedAt ? (
-            <p className="mt-1 text-sm text-muted">
-              Décision du {dateFormatter.format(detail.decidedAt)}
-              {detail.decidedByName ? ` par ${detail.decidedByName}` : ''}
-            </p>
-          ) : null}
-        </div>
-      </div>
+            <span>
+              · demandée le{' '}
+              <LocalDateTime iso={detail.createdAt.toISOString()} dateStyle="medium" />
+            </span>
+          </span>
+        }
+      />
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-        <div className="space-y-6">
+      <div className="grid items-start gap-3 lg:grid-cols-2">
+        <div className="grid gap-3">
           <Card>
-            <h2 className="font-heading text-xl font-bold text-fg">Coordonnées de la cliente</h2>
+            <h2 className="font-heading text-lg font-bold text-fg">Cliente</h2>
             {detail.customer ? (
-              <dl className="mt-3 space-y-2 text-sm">
-                <div className="flex flex-wrap gap-2">
-                  <dt className="font-semibold">Nom :</dt>
-                  <dd>{detail.customer.name}</dd>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <dt className="font-semibold">E-mail :</dt>
-                  <dd>
+              <>
+                <p className="mt-2 font-semibold">{detail.customer.name}</p>
+                <ul className="mt-2 grid gap-1.5 text-sm">
+                  <li>
                     <a
                       href={`mailto:${detail.customer.email}`}
-                      className="text-cacao underline-offset-4 hover:underline"
+                      className="inline-flex items-center gap-2 text-accent underline-offset-4 hover:underline"
                     >
+                      <Mail aria-hidden="true" className="size-4" />
                       {detail.customer.email}
                     </a>
-                  </dd>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <dt className="font-semibold">Téléphone :</dt>
-                  <dd>
+                  </li>
+                  <li>
                     <a
                       href={`tel:${detail.customer.phone.replace(/\s+/g, '')}`}
-                      className="text-cacao underline-offset-4 hover:underline"
+                      className="inline-flex items-center gap-2 text-accent underline-offset-4 hover:underline"
                     >
+                      <Phone aria-hidden="true" className="size-4" />
                       {detail.customer.phone}
                     </a>
-                  </dd>
-                </div>
-              </dl>
+                  </li>
+                </ul>
+              </>
             ) : (
               <p className="mt-2 text-sm text-muted">Coordonnées non renseignées.</p>
             )}
+            <p className="mt-3 text-sm">
+              <Link
+                href={`/compatibilite?service=${detail.serviceSlug}`}
+                className="inline-flex items-center gap-1.5 text-muted underline-offset-4 hover:underline"
+              >
+                <ExternalLink aria-hidden="true" className="size-3.5" />
+                Voir le parcours public
+              </Link>
+            </p>
           </Card>
 
           <Card>
-            <h2 className="font-heading text-xl font-bold text-fg">Réponses capillaires</h2>
+            <h2 className="font-heading text-lg font-bold text-fg">Réponses capillaires</h2>
             {answerRows.length === 0 ? (
               <p className="mt-2 text-sm text-muted">Aucune réponse enregistrée.</p>
             ) : (
-              <dl className="mt-3 divide-y divide-line">
+              <dl className="mt-2 divide-y divide-line">
                 {answerRows.map((row) => (
                   <div
                     key={row.key}
-                    className="flex flex-col gap-1 py-2 sm:flex-row sm:justify-between"
+                    className="flex flex-col gap-0.5 py-2 sm:flex-row sm:justify-between sm:gap-3"
                   >
                     <dt className="text-sm font-semibold text-fg">{row.label}</dt>
                     <dd className="text-sm text-muted sm:text-right">{row.value}</dd>
@@ -190,21 +165,14 @@ export default async function AssessmentDetailPage({
                 ))}
               </dl>
             )}
-
-            {detail.decisionNote ? (
-              <div className="mt-4 rounded-[var(--radius-md)] bg-line px-4 py-3 text-sm text-fg">
-                <p className="font-semibold">Note / commentaire</p>
-                <p className="mt-1 whitespace-pre-line">{detail.decisionNote}</p>
-              </div>
-            ) : null}
           </Card>
 
           <Card>
-            <h2 className="font-heading text-xl font-bold text-fg">Photos privées</h2>
+            <h2 className="font-heading text-lg font-bold text-fg">Photos privées</h2>
             {photos.length === 0 ? (
               <p className="mt-2 text-sm text-muted">Aucune photo envoyée.</p>
             ) : (
-              <ul className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {photos.map((photo, index) => (
                   <li
                     key={photo.key}
@@ -212,16 +180,17 @@ export default async function AssessmentDetailPage({
                   >
                     {photo.url ? (
                       <a href={photo.url} target="_blank" rel="noreferrer" className="block">
-                        {/* URL signée privée, impossible à déclarer dans next/image. */}
+                        {/* URL signée privée : next/image la mettrait en cache optimisé, on garde <img>. */}
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={photo.url}
                           alt={`Photo capillaire ${index + 1} de la cliente`}
+                          loading="lazy"
                           className="aspect-square w-full object-cover"
                         />
                       </a>
                     ) : (
-                      <p className="p-4 text-xs text-muted">
+                      <p className="p-3 text-xs text-muted">
                         Aperçu indisponible (stockage non configuré ou URL expirée).
                       </p>
                     )}
@@ -230,16 +199,15 @@ export default async function AssessmentDetailPage({
               </ul>
             )}
             <p className="mt-3 text-xs text-muted">
-              Ces photos ne sont jamais publiées dans la galerie publique et ne sont accessibles
-              qu’aux personnes habilitées.
+              Ces photos ne sont jamais publiées dans la galerie publique.
             </p>
           </Card>
         </div>
 
-        <div className="space-y-6">
+        <div className="grid gap-3">
           <Card>
-            <h2 className="font-heading text-xl font-bold text-fg">Analyse automatique</h2>
-            <div className="mt-3 flex flex-wrap items-center gap-2">
+            <h2 className="font-heading text-lg font-bold text-fg">Analyse automatique</h2>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
               <Badge
                 tone={
                   engine.verdict === 'COMPATIBLE'
@@ -259,37 +227,49 @@ export default async function AssessmentDetailPage({
                 <Badge tone="neutral">Validation manuelle requise</Badge>
               ) : null}
             </div>
-            <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-muted">
+            <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-muted">
               {engine.message}
             </p>
             {engine.conditionsNote ? (
-              <p className="mt-3 rounded-[var(--radius-md)] bg-accent-soft px-4 py-3 text-sm text-fg">
+              <p className="mt-2 rounded-[var(--radius-md)] bg-accent-soft px-3 py-2 text-sm text-fg">
                 {engine.conditionsNote}
               </p>
             ) : null}
           </Card>
 
           <Card>
-            <h2 className="font-heading text-xl font-bold text-fg">Décision</h2>
+            <h2 className="font-heading text-lg font-bold text-fg">Décision</h2>
+            {detail.decidedAt ? (
+              <p className="mt-1 text-sm text-muted">
+                Prise le <LocalDateTime iso={detail.decidedAt.toISOString()} dateStyle="medium" />
+                {detail.decidedByName ? ` par ${detail.decidedByName}` : ''}
+              </p>
+            ) : null}
             {detail.decisionMessage ? (
-              <div className="mt-3 rounded-[var(--radius-md)] bg-line px-4 py-3 text-sm">
-                <p className="font-semibold text-fg">Message transmis à la cliente</p>
+              <div className="mt-2 rounded-[var(--radius-md)] bg-line px-3 py-2.5 text-sm">
+                <p className="font-semibold text-fg">Message pour la cliente</p>
                 <p className="mt-1 whitespace-pre-line text-muted">{detail.decisionMessage}</p>
               </div>
             ) : null}
-            <div className="mt-4">
+            {detail.decisionNote ? (
+              <div className="mt-2 rounded-[var(--radius-md)] bg-line px-3 py-2.5 text-sm">
+                <p className="font-semibold text-fg">Note interne</p>
+                <p className="mt-1 whitespace-pre-line text-muted">{detail.decisionNote}</p>
+              </div>
+            ) : null}
+            <div className="mt-3">
               <DecisionForm assessmentId={detail.id} terminal={terminal} />
             </div>
           </Card>
 
           <Card>
-            <h2 className="font-heading text-xl font-bold text-fg">Historique</h2>
+            <h2 className="font-heading text-lg font-bold text-fg">Historique</h2>
             {history.length === 0 ? (
               <p className="mt-2 text-sm text-muted">Aucune action enregistrée.</p>
             ) : (
               <ol className="mt-3 space-y-3">
                 {history.map((entry) => (
-                  <li key={entry.id} className="border-b border-line pb-3 last:border-0">
+                  <li key={entry.id} className="border-b border-line pb-3 last:border-0 last:pb-0">
                     <p className="text-sm font-semibold text-fg">
                       {ACTION_LABELS[entry.action] ??
                         ASSESSMENT_DECISION_LABELS[
@@ -300,7 +280,7 @@ export default async function AssessmentDetailPage({
                         entry.action}
                     </p>
                     <p className="text-xs text-muted">
-                      {dateFormatter.format(entry.createdAt)}
+                      <LocalDateTime iso={entry.createdAt.toISOString()} dateStyle="medium" />
                       {entry.userName ? ` · ${entry.userName}` : ''}
                     </p>
                   </li>

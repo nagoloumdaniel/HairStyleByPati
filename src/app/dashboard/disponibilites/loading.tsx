@@ -2,13 +2,20 @@ import { Skeleton } from '@/components/shared/Skeleton';
 
 export default function DisponibilitesLoading() {
   return (
-    <div className="p-6">
-      <Skeleton className="h-8 w-64" />
-      <Skeleton className="mt-2 h-4 w-full max-w-xl" />
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <Skeleton key={index} className="h-80 w-full" />
-        ))}
+    <div aria-busy="true">
+      <div className="mb-4 flex items-center gap-3">
+        <Skeleton className="size-10" />
+        <div className="flex-1">
+          <Skeleton className="h-6 w-48" />
+          <Skeleton className="mt-1.5 h-4 w-full max-w-md" />
+        </div>
+      </div>
+      <div className="grid gap-3 xl:grid-cols-2">
+        <Skeleton className="h-96 w-full" />
+        <div className="grid gap-3">
+          <Skeleton className="h-52 w-full" />
+          <Skeleton className="h-52 w-full" />
+        </div>
       </div>
     </div>
   );

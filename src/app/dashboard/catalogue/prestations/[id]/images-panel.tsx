@@ -1,10 +1,11 @@
 'use client';
 
-import { ArrowDown, ArrowUp, ImageOff } from 'lucide-react';
-import { useActionState, useEffect, useRef, useState } from 'react';
+import { ImageOff, Pencil, Save, Star, Trash2, Upload } from 'lucide-react';
+import { useId, useRef, useState } from 'react';
 import type { AdminServiceImage } from '@/lib/catalogue-admin';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { useConfirm } from '@/components/ui/Confirm';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import {
@@ -13,73 +14,100 @@ import {
   adminSetPrimaryImage,
   adminUpdateImageAlt,
   adminUploadServiceImage,
-  type CatalogueActionState,
 } from '@/modules/catalogue/actions';
+import {
+  EmptyBlock,
+  FormError,
+  ReorderButtons,
+  formDataOf,
+  useFormAction,
+  useReorderableList,
+  useRunAction,
+} from '../../catalogue-ui';
 
 /* ============================================================
  * P4.4 / P4.5 — Photos d'une prestation : upload contrôlé,
- * image principale, texte alternatif, ordre et suppression.
+ * ordre (la première est la principale), texte alternatif, suppression.
  * Les images sont servies par URL signée, jamais publiques.
  * ============================================================ */
 
 type ImageWithUrl = AdminServiceImage & { url: string | null };
 
-function UploadForm({ serviceId, storageReady }: { serviceId: string; storageReady: boolean }) {
-  const [state, formAction, pending] = useActionState<CatalogueActionState, FormData>(
-    adminUploadServiceImage,
-    {},
-  );
-  const fileRef = useRef<HTMLInputElement>(null);
+// Même limite que le serveur (image-validation) : on évite d'envoyer un fichier déjà refusé.
+const MAX_BYTES = 5 * 1024 * 1024;
+const ACCEPTED = ['image/jpeg', 'image/png', 'image/webp'];
 
-  useEffect(() => {
-    if (state.success && fileRef.current) fileRef.current.value = '';
-  }, [state.success]);
+function UploadForm({ serviceId, storageReady }: { serviceId: string; storageReady: boolean }) {
+  const formRef = useRef<HTMLFormElement>(null);
+  const fileId = useId();
+  const [fileError, setFileError] = useState<string | undefined>();
+  const { state, onSubmit, pending } = useFormAction(adminUploadServiceImage, () => {
+    formRef.current?.reset();
+    setFileError(undefined);
+  });
 
   return (
     <form
-      action={formAction}
-      className="flex flex-col gap-3 rounded-[var(--radius-md)] border border-line p-4"
+      ref={formRef}
+      onSubmit={onSubmit}
+      className="flex flex-col gap-3 rounded-[var(--radius-md)] border border-line p-3 sm:p-4"
     >
       <input type="hidden" name="serviceId" value={serviceId} />
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="service-image-file" className="text-sm font-semibold">
-          Photo (JPEG, PNG ou WebP, 5 Mo maximum)
+        <label htmlFor={fileId} className="text-sm font-semibold">
+          Photo{' '}
+          <span aria-hidden="true" className="text-alert">
+            *
+          </span>
+          <span className="sr-only">(obligatoire)</span>
         </label>
-        <input
-          ref={fileRef}
-          id="service-image-file"
-          name="file"
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          required
-          disabled={!storageReady}
-          className="w-full rounded-[var(--radius-md)] border border-line bg-card px-4 py-2.5 text-sm file:mr-3 file:rounded-full file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-fg"
-        />
+        <div className="relative">
+          <Upload
+            aria-hidden="true"
+            className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-cacao"
+          />
+          <input
+            id={fileId}
+            name="file"
+            type="file"
+            accept={ACCEPTED.join(',')}
+            required
+            disabled={!storageReady}
+            aria-invalid={fileError ? true : undefined}
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (!file) return setFileError(undefined);
+              if (!ACCEPTED.includes(file.type)) {
+                event.target.value = '';
+                return setFileError('Format non accepté : utilisez une photo JPEG, PNG ou WebP.');
+              }
+              if (file.size > MAX_BYTES) {
+                event.target.value = '';
+                return setFileError('La photo dépasse 5 Mo. Choisissez une image plus légère.');
+              }
+              setFileError(undefined);
+            }}
+            className="h-10 w-full rounded-[var(--radius-md)] border border-line bg-card pl-10 pr-3 text-sm leading-10 file:mr-3 file:rounded-full file:border-0 file:bg-accent-soft file:px-3 file:py-1 file:text-sm file:font-semibold file:text-fg disabled:opacity-60"
+          />
+        </div>
+        <p className="text-sm text-muted">JPEG, PNG ou WebP, 5 Mo maximum.</p>
+        <FormError message={fileError} />
       </div>
       <Input
-        label="Texte alternatif (description pour l'accessibilité)"
+        label="Texte alternatif"
         name="alt"
         maxLength={160}
-        hint="Décrivez la coiffure visible sur la photo, sans mention inutile."
+        hint="Décrivez la coiffure visible sur la photo (accessibilité)."
         disabled={!storageReady}
       />
-      {state.error ? (
-        <p
-          role="alert"
-          className="rounded-[var(--radius-md)] bg-alert-soft px-3 py-2 text-sm font-medium text-alert"
-        >
-          {state.error}
-        </p>
-      ) : null}
-      {state.success ? (
-        <p
-          role="status"
-          className="rounded-[var(--radius-md)] bg-success-soft px-3 py-2 text-sm font-medium text-success"
-        >
-          {state.success}
-        </p>
-      ) : null}
-      <Button type="submit" loading={pending} disabled={!storageReady} className="self-start">
+      <FormError message={state.error} />
+      <Button
+        type="submit"
+        icon={Upload}
+        loading={pending}
+        disabled={!storageReady || pending}
+        className="self-end"
+      >
         Envoyer la photo
       </Button>
     </form>
@@ -87,207 +115,133 @@ function UploadForm({ serviceId, storageReady }: { serviceId: string; storageRea
 }
 
 function AltForm({ image, onDone }: { image: ImageWithUrl; onDone: () => void }) {
-  const [state, formAction, pending] = useActionState<CatalogueActionState, FormData>(
-    adminUpdateImageAlt,
-    {},
-  );
-  const doneRef = useRef(onDone);
-  doneRef.current = onDone;
-
-  useEffect(() => {
-    if (state.success) doneRef.current();
-  }, [state.success]);
-
+  const { state, onSubmit, pending } = useFormAction(adminUpdateImageAlt, onDone);
   return (
-    <form action={formAction} className="flex flex-col gap-4">
+    <form onSubmit={onSubmit} className="flex flex-col gap-3">
       <input type="hidden" name="id" value={image.id} />
       <Input
         label="Texte alternatif"
         name="alt"
         maxLength={160}
+        autoFocus
         defaultValue={image.alt}
         hint="160 caractères maximum."
       />
-      {state.error ? (
-        <p role="alert" className="text-sm font-medium text-alert">
-          {state.error}
-        </p>
-      ) : null}
-      <Button type="submit" loading={pending}>
+      <FormError message={state.error} />
+      <Button type="submit" icon={Save} loading={pending} className="self-end">
         Enregistrer
       </Button>
     </form>
   );
 }
 
-function ReorderImageForm({
-  serviceId,
-  images,
-  index,
-  direction,
-}: {
-  serviceId: string;
-  images: ImageWithUrl[];
-  index: number;
-  direction: -1 | 1;
-}) {
-  const [state, formAction, pending] = useActionState<CatalogueActionState, FormData>(
-    adminReorderImages,
-    {},
-  );
-  const target = index + direction;
-  const current = images[index];
-  const swap = images[target];
-  if (!current || !swap) {
-    return (
-      <span
-        aria-hidden="true"
-        className="inline-flex size-8 items-center justify-center rounded-[var(--radius-sm)] border border-line text-muted/40"
-      >
-        {direction === -1 ? (
-          <ArrowUp aria-hidden="true" className="size-4" />
-        ) : (
-          <ArrowDown aria-hidden="true" className="size-4" />
-        )}
-      </span>
-    );
-  }
-  const reordered = [...images];
-  reordered[index] = swap;
-  reordered[target] = current;
-
-  return (
-    <form action={formAction}>
-      <input type="hidden" name="serviceId" value={serviceId} />
-      <input
-        type="hidden"
-        name="orderedIds"
-        value={JSON.stringify(reordered.map((image) => image.id))}
-      />
-      <Button
-        type="submit"
-        variant="ghost"
-        size="sm"
-        loading={pending}
-        aria-label={`${direction === -1 ? 'Monter' : 'Descendre'} la photo`}
-        title={direction === -1 ? 'Monter' : 'Descendre'}
-      >
-        {direction === -1 ? (
-          <ArrowUp aria-hidden="true" className="size-4" />
-        ) : (
-          <ArrowDown aria-hidden="true" className="size-4" />
-        )}
-      </Button>
-      {state.error ? (
-        <span role="alert" className="text-xs text-alert">
-          {state.error}
-        </span>
-      ) : null}
-    </form>
-  );
-}
-
-function PrimaryImageForm({ serviceId, image }: { serviceId: string; image: ImageWithUrl }) {
-  const [state, formAction, pending] = useActionState<CatalogueActionState, FormData>(
-    adminSetPrimaryImage,
-    {},
-  );
-  return (
-    <form action={formAction}>
-      <input type="hidden" name="serviceId" value={serviceId} />
-      <input type="hidden" name="id" value={image.id} />
-      <Button type="submit" variant="secondary" size="sm" loading={pending}>
-        Définir comme principale
-      </Button>
-      {state.error ? (
-        <p role="alert" className="text-xs text-alert">
-          {state.error}
-        </p>
-      ) : null}
-    </form>
-  );
-}
-
-function DeleteImageForm({ image }: { image: ImageWithUrl }) {
-  const [state, formAction, pending] = useActionState<CatalogueActionState, FormData>(
-    adminDeleteImage,
-    {},
-  );
-  return (
-    <form
-      action={formAction}
-      onSubmit={(event) => {
-        if (
-          !window.confirm('Supprimer cette photo ? Le fichier sera aussi supprimé du stockage.')
-        ) {
-          event.preventDefault();
-        }
-      }}
-    >
-      <input type="hidden" name="id" value={image.id} />
-      <Button type="submit" variant="danger" size="sm" loading={pending}>
-        Supprimer
-      </Button>
-      {state.error ? (
-        <p role="alert" className="text-xs text-alert">
-          {state.error}
-        </p>
-      ) : null}
-    </form>
-  );
-}
-
-function ImageCard({
+function ImageRow({
   serviceId,
   image,
   index,
-  images,
+  count,
+  pendingOrder,
+  onMove,
 }: {
   serviceId: string;
   image: ImageWithUrl;
   index: number;
-  images: ImageWithUrl[];
+  count: number;
+  pendingOrder: boolean;
+  onMove: (index: number, direction: -1 | 1) => void;
 }) {
   const [altOpen, setAltOpen] = useState(false);
+  const confirm = useConfirm();
+  const primary = useRunAction();
+  const remove = useRunAction();
+  const isFirst = index === 0;
+  const name = image.alt || `photo ${index + 1}`;
+
+  async function onDelete() {
+    const ok = await confirm({
+      title: 'Supprimer cette photo ?',
+      message: 'Le fichier sera aussi supprimé du stockage.',
+    });
+    if (!ok) return;
+    remove.run(() => adminDeleteImage({}, formDataOf({ id: image.id })));
+  }
 
   return (
-    <li className="flex flex-col gap-3 rounded-[var(--radius-md)] border border-line bg-card p-3">
-      <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-sm)] bg-line">
-        {image.url ? (
-          // URL signée à durée limitée, impossible à déclarer dans next/image.
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={image.url}
-            alt={image.alt || 'Photo de la prestation'}
-            className="size-full object-cover"
-          />
-        ) : (
-          <div className="flex size-full flex-col items-center justify-center gap-1 p-3 text-center text-xs text-muted">
-            <ImageOff aria-hidden="true" className="size-6" />
-            Aperçu indisponible (stockage non configuré ou URL expirée).
-          </div>
-        )}
-        {image.isPrimary ? (
-          <span className="absolute left-2 top-2">
-            <Badge tone="accent">Principale</Badge>
+    <li className="flex items-center gap-2 rounded-[var(--radius-md)] border border-line bg-card p-2 sm:gap-3 sm:p-3">
+      <ReorderButtons
+        index={index}
+        count={count}
+        pending={pendingOrder}
+        onMove={(direction) => onMove(index, direction)}
+        label={name}
+      />
+      {/* Vignette + texte : un clic ouvre la modification du texte alternatif. */}
+      <button
+        type="button"
+        onClick={() => setAltOpen(true)}
+        aria-label={`Modifier le texte alternatif de ${name}`}
+        className="group flex min-w-0 flex-1 items-center gap-3 rounded-[var(--radius-sm)] p-1 text-left transition hover:bg-accent-soft/50"
+      >
+        <span className="relative size-16 shrink-0 overflow-hidden rounded-[var(--radius-sm)] bg-line sm:size-20">
+          {image.url ? (
+            // URL signée à durée limitée : next/image mettrait chaque URL en cache d'optimisation.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={image.url}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              className="size-full object-cover"
+            />
+          ) : (
+            <span className="flex size-full items-center justify-center text-muted">
+              <ImageOff aria-hidden="true" className="size-5" />
+            </span>
+          )}
+        </span>
+        <span className="min-w-0 flex-1">
+          {isFirst ? <Badge tone="accent">Principale</Badge> : null}
+          <span className="mt-0.5 line-clamp-2 block text-sm text-muted">
+            {image.alt || 'Aucun texte alternatif : ajoutez-en un pour l’accessibilité.'}
           </span>
-        ) : null}
-      </div>
-
-      <p className="line-clamp-2 min-h-10 text-sm text-muted">
-        {image.alt || "Aucun texte alternatif : ajoutez-en un pour l'accessibilité."}
-      </p>
-
-      <div className="flex flex-wrap items-center gap-2">
-        <ReorderImageForm serviceId={serviceId} images={images} index={index} direction={-1} />
-        <ReorderImageForm serviceId={serviceId} images={images} index={index} direction={1} />
-        {!image.isPrimary ? <PrimaryImageForm serviceId={serviceId} image={image} /> : null}
-        <Button type="button" variant="secondary" size="sm" onClick={() => setAltOpen(true)}>
-          Texte alternatif
+        </span>
+        <Pencil
+          aria-hidden="true"
+          className="size-4 shrink-0 text-muted transition group-hover:text-accent"
+        />
+      </button>
+      <div className="flex shrink-0 flex-col gap-1 sm:flex-row sm:gap-2">
+        {isFirst ? null : (
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            iconOnly
+            icon={Star}
+            loading={primary.pending}
+            onClick={() =>
+              primary.run(() => adminSetPrimaryImage({}, formDataOf({ serviceId, id: image.id })))
+            }
+            aria-label={`Définir ${name} comme photo principale`}
+            title="Définir comme principale"
+          >
+            Définir comme principale
+          </Button>
+        )}
+        <Button
+          type="button"
+          variant="danger"
+          size="sm"
+          iconOnly
+          icon={Trash2}
+          loading={remove.pending}
+          onClick={onDelete}
+          aria-label={`Supprimer ${name}`}
+          title="Supprimer"
+        >
+          Supprimer
         </Button>
-        <DeleteImageForm image={image} />
       </div>
-
       <Modal open={altOpen} onClose={() => setAltOpen(false)} title="Texte alternatif de la photo">
         <AltForm image={image} onDone={() => setAltOpen(false)} />
       </Modal>
@@ -306,35 +260,39 @@ export function ImagesPanel({
   storageReady: boolean;
   storageHint: string;
 }) {
+  const { list, move, pending } = useReorderableList(images, (orderedIds) =>
+    adminReorderImages(serviceId, orderedIds),
+  );
+
   return (
-    <div className="flex flex-col gap-4 p-4">
-      {!storageReady ? (
-        <p
-          role="alert"
-          className="rounded-[var(--radius-md)] border border-alert bg-alert-soft px-4 py-3 text-sm text-alert"
-        >
-          {storageHint}
-        </p>
-      ) : null}
+    <div className="flex flex-col gap-3 rounded-[var(--radius-lg)] bg-card p-3 shadow-soft sm:p-4">
+      {!storageReady ? <FormError message={storageHint} /> : null}
 
       <UploadForm serviceId={serviceId} storageReady={storageReady} />
 
-      {images.length === 0 ? (
-        <p className="rounded-[var(--radius-md)] border border-dashed border-line p-8 text-center text-muted">
+      {list.length === 0 ? (
+        <EmptyBlock>
           Aucune photo. La première photo envoyée devient la photo principale.
-        </p>
+        </EmptyBlock>
       ) : (
-        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {images.map((image, index) => (
-            <ImageCard
-              key={image.id}
-              serviceId={serviceId}
-              image={image}
-              index={index}
-              images={images}
-            />
-          ))}
-        </ul>
+        <>
+          <p className="text-sm text-muted">
+            La première photo est la photo principale : utilisez les flèches pour changer l’ordre.
+          </p>
+          <ul className="flex flex-col gap-2">
+            {list.map((image, index) => (
+              <ImageRow
+                key={image.id}
+                serviceId={serviceId}
+                image={image}
+                index={index}
+                count={list.length}
+                pendingOrder={pending}
+                onMove={move}
+              />
+            ))}
+          </ul>
+        </>
       )}
     </div>
   );

@@ -42,16 +42,14 @@ import {
   uploadImageObject,
 } from '@/modules/fichiers/storage';
 import { buildServiceImageKey, validateImageFile } from '@/modules/fichiers/image-validation';
-import { priceFieldsFromInput } from './pricing';
+import { eurosToCents, priceFieldsFromInput } from './pricing';
 import {
   adminServiceFiltersSchema,
   categoryInputSchema,
-  categoryOrderSchema,
   compatibilityRuleInputSchema,
   imageAltSchema,
-  imageOrderSchema,
+  orderedIdsSchema,
   questionInputSchema,
-  questionOrderSchema,
   serviceInputSchema,
   serviceOptionInputSchema,
   serviceStatusSchema,
@@ -94,6 +92,8 @@ function revalidateCatalogue(service?: { id?: string; slug?: string }) {
   revalidateTag('catalogue');
   revalidatePath('/dashboard/catalogue');
   revalidatePath('/dashboard/historique');
+  // Toutes les fiches prestation (options, photos, questions… modifiées sans connaître l'id).
+  revalidatePath('/dashboard/catalogue/prestations/[id]', 'page');
   if (service?.id) revalidatePath(`/dashboard/catalogue/prestations/${service.id}`);
   revalidatePath('/coiffures');
   if (service?.slug) revalidatePath(`/coiffures/${service.slug}`);
@@ -222,20 +222,12 @@ export async function adminSetCategoryActive(
   }
 }
 
-export async function adminReorderCategories(
-  _prev: CatalogueActionState,
-  formData: FormData,
-): Promise<CatalogueActionState> {
+/** Monter / descendre : reçoit la liste COMPLÈTE des ids dans le nouvel ordre. */
+export async function adminReorderCategories(orderedIds: string[]): Promise<CatalogueActionState> {
   const user = await requireAdmin();
   if (!user) return { error: 'Accès interdit.' };
 
-  let raw: unknown;
-  try {
-    raw = JSON.parse(String(formData.get('items') ?? '[]'));
-  } catch {
-    return { error: 'Données de réordonnancement invalides.' };
-  }
-  const parsed = parseForm(categoryOrderSchema, raw);
+  const parsed = parseForm(orderedIdsSchema, orderedIds);
   if ('error' in parsed) return { error: parsed.error };
 
   try {
@@ -452,7 +444,7 @@ export async function adminCreateOption(
   try {
     const option = await createServiceOption(serviceId, {
       name: parsed.data.name,
-      priceCents: Math.round(parsed.data.priceEuros * 100),
+      priceCents: eurosToCents(parsed.data.priceEuros),
       durationMinutes: parsed.data.durationMinutes,
       active: parsed.data.active,
     });
@@ -486,7 +478,7 @@ export async function adminUpdateOption(
   try {
     await updateServiceOption(id, {
       name: parsed.data.name,
-      priceCents: Math.round(parsed.data.priceEuros * 100),
+      priceCents: eurosToCents(parsed.data.priceEuros),
       durationMinutes: parsed.data.durationMinutes,
       active: parsed.data.active,
     });
@@ -694,23 +686,16 @@ export async function adminDeleteImage(
   }
 }
 
+/** Monter / descendre une photo : liste COMPLÈTE des ids ; la première devient la principale. */
 export async function adminReorderImages(
-  _prev: CatalogueActionState,
-  formData: FormData,
+  serviceId: string,
+  orderedIds: string[],
 ): Promise<CatalogueActionState> {
   const user = await requireAdmin();
   if (!user) return { error: 'Accès interdit.' };
+  if (typeof serviceId !== 'string' || !serviceId.trim()) return { error: 'Prestation invalide.' };
 
-  const serviceId = String(formData.get('serviceId') ?? '').trim();
-  if (!serviceId) return { error: 'Prestation invalide.' };
-
-  let raw: unknown;
-  try {
-    raw = JSON.parse(String(formData.get('orderedIds') ?? '[]'));
-  } catch {
-    return { error: 'Données de réordonnancement invalides.' };
-  }
-  const parsed = parseForm(imageOrderSchema, raw);
+  const parsed = parseForm(orderedIdsSchema, orderedIds);
   if ('error' in parsed) return { error: parsed.error };
 
   try {
@@ -892,23 +877,16 @@ export async function adminDeleteQuestion(
   }
 }
 
+/** Monter / descendre une question : liste COMPLÈTE des ids dans le nouvel ordre. */
 export async function adminReorderQuestions(
-  _prev: CatalogueActionState,
-  formData: FormData,
+  serviceId: string,
+  orderedIds: string[],
 ): Promise<CatalogueActionState> {
   const user = await requireAdmin();
   if (!user) return { error: 'Accès interdit.' };
+  if (typeof serviceId !== 'string' || !serviceId.trim()) return { error: 'Prestation invalide.' };
 
-  const serviceId = String(formData.get('serviceId') ?? '').trim();
-  if (!serviceId) return { error: 'Prestation invalide.' };
-
-  let raw: unknown;
-  try {
-    raw = JSON.parse(String(formData.get('items') ?? '[]'));
-  } catch {
-    return { error: 'Données de réordonnancement invalides.' };
-  }
-  const parsed = parseForm(questionOrderSchema, raw);
+  const parsed = parseForm(orderedIdsSchema, orderedIds);
   if ('error' in parsed) return { error: parsed.error };
 
   try {

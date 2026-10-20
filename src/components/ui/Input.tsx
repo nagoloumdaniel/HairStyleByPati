@@ -127,9 +127,9 @@ export function Input({ label, error, hint, id, required, icon, type, ...rest }:
           required={required}
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy || undefined}
-          className={`w-full rounded-[var(--radius-md)] border bg-card py-2.5 text-fg placeholder:text-muted transition ${
-            Icon ? 'pl-10' : 'pl-4'
-          } ${isPassword ? 'pr-11' : 'pr-4'} ${error ? 'border-alert' : 'border-line focus:border-cacao'}`}
+          className={`h-10 w-full rounded-[var(--radius-md)] border bg-card text-sm text-fg placeholder:text-muted transition ${
+            Icon ? 'pl-10' : 'pl-3.5'
+          } ${isPassword ? 'pr-11' : 'pr-3.5'} ${error ? 'border-alert' : 'border-line focus:border-cacao'}`}
         />
         {isPassword ? (
           <button

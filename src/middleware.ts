@@ -7,7 +7,7 @@ import { authConfig } from '@/modules/auth/auth.config';
 const { auth } = NextAuth(authConfig);
 
 export default auth((req) => {
-  const isLoggedIn = !!req.auth?.user;
+  const isLoggedIn = req.auth?.user?.role === 'ADMIN';
   const isOnDashboard = req.nextUrl.pathname.startsWith('/dashboard');
   const isAdminApi = req.nextUrl.pathname.startsWith('/api/admin');
 

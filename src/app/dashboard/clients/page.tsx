@@ -1,13 +1,15 @@
-import { Users } from 'lucide-react';
+import { CalendarDays, ChevronRight, MessageSquare, Search, Users, X } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/modules/auth/guards';
 import { listCustomers } from '@/modules/clients/queries';
-import { LocalDateTime } from '@/components/shared/LocalDateTime';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { Button, ButtonLink } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Avatar, RowCard, rowLinkClass } from '../_inbox/RowCard';
+import { Pagination } from '../_inbox/Pagination';
 
 export const metadata: Metadata = { title: 'Clientes - Tableau de bord' };
 
@@ -38,112 +40,96 @@ export default async function CustomersPage({
   };
 
   return (
-    <div className="p-6">
-      <div>
-        <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
-          <Users aria-hidden="true" className="size-6 text-accent" />
-          Clientes
-        </h1>
-        <p className="mt-1 text-ink-soft">
-          Coordonnées, historique de rendez-vous, évaluations, demandes et conversations. Accès
-          réservé à l’administration.
-        </p>
-      </div>
+    <div>
+      <PageHeader
+        icon={Users}
+        title="Clientes"
+        description={`${result.total} fiche${result.total > 1 ? 's' : ''} · accès réservé à l’administration`}
+      />
 
       <form
         method="get"
         action="/dashboard/clients"
-        className="mt-5 flex flex-wrap items-end gap-3"
+        role="search"
+        className="mb-3 flex items-end gap-2"
       >
-        <div className="w-full max-w-sm">
-          <label htmlFor="customer-search" className="text-sm font-semibold text-fg">
-            Rechercher
-          </label>
-          <input
-            id="customer-search"
+        <div className="min-w-0 flex-1">
+          <Input
+            label="Rechercher une cliente"
+            type="search"
             name="q"
             defaultValue={search}
             placeholder="Nom, e-mail ou téléphone"
-            className="mt-1 w-full rounded-[var(--radius-md)] border border-line bg-card px-4 py-2.5 text-fg placeholder:text-muted"
+            maxLength={100}
           />
         </div>
-        <Button type="submit" variant="secondary">
+        <Button type="submit" variant="secondary" icon={Search} iconOnly="mobile">
           Rechercher
         </Button>
         {search ? (
-          <Link
-            href="/dashboard/clients"
-            className="text-sm font-semibold text-cacao hover:underline"
-          >
+          <ButtonLink href="/dashboard/clients" variant="ghost" icon={X} iconOnly="mobile">
             Réinitialiser
-          </Link>
+          </ButtonLink>
         ) : null}
       </form>
 
-      <Card className="mt-5 p-0">
-        {result.items.length === 0 ? (
-          <div className="p-4">
-            <EmptyState
-              title="Aucune cliente"
-              message="Les fiches sont créées automatiquement lors d’une réservation, d’une demande ou d’un message."
-            />
-          </div>
-        ) : (
-          <ul className="divide-y divide-line">
-            {result.items.map((customer) => (
-              <li key={customer.id}>
-                <Link
-                  href={`/dashboard/clients/${customer.id}`}
-                  className="flex flex-col gap-2 p-4 transition hover:bg-page sm:flex-row sm:items-center sm:justify-between"
-                >
-                  <div className="min-w-0">
-                    <p className="font-semibold text-fg">{customer.name}</p>
-                    <p className="text-sm text-ink-soft">
-                      {customer.email} · {customer.phone || 'Téléphone non renseigné'}
+      {result.items.length === 0 ? (
+        <EmptyState
+          title={search ? 'Aucun résultat' : 'Aucune cliente'}
+          message={
+            search
+              ? 'Aucune fiche ne correspond à cette recherche. Essayez un autre nom, e-mail ou numéro.'
+              : 'Les fiches sont créées automatiquement lors d’une réservation, d’une demande ou d’un message.'
+          }
+        />
+      ) : (
+        <ul className="flex flex-col gap-2">
+          {result.items.map((customer) => (
+            <li key={customer.id}>
+              <RowCard>
+                <div className="flex items-center gap-3">
+                  <Avatar name={customer.name} />
+                  <div className="min-w-0 flex-1">
+                    <Link
+                      href={`/dashboard/clients/${customer.id}`}
+                      className={`block truncate font-semibold text-fg ${rowLinkClass}`}
+                    >
+                      {customer.name}
+                    </Link>
+                    <p className="truncate text-sm text-muted">
+                      {customer.email}
+                      {customer.phone ? ` · ${customer.phone}` : ''}
                     </p>
-                    <p className="mt-1 text-xs text-ink-soft">
-                      {customer.appointmentCount} rendez-vous · {customer.customRequestCount}{' '}
-                      demande(s) · {customer.assessmentCount} évaluation(s) ·{' '}
-                      {customer.conversationCount} conversation(s)
+                    <p className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted">
+                      <span className="inline-flex items-center gap-1">
+                        <CalendarDays aria-hidden="true" className="size-3.5" />
+                        {customer.appointmentCount} rdv
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        <MessageSquare aria-hidden="true" className="size-3.5" />
+                        {customer.conversationCount} conv.
+                      </span>
+                      <span>
+                        {customer.customRequestCount} demande
+                        {customer.customRequestCount > 1 ? 's' : ''} · {customer.assessmentCount}{' '}
+                        évaluation{customer.assessmentCount > 1 ? 's' : ''}
+                      </span>
                     </p>
                   </div>
-                  <p className="shrink-0 text-xs text-ink-soft">
-                    Créée le <LocalDateTime iso={customer.createdAt.toISOString()} />
-                  </p>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Card>
+                  <ChevronRight aria-hidden="true" className="size-5 shrink-0 text-muted" />
+                </div>
+              </RowCard>
+            </li>
+          ))}
+        </ul>
+      )}
 
-      {result.totalPages > 1 ? (
-        <nav aria-label="Pagination des clientes" className="mt-4 flex justify-between text-sm">
-          {result.page > 1 ? (
-            <Link
-              href={hrefFor(result.page - 1)}
-              className="font-semibold text-cacao hover:underline"
-            >
-              Précédent
-            </Link>
-          ) : (
-            <span />
-          )}
-          <span className="text-ink-soft">
-            Page {result.page} sur {result.totalPages}
-          </span>
-          {result.page < result.totalPages ? (
-            <Link
-              href={hrefFor(result.page + 1)}
-              className="font-semibold text-cacao hover:underline"
-            >
-              Suivant
-            </Link>
-          ) : (
-            <span />
-          )}
-        </nav>
-      ) : null}
+      <Pagination
+        page={result.page}
+        totalPages={result.totalPages}
+        hrefFor={hrefFor}
+        label="Pagination des clientes"
+      />
     </div>
   );
 }

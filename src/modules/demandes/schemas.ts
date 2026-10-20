@@ -29,29 +29,38 @@ export const customRequestSchema = z.object({
 
 export type CustomRequestInput = z.infer<typeof customRequestSchema>;
 
-export const customRequestDecisionSchema = z.object({
-  requestId: z.string().trim().min(1).max(64),
-  action: z.enum(['IN_REVIEW', 'INFO_REQUESTED', 'QUOTED', 'ACCEPTED', 'REFUSED', 'CLOSED']),
-  message: z
-    .string()
-    .trim()
-    .min(2, 'Message requis (2 caractères minimum).')
-    .max(3000, 'Message trop long (3000 caractères maximum).'),
-  estimatedPriceEuros: z
-    .string()
-    .trim()
-    .optional()
-    .default('')
-    .transform((value) => (value === '' ? null : Math.round(Number(value) * 100)))
-    .refine(
-      (value) => value === null || (Number.isInteger(value) && value >= 0 && value <= 10_000_00),
-      {
-        message: 'Prix estimé invalide.',
-      },
-    ),
-  serviceId: z.string().trim().max(64).optional().default(''),
-  proposedSlotLocal: z.string().trim().max(30).optional().default(''),
-  timeZone: z.string().trim().max(80).optional().default('Africa/Dakar'),
-});
+/* Prix saisi en FCFA entiers ; stocké en centièmes de FCFA (unité interne *Cents). */
+export const MAX_ESTIMATED_PRICE_FCFA = 10_000_000;
+
+export const customRequestDecisionSchema = z
+  .object({
+    requestId: z.string().trim().min(1).max(64),
+    action: z.enum(['IN_REVIEW', 'INFO_REQUESTED', 'QUOTED', 'ACCEPTED', 'REFUSED', 'CLOSED']),
+    message: z
+      .string()
+      .trim()
+      .max(3000, 'Message trop long (3000 caractères maximum).')
+      .default(''),
+    estimatedPriceFcfa: z
+      .string()
+      .trim()
+      .optional()
+      .default('')
+      .transform((value) => (value === '' ? null : Number(value)))
+      .refine(
+        (value) =>
+          value === null ||
+          (Number.isInteger(value) && value >= 0 && value <= MAX_ESTIMATED_PRICE_FCFA),
+        { message: 'Prix estimé invalide (montant entier en FCFA).' },
+      )
+      .transform((value) => (value === null ? null : value * 100)),
+    serviceId: z.string().trim().max(64).optional().default(''),
+    proposedSlotLocal: z.string().trim().max(30).optional().default(''),
+    timeZone: z.string().trim().max(80).optional().default('Africa/Dakar'),
+  })
+  .refine((data) => data.action === 'IN_REVIEW' || data.message.length >= 2, {
+    message: 'Message requis (2 caractères minimum).',
+    path: ['message'],
+  });
 
 export const conversationIdSchema = z.object({ id: z.string().trim().min(1).max(64) });

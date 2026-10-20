@@ -1,8 +1,8 @@
-import { Images } from 'lucide-react';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { requireAdmin } from '@/modules/auth/guards';
 import { db } from '@/lib/db';
+import { requireAdmin } from '@/modules/auth/guards';
+import { getImageSignedUrl, isStorageConfigured } from '@/modules/fichiers/storage';
 import { listGalleryPhotosAdmin } from '@/modules/galerie/queries';
 import { GalerieClient } from './galerie-client';
 
@@ -17,21 +17,18 @@ export default async function GaleriePage() {
     db.service.findMany({ select: { id: true, name: true }, orderBy: { name: 'asc' } }),
   ]);
 
-  return (
-    <div className="p-6">
-      <div>
-        <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
-          <Images aria-hidden="true" className="size-6 text-accent" />
-          Galerie de réalisations
-        </h1>
-        <p className="mt-1 text-ink-soft">
-          Photos publiques des réalisations (hors v1 initial, §19). Une photo n’est publiée que si
-          la cliente a explicitement autorisé son usage.
-        </p>
-      </div>
-      <div className="mt-5">
-        <GalerieClient photos={photos} services={services} />
-      </div>
-    </div>
+  // URLs signées calculées en parallèle ; une photo illisible n'empêche pas l'affichage des autres.
+  const rows = await Promise.all(
+    photos.map(async (photo) => ({
+      id: photo.id,
+      url: await getImageSignedUrl(photo.key, 3600).catch(() => null),
+      alt: photo.alt,
+      consentConfirmed: photo.consentConfirmed,
+      published: photo.published,
+      serviceId: photo.service?.id ?? '',
+      serviceName: photo.service?.name ?? null,
+    })),
   );
+
+  return <GalerieClient photos={rows} services={services} storageReady={isStorageConfigured()} />;
 }

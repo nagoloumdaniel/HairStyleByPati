@@ -59,6 +59,16 @@ export async function adminReplyToConversation(
         where: { id: conversation.id },
         data: { status: 'WAITING_RESPONSE', lastMessageAt: new Date() },
       });
+      // Répondre = avoir lu : les messages de la cliente ne restent plus « non lus ».
+      await tx.message.updateMany({
+        where: {
+          conversationId: conversation.id,
+          author: 'CUSTOMER',
+          isInternal: false,
+          readAt: null,
+        },
+        data: { readAt: new Date() },
+      });
       const payload = {
         kind: 'conversation',
         conversationId: conversation.id,
@@ -192,5 +202,59 @@ export async function adminMarkConversationRead(formData: FormData): Promise<voi
     data: { readAt: new Date() },
   });
   revalidatePath('/dashboard/messages');
-  revalidatePath('/dashboard');
+  revalidatePath('/dashboard', 'layout');
+}
+
+/* Marque toutes les conversations comme lues (bouton « Tout lu » de la liste). */
+export async function adminMarkAllConversationsRead(): Promise<ConversationActionState> {
+  try {
+    const user = await requireAdmin();
+    if (!user) return { error: 'Session expirée.' };
+    const result = await db.message.updateMany({
+      where: { author: 'CUSTOMER', isInternal: false, readAt: null },
+      data: { readAt: new Date() },
+    });
+    revalidatePath('/dashboard/messages');
+    revalidatePath('/dashboard', 'layout');
+    return { success: `${result.count} message(s) marqué(s) comme lus.` };
+  } catch (error) {
+    return handleError(error);
+  }
+}
+
+/* Suppression définitive d'une conversation (messages en cascade) et de ses alertes dashboard. */
+/* `revalidate: false` : depuis la page de la conversation elle-même, la revalidation re-rendrait
+   la page supprimée (notFound) avant la navigation. L'appelant navigue puis rafraîchit. */
+export async function adminDeleteConversation(
+  conversationId: string,
+  options?: { revalidate?: boolean },
+): Promise<ConversationActionState> {
+  try {
+    const user = await requireAdmin();
+    if (!user) return { error: 'Session expirée.' };
+    const input = parseInput(conversationIdSchema, { conversationId });
+    const existing = await db.conversation.findUnique({
+      where: { id: input.conversationId },
+      select: { id: true },
+    });
+    if (!existing) return { error: 'Conversation introuvable.' };
+
+    await db.$transaction([
+      db.notification.deleteMany({
+        where: { channel: 'IN_APP', link: `/dashboard/messages/${existing.id}` },
+      }),
+      db.conversation.delete({ where: { id: existing.id } }),
+    ]);
+    await logAudit({
+      action: 'conversation.delete',
+      entityType: 'Conversation',
+      entityId: existing.id,
+      userId: user.id,
+    }).catch(() => undefined);
+    if (options?.revalidate === false) flushEmailsSoon();
+    else revalidateConversations();
+    return { success: 'Conversation supprimée.' };
+  } catch (error) {
+    return handleError(error);
+  }
 }

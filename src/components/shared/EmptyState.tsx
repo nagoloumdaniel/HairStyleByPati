@@ -1,5 +1,4 @@
-import Link from 'next/link';
-import { Button } from '@/components/ui/Button';
+import { Button, ButtonLink } from '@/components/ui/Button';
 import { Title } from '@/components/ui/Title';
 
 /* P2.7 : etat vide = invitation a agir, ton conversationnel, un seul appel a l'action. */
@@ -42,12 +41,9 @@ export function EmptyState({
       </Title>
       <p className="mt-2 max-w-md text-muted">{message}</p>
       {actionLabel && actionHref ? (
-        <Link
-          href={actionHref}
-          className="mt-6 inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-5 py-2.5 font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
-        >
+        <ButtonLink href={actionHref} className="mt-6">
           {actionLabel}
-        </Link>
+        </ButtonLink>
       ) : null}
       {actionLabel && onAction ? (
         <Button onClick={onAction} className="mt-6">

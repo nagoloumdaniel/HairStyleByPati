@@ -2,17 +2,22 @@ import { Skeleton } from '@/components/shared/Skeleton';
 
 export default function NotificationsLoading() {
   return (
-    <div className="p-6">
-      <Skeleton className="h-8 w-56" />
-      <Skeleton className="mt-2 h-4 w-full max-w-xl" />
-      <div className="mt-5 flex gap-3">
-        <Skeleton className="h-8 w-28" />
-        <Skeleton className="h-8 w-28" />
-        <Skeleton className="h-8 w-28" />
+    <div aria-busy="true" aria-label="Chargement des notifications">
+      <div className="mb-4 flex items-center gap-3">
+        <Skeleton className="size-10" />
+        <div className="flex-1">
+          <Skeleton className="h-6 w-40" />
+          <Skeleton className="mt-1 h-4 w-72 max-w-full" />
+        </div>
       </div>
-      <div className="mt-5 space-y-3">
-        {Array.from({ length: 5 }).map((_, index) => (
-          <Skeleton key={index} className="h-20 w-full" />
+      <div className="mb-3 flex gap-2 overflow-hidden">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <Skeleton key={index} className="h-9 w-28 shrink-0" />
+        ))}
+      </div>
+      <div className="flex flex-col gap-2">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <Skeleton key={index} className="h-[78px] w-full" />
         ))}
       </div>
     </div>

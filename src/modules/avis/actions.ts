@@ -3,8 +3,9 @@
 import { revalidatePath } from 'next/cache';
 import { requireAdmin } from '@/modules/auth/guards';
 import { AppError } from '@/lib/errors';
-import { moderateReview, submitReview } from './service';
-import { reviewModerationSchema, submitReviewSchema } from './schemas';
+import { logAudit } from '@/modules/stats/audit';
+import { deleteReview, moderateReview, submitReview } from './service';
+import { reviewIdSchema, reviewModerationSchema, submitReviewSchema } from './schemas';
 
 export type ReviewActionState = { error?: string; success?: string };
 
@@ -33,9 +34,40 @@ export async function adminModerateReview(
       decision: parsed.data.decision,
       moderatorId: user.id,
     });
+    await logAudit({
+      userId: user.id,
+      action: `review.${parsed.data.decision.toLowerCase()}`,
+      entityType: 'Review',
+      entityId: parsed.data.id,
+    }).catch(() => undefined);
     revalidatePath('/dashboard/avis');
     revalidatePath('/');
-    return { success: parsed.data.decision === 'APPROVED' ? 'Avis approuvé.' : 'Avis rejeté.' };
+    return {
+      success: parsed.data.decision === 'APPROVED' ? 'Avis approuvé et publié.' : 'Avis rejeté.',
+    };
+  } catch (error) {
+    return handleError(error);
+  }
+}
+
+export async function adminDeleteReview(id: string): Promise<ReviewActionState> {
+  const user = await requireAdmin();
+  if (!user) return { error: 'Accès interdit.' };
+
+  const parsed = reviewIdSchema.safeParse({ id });
+  if (!parsed.success) return { error: 'Données invalides.' };
+
+  try {
+    await deleteReview(parsed.data.id);
+    await logAudit({
+      userId: user.id,
+      action: 'review.delete',
+      entityType: 'Review',
+      entityId: parsed.data.id,
+    }).catch(() => undefined);
+    revalidatePath('/dashboard/avis');
+    revalidatePath('/');
+    return { success: 'Avis supprimé.' };
   } catch (error) {
     return handleError(error);
   }

@@ -78,12 +78,21 @@ export async function listCustomers(options?: { search?: string; page?: number }
   };
 }
 
+/* Nombre max. d'éléments liés affichés par rubrique sur la fiche (les totaux restent exacts). */
+const DETAIL_LIMIT = 30;
+
 export interface CustomerDetail {
   id: string;
   name: string;
   email: string;
   phone: string;
   createdAt: Date;
+  counts: {
+    appointments: number;
+    assessments: number;
+    customRequests: number;
+    conversations: number;
+  };
   appointments: Array<{
     id: string;
     startsAt: Date;
@@ -115,22 +124,53 @@ export interface CustomerDetail {
 export async function getCustomerAdmin(id: string): Promise<CustomerDetail | null> {
   const row = await db.customer.findUnique({
     where: { id },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      createdAt: true,
+      _count: {
+        select: {
+          appointments: true,
+          assessments: true,
+          customRequests: true,
+          conversations: true,
+        },
+      },
       appointments: {
         orderBy: { startsAt: 'desc' },
-        include: { service: { select: { name: true } } },
+        take: DETAIL_LIMIT,
+        select: {
+          id: true,
+          startsAt: true,
+          status: true,
+          priceCents: true,
+          service: { select: { name: true } },
+        },
       },
       assessments: {
         orderBy: { createdAt: 'desc' },
-        include: { service: { select: { name: true } } },
+        take: DETAIL_LIMIT,
+        select: { id: true, createdAt: true, status: true, service: { select: { name: true } } },
       },
-      customRequests: { orderBy: { createdAt: 'desc' } },
+      customRequests: {
+        orderBy: { createdAt: 'desc' },
+        take: DETAIL_LIMIT,
+        select: { id: true, createdAt: true, status: true, description: true },
+      },
       conversations: {
         orderBy: { lastMessageAt: 'desc' },
-        include: {
-          messages: {
-            where: { author: 'CUSTOMER', isInternal: false, readAt: null },
-            select: { id: true },
+        take: DETAIL_LIMIT,
+        select: {
+          id: true,
+          subject: true,
+          status: true,
+          lastMessageAt: true,
+          _count: {
+            select: {
+              messages: { where: { author: 'CUSTOMER', isInternal: false, readAt: null } },
+            },
           },
         },
       },
@@ -143,6 +183,12 @@ export async function getCustomerAdmin(id: string): Promise<CustomerDetail | nul
     email: row.email,
     phone: row.phone,
     createdAt: row.createdAt,
+    counts: {
+      appointments: row._count.appointments,
+      assessments: row._count.assessments,
+      customRequests: row._count.customRequests,
+      conversations: row._count.conversations,
+    },
     appointments: row.appointments.map((appointment) => ({
       id: appointment.id,
       startsAt: appointment.startsAt,
@@ -160,14 +206,14 @@ export async function getCustomerAdmin(id: string): Promise<CustomerDetail | nul
       id: request.id,
       createdAt: request.createdAt,
       status: request.status,
-      description: request.description,
+      description: request.description.slice(0, 120),
     })),
     conversations: row.conversations.map((conversation) => ({
       id: conversation.id,
       subject: conversation.subject,
       status: conversation.status,
       lastMessageAt: conversation.lastMessageAt,
-      unreadCount: conversation.messages.length,
+      unreadCount: conversation._count.messages,
     })),
   };
 }

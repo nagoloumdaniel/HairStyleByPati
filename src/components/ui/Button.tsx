@@ -1,14 +1,30 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import type { LucideIcon } from 'lucide-react';
+import Link from 'next/link';
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from 'react';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 type ButtonSize = 'sm' | 'md' | 'lg';
+/* `true` : icône seule partout ; `'mobile'` : icône seule sous 640 px, libellé visible ensuite. */
+type IconOnly = boolean | 'mobile';
 
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+type CommonProps = {
   variant?: ButtonVariant;
   size?: ButtonSize;
-  loading?: boolean;
+  icon?: LucideIcon;
+  iconOnly?: IconOnly;
   children: ReactNode;
 };
+
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
+  CommonProps & {
+    loading?: boolean;
+  };
+
+type ButtonLinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> &
+  CommonProps & {
+    href: string;
+    prefetch?: boolean;
+  };
 
 const VARIANTS: Record<ButtonVariant, string> = {
   // Primaire ocre (clair) / jaune (sombre) : text-accent-fg garantit le contraste AA.
@@ -18,36 +34,117 @@ const VARIANTS: Record<ButtonVariant, string> = {
   danger: 'bg-alert text-alert-fg hover:brightness-95',
 };
 
+/* Hauteurs uniques (boutons = champs = menus) : sm 36, md 40, lg 48. */
 const SIZES: Record<ButtonSize, string> = {
-  sm: 'px-3 py-1.5 text-sm rounded-[var(--radius-sm)]',
-  md: 'px-5 py-2.5 text-base rounded-[var(--radius-md)]',
-  lg: 'px-7 py-3.5 text-lg rounded-[var(--radius-md)]',
+  sm: 'h-9 px-3 text-sm rounded-[var(--radius-md)]',
+  md: 'h-10 px-4 text-sm rounded-[var(--radius-md)]',
+  lg: 'h-12 px-6 text-base rounded-[var(--radius-md)]',
 };
 
-/* P2.3 + P2.9 : bouton accessible, anneau focus via CSS global, etat chargement annonce. */
-export function Button({
+const SQUARE: Record<ButtonSize, string> = { sm: 'size-9', md: 'size-10', lg: 'size-12' };
+const SQUARE_MOBILE: Record<ButtonSize, string> = {
+  sm: 'max-sm:size-9 max-sm:px-0',
+  md: 'max-sm:size-10 max-sm:px-0',
+  lg: 'max-sm:size-12 max-sm:px-0',
+};
+
+export function buttonClasses({
   variant = 'primary',
   size = 'md',
-  loading = false,
-  disabled,
-  children,
+  iconOnly = false,
   className = '',
-  ...rest
-}: ButtonProps) {
+}: Pick<CommonProps, 'variant' | 'size' | 'iconOnly'> & { className?: string }) {
+  const shape =
+    iconOnly === true
+      ? `${SQUARE[size]} rounded-[var(--radius-md)] p-0`
+      : `${SIZES[size]} ${iconOnly === 'mobile' ? SQUARE_MOBILE[size] : ''}`;
+  return `inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap font-semibold transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 ${VARIANTS[variant]} ${shape} ${className}`;
+}
+
+function Content({
+  icon: Icon,
+  iconOnly,
+  children,
+  loading,
+}: Pick<CommonProps, 'icon' | 'iconOnly' | 'children'> & { loading?: boolean }) {
+  // inline-flex : une icône passée en enfant reste alignée avec le libellé (svg = display:block).
+  const hideLabel =
+    iconOnly === true
+      ? 'sr-only'
+      : iconOnly === 'mobile'
+        ? 'max-sm:sr-only sm:inline-flex sm:items-center sm:gap-2'
+        : 'inline-flex items-center gap-2';
   return (
-    <button
-      {...rest}
-      disabled={disabled ?? loading}
-      aria-busy={loading || undefined}
-      className={`inline-flex items-center justify-center gap-2 font-semibold transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
-    >
+    <>
       {loading ? (
         <span
           aria-hidden="true"
           className="inline-block size-4 animate-spin rounded-full border-2 border-current border-t-transparent"
         />
+      ) : Icon ? (
+        <Icon aria-hidden="true" className="size-[18px] shrink-0" />
       ) : null}
-      {children}
+      <span className={hideLabel}>{children}</span>
+    </>
+  );
+}
+
+const titleOf = (iconOnly: IconOnly | undefined, children: ReactNode) =>
+  iconOnly && typeof children === 'string' ? children : undefined;
+
+/* Bouton accessible : hauteur uniforme, icône optionnelle, icône seule (toujours ou sur mobile),
+   état de chargement annoncé. Un `loading` désactive le bouton (anti double-clic). */
+export function Button({
+  variant,
+  size,
+  icon,
+  iconOnly,
+  loading = false,
+  disabled,
+  children,
+  className = '',
+  title,
+  ...rest
+}: ButtonProps) {
+  return (
+    <button
+      {...rest}
+      title={title ?? titleOf(iconOnly, children)}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
+      className={buttonClasses({ variant, size, iconOnly, className })}
+    >
+      <Content icon={icon} iconOnly={iconOnly} loading={loading}>
+        {children}
+      </Content>
     </button>
+  );
+}
+
+/* Lien ayant l'apparence d'un bouton (mêmes tailles et variantes). */
+export function ButtonLink({
+  variant,
+  size,
+  icon,
+  iconOnly,
+  children,
+  className = '',
+  title,
+  href,
+  prefetch,
+  ...rest
+}: ButtonLinkProps) {
+  return (
+    <Link
+      {...rest}
+      href={href}
+      prefetch={prefetch}
+      title={title ?? titleOf(iconOnly, children)}
+      className={buttonClasses({ variant, size, iconOnly, className })}
+    >
+      <Content icon={icon} iconOnly={iconOnly}>
+        {children}
+      </Content>
+    </Link>
   );
 }

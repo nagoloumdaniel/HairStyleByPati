@@ -1,6 +1,5 @@
-import { Wand2 } from 'lucide-react';
+import { CalendarClock, ChevronLeft, ChevronRight, Mail, Wand2 } from 'lucide-react';
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import type { CustomRequestStatus } from '@prisma/client';
 import { requireAdmin } from '@/modules/auth/guards';
@@ -11,15 +10,25 @@ import {
   countCustomRequestsByStatus,
   listCustomRequests,
 } from '@/modules/demandes/queries';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { LocalDateTime } from '@/components/shared/LocalDateTime';
 import { Badge } from '@/components/ui/Badge';
-import { Card } from '@/components/ui/Card';
-import { EmptyState } from '@/components/shared/EmptyState';
+import { ButtonLink } from '@/components/ui/Button';
+import { CardLink } from '@/components/ui/Card';
 
 export const metadata: Metadata = { title: 'Demandes personnalisées - Tableau de bord' };
 
 function first(value: string | string[] | undefined): string {
   return Array.isArray(value) ? (value[0] ?? '') : (value ?? '');
+}
+
+function hrefFor(status?: CustomRequestStatus, page = 1): string {
+  const params = new URLSearchParams();
+  if (status) params.set('status', status);
+  if (page > 1) params.set('page', String(page));
+  const query = params.toString();
+  return query ? `/dashboard/demandes?${query}` : '/dashboard/demandes';
 }
 
 export default async function CustomRequestsPage({
@@ -42,98 +51,135 @@ export default async function CustomRequestsPage({
     countCustomRequestsByStatus(),
     listCustomRequests({ status, page }),
   ]);
-
-  const hrefFor = (nextStatus?: CustomRequestStatus) =>
-    nextStatus ? `/dashboard/demandes?status=${nextStatus}` : '/dashboard/demandes';
+  const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
 
   return (
-    <div className="p-6">
-      <div>
-        <h1 className="flex items-center gap-2.5 text-2xl font-semibold">
-          <Wand2 aria-hidden="true" className="size-6 text-accent" />
-          Demandes personnalisées
-        </h1>
-        <p className="mt-1 text-ink-soft">
-          Coiffures hors catalogue, photos de référence et décisions. Une demande acceptée propose
-          un créneau, sans jamais le réserver automatiquement.
-        </p>
-      </div>
+    <div>
+      <PageHeader
+        icon={Wand2}
+        title="Demandes personnalisées"
+        description="Coiffures hors catalogue et photos de référence. Une demande acceptée propose un créneau sans jamais le réserver."
+      />
 
-      <div className="mt-5 flex flex-wrap gap-2" role="navigation" aria-label="Filtres demandes">
-        <Link
+      <nav
+        aria-label="Filtres des demandes"
+        className="-mx-3 mb-3 flex gap-2 overflow-x-auto px-3 pb-1 sm:mx-0 sm:flex-wrap sm:px-0"
+      >
+        <ButtonLink
           href={hrefFor()}
+          size="sm"
+          variant={!status ? 'primary' : 'secondary'}
           aria-current={!status ? 'page' : undefined}
-          className={`rounded-[var(--radius-full)] border px-4 py-1.5 text-sm font-semibold transition ${
-            !status
-              ? 'border-cacao bg-cacao text-cacao-fg'
-              : 'border-line bg-card text-fg hover:border-cacao'
-          }`}
         >
-          Toutes ({Object.values(counts).reduce((sum, count) => sum + count, 0)})
-        </Link>
+          {`Toutes (${total})`}
+        </ButtonLink>
         {CUSTOM_REQUEST_STATUSES.map((item) => (
-          <Link
+          <ButtonLink
             key={item}
             href={hrefFor(item)}
+            size="sm"
+            variant={status === item ? 'primary' : 'secondary'}
             aria-current={status === item ? 'page' : undefined}
-            className={`rounded-[var(--radius-full)] border px-4 py-1.5 text-sm font-semibold transition ${
-              status === item
-                ? 'border-cacao bg-cacao text-cacao-fg'
-                : 'border-line bg-card text-fg hover:border-cacao'
-            }`}
           >
-            {CUSTOM_REQUEST_STATUS_LABELS[item]} ({counts[item]})
-          </Link>
+            {`${CUSTOM_REQUEST_STATUS_LABELS[item]} (${counts[item]})`}
+          </ButtonLink>
         ))}
-      </div>
+      </nav>
 
-      <Card className="mt-5 p-0">
-        {result.items.length === 0 ? (
-          <div className="p-4">
-            <EmptyState
-              title="Aucune demande"
-              message="Les demandes envoyées depuis la page sur mesure apparaîtront ici."
-              actionLabel="Voir le formulaire public"
-              actionHref="/demandes-personnalisees"
-            />
-          </div>
-        ) : (
-          <ul className="divide-y divide-line">
-            {result.items.map((request) => (
-              <li key={request.id}>
-                <Link
-                  href={`/dashboard/demandes/${request.id}`}
-                  className="flex flex-col gap-2 p-4 transition hover:bg-page sm:flex-row sm:items-start sm:justify-between"
-                >
+      {result.items.length === 0 ? (
+        <EmptyState
+          title="Aucune demande"
+          message={
+            status
+              ? 'Aucune demande avec ce statut.'
+              : 'Les demandes envoyées depuis la page sur mesure apparaîtront ici.'
+          }
+        />
+      ) : (
+        <ul className="grid gap-2">
+          {result.items.map((request) => (
+            <li key={request.id}>
+              <CardLink
+                href={`/dashboard/demandes/${request.id}`}
+                label={`Demande de ${request.requesterName}`}
+              >
+                <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-semibold text-fg">{request.requesterName}</p>
-                      <Badge tone={CUSTOM_REQUEST_STATUS_TONES[request.status]}>
-                        {CUSTOM_REQUEST_STATUS_LABELS[request.status]}
-                      </Badge>
-                    </div>
-                    <p className="mt-1 text-sm text-ink-soft">{request.requesterEmail}</p>
-                    <p className="mt-1 line-clamp-2 text-sm text-ink-soft">{request.description}</p>
-                  </div>
-                  <div className="shrink-0 text-xs text-ink-soft">
-                    <p>
-                      Reçue le <LocalDateTime iso={request.createdAt.toISOString()} />
+                    <p className="truncate font-semibold text-fg">{request.requesterName}</p>
+                    <p className="flex items-center gap-1.5 truncate text-sm text-muted">
+                      <Mail aria-hidden="true" className="size-3.5 shrink-0" />
+                      {request.requesterEmail}
                     </p>
-                    {request.desiredDate ? (
-                      <p className="mt-1">
-                        Date souhaitée :{' '}
-                        {new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' }).format(
-                          request.desiredDate,
-                        )}
-                      </p>
-                    ) : null}
                   </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Card>
+                  <Badge tone={CUSTOM_REQUEST_STATUS_TONES[request.status]} className="shrink-0">
+                    {CUSTOM_REQUEST_STATUS_LABELS[request.status]}
+                  </Badge>
+                </div>
+                <p className="mt-2 line-clamp-2 text-sm text-fg">{request.description}</p>
+                <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
+                  <span>
+                    Reçue le{' '}
+                    <LocalDateTime
+                      iso={request.createdAt.toISOString()}
+                      dateStyle="medium"
+                      timeStyle="short"
+                    />
+                  </span>
+                  {request.desiredDate ? (
+                    <span className="inline-flex items-center gap-1">
+                      <CalendarClock aria-hidden="true" className="size-3.5" />
+                      Souhaitée le{' '}
+                      {new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' }).format(
+                        request.desiredDate,
+                      )}
+                    </span>
+                  ) : null}
+                </p>
+              </CardLink>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {result.totalPages > 1 ? (
+        <nav
+          aria-label="Pagination des demandes"
+          className="mt-4 flex items-center justify-between gap-3"
+        >
+          {result.page > 1 ? (
+            <ButtonLink
+              href={hrefFor(status, result.page - 1)}
+              rel="prev"
+              variant="secondary"
+              size="sm"
+              icon={ChevronLeft}
+              iconOnly="mobile"
+            >
+              Page précédente
+            </ButtonLink>
+          ) : (
+            <span aria-hidden="true" className="size-9" />
+          )}
+          <p className="text-center text-sm text-muted">
+            Page {result.page} sur {result.totalPages} · {result.total} demande
+            {result.total > 1 ? 's' : ''}
+          </p>
+          {result.page < result.totalPages ? (
+            <ButtonLink
+              href={hrefFor(status, result.page + 1)}
+              rel="next"
+              variant="secondary"
+              size="sm"
+              icon={ChevronRight}
+              iconOnly="mobile"
+            >
+              Page suivante
+            </ButtonLink>
+          ) : (
+            <span aria-hidden="true" className="size-9" />
+          )}
+        </nav>
+      ) : null}
     </div>
   );
 }
