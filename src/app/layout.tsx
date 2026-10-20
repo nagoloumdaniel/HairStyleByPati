@@ -25,23 +25,47 @@ const playfair = Playfair_Display({
   display: 'swap',
 });
 
+const SITE_URL =
+  process.env.NEXT_PUBLIC_APP_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : 'http://localhost:3000');
+const SITE_DESCRIPTION =
+  'Départ et retwist de locs, nattes collées, vanilles. Coiffure à domicile à Dakar pour hommes et femmes : catalogue, diagnostic capillaire et réservation en ligne.';
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'),
-  title: 'Hairstyle by Patricia',
-  description: 'Coiffure à domicile spécialisée tresses, vanilles et locs — réservation en ligne.',
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: 'Hairstyle by Patricia — Locs, nattes collées et vanilles à Dakar',
+    template: '%s | Hairstyle by Patricia',
+  },
+  description: SITE_DESCRIPTION,
   applicationName: 'Hairstyle by Patricia',
   authors: [{ name: 'Hairstyle by Patricia' }],
+  keywords: [
+    'coiffure Dakar',
+    'retwist locs',
+    'départ de locs',
+    'nattes collées',
+    'vanilles',
+    'coiffure à domicile',
+    'cheveux naturels',
+    'Hairstyle by Patricia',
+  ],
+  category: 'beauty',
+  alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
-    locale: 'fr_FR',
+    locale: 'fr_SN',
+    url: '/',
     siteName: 'Hairstyle by Patricia',
-    title: 'Hairstyle by Patricia',
-    description: 'Tresses, vanilles et locs sur mesure à Dakar. Réservez votre créneau en ligne.',
+    title: 'Hairstyle by Patricia — Locs, nattes collées et vanilles à Dakar',
+    description: SITE_DESCRIPTION,
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Hairstyle by Patricia',
-    description: 'Tresses, vanilles et locs sur mesure à Dakar. Réservez votre créneau en ligne.',
+    title: 'Hairstyle by Patricia — Locs, nattes collées et vanilles à Dakar',
+    description: SITE_DESCRIPTION,
   },
   robots: { index: true, follow: true },
 };
