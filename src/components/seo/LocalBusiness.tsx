@@ -21,7 +21,7 @@ export interface LocalBusinessData {
 export const LOCAL_BUSINESS: LocalBusinessData = {
   name: 'Hairstyle by Patricia',
   address: {
-    streetAddress: 'Dakar',
+    streetAddress: 'Ouest - Foire',
     addressLocality: 'Dakar',
     addressRegion: 'Dakar',
     addressCountry: 'SN',

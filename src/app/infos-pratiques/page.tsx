@@ -79,7 +79,7 @@ export default function InfosPratiquesPage() {
           <p className="text-muted">
             <span className="font-semibold text-fg">Adresse</span>
             <br />
-            12 Rue de la Coiffure
+            Ouest - Foire
             <br />
             Dakar, Sénégal
           </p>

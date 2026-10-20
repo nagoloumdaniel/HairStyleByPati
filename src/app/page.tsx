@@ -277,7 +277,7 @@ export default async function HomePage() {
               <span>
                 Hairstyle by Patricia
                 <br />
-                Dakar, Sénégal
+                Ouest - Foire, Dakar, Sénégal
               </span>
             </p>
             <p className="flex items-start gap-3 text-fg">
