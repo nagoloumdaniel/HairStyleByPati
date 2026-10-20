@@ -94,7 +94,7 @@ test.describe('Thème clair et sombre', () => {
       .toBe('rgb(23, 21, 11)');
     expect((await bodyColors(page)).color).toBe('rgb(255, 248, 216)');
     expect(await page.evaluate(() => localStorage.getItem('theme'))).toBe('dark');
-    expect(await page.locator('meta[name="theme-color"]').getAttribute('content')).toBe('#12100e');
+    expect(await page.locator('meta[name="theme-color"]').getAttribute('content')).toBe('#17150B');
     await page.screenshot({
       path: 'tests/e2e/screenshots/theme-dark-home.png',
       fullPage: true,
