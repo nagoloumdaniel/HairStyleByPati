@@ -1,9 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ServiceCard } from '@/components/catalogue/ServiceCard';
+import { CardCarousel } from '@/components/catalogue/CardCarousel';
 import { EmptyState } from '@/components/shared/EmptyState';
-import { getPublishedCategories, getPublishedServices, parseCatalogueQuery } from '@/lib/catalogue';
+import { parseCatalogueQuery } from '@/lib/catalogue';
+import { getCachedCategories, getCachedServices } from '@/lib/public-cache';
 import { CatalogueFilters } from '../catalogue-filters';
+import { Title } from '@/components/ui/Title';
 
 export const metadata: Metadata = {
   title: 'Catalogue des coiffures',
@@ -27,10 +30,7 @@ export default async function CataloguePage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const query = parseCatalogueQuery(await searchParams);
-  const [categories, result] = await Promise.all([
-    getPublishedCategories(),
-    getPublishedServices(query),
-  ]);
+  const [categories, result] = await Promise.all([getCachedCategories(), getCachedServices(query)]);
 
   const { services, total, page, totalPages, pageSize } = result;
   const search = query.search ?? '';
@@ -59,9 +59,9 @@ export default async function CataloguePage({
 
       <header className="max-w-3xl space-y-3">
         <p className="text-sm font-semibold uppercase tracking-[0.14em] text-cacao">Catalogue</p>
-        <h1 className="font-heading text-4xl font-bold text-fg md:text-5xl">
+        <Title as="h1" size="display" className="">
           Coiffures et prestations
-        </h1>
+        </Title>
         <p className="text-lg leading-relaxed text-muted">
           Chaque prestation est réalisée sur mesure par Patricia, selon votre nature de cheveux et
           vos envies. Prix, durée et options sont affichés avant la réservation.
@@ -77,9 +77,9 @@ export default async function CataloguePage({
 
       <section aria-labelledby="resultats-titre" className="space-y-6">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 id="resultats-titre" className="font-heading text-2xl font-bold text-fg">
+          <Title as="h2" id="resultats-titre" className="">
             {hasFilters ? 'Résultats de votre recherche' : 'Toutes les coiffures'}
-          </h2>
+          </Title>
           {total > 0 ? (
             <p className="text-sm text-muted">
               Affichage de {firstResult} à {lastResult} sur {total}
@@ -99,13 +99,11 @@ export default async function CataloguePage({
             actionHref={hasFilters ? '/coiffures' : undefined}
           />
         ) : (
-          <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <CardCarousel label="Prestations du catalogue">
             {services.map((service, index) => (
-              <li key={service.id}>
-                <ServiceCard service={service} priority={index < 3} />
-              </li>
+              <ServiceCard key={service.id} service={service} priority={index < 3} />
             ))}
-          </ul>
+          </CardCarousel>
         )}
 
         {totalPages > 1 ? (

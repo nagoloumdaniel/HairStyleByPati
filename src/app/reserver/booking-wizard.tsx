@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
+import { Title } from '@/components/ui/Title';
 
 /* ============================================================
  * P6.3 / P6.4 : parcours de réservation public en 8 étapes.
@@ -43,7 +44,7 @@ const STEPS = [
 
 const euroFormatter = new Intl.NumberFormat('fr-FR', {
   style: 'currency',
-  currency: 'EUR',
+  currency: 'XOF',
   minimumFractionDigits: 0,
   maximumFractionDigits: 2,
 });
@@ -92,7 +93,7 @@ export function BookingWizard({
   const [answers, setAnswers] = useState<Record<string, unknown>>({});
   const [optionIds, setOptionIds] = useState<string[]>([]);
   const [dateISO, setDateISO] = useState('');
-  const [timeZone, setTimeZone] = useState('Europe/Paris');
+  const [timeZone, setTimeZone] = useState('Africa/Dakar');
   const [selectedSlot, setSelectedSlot] = useState<{
     startsAt: string;
     endsAt: string;
@@ -126,9 +127,9 @@ export function BookingWizard({
     now.setDate(now.getDate() + 1);
     setDateISO(localDateISO(now));
     try {
-      setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Paris');
+      setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone || 'Africa/Dakar');
     } catch {
-      setTimeZone('Europe/Paris');
+      setTimeZone('Africa/Dakar');
     }
   }, []);
 
@@ -250,13 +251,15 @@ export function BookingWizard({
 
       {phase === 'questions' ? (
         <Card>
-          <h2
+          <Title
+            as="h2"
             ref={headingRef}
             tabIndex={-1}
-            className="font-heading text-2xl font-bold text-fg outline-none"
+
+            className="outline-none"
           >
             Vos informations capillaires
-          </h2>
+          </Title>
           <p className="mt-2 text-muted">
             Patricia utilise ces réponses pour vérifier que la prestation est réalisable.
           </p>
@@ -314,13 +317,15 @@ export function BookingWizard({
             <Badge tone={previewState.preview.verdict === 'INCOMPATIBLE' ? 'alert' : 'accent'}>
               {previewState.preview.verdict === 'INCOMPATIBLE' ? 'Incompatible' : 'À vérifier'}
             </Badge>
-            <h2
+            <Title
+              as="h2"
               ref={headingRef}
               tabIndex={-1}
-              className="font-heading text-2xl font-bold text-fg outline-none"
+
+              className="outline-none"
             >
               La réservation en ligne ne peut pas continuer
-            </h2>
+            </Title>
           </div>
           <p className="mt-4 whitespace-pre-line text-lg text-fg">{previewState.preview.message}</p>
           <div className="mt-6 flex flex-wrap gap-3">
@@ -350,13 +355,15 @@ export function BookingWizard({
 
       {phase === 'options' ? (
         <Card>
-          <h2
+          <Title
+            as="h2"
             ref={headingRef}
             tabIndex={-1}
-            className="font-heading text-2xl font-bold text-fg outline-none"
+
+            className="outline-none"
           >
             Options et précisions
-          </h2>
+          </Title>
           {verificationMessage ? (
             <p className="mt-2 rounded-[var(--radius-md)] bg-success-soft px-4 py-3 text-sm text-success">
               {verificationMessage}
@@ -415,13 +422,15 @@ export function BookingWizard({
 
       {phase === 'slot' ? (
         <Card>
-          <h2
+          <Title
+            as="h2"
             ref={headingRef}
             tabIndex={-1}
-            className="font-heading text-2xl font-bold text-fg outline-none"
+
+            className="outline-none"
           >
             Choisissez votre créneau
-          </h2>
+          </Title>
           <p className="mt-2 text-muted">
             Seuls les créneaux réellement disponibles sont proposés, selon les horaires de Patricia.
           </p>
@@ -510,13 +519,15 @@ export function BookingWizard({
 
       {phase === 'contact' ? (
         <Card>
-          <h2
+          <Title
+            as="h2"
             ref={headingRef}
             tabIndex={-1}
-            className="font-heading text-2xl font-bold text-fg outline-none"
+
+            className="outline-none"
           >
             Vos coordonnées
-          </h2>
+          </Title>
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
             <Input
               label="Nom et prénom"
@@ -605,13 +616,15 @@ export function BookingWizard({
 
       {phase === 'summary' ? (
         <Card>
-          <h2
+          <Title
+            as="h2"
             ref={headingRef}
             tabIndex={-1}
-            className="font-heading text-2xl font-bold text-fg outline-none"
+
+            className="outline-none"
           >
             Récapitulatif
-          </h2>
+          </Title>
           <dl className="mt-4 divide-y divide-line">
             <div className="flex justify-between gap-4 py-2">
               <dt className="text-muted">Prestation</dt>
@@ -693,15 +706,17 @@ export function BookingWizard({
 
       {phase === 'done' && bookingState.success ? (
         <Card>
-          <h2
+          <Title
+            as="h2"
             ref={headingRef}
             tabIndex={-1}
-            className="font-heading text-2xl font-bold text-fg outline-none"
+
+            className="outline-none"
           >
             {bookingState.success.status === 'CONFIRMED'
               ? 'Votre rendez-vous est confirmé'
               : 'Votre demande est enregistrée'}
-          </h2>
+          </Title>
           <p className="mt-3 text-lg text-fg">
             {bookingState.success.status === 'CONFIRMED'
               ? 'Votre créneau est réservé et protégé contre les doubles réservations.'

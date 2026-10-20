@@ -11,9 +11,8 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const VARIANTS: Record<ButtonVariant, string> = {
-  // P2.3 : primaire jaune dore, texte ink (#191919) pour contraste AAA ~10.9:1.
-  // Ne JAMAIS mettre de texte blanc sur accent (1.6:1).
-  primary: 'bg-accent text-accent-fg hover:bg-accent-hover shadow-soft',
+  // Primaire ocre (clair) / jaune (sombre) : text-accent-fg garantit le contraste AA.
+  primary: 'bg-gradient-primary text-accent-fg hover:brightness-110 shadow-soft',
   secondary: 'bg-card text-fg border border-line hover:border-cacao shadow-soft',
   ghost: 'bg-transparent text-cacao hover:bg-accent-soft',
   danger: 'bg-alert text-alert-fg hover:brightness-95',

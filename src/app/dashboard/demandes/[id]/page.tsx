@@ -33,7 +33,7 @@ const ACTION_LABELS: Record<string, string> = {
 
 const euroFormatter = new Intl.NumberFormat('fr-FR', {
   style: 'currency',
-  currency: 'EUR',
+  currency: 'XOF',
   maximumFractionDigits: 2,
 });
 

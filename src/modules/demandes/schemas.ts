@@ -51,7 +51,7 @@ export const customRequestDecisionSchema = z.object({
     ),
   serviceId: z.string().trim().max(64).optional().default(''),
   proposedSlotLocal: z.string().trim().max(30).optional().default(''),
-  timeZone: z.string().trim().max(80).optional().default('Europe/Paris'),
+  timeZone: z.string().trim().max(80).optional().default('Africa/Dakar'),
 });
 
 export const conversationIdSchema = z.object({ id: z.string().trim().min(1).max(64) });

@@ -43,7 +43,7 @@ function pageHref(status: string, page: number, all: boolean): string {
 
 const euroFormatter = new Intl.NumberFormat('fr-FR', {
   style: 'currency',
-  currency: 'EUR',
+  currency: 'XOF',
   minimumFractionDigits: 0,
   maximumFractionDigits: 2,
 });

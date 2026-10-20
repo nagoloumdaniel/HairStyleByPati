@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 const euroFormatter = new Intl.NumberFormat('fr-FR', {
   style: 'currency',
-  currency: 'EUR',
+  currency: 'XOF',
   maximumFractionDigits: 2,
 });
 

@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { isNotifyTokenValid } from '@/modules/liste-attente/engine';
 import { LocalDateTime } from '@/components/shared/LocalDateTime';
 import { ConfirmForm } from './confirm-form';
+import { Title } from '@/components/ui/Title';
 
 export const metadata: Metadata = {
   title: 'Confirmer ma réservation',
@@ -38,9 +39,9 @@ export default async function WaitlistTokenPage({
     return (
       <main className="mx-auto w-full max-w-2xl px-4 py-12 sm:px-6">
         <div className="rounded-[var(--radius-lg)] border border-line bg-card p-8 text-center">
-          <h1 className="font-heading text-2xl font-bold text-fg">
+          <Title as="h1" size="display" className="">
             {entry.status === 'CONFIRMED' ? 'Déjà confirmée' : 'Lien expiré'}
-          </h1>
+          </Title>
           <p className="mt-3 text-muted">
             {entry.status === 'CONFIRMED'
               ? 'Cette réservation a déjà été confirmée.'
@@ -54,9 +55,9 @@ export default async function WaitlistTokenPage({
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-12 sm:px-6">
       <div className="rounded-[var(--radius-lg)] border border-line bg-card p-8 shadow-soft">
-        <h1 className="font-heading text-2xl font-bold text-fg">
+        <Title as="h1" size="display" className="">
           Une place s’est libérée pour « {entry.service.name} »
-        </h1>
+        </Title>
         <p className="mt-2 text-muted">
           Créneau du <LocalDateTime iso={entry.desiredStartsAt.toISOString()} />. Confirmez votre
           réservation ci-dessous : la disponibilité est vérifiée à nouveau au moment de la

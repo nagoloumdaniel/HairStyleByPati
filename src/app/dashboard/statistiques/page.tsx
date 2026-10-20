@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: 'Statistiques - Tableau de bord' };
 
 const euroFormatter = new Intl.NumberFormat('fr-FR', {
   style: 'currency',
-  currency: 'EUR',
+  currency: 'XOF',
   maximumFractionDigits: 2,
 });
 

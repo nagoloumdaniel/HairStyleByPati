@@ -10,7 +10,7 @@ const inputClasses =
 
 const btnBase =
   'inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] ' +
-  'px-6 py-3 font-semibold text-[#191919] shadow-soft transition disabled:opacity-70 disabled:cursor-not-allowed';
+  'px-6 py-3 font-semibold text-accent-fg shadow-soft transition disabled:opacity-70 disabled:cursor-not-allowed';
 
 export function ContactForm() {
   const [state, formAction, isPending] = useActionState(createConversation, null);

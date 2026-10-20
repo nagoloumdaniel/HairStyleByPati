@@ -2,11 +2,14 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
+import { Title } from '@/components/ui/Title';
 
 export default function GlobalError({ reset }: { error: Error; reset: () => void }) {
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col items-center px-4 py-20 text-center sm:px-6">
-      <h1 className="font-heading text-3xl font-bold text-fg">Une erreur est survenue</h1>
+      <Title as="h1" size="display" className="">
+        Une erreur est survenue
+      </Title>
       <p className="mt-3 max-w-md text-muted">
         La page n’a pas pu être affichée. Réessayez, ou revenez au catalogue si le problème
         persiste.

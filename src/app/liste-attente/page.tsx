@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { db } from '@/lib/db';
 import { WaitlistForm } from './waitlist-form';
+import { Title } from '@/components/ui/Title';
 
 export const metadata: Metadata = {
   title: 'Liste d’attente - Hairstyle by Patricia',
@@ -16,7 +17,9 @@ export default async function ListeAttentePage() {
 
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-12 sm:px-6">
-      <h1 className="font-heading text-3xl font-bold text-fg">Liste d’attente</h1>
+      <Title as="h1" size="display" className="">
+        Liste d’attente
+      </Title>
       <p className="mt-2 text-muted">
         Aucun créneau disponible à la date souhaitée ? Laissez vos coordonnées : vous serez prévenue
         par e-mail si ce créneau exact se libère. La confirmation reste à votre initiative, avec une

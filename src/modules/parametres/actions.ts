@@ -1,6 +1,6 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { AppError, parseInput } from '@/lib/errors';
@@ -85,6 +85,7 @@ export async function adminSaveSalonProfile(
       entityType: 'SalonSettings',
       entityId: '1',
     }).catch(() => undefined);
+    revalidateTag('salon-settings');
     revalidatePath('/dashboard/parametres');
     revalidatePath('/dashboard', 'layout');
     return { success: 'Identité et paramètres du salon enregistrés.' };

@@ -36,13 +36,13 @@ const DEMO_SERVICES: DemoService[] = [
     categorySlug: 'tresses',
     description:
       'Tresses collées au cuir chevelu, réalisées mèche par mèche. Tenue longue durée et finition soignée, adaptée à toutes les occasions.',
-    priceFromCents: 8000,
-    priceToCents: 14000,
+    priceFromCents: 2000000,
+    priceToCents: 3500000,
     durationMinutes: 180,
     order: 1,
     options: [
-      { name: 'Soin profond avant pose', priceCents: 1000, durationMinutes: 15 },
-      { name: 'Perles et accessoires', priceCents: 500, durationMinutes: 10 },
+      { name: 'Soin profond avant pose', priceCents: 250000, durationMinutes: 15 },
+      { name: 'Perles et accessoires', priceCents: 125000, durationMinutes: 10 },
     ],
   },
   {
@@ -51,8 +51,8 @@ const DEMO_SERVICES: DemoService[] = [
     categorySlug: 'tresses',
     description:
       'Tresses plaquées près du crâne, idéales pour un rendu net et durable. Plusieurs épaisseurs disponibles selon votre envie.',
-    priceFromCents: 4500,
-    priceToCents: 6500,
+    priceFromCents: 1125000,
+    priceToCents: 1625000,
     durationMinutes: 120,
     order: 2,
   },
@@ -62,11 +62,11 @@ const DEMO_SERVICES: DemoService[] = [
     categorySlug: 'tresses',
     description:
       'Tresses longues réalisées avec des mèches pour un volume et une longueur sur mesure. Prévoir une photo de référence.',
-    priceFromCents: 9000,
+    priceFromCents: 2250000,
     priceToCents: null,
     durationMinutes: 210,
     order: 3,
-    options: [{ name: 'Mèches fournies', priceCents: 3500, durationMinutes: 0 }],
+    options: [{ name: 'Mèches fournies', priceCents: 875000, durationMinutes: 0 }],
   },
   {
     name: 'Vanilles légères',
@@ -74,8 +74,8 @@ const DEMO_SERVICES: DemoService[] = [
     categorySlug: 'vanilles',
     description:
       'Vanilles souples et régulières, réalisées sur cheveux propres et démêlés. Un classique protecteur qui convient au quotidien.',
-    priceFromCents: 6000,
-    priceToCents: 6000,
+    priceFromCents: 1500000,
+    priceToCents: 1500000,
     durationMinutes: 150,
     order: 4,
   },
@@ -85,8 +85,8 @@ const DEMO_SERVICES: DemoService[] = [
     categorySlug: 'vanilles',
     description:
       'Vanilles réalisées sur cheveux naturels, sans extension. Le tarif dépend de la longueur et de la densité de votre chevelure.',
-    priceFromCents: 5000,
-    priceToCents: 7500,
+    priceFromCents: 1250000,
+    priceToCents: 1875000,
     durationMinutes: 120,
     order: 5,
   },
@@ -96,7 +96,7 @@ const DEMO_SERVICES: DemoService[] = [
     categorySlug: 'vanilles',
     description:
       'Twists deux mèches au rendu volumineux et souple, parfaits pour laisser respirer le cuir chevelu.',
-    priceFromCents: 7000,
+    priceFromCents: 1750000,
     priceToCents: null,
     durationMinutes: 180,
     order: 6,
@@ -107,13 +107,13 @@ const DEMO_SERVICES: DemoService[] = [
     categorySlug: 'locs',
     description:
       'Entretien et reprise des racines de vos locs, avec nettoyage du cuir chevelu et finition soignée.',
-    priceFromCents: 10000,
+    priceFromCents: 2500000,
     priceToCents: null,
     durationMinutes: 120,
     order: 7,
     options: [
-      { name: 'Soin hydratant locs', priceCents: 1500, durationMinutes: 20 },
-      { name: 'Mise en forme finale', priceCents: 1000, durationMinutes: 15 },
+      { name: 'Soin hydratant locs', priceCents: 375000, durationMinutes: 20 },
+      { name: 'Mise en forme finale', priceCents: 250000, durationMinutes: 15 },
     ],
   },
   {
@@ -122,8 +122,8 @@ const DEMO_SERVICES: DemoService[] = [
     categorySlug: 'locs',
     description:
       'Nettoyage, resserrage et hydratation de vos locs pour préserver leur santé entre deux rétissages.',
-    priceFromCents: 4500,
-    priceToCents: 4500,
+    priceFromCents: 1125000,
+    priceToCents: 1125000,
     durationMinutes: 90,
     order: 8,
   },
@@ -138,7 +138,7 @@ const DEMO_SERVICES: DemoService[] = [
     priceOnRequest: true,
     durationMinutes: 90,
     order: 9,
-    options: [{ name: 'Kit de démarrage locs', priceCents: 2500, durationMinutes: 0 }],
+    options: [{ name: 'Kit de démarrage locs', priceCents: 625000, durationMinutes: 0 }],
   },
   {
     name: 'Coiffure protectrice complète',
@@ -146,11 +146,11 @@ const DEMO_SERVICES: DemoService[] = [
     categorySlug: 'protectrices',
     description:
       'Pose protectrice complète avec préparation du cheveu, soin et finition. Convient aux cheveux fragilisés ou en transition.',
-    priceFromCents: 12000,
+    priceFromCents: 3000000,
     priceToCents: null,
     durationMinutes: 240,
     order: 10,
-    options: [{ name: 'Soin réparateur', priceCents: 1800, durationMinutes: 20 }],
+    options: [{ name: 'Soin réparateur', priceCents: 450000, durationMinutes: 20 }],
   },
   {
     name: 'Coupe et brushing',
@@ -158,8 +158,8 @@ const DEMO_SERVICES: DemoService[] = [
     categorySlug: 'coupes',
     description:
       'Coupe personnalisée suivie d’un brushing soigné, avec conseils d’entretien adaptés à votre chevelure.',
-    priceFromCents: 3500,
-    priceToCents: 3500,
+    priceFromCents: 875000,
+    priceToCents: 875000,
     durationMinutes: 60,
     order: 11,
   },
@@ -169,8 +169,8 @@ const DEMO_SERVICES: DemoService[] = [
     categorySlug: 'coupes',
     description:
       'Coupe douce et rapide pour les enfants, dans une ambiance rassurante et adaptée à leur âge.',
-    priceFromCents: 2000,
-    priceToCents: 2000,
+    priceFromCents: 500000,
+    priceToCents: 500000,
     durationMinutes: 45,
     order: 12,
   },

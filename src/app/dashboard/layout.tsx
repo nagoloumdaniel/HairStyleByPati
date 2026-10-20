@@ -21,14 +21,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
   ]);
   return (
     <div className="mx-auto grid max-w-6xl gap-4 px-4 py-6 sm:px-6 lg:grid-cols-[240px_1fr] lg:gap-6 lg:py-8">
-      <aside className="min-w-0 rounded-[var(--radius-lg)] bg-ink p-2 text-panel-fg shadow-lift lg:sticky lg:top-20 lg:self-start lg:p-4">
+      <aside className="min-w-0 rounded-[var(--radius-lg)] bg-ink p-2 text-panel-fg shadow-lift lg:sticky lg:top-28 lg:self-start lg:p-4">
         <Link href="/" className="hidden items-center gap-2 px-4 pb-4 lg:flex">
           <Logo markClassName="h-7 w-auto text-panel-fg" showWordmark={false} />
           <span className="font-heading text-sm font-bold text-panel-fg">
             Hairstyle by Patricia
           </span>
         </Link>
-        <p className="hidden px-4 pb-3 font-heading text-sm font-bold uppercase tracking-wide text-accent lg:block">
+        <p className="hidden px-4 pb-3 font-heading text-sm font-bold uppercase tracking-wide text-bright lg:block">
           Administration
         </p>
         <Sidebar

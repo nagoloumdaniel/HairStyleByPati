@@ -4,22 +4,24 @@ import { Footer } from '@/components/layout/Footer';
 import LocalBusiness from '@/components/seo/LocalBusiness';
 import { LOCAL_BUSINESS } from '@/components/seo/LocalBusiness';
 import type { Metadata } from 'next';
-import { Manrope, Playfair_Display } from 'next/font/google';
+import { Lato, Playfair_Display } from 'next/font/google';
 import './globals.css';
 
 /* P1.3 — polices optimisées via next/font : préchargement, swap,
    zéro requête externe, poids limités au strict nécessaire. */
-const manrope = Manrope({
+const lato = Lato({
   subsets: ['latin'],
-  variable: '--font-manrope',
-  weight: ['400', '500', '600', '700'],
+  variable: '--font-lato',
+  weight: ['100', '300', '400', '700', '900'],
+  style: ['normal', 'italic'],
   display: 'swap',
 });
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
   variable: '--font-playfair',
-  weight: ['500', '600', '700'],
+  weight: ['400', '500', '600', '700', '800', '900'],
+  style: ['normal', 'italic'],
   display: 'swap',
 });
 
@@ -34,28 +36,30 @@ export const metadata: Metadata = {
     locale: 'fr_FR',
     siteName: 'Hairstyle by Patricia',
     title: 'Hairstyle by Patricia',
-    description: 'Tresses, vanilles et locs sur mesure à Paris. Réservez votre créneau en ligne.',
+    description: 'Tresses, vanilles et locs sur mesure à Dakar. Réservez votre créneau en ligne.',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Hairstyle by Patricia',
-    description: 'Tresses, vanilles et locs sur mesure à Paris. Réservez votre créneau en ligne.',
+    description: 'Tresses, vanilles et locs sur mesure à Dakar. Réservez votre créneau en ligne.',
   },
   robots: { index: true, follow: true },
 };
 
 /* Applique le thème avant le premier rendu pour éviter tout flash clair.
    Priorité : choix enregistré, sinon préférence système. */
-const THEME_SCRIPT = `(function(){try{var s=localStorage.getItem('theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;var t=(s==='dark'||s==='light')?s:(d?'dark':'light');var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t;var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',t==='dark'?'#12100e':'#fff8e9');}catch(e){}})();`;
+const THEME_SCRIPT = `(function(){try{var s=localStorage.getItem('theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;var t=(s==='dark'||s==='light')?s:(d?'dark':'light');var r=document.documentElement;r.setAttribute('data-theme',t);r.style.colorScheme=t;var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',t==='dark'?'#17150B':'#FFFCF0');}catch(e){}})();
+/* Extensions antivirus (Bitdefender) ajoutent bis_skin_checked sur les div avant l'hydratation : on les retire pour éviter un faux mismatch. */
+(function(){try{var a='bis_skin_checked';var c=function(){document.querySelectorAll('['+a+']').forEach(function(n){n.removeAttribute(a)})};c();var o=new MutationObserver(function(ms){ms.forEach(function(m){if(m.target&&m.target.removeAttribute)m.target.removeAttribute(a)})});o.observe(document.documentElement,{attributes:true,subtree:true,attributeFilter:[a]});setTimeout(function(){o.disconnect()},10000);}catch(e){}})();`;
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="fr" className={`${manrope.variable} ${playfair.variable}`} suppressHydrationWarning>
+    <html lang="fr" className={`${lato.variable} ${playfair.variable}`} suppressHydrationWarning>
       <head>
-        <meta name="theme-color" content="#fff8e9" />
+        <meta name="theme-color" content="#FFFCF0" />
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         {/* P2.9 : lien d'evitement clavier */}
         <a
           href="#contenu"

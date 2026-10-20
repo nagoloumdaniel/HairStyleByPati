@@ -3,14 +3,16 @@ import { IMAGE_BLUR_DATA_URL } from '@/lib/image-placeholder';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 
-import { Card } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
 import { getApprovedReviews } from '@/modules/avis/queries';
+import { Title } from '@/components/ui/Title';
+import { CardCarousel } from '@/components/catalogue/CardCarousel';
+import { PrestationCard } from '@/components/catalogue/PrestationCard';
+import { bookingHref } from '@/lib/catalogue';
 
 export const metadata: Metadata = {
-  title: 'Hairstyle by Patricia — Coiffures texturées, tresses, vanilles et locs à Paris',
+  title: 'Hairstyle by Patricia — Coiffures texturées, tresses, vanilles et locs à Dakar',
   description:
-    'Salon de coiffure spécialisé en tresses, vanilles et locs. Diagnostic capillaire sur mesure et réservation en ligne. Paris 12e.',
+    'Salon de coiffure spécialisé en tresses, vanilles et locs. Diagnostic capillaire sur mesure et réservation en ligne. Dakar, Sénégal.',
   alternates: { canonical: '/' },
   openGraph: {
     title: 'Hairstyle by Patricia — Sublimez vos cheveux avec Patricia',
@@ -25,7 +27,7 @@ const popularServices = [
   {
     title: 'Tresses BOX',
     slug: 'tresses-box',
-    price: 'À partir de 80 €',
+    price: 'À partir de 20 000 FCFA',
     duration: '3h00',
     category: 'Tresses',
     image:
@@ -35,7 +37,7 @@ const popularServices = [
   {
     title: 'Vanilles légères',
     slug: 'vanilles-legeres',
-    price: 'À partir de 60 €',
+    price: 'À partir de 15 000 FCFA',
     duration: '2h30',
     category: 'Vanilles',
     image:
@@ -45,7 +47,7 @@ const popularServices = [
   {
     title: 'Rétissage de locs',
     slug: 'retissage-de-locs',
-    price: 'À partir de 100 €',
+    price: 'À partir de 25 000 FCFA',
     duration: '2h00',
     category: 'Locs',
     image:
@@ -85,14 +87,9 @@ export default async function HomePage() {
       >
         <div className="md:flex md:items-center gap-8">
           <div className="md:w-1/2 space-y-6">
-            <h1
-              id="hero-title"
-              className="text-4xl md:text-6xl font-heading font-bold leading-tight"
-            >
-              Sublimez vos cheveux
-              <br />
-              avec Patricia
-            </h1>
+            <Title as="h1" size="display" id="hero-title" className="title-on-dark">
+              Sublimez vos cheveux avec Patricia
+            </Title>
             <p className="text-lg md:text-xl text-panel-fg/90 max-w-md leading-relaxed">
               Coiffeuse spécialisée en tresses, vanilles et locs. Prenez rendez-vous en quelques
               clics pour une coiffure sur mesure.
@@ -133,7 +130,9 @@ export default async function HomePage() {
       <section id="coiffures" className="space-y-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h2 className="text-3xl font-heading font-bold text-fg">Coiffures populaires</h2>
+            <Title as="h2" className="">
+              Coiffures populaires
+            </Title>
             <p className="text-muted">Nos prestations les plus demandées.</p>
           </div>
           <Link
@@ -143,46 +142,27 @@ export default async function HomePage() {
             Voir toutes les coiffures
           </Link>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <CardCarousel label="Coiffures populaires">
           {popularServices.map((service) => (
-            <Card
-              key={service.title}
-              className="overflow-hidden shadow-soft hover:shadow-lift transition-shadow"
-            >
-              <Image
-                src={service.image}
-                alt={service.alt}
-                className="w-full h-48 object-cover"
-                width={400}
-                height={300}
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                placeholder="blur"
-                blurDataURL={IMAGE_BLUR_DATA_URL}
-                quality={80}
-                loading="lazy"
-              />
-              <div className="p-5">
-                <div className="flex justify-between items-start mb-2">
-                  <Badge tone="neutral">{service.category}</Badge>
-                  <Badge tone="accent">{service.price}</Badge>
-                </div>
-                <h3 className="text-xl font-heading font-bold text-fg mb-1">{service.title}</h3>
-                <p className="text-muted text-sm mb-4">{service.duration}</p>
-                <Link
-                  href={`/coiffures/${service.slug}`}
-                  className="inline-flex items-center justify-center gap-2 font-semibold bg-accent text-accent-fg hover:bg-accent-hover shadow-soft px-3 py-1.5 text-sm rounded-[var(--radius-sm)] transition active:scale-[0.98]"
-                >
-                  Voir les détails
-                </Link>
-              </div>
-            </Card>
+            <PrestationCard
+              key={service.slug}
+              href={`/coiffures/${service.slug}`}
+              bookHref={bookingHref(service.slug)}
+              images={[{ src: service.image, alt: service.alt }]}
+              badge={service.category}
+              title={service.title}
+              price={service.price}
+              duration={service.duration}
+            />
           ))}
-        </div>
+        </CardCarousel>
       </section>
 
       {/* Étapes de réservation */}
       <section id="etapes" className="space-y-8">
-        <h2 className="text-3xl font-heading font-bold text-fg">Comment ça marche</h2>
+        <Title as="h2" className="">
+          Comment ça marche
+        </Title>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {steps.map((step) => (
             <div key={step.number} className="text-center">
@@ -213,7 +193,9 @@ export default async function HomePage() {
           />
         </div>
         <div className="md:w-1/2 space-y-6">
-          <h2 className="text-3xl font-heading font-bold text-fg">À propos de Patricia</h2>
+          <Title as="h2" className="">
+            À propos de Patricia
+          </Title>
           <p className="text-muted leading-relaxed">
             Coiffeuse passionnée et expérimentée, Patricia met son savoir-faire au service de vos
             cheveux depuis plus de 10 ans. Spécialiste des tresses, vanilles et locs, elle vous
@@ -230,7 +212,9 @@ export default async function HomePage() {
       {/* Témoignages (P8.10) : avis réels approuvés uniquement, jamais inventés. */}
       {reviews.length > 0 ? (
         <section id="temoinages" className="space-y-8">
-          <h2 className="text-3xl font-heading font-bold text-fg">Elles nous font confiance</h2>
+          <Title as="h2" className="">
+            Elles nous font confiance
+          </Title>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {reviews.map((review) => (
               <blockquote
@@ -250,9 +234,9 @@ export default async function HomePage() {
 
       {/* Demande personnalisée */}
       <section className="rounded-2xl border border-line bg-card p-8 text-center shadow-soft md:p-12">
-        <h2 className="font-heading text-3xl font-bold text-fg">
+        <Title as="h2" className="">
           Une coiffure sur mesure en tête ?
-        </h2>
+        </Title>
         <p className="mx-auto mt-3 max-w-2xl text-ink-soft">
           Décrivez votre projet et joignez jusqu’à trois photos de référence. Patricia étudie votre
           demande et vous propose une prestation adaptée, sans réservation automatique.
@@ -269,7 +253,9 @@ export default async function HomePage() {
       <section id="contact" className="rounded-2xl bg-page p-8 md:p-12 reveal">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           <div className="space-y-6">
-            <h2 className="text-3xl font-heading font-bold text-fg">Contactez-nous</h2>
+            <Title as="h2" className="">
+              Contactez-nous
+            </Title>
             <p className="text-muted leading-relaxed">
               Une question sur une prestation ou sur la disponibilité d&apos;un créneau ?
               Contactez-nous, nous vous répondrons rapidement.
@@ -287,7 +273,7 @@ export default async function HomePage() {
               <span>
                 Salon Hairstyle by Patricia
                 <br />
-                12 Rue de la Coiffure, 75000 Paris
+                Dakar, Sénégal
               </span>
             </p>
             <p className="flex items-start gap-3 text-fg">

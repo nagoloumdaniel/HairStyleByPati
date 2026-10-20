@@ -1,24 +1,38 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import { Title } from '@/components/ui/Title';
+
+export const metadata: Metadata = {
+  title: 'Page introuvable',
+  robots: { index: false, follow: false },
+};
 
 export default function NotFound() {
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col items-center px-4 py-20 text-center sm:px-6">
-      <p className="font-heading text-6xl font-bold text-accent">404</p>
-      <h1 className="mt-4 font-heading text-3xl font-bold text-fg">Page introuvable</h1>
-      <p className="mt-3 max-w-md text-muted">
+    <main className="bg-gradient-soft flex min-h-[calc(100svh-6rem)] w-full flex-col items-center justify-center px-6 py-16 text-center">
+      <p
+        aria-hidden="true"
+        className="text-gradient-primary font-heading text-[clamp(7rem,32vw,20rem)] font-black italic leading-none"
+      >
+        404
+      </p>
+      <Title as="h1" size="display" className="mt-2">
+        Page introuvable
+      </Title>
+      <p className="mt-4 max-w-md text-lg text-muted">
         Cette page n’existe pas ou n’est plus disponible. Le catalogue reste accessible pour
         découvrir les prestations du salon.
       </p>
-      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+      <div className="mt-10 flex flex-col gap-3 sm:flex-row">
         <Link
           href="/coiffures"
-          className="inline-flex items-center justify-center rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
+          className="bg-gradient-primary inline-flex items-center justify-center rounded-full px-8 py-3.5 font-bold text-accent-fg shadow-soft transition hover:brightness-110 active:scale-[0.98]"
         >
           Voir le catalogue
         </Link>
         <Link
           href="/"
-          className="inline-flex items-center justify-center rounded-[var(--radius-md)] border border-line bg-card px-6 py-3 font-semibold text-fg transition hover:border-cacao hover:bg-page"
+          className="glass inline-flex items-center justify-center rounded-full px-8 py-3.5 font-bold text-fg transition hover:bg-accent-soft"
         >
           Retour à l’accueil
         </Link>

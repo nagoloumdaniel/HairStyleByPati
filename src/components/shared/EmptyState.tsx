@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
+import { Title } from '@/components/ui/Title';
 
 /* P2.7 : etat vide = invitation a agir, ton conversationnel, un seul appel a l'action. */
 export function EmptyState({
@@ -36,7 +37,9 @@ export function EmptyState({
           <path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12" />
         </svg>
       </span>
-      <h2 className="mt-4 text-xl font-heading font-bold text-fg">{title}</h2>
+      <Title as="h2" className="mt-4">
+        {title}
+      </Title>
       <p className="mt-2 max-w-md text-muted">{message}</p>
       {actionLabel && actionHref ? (
         <Link

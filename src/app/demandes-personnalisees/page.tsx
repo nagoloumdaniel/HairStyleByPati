@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CustomRequestForm } from './custom-request-form';
+import { Title } from '@/components/ui/Title';
 
 export const metadata: Metadata = {
   title: 'Demande de coiffure personnalisée',
@@ -35,9 +36,9 @@ export default function CustomRequestPage() {
 
       <header className="mt-4 max-w-3xl space-y-4">
         <p className="text-sm font-semibold uppercase tracking-wide text-cacao">Sur mesure</p>
-        <h1 className="font-heading text-4xl font-bold text-fg md:text-5xl">
+        <Title as="h1" size="display" className="">
           Une coiffure qui n’est pas au catalogue ?
-        </h1>
+        </Title>
         <p className="text-lg leading-relaxed text-ink-soft">
           Décrivez votre projet, ajoutez jusqu’à 3 photos de référence et vos informations
           capillaires. Patricia étudie chaque demande personnellement et vous répond avec une
@@ -58,9 +59,9 @@ export default function CustomRequestPage() {
       </header>
 
       <section className="mt-8" aria-labelledby="formulaire-demande">
-        <h2 id="formulaire-demande" className="font-heading text-2xl font-bold text-fg">
+        <Title as="h2" id="formulaire-demande" className="">
           Votre demande
-        </h2>
+        </Title>
         <p className="mt-1 text-sm text-ink-soft">
           Une demande ne réserve pas de créneau. Aucun paiement n’est demandé.
         </p>

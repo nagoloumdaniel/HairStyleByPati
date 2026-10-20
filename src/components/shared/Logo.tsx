@@ -21,16 +21,18 @@ export function Logo({
   className = '',
   markClassName = 'h-8 w-auto text-fg',
   showWordmark = true,
+  wordmarkClassName = '',
 }: {
   className?: string;
   markClassName?: string;
   showWordmark?: boolean;
+  wordmarkClassName?: string;
 }) {
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
       <LogoMark className={markClassName} />
       {showWordmark ? (
-        <span className="font-heading text-xl font-bold text-fg">
+        <span className={`font-heading text-xl font-bold text-fg ${wordmarkClassName}`}>
           Hairstyle <span className="text-cacao">by Patricia</span>
         </span>
       ) : null}

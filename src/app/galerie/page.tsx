@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import { listPublishedGalleryPhotos } from '@/modules/galerie/queries';
 import { IMAGE_BLUR_DATA_URL } from '@/lib/image-placeholder';
+import { Title } from '@/components/ui/Title';
 
 export const metadata: Metadata = {
   title: 'Galerie de réalisations - Hairstyle by Patricia',
@@ -15,7 +16,9 @@ export default async function GaleriePage() {
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
-      <h1 className="font-heading text-3xl font-bold text-fg">Galerie de réalisations</h1>
+      <Title as="h1" size="display" className="">
+        Galerie de réalisations
+      </Title>
       <p className="mt-2 max-w-2xl text-muted">
         Un aperçu de réalisations de Patricia, partagées avec l’autorisation explicite des clientes
         concernées.

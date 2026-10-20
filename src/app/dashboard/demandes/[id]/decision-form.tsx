@@ -36,7 +36,7 @@ export function CustomRequestDecisionForm({
           name="timeZone"
           value={
             typeof window === 'undefined'
-              ? 'Europe/Paris'
+              ? 'Africa/Dakar'
               : Intl.DateTimeFormat().resolvedOptions().timeZone
           }
         />
@@ -55,13 +55,13 @@ export function CustomRequestDecisionForm({
             ]}
           />
           <Input
-            label="Prix estimatif (€, facultatif)"
+            label="Prix estimatif (FCFA, facultatif)"
             name="estimatedPriceEuros"
             type="number"
             min={0}
             step="0.01"
             placeholder="Exemple : 120"
-            hint="Montant en euros, converti en centimes."
+            hint="Montant en francs CFA (FCFA)."
           />
           <Select
             label="Prestation existante à proposer (facultatif)"

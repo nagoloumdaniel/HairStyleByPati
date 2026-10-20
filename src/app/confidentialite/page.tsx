@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { getSalonSettings } from '@/modules/disponibilites/queries';
+import { getCachedSalonSettings } from '@/lib/public-cache';
+import { Title } from '@/components/ui/Title';
 
 export const metadata: Metadata = {
   title: 'Politique de confidentialité RGPD',
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function ConfidentialitePage() {
-  const settings = await getSalonSettings();
+  const settings = await getCachedSalonSettings();
   const contactEmail =
     settings.contactEmail?.trim() ||
     process.env.ADMIN_EMAIL?.trim() ||
@@ -40,9 +41,9 @@ export default async function ConfidentialitePage() {
         <p className="text-sm font-semibold uppercase tracking-[0.14em] text-cacao">
           Protection des données
         </p>
-        <h1 className="font-heading text-4xl font-bold text-fg md:text-5xl">
+        <Title as="h1" size="display" className="">
           Politique de confidentialité
-        </h1>
+        </Title>
         <p className="text-lg leading-relaxed text-muted">
           Ce que nous collectons, pourquoi, combien de temps nous conservons vos données et comment
           exercer vos droits (RGPD).
@@ -50,7 +51,9 @@ export default async function ConfidentialitePage() {
       </header>
 
       <section className="max-w-3xl space-y-8">
-        <h2 className="font-heading text-3xl font-bold text-fg">1. Responsable du traitement</h2>
+        <Title as="h2" className="">
+          1. Responsable du traitement
+        </Title>
         <p className="text-muted leading-relaxed">
           Le salon Hairstyle by Patricia (Patricia, gérante) est responsable du traitement des
           données personnelles collectées sur ce site. Contact :{' '}
@@ -62,7 +65,9 @@ export default async function ConfidentialitePage() {
       </section>
 
       <section className="max-w-3xl space-y-8">
-        <h2 className="font-heading text-3xl font-bold text-fg">2. Données collectées</h2>
+        <Title as="h2" className="">
+          2. Données collectées
+        </Title>
         <ul className="list-disc list-inside space-y-2 text-muted leading-relaxed">
           <li>Formulaire de contact : nom, e-mail, téléphone (facultatif), sujet, message.</li>
           <li>
@@ -84,7 +89,9 @@ export default async function ConfidentialitePage() {
       </section>
 
       <section className="max-w-3xl space-y-8">
-        <h2 className="font-heading text-3xl font-bold text-fg">3. Finalités et base légale</h2>
+        <Title as="h2" className="">
+          3. Finalités et base légale
+        </Title>
         <table className="w-full text-left border-collapse text-muted">
           <thead>
             <tr className="border-b border-line">
@@ -114,7 +121,9 @@ export default async function ConfidentialitePage() {
       </section>
 
       <section className="max-w-3xl space-y-8">
-        <h2 className="font-heading text-3xl font-bold text-fg">4. Durée de conservation</h2>
+        <Title as="h2" className="">
+          4. Durée de conservation
+        </Title>
         <ul className="list-disc list-inside space-y-2 text-muted leading-relaxed">
           <li>Messages de contact : 12 mois maximum après la dernière réponse.</li>
           <li>
@@ -141,9 +150,9 @@ export default async function ConfidentialitePage() {
       </section>
 
       <section className="max-w-3xl space-y-8">
-        <h2 className="font-heading text-3xl font-bold text-fg">
+        <Title as="h2" className="">
           5. Destinataires et sous-traitants
-        </h2>
+        </Title>
         <p className="text-muted leading-relaxed">
           Vos données ne sont ni vendues ni louées. Elles peuvent être transmises à des prestataires
           techniques strictement nécessaires au fonctionnement du site : hébergement, base de
@@ -154,7 +163,9 @@ export default async function ConfidentialitePage() {
       </section>
 
       <section className="max-w-3xl space-y-8">
-        <h2 className="font-heading text-3xl font-bold text-fg">6. Vos droits (RGPD)</h2>
+        <Title as="h2" className="">
+          6. Vos droits (RGPD)
+        </Title>
         <p className="text-muted leading-relaxed">
           Conformément au RGPD, vous pouvez exercer gratuitement les droits suivants :
         </p>
@@ -186,7 +197,9 @@ export default async function ConfidentialitePage() {
       </section>
 
       <section className="max-w-3xl space-y-8">
-        <h2 className="font-heading text-3xl font-bold text-fg">7. Cookies et traceurs</h2>
+        <Title as="h2" className="">
+          7. Cookies et traceurs
+        </Title>
         <p className="text-muted leading-relaxed">
           Ce site peut utiliser des cookies strictement nécessaires à son fonctionnement (session du
           tableau de bord, protection du formulaire de contact). Aucun cookie de traçage
@@ -196,7 +209,9 @@ export default async function ConfidentialitePage() {
       </section>
 
       <section className="max-w-3xl space-y-8">
-        <h2 className="font-heading text-3xl font-bold text-fg">8. Sécurité</h2>
+        <Title as="h2" className="">
+          8. Sécurité
+        </Title>
         <p className="text-muted leading-relaxed">
           Le salon met en œuvre des mesures de sécurité adaptées pour protéger vos données contre
           toute destruction, perte, altération ou accès non autorisé : authentification protégée
@@ -206,7 +221,9 @@ export default async function ConfidentialitePage() {
       </section>
 
       <section className="max-w-3xl rounded-2xl bg-page p-8 text-center md:p-10 border border-line">
-        <h2 className="font-heading text-2xl font-bold text-fg">Exercer vos droits</h2>
+        <Title as="h2" className="">
+          Exercer vos droits
+        </Title>
         <p className="mx-auto mt-3 max-w-md text-muted">
           Contactez Patricia pour toute question sur vos données personnelles.
         </p>

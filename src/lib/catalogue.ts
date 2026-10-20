@@ -60,7 +60,7 @@ const CATALOGUE_SERVICE_SELECT = {
   category: { select: { name: true, slug: true } },
   images: {
     orderBy: [{ isPrimary: 'desc' }, { order: 'asc' }],
-    take: 1,
+    take: 4,
     select: { key: true, alt: true },
   },
   options: {
@@ -331,9 +331,9 @@ export function serviceImage(service: Pick<CatalogueService, 'slug' | 'images' |
 
 const euroFormatter = new Intl.NumberFormat('fr-FR', {
   style: 'currency',
-  currency: 'EUR',
+  currency: 'XOF',
   minimumFractionDigits: 0,
-  maximumFractionDigits: 2,
+  maximumFractionDigits: 0,
 });
 
 function formatEuros(cents: number): string {
@@ -371,4 +371,14 @@ export function formatDuration(durationMinutes: number | null): string {
 /** CTA « Réserver » d'une carte ou d'une fiche : le parcours arrive en Phase 6. */
 export function bookingHref(slug: string): string {
   return `/reserver?service=${encodeURIComponent(slug)}`;
+}
+
+/** Toutes les photos affichables d'une prestation (jusqu'à 4), repli démo sinon. */
+export function serviceImages(
+  service: Pick<CatalogueService, 'slug' | 'images' | 'category'>,
+): { src: string; alt: string }[] {
+  const list = service.images
+    .filter((image) => isDisplayableImageKey(image.key))
+    .map((image) => ({ src: image.key, alt: image.alt || service.slug }));
+  return list.length > 0 ? list : [serviceImage(service)];
 }
