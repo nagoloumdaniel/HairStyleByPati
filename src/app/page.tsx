@@ -3,10 +3,11 @@ import { IMAGE_BLUR_DATA_URL } from '@/lib/image-placeholder';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 
-import { Card } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
 import { getApprovedReviews } from '@/modules/avis/queries';
 import { Title } from '@/components/ui/Title';
+import { CardCarousel } from '@/components/catalogue/CardCarousel';
+import { PrestationCard } from '@/components/catalogue/PrestationCard';
+import { bookingHref } from '@/lib/catalogue';
 
 export const metadata: Metadata = {
   title: 'Hairstyle by Patricia — Coiffures texturées, tresses, vanilles et locs à Paris',
@@ -141,41 +142,21 @@ export default async function HomePage() {
             Voir toutes les coiffures
           </Link>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <CardCarousel label="Coiffures populaires">
           {popularServices.map((service) => (
-            <Card
-              key={service.title}
-              className="overflow-hidden shadow-soft hover:shadow-lift transition-shadow"
-            >
-              <Image
-                src={service.image}
-                alt={service.alt}
-                className="w-full h-48 object-cover"
-                width={400}
-                height={300}
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                placeholder="blur"
-                blurDataURL={IMAGE_BLUR_DATA_URL}
-                quality={80}
-                loading="lazy"
-              />
-              <div className="p-5">
-                <div className="flex justify-between items-start mb-2">
-                  <Badge tone="neutral">{service.category}</Badge>
-                  <Badge tone="accent">{service.price}</Badge>
-                </div>
-                <h3 className="text-xl font-heading font-bold text-fg mb-1">{service.title}</h3>
-                <p className="text-muted text-sm mb-4">{service.duration}</p>
-                <Link
-                  href={`/coiffures/${service.slug}`}
-                  className="inline-flex items-center justify-center gap-2 font-semibold bg-accent text-accent-fg hover:bg-accent-hover shadow-soft px-3 py-1.5 text-sm rounded-[var(--radius-sm)] transition active:scale-[0.98]"
-                >
-                  Voir les détails
-                </Link>
-              </div>
-            </Card>
+            <PrestationCard
+              key={service.slug}
+              href={`/coiffures/${service.slug}`}
+              bookHref={bookingHref(service.slug)}
+              images={[{ src: service.image, alt: service.alt }]}
+              badge={service.category}
+              title={service.title}
+              price={service.price}
+              duration={service.duration}
+              optionsLabel="Sur mesure"
+            />
           ))}
-        </div>
+        </CardCarousel>
       </section>
 
       {/* Étapes de réservation */}

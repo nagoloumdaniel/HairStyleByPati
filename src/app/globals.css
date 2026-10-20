@@ -339,3 +339,39 @@ html[data-theme='dark'] {
 .title-on-dark .title-accent {
   background-image: linear-gradient(100deg, #fff1b8 0%, #ffd84d 100%);
 }
+
+/* ============================================================
+   Carte prestation immersive : voile + flou adaptés au thème
+   ============================================================ */
+:root {
+  --scrim: 40 35 12;
+}
+html[data-theme='dark'] {
+  --scrim: 16 14 6;
+}
+.prestation-card {
+  box-shadow: var(--shadow-lift);
+  outline: 1px solid var(--glass-border);
+  outline-offset: -1px;
+}
+.card-scrim {
+  background: linear-gradient(
+    to top,
+    rgb(var(--scrim) / 0.96) 0%,
+    rgb(var(--scrim) / 0.78) 30%,
+    rgb(var(--scrim) / 0.1) 58%,
+    transparent 75%
+  );
+}
+.card-blur {
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  -webkit-mask-image: linear-gradient(to top, #000 22%, transparent 48%);
+  mask-image: linear-gradient(to top, #000 22%, transparent 48%);
+}
+.stretched-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}

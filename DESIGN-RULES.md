@@ -34,6 +34,20 @@
 - Utiliser le composant `src/components/ui/Title.tsx` (`size="display"` pour titre de page, animé à l'entrée ; `size="section"` par défaut). Sur fond foncé/ocre : `className="title-on-dark"`. Dashboard : titres inchangés.
 - Animation respecte `prefers-reduced-motion`.
 
+## Cartes (consigne utilisateur)
+
+- Toutes les cartes prestation = `PrestationCard` (photo plein cadre, voile + flou bas, badge catégorie, nom + prix, durée, bouton Réserver). Modèle : capture « Highland huts ».
+- Carte entièrement cliquable vers la fiche (`.stretched-link` sur le titre) ; adapte voile/ombre au thème clair/sombre.
+- Rangées de cartes = `CardCarousel` (défilement horizontal snap + flèches en verre). Plusieurs photos : points + fondu au survol.
+
+## Titres : polices
+
+- Effet mix uniquement avec Playfair Display (mots forts) + Lato (mots accent italique). Aucune autre police.
+
+## Page 404
+
+- Plein écran, sans carte englobante (`src/app/not-found.tsx`).
+
 ## Consignes par interface
 
 - composants reutilisables

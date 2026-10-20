@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ServiceCard } from '@/components/catalogue/ServiceCard';
+import { CardCarousel } from '@/components/catalogue/CardCarousel';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { getPublishedCategories, getPublishedServices, parseCatalogueQuery } from '@/lib/catalogue';
 import { CatalogueFilters } from '../catalogue-filters';
@@ -100,13 +101,11 @@ export default async function CataloguePage({
             actionHref={hasFilters ? '/coiffures' : undefined}
           />
         ) : (
-          <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <CardCarousel label="Prestations du catalogue">
             {services.map((service, index) => (
-              <li key={service.id}>
-                <ServiceCard service={service} priority={index < 3} />
-              </li>
+              <ServiceCard key={service.id} service={service} priority={index < 3} />
             ))}
-          </ul>
+          </CardCarousel>
         )}
 
         {totalPages > 1 ? (
