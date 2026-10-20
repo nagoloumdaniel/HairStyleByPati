@@ -28,8 +28,19 @@
 - Verre : `.glass` / `.glass-strong` (blur + bordure translucide). Navbar : `.nav-floating` flottante (pilule, web + mobile), contenu décalé par un espaceur.
 - Respecter `prefers-reduced-motion`, focus visible, contraste WCAG AA, états loading/erreur/vide, responsive.
 
+## Titres (consigne utilisateur)
+
+- Tous les titres h1/h2 publics : **grands, en MAJUSCULES**, effet « text motion design » : Playfair Display 900 mêlé à Lato italique léger en dégradé de couleur (derniers mots = accent).
+- Utiliser le composant `src/components/ui/Title.tsx` (`size="display"` pour titre de page, animé à l'entrée ; `size="section"` par défaut). Sur fond foncé/ocre : `className="title-on-dark"`. Dashboard : titres inchangés.
+- Animation respecte `prefers-reduced-motion`.
+
 ## Consignes par interface
 
-(à compléter au fil des instructions de l'utilisateur)
+- composants reutilisables
+- text motion design
+- utiliser les meme type de composants, meme style et allignement et espacements
+- etats de chargement et rate limiting sur les boutons d'actions
+- icones partout ou c'est necessaire
+- animation des etats de chargements
 
 - Global : navbar flottante verre. Page 404 : `src/app/not-found.tsx` (dégradé + verre).

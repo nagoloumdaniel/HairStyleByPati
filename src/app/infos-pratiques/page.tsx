@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { Title } from '@/components/ui/Title';
 
 export const metadata: Metadata = {
   title: 'Informations pratiques',
@@ -59,9 +60,9 @@ export default function InfosPratiquesPage() {
 
       <header className="max-w-3xl space-y-3">
         <p className="text-sm font-semibold uppercase tracking-[0.14em] text-cacao">Pratique</p>
-        <h1 className="font-heading text-4xl font-bold text-fg md:text-5xl">
+        <Title as="h1" size="display" className="">
           Informations pratiques
-        </h1>
+        </Title>
         <p className="text-lg leading-relaxed text-muted">
           Tout ce qu&apos;il faut savoir avant votre venue : horaires, préparation du rendez-vous et
           conditions d&apos;annulation.
@@ -71,7 +72,9 @@ export default function InfosPratiquesPage() {
       {/* Coordonnées et horaires */}
       <section className="grid grid-cols-1 gap-8 md:grid-cols-2">
         <div className="space-y-6 rounded-2xl bg-card p-8 shadow-soft">
-          <h2 className="font-heading text-2xl font-bold text-fg">Coordonnées</h2>
+          <Title as="h2" className="">
+            Coordonnées
+          </Title>
           <p className="text-muted">
             <span className="font-semibold text-fg">Adresse</span>
             <br />
@@ -91,7 +94,9 @@ export default function InfosPratiquesPage() {
           </p>
         </div>
         <div className="space-y-6 rounded-2xl bg-card p-8 shadow-soft">
-          <h2 className="font-heading text-2xl font-bold text-fg">Horaires</h2>
+          <Title as="h2" className="">
+            Horaires
+          </Title>
           <p className="text-muted">
             Mardi – Samedi : 10h – 19h
             <br />
@@ -106,7 +111,9 @@ export default function InfosPratiquesPage() {
 
       {/* Préparation */}
       <section className="space-y-6">
-        <h2 className="font-heading text-3xl font-bold text-fg">Préparer votre rendez-vous</h2>
+        <Title as="h2" className="">
+          Préparer votre rendez-vous
+        </Title>
         <ul className="max-w-3xl space-y-3">
           {preparation.map((item) => (
             <li key={item} className="flex items-start gap-3 text-muted">
@@ -121,7 +128,9 @@ export default function InfosPratiquesPage() {
 
       {/* Politique d'annulation */}
       <section className="space-y-6">
-        <h2 className="font-heading text-3xl font-bold text-fg">Politique d&apos;annulation</h2>
+        <Title as="h2" className="">
+          Politique d&apos;annulation
+        </Title>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {annulationRules.map((rule) => (
             <div key={rule.label} className="border-l-4 border-accent pl-5">
@@ -133,7 +142,9 @@ export default function InfosPratiquesPage() {
       </section>
 
       <section className="rounded-2xl bg-page p-8 text-center md:p-10">
-        <h2 className="font-heading text-2xl font-bold text-fg">Une question ?</h2>
+        <Title as="h2" className="">
+          Une question ?
+        </Title>
         <p className="mx-auto mt-3 max-w-md text-muted">
           Pour toute demande particulière (groupe, coiffure sur mesure, situation particulière),
           contactez-nous avant de réserver.

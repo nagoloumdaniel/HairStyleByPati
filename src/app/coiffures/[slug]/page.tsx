@@ -13,6 +13,7 @@ import {
   getPublishedServiceBySlug,
   serviceGallery,
 } from '@/lib/catalogue';
+import { Title } from '@/components/ui/Title';
 
 type ServicePageProps = { params: Promise<{ slug: string }> };
 
@@ -111,7 +112,9 @@ export default async function ServicePage({ params }: ServicePageProps) {
                 </Badge>
               ) : null}
             </div>
-            <h1 className="font-heading text-4xl font-bold text-fg md:text-5xl">{service.name}</h1>
+            <Title as="h1" size="display" className="">
+              {service.name}
+            </Title>
             {service.description ? (
               <p className="whitespace-pre-line text-lg leading-relaxed text-muted">
                 {service.description}
@@ -174,9 +177,9 @@ export default async function ServicePage({ params }: ServicePageProps) {
 
           {service.options.length > 0 ? (
             <section aria-labelledby="options-titre" className="space-y-3">
-              <h2 id="options-titre" className="font-heading text-2xl font-bold text-fg">
+              <Title as="h2" id="options-titre" className="">
                 Options disponibles
-              </h2>
+              </Title>
               <ul className="divide-y divide-line rounded-[var(--radius-lg)] border border-line bg-card">
                 {service.options.map((option) => (
                   <li
@@ -209,9 +212,9 @@ export default async function ServicePage({ params }: ServicePageProps) {
           ) : null}
 
           <section aria-labelledby="compatibilite-titre" className="space-y-3">
-            <h2 id="compatibilite-titre" className="font-heading text-2xl font-bold text-fg">
+            <Title as="h2" id="compatibilite-titre" className="">
               Compatibilité capillaire
-            </h2>
+            </Title>
             {hasCompatibilityInfo ? (
               <ul className="space-y-2 rounded-[var(--radius-lg)] border border-line bg-card p-5 text-muted">
                 {acceptedLengths.length > 0 ? (
@@ -264,9 +267,9 @@ export default async function ServicePage({ params }: ServicePageProps) {
           </section>
 
           <section aria-labelledby="infos-titre" className="space-y-3">
-            <h2 id="infos-titre" className="font-heading text-2xl font-bold text-fg">
+            <Title as="h2" id="infos-titre" className="">
               Avant votre rendez-vous
-            </h2>
+            </Title>
             <ul className="space-y-2 text-muted">
               <li>Le paiement s’effectue sur place ; aucun paiement en ligne n’est demandé.</li>
               <li>Merci d’arriver avec des cheveux propres et démêlés.</li>

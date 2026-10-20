@@ -6,6 +6,7 @@ import { getSalonSettings } from '@/modules/disponibilites/queries';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { Badge } from '@/components/ui/Badge';
 import { BookingWizard } from './booking-wizard';
+import { Title } from '@/components/ui/Title';
 
 export const metadata: Metadata = {
   title: 'Réserver un rendez-vous',
@@ -50,9 +51,9 @@ export default async function ReserverPage({
           <p className="text-sm font-semibold uppercase tracking-[0.14em] text-cacao">
             Réservation en ligne
           </p>
-          <h1 className="font-heading text-4xl font-bold text-fg md:text-5xl">
+          <Title as="h1" size="display" className="">
             Choisissez votre coiffure
-          </h1>
+          </Title>
           <p className="text-lg leading-relaxed text-muted">
             Sélectionnez la prestation, vérifiez sa compatibilité avec vos cheveux, choisissez vos
             options puis un créneau disponible. Le paiement se fait sur place.
@@ -68,9 +69,9 @@ export default async function ReserverPage({
           />
         ) : (
           <section aria-labelledby="choix-prestation" className="space-y-4">
-            <h2 id="choix-prestation" className="font-heading text-2xl font-bold text-fg">
+            <Title as="h2" id="choix-prestation" className="">
               Prestations disponibles
-            </h2>
+            </Title>
             <ul className="grid gap-3 sm:grid-cols-2">
               {services.map((service) => (
                 <li key={service.id}>
@@ -138,9 +139,9 @@ export default async function ReserverPage({
           <Badge tone="neutral">{service.categoryName}</Badge>
           <Badge tone="accent">Paiement sur place</Badge>
         </div>
-        <h1 className="font-heading text-3xl font-bold text-fg md:text-4xl">
+        <Title as="h1" size="display" className="">
           Réserver {service.name}
-        </h1>
+        </Title>
         <p className="max-w-2xl text-lg leading-relaxed text-muted">
           Huit étapes, sans paiement en ligne. Votre créneau est protégé dès l’enregistrement.
         </p>

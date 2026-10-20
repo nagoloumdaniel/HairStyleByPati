@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
+import { Title } from '@/components/ui/Title';
 
 /* ============================================================
  * P5.3 / P5.4 : parcours public conditionnel de compatibilité.
@@ -259,13 +260,15 @@ export function CompatibilityWizard({
 
       {phase === 'questions' ? (
         <Card>
-          <h2
+          <Title
+            as="h2"
             ref={headingRef}
             tabIndex={-1}
-            className="font-heading text-2xl font-bold text-fg outline-none"
+
+            className="outline-none"
           >
             Quelques questions sur vos cheveux
-          </h2>
+          </Title>
           <p className="mt-2 text-muted">
             Pour {serviceName}, seules les informations réellement utiles sont demandées.
           </p>
@@ -330,17 +333,19 @@ export function CompatibilityWizard({
         <Card>
           <div className="flex flex-wrap items-center gap-3">
             <Badge tone={verdictTone(preview.verdict)}>{verdictLabel(preview.verdict)}</Badge>
-            <h2
+            <Title
+              as="h2"
               ref={headingRef}
               tabIndex={-1}
-              className="font-heading text-2xl font-bold text-fg outline-none"
+
+              className="outline-none"
             >
               {preview.verdict === 'COMPATIBLE'
                 ? 'Bonne nouvelle'
                 : preview.verdict === 'INCOMPATIBLE'
                   ? 'Cette prestation semble inadaptée'
                   : 'Une vérification est nécessaire'}
-            </h2>
+            </Title>
           </div>
 
           <p className="mt-4 whitespace-pre-line text-lg leading-relaxed text-fg">
@@ -435,13 +440,15 @@ export function CompatibilityWizard({
 
       {phase === 'contact' ? (
         <Card>
-          <h2
+          <Title
+            as="h2"
             ref={headingRef}
             tabIndex={-1}
-            className="font-heading text-2xl font-bold text-fg outline-none"
+
+            className="outline-none"
           >
             Demander l’évaluation de Patricia
-          </h2>
+          </Title>
           <p className="mt-2 text-muted">
             Laissez vos coordonnées pour recevoir la réponse. Vos informations capillaires et vos
             photos ne sont jamais publiées.
@@ -545,15 +552,17 @@ export function CompatibilityWizard({
 
       {phase === 'done' && success ? (
         <Card>
-          <h2
+          <Title
+            as="h2"
             ref={headingRef}
             tabIndex={-1}
-            className="font-heading text-2xl font-bold text-fg outline-none"
+
+            className="outline-none"
           >
             {success.status === 'COMPATIBLE'
               ? 'Vos informations sont compatibles'
               : 'Votre demande a bien été transmise'}
-          </h2>
+          </Title>
           <p className="mt-3 whitespace-pre-line text-lg text-fg">{success.message}</p>
 
           {success.status === 'RECEIVED' ? (

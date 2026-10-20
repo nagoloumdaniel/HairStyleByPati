@@ -9,6 +9,7 @@ import {
 import { EmptyState } from '@/components/shared/EmptyState';
 import { Badge } from '@/components/ui/Badge';
 import { CompatibilityWizard } from './compatibility-wizard';
+import { Title } from '@/components/ui/Title';
 
 export const metadata: Metadata = {
   title: 'Compatibilité capillaire',
@@ -53,9 +54,9 @@ export default async function CompatibilitePage({
           <p className="text-sm font-semibold uppercase tracking-[0.14em] text-cacao">
             Avant de réserver
           </p>
-          <h1 className="font-heading text-4xl font-bold text-fg md:text-5xl">
+          <Title as="h1" size="display" className="">
             Vérifiez la compatibilité de votre coiffure
-          </h1>
+          </Title>
           <p className="text-lg leading-relaxed text-muted">
             Chaque prestation a ses propres exigences. Quelques questions suffisent pour savoir si
             elle est réalisable sur vos cheveux, ou pour demander une évaluation à Patricia.
@@ -71,9 +72,9 @@ export default async function CompatibilitePage({
           />
         ) : (
           <section aria-labelledby="choix-prestation" className="space-y-4">
-            <h2 id="choix-prestation" className="font-heading text-2xl font-bold text-fg">
+            <Title as="h2" id="choix-prestation" className="">
               Choisissez votre prestation
-            </h2>
+            </Title>
             <ul className="grid gap-3 sm:grid-cols-2">
               {services.map((service) => (
                 <li key={service.id}>
@@ -138,9 +139,9 @@ export default async function CompatibilitePage({
           <Badge tone="neutral">{service.categoryName}</Badge>
           <Badge tone="accent">Compatibilité capillaire</Badge>
         </div>
-        <h1 className="font-heading text-3xl font-bold text-fg md:text-4xl">
+        <Title as="h1" size="display" className="">
           Votre coiffure est-elle compatible ?
-        </h1>
+        </Title>
         <p className="max-w-2xl text-lg leading-relaxed text-muted">
           Répondez uniquement aux questions utiles pour <strong>{service.name}</strong>. Aucune
           réservation n’est créée à cette étape : Patricia valide les cas particuliers avant de

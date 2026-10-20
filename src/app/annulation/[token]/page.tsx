@@ -13,6 +13,7 @@ import { getSalonSettings } from '@/modules/disponibilites/queries';
 import { LocalDateTime } from '@/components/shared/LocalDateTime';
 import { Badge } from '@/components/ui/Badge';
 import { CancelForm } from './cancel-form';
+import { Title } from '@/components/ui/Title';
 
 export const metadata: Metadata = {
   title: 'Gérer mon rendez-vous',
@@ -84,9 +85,9 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
             {APPOINTMENT_STATUS_LABELS[appointment.status] ?? appointment.status}
           </Badge>
         </div>
-        <h1 className="font-heading text-3xl font-bold text-fg md:text-4xl">
+        <Title as="h1" size="display" className="">
           Gérer mon rendez-vous
-        </h1>
+        </Title>
         <p className="text-lg text-muted">
           Retrouvez ici les informations de votre rendez-vous et les conditions d’annulation.
         </p>
@@ -132,9 +133,9 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
         </section>
       ) : !active ? (
         <section className="rounded-[var(--radius-lg)] border border-line bg-page p-6">
-          <h2 className="font-heading text-xl font-bold text-fg">
+          <Title as="h2" className="">
             Ce rendez-vous n’est plus actif
-          </h2>
+          </Title>
           <p className="mt-2 text-muted">
             Statut actuel : {APPOINTMENT_STATUS_LABELS[appointment.status] ?? appointment.status}.
             {appointment.cancelReason ? ` Motif : ${appointment.cancelReason}.` : ''}
@@ -155,7 +156,9 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
         </section>
       ) : (
         <section className="rounded-[var(--radius-lg)] border border-line bg-card p-6 shadow-soft">
-          <h2 className="font-heading text-xl font-bold text-fg">Annuler ce rendez-vous</h2>
+          <Title as="h2" className="">
+            Annuler ce rendez-vous
+          </Title>
           <p className="mt-2 text-sm text-muted">{policy.message}</p>
           <div className="mt-4">
             <CancelForm token={token} reasonRequired={settings.cancelReasonRequired} />

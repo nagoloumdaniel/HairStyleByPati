@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { Accordion } from '@/components/ui/Accordion';
+import { Title } from '@/components/ui/Title';
 
 export const metadata: Metadata = {
   title: 'FAQ',
@@ -83,9 +84,9 @@ export default function FaqPage() {
         <p className="text-sm font-semibold uppercase tracking-[0.14em] text-cacao">
           Questions fréquentes
         </p>
-        <h1 className="font-heading text-4xl font-bold text-fg md:text-5xl">
+        <Title as="h1" size="display" className="">
           Vos questions, nos réponses
-        </h1>
+        </Title>
         <p className="text-lg leading-relaxed text-muted">
           Réservation, préparation, prix, annulation : retrouvez les réponses aux questions les plus
           courantes. Une question reste sans réponse ? Contactez-nous, nous vous répondrons
@@ -101,7 +102,9 @@ export default function FaqPage() {
       </section>
 
       <section className="max-w-3xl rounded-2xl bg-page p-8 text-center md:p-10">
-        <h2 className="font-heading text-2xl font-bold text-fg">Une autre question ?</h2>
+        <Title as="h2" className="">
+          Une autre question ?
+        </Title>
         <p className="mx-auto mt-3 max-w-md text-muted">
           Écrivez-nous, Patricia vous répond personnellement, généralement sous 24 heures ouvrées.
         </p>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { Title } from '@/components/ui/Title';
 
 export const metadata: Metadata = {
   title: 'Mentions légales',
@@ -31,7 +32,9 @@ export default function MentionsLegalesPage() {
         <p className="text-sm font-semibold uppercase tracking-[0.14em] text-cacao">
           Informations légales
         </p>
-        <h1 className="font-heading text-4xl font-bold text-fg md:text-5xl">Mentions légales</h1>
+        <Title as="h1" size="display" className="">
+          Mentions légales
+        </Title>
         <p className="text-lg leading-relaxed text-muted">
           Identité du salon, coordonnées, hébergement et conditions de publication du site Hairstyle
           by Patricia.
@@ -39,7 +42,9 @@ export default function MentionsLegalesPage() {
       </header>
 
       <section className="max-w-3xl space-y-8">
-        <h2 className="font-heading text-3xl font-bold text-fg">1. Éditeur du site</h2>
+        <Title as="h2" className="">
+          1. Éditeur du site
+        </Title>
         <dl className="space-y-4 text-muted leading-relaxed">
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="bg-page p-6 rounded-xl border border-line">
@@ -72,7 +77,9 @@ export default function MentionsLegalesPage() {
       </section>
 
       <section className="max-w-3xl space-y-8">
-        <h2 className="font-heading text-3xl font-bold text-fg">2. Hébergement</h2>
+        <Title as="h2" className="">
+          2. Hébergement
+        </Title>
         <div className="bg-page p-6 rounded-xl border border-line">
           <p className="text-muted leading-relaxed">
             Ce site est hébergé sur une plateforme de cloud publique (ex. Vercel ou équivalent). Les
@@ -82,7 +89,9 @@ export default function MentionsLegalesPage() {
       </section>
 
       <section className="max-w-3xl space-y-8">
-        <h2 className="font-heading text-3xl font-bold text-fg">3. Publication et contenus</h2>
+        <Title as="h2" className="">
+          3. Publication et contenus
+        </Title>
         <p className="text-muted leading-relaxed">
           La directrice de la publication est Patricia, gérante du salon Hairstyle by Patricia. Les
           textes, photos et visuels du site sont la propriété du salon ou utilisés avec
@@ -91,7 +100,9 @@ export default function MentionsLegalesPage() {
       </section>
 
       <section className="max-w-3xl space-y-8">
-        <h2 className="font-heading text-3xl font-bold text-fg">4. Données personnelles</h2>
+        <Title as="h2" className="">
+          4. Données personnelles
+        </Title>
         <p className="text-muted leading-relaxed">
           Les données collectées via ce site font l’objet d’un traitement décrit dans la{' '}
           <Link href="/confidentialite" className="text-cacao underline font-medium">
@@ -107,7 +118,9 @@ export default function MentionsLegalesPage() {
       </section>
 
       <section className="max-w-3xl rounded-2xl bg-page p-8 text-center md:p-10 border border-line">
-        <h2 className="font-heading text-2xl font-bold text-fg">Une question sur ces mentions ?</h2>
+        <Title as="h2" className="">
+          Une question sur ces mentions ?
+        </Title>
         <p className="mx-auto mt-3 max-w-md text-muted">Patricia vous répond personnellement.</p>
         <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
           <Link

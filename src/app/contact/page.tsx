@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { ContactForm } from './ContactForm';
+import { Title } from '@/components/ui/Title';
 
 export const metadata: Metadata = {
   title: 'Contact',
@@ -31,7 +32,9 @@ export default function ContactPage() {
 
       <header className="max-w-3xl space-y-3">
         <p className="text-sm font-semibold uppercase tracking-[0.14em] text-cacao">Contact</p>
-        <h1 className="font-heading text-4xl font-bold text-fg md:text-5xl">Écrivez-nous</h1>
+        <Title as="h1" size="display" className="">
+          Écrivez-nous
+        </Title>
         <p className="text-lg leading-relaxed text-muted">
           Une question sur une prestation, un rendez-vous ou les horaires ? Patricia vous répond
           personnellement.
@@ -43,7 +46,9 @@ export default function ContactPage() {
       </section>
 
       <section className="max-w-3xl rounded-2xl bg-page p-8 text-center md:p-10">
-        <h2 className="font-heading text-2xl font-bold text-fg">Retrouvez-nous aussi</h2>
+        <Title as="h2" className="">
+          Retrouvez-nous aussi
+        </Title>
         <p className="mx-auto mt-3 max-w-md text-muted">
           Salon Hairstyle by Patricia – coiffures texturées, tresses, vanilles, locs et coiffures
           protectrices.

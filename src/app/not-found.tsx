@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { Title } from '@/components/ui/Title';
 
 export const metadata: Metadata = {
   title: 'Page introuvable',
@@ -16,9 +17,9 @@ export default function NotFound() {
         >
           404
         </p>
-        <h1 className="mt-6 font-heading text-3xl font-bold text-fg sm:text-4xl">
+        <Title as="h1" size="display" className="mt-6">
           Page introuvable
-        </h1>
+        </Title>
         <p className="mx-auto mt-3 max-w-md text-muted">
           Cette page n’existe pas ou n’est plus disponible. Le catalogue reste accessible pour
           découvrir les prestations du salon.

@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { IMAGE_BLUR_DATA_URL } from '@/lib/image-placeholder';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { Title } from '@/components/ui/Title';
 
 export const metadata: Metadata = {
   title: 'Le salon',
@@ -88,9 +89,9 @@ export default function SalonPage() {
         </div>
         <div className="space-y-6 md:w-3/5">
           <p className="text-sm font-semibold uppercase tracking-[0.14em] text-cacao">Le salon</p>
-          <h1 className="font-heading text-4xl font-bold text-fg md:text-5xl">
+          <Title as="h1" size="display" className="">
             Un salon à taille humaine, un savoir-faire sur mesure
-          </h1>
+          </Title>
           <p className="text-lg leading-relaxed text-muted">
             Depuis plus de dix ans, Patricia accueille sa clientèle dans un espace chaleureux dédié
             aux cheveux texturés : tresses, vanilles, locs et coiffures protectrices. Ici, chaque
@@ -115,7 +116,9 @@ export default function SalonPage() {
 
       {/* Histoire */}
       <section className="max-w-3xl space-y-6">
-        <h2 className="font-heading text-3xl font-bold text-fg">Notre histoire</h2>
+        <Title as="h2" className="">
+          Notre histoire
+        </Title>
         <p className="leading-relaxed text-muted">
           Patricia s&apos;est formée auprès de coiffeuses expertes des cheveux africains avant
           d&apos;ouvrir son propre salon. L&apos;idée était simple : offrir un lieu où l&apos;on
@@ -131,7 +134,9 @@ export default function SalonPage() {
 
       {/* Approche en 3 étapes */}
       <section className="space-y-8">
-        <h2 className="font-heading text-3xl font-bold text-fg">Une approche sur mesure</h2>
+        <Title as="h2" className="">
+          Une approche sur mesure
+        </Title>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           {approach.map((step) => (
             <div key={step.number} className="border-t-2 border-accent pt-5">
@@ -150,7 +155,9 @@ export default function SalonPage() {
 
       {/* Valeurs : liste à bordure gauche, pas de cartes génériques */}
       <section className="space-y-8">
-        <h2 className="font-heading text-3xl font-bold text-fg">Nos valeurs</h2>
+        <Title as="h2" className="">
+          Nos valeurs
+        </Title>
         <dl className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {values.map((value) => (
             <div key={value.title} className="border-l-4 border-accent pl-5">
@@ -165,7 +172,9 @@ export default function SalonPage() {
       <section className="rounded-2xl bg-page p-8 md:p-12">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           <div>
-            <h2 className="font-heading text-2xl font-bold text-fg">Horaires</h2>
+            <Title as="h2" className="">
+              Horaires
+            </Title>
             <p className="mt-3 text-muted">
               Mardi – Samedi : 10h – 19h
               <br />
@@ -173,7 +182,9 @@ export default function SalonPage() {
             </p>
           </div>
           <div>
-            <h2 className="font-heading text-2xl font-bold text-fg">Adresse</h2>
+            <Title as="h2" className="">
+              Adresse
+            </Title>
             <p className="mt-3 text-muted">
               12 Rue de la Coiffure
               <br />
