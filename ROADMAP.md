@@ -200,8 +200,8 @@
 
 > Objectif : §17 intégral, preuves à l'appui.
 
-- [ ] **P11.1** Suite tests unitaires/métier : moteur compatibilité, moteur disponibilités, machine à statuts, idempotence notifications, protection conflits. — *skill : test-driven-development*
-- [ ] **P11.2** Tests e2e Playwright : parcours complet visiteur (catalogue → compatibilité → réservation → e-mail), parcours admin complet (créer coiffure → règles → valider évaluation → gérer RDV), annulation client par lien. — *skill : webapp-testing*
+- [x] **P11.1** Suite tests unitaires/métier : moteur compatibilité, moteur disponibilités, machine à statuts, idempotence notifications, protection conflits. 182 tests verts (`npm run test`). — *skill : test-driven-development*
+- [x] **P11.2** Tests e2e Playwright : parcours complet visiteur (catalogue → compatibilité → réservation → e-mail) + admin (valider évaluation → confirmer RDV) dans `tests/e2e/parcours-complet.spec.ts` ; annulation client par lien déjà couverte par `reservations.spec.ts`. — *skill : webapp-testing*
 - [ ] **P11.3** Recette manuelle scénarios §17 (catalogue, compatibilité, réservation, annulation, messagerie, sécurité, interface). — *skill : verify-and-stop*
 - [ ] **P11.4** Revue de code de chaque phase (sécurité + qualité). — *skill : requesting-code-review + receiving-code-review*
 - [ ] **P11.5** Correction des anomalies : debug discipliné, refactors sûrs, re-test après chaque fix. — *skill : systematic-debugging + safe-refactor*
