@@ -78,8 +78,8 @@ test.describe('Thème clair et sombre', () => {
     await themeIs(page, 'light');
     await expect
       .poll(async () => (await bodyColors(page)).background, { timeout: 2000 })
-      .toBe('rgb(255, 248, 233)');
-    expect((await bodyColors(page)).color).toBe('rgb(25, 25, 25)');
+      .toBe('rgb(255, 252, 240)');
+    expect((await bodyColors(page)).color).toBe('rgb(40, 35, 12)');
     await page.screenshot({
       path: 'tests/e2e/screenshots/theme-light-home.png',
       fullPage: true,
@@ -91,8 +91,8 @@ test.describe('Thème clair et sombre', () => {
     await expect(page.locator(TOGGLE)).toHaveAttribute('aria-pressed', 'true');
     await expect
       .poll(async () => (await bodyColors(page)).background, { timeout: 2000 })
-      .toBe('rgb(18, 16, 14)');
-    expect((await bodyColors(page)).color).toBe('rgb(247, 236, 220)');
+      .toBe('rgb(23, 21, 11)');
+    expect((await bodyColors(page)).color).toBe('rgb(255, 248, 216)');
     expect(await page.evaluate(() => localStorage.getItem('theme'))).toBe('dark');
     expect(await page.locator('meta[name="theme-color"]').getAttribute('content')).toBe('#12100e');
     await page.screenshot({
@@ -199,7 +199,7 @@ test.describe('Thème clair et sombre', () => {
     await themeIs(page, 'dark');
     await expect
       .poll(async () => (await bodyColors(page)).background, { timeout: 2000 })
-      .toBe('rgb(18, 16, 14)');
+      .toBe('rgb(23, 21, 11)');
     await assertNoOverflow(page, 'accueil mobile en sombre');
     await page.waitForTimeout(250);
     await page.screenshot({
