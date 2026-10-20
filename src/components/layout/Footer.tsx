@@ -6,7 +6,7 @@ import { SOCIALS } from './SocialLinks';
 export function Footer() {
   return (
     <footer className="mt-16 bg-footer text-panel-fg">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-3 sm:px-6">
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:grid-cols-3 sm:px-6">
         <div>
           <p className="flex items-center gap-2 font-heading text-lg font-bold">
             <LogoMark className="h-8 w-auto text-panel-fg" />

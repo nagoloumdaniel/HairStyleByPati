@@ -1,4 +1,5 @@
 import { MessageSquareText } from 'lucide-react';
+import { autoPlaceholder } from './Field';
 import type { TextareaHTMLAttributes } from 'react';
 
 type TextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
@@ -30,6 +31,7 @@ export function Textarea({ label, error, hint, id, required, ...rest }: Textarea
         />
         <textarea
           {...rest}
+          placeholder={rest.placeholder ?? autoPlaceholder(label, undefined, rest.name)}
           id={inputId}
           required={required}
           aria-invalid={error ? true : undefined}

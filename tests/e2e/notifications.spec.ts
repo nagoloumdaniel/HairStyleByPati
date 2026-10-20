@@ -8,6 +8,7 @@
 import { randomBytes } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { test, expect, type Page } from '@playwright/test';
+import { selectOption } from './helpers/fields';
 
 const stamp = Date.now().toString(36);
 const prefix = `zz-e2e-notif-${stamp}`;
@@ -260,7 +261,7 @@ test.describe('Notifications et messagerie', () => {
     });
     expect(replyNotification).not.toBeNull();
 
-    await page.getByLabel('Statut').selectOption('TREATED');
+    await selectOption(page, 'Statut', 'TREATED');
     await page.getByRole('button', { name: 'Appliquer' }).click();
     await expect
       .poll(

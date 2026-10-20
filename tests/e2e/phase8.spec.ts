@@ -7,6 +7,7 @@
 
 import { readFileSync } from 'node:fs';
 import { test, expect, type Page } from '@playwright/test';
+import { selectOption, pickDateTime, pickDate } from './helpers/fields';
 
 const stamp = Date.now().toString(36);
 const prefix = `zz-e2e-p8-${stamp}`;
@@ -201,10 +202,10 @@ test.describe('Demandes personnalisées, clientes et pilotage', () => {
     await page.getByLabel('E-mail').fill(requesterEmail);
     await page.getByLabel('Téléphone (facultatif)').fill('06 12 34 56 78');
     await page.getByLabel('Décrivez la coiffure souhaitée').fill(subjectDescription);
-    await page.getByLabel('Longueur actuelle').selectOption('LONG');
+    await selectOption(page, 'Longueur actuelle', 'LONG');
     await page.getByLabel('Type de cheveux').fill('Cheveux naturels épais');
     await page.getByLabel('Coiffure actuelle (facultatif)').fill('Tresses depuis deux semaines');
-    await page.getByLabel('Date souhaitée (facultatif)').fill(desiredDateISO());
+    await pickDate(page, 'Date souhaitée (facultatif)', desiredDateISO());
     await page.getByLabel('Précisions complémentaires (facultatif)').fill('Budget 150 euros.');
     await page.getByLabel(/J’accepte que mes informations/).check();
     await page.getByRole('button', { name: 'Envoyer ma demande' }).click();
@@ -256,10 +257,10 @@ test.describe('Demandes personnalisées, clientes et pilotage', () => {
     await expect(page.getByRole('heading', { name: /Demande de Amina P8 E2E/ })).toBeVisible();
     await expect(page.getByText(subjectDescription)).toBeVisible();
 
-    await page.getByLabel('Décision').selectOption('ACCEPTED');
+    await selectOption(page, 'Décision', 'ACCEPTED');
     await page.getByLabel('Prix estimatif (FCFA, facultatif)').fill('150');
-    await page.getByLabel('Prestation existante à proposer (facultatif)').selectOption(serviceId);
-    await page.getByLabel('Créneau proposé (facultatif)').fill(`${desiredDateISO()}T10:00`);
+    await selectOption(page, 'Prestation existante à proposer (facultatif)', serviceId);
+    await pickDateTime(page, 'proposedSlotLocal', `${desiredDateISO()}T10:00`);
     await page
       .getByLabel('Message transmis à la cliente')
       .fill('Votre projet est réalisable. Voici un créneau et un prix estimatif.');

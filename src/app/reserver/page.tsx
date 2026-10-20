@@ -34,7 +34,7 @@ export default async function ReserverPage({
       getCachedSalonSettings(),
     ]);
     return (
-      <main className="page-main page-main-medium space-y-8">
+      <main className="page-main space-y-8">
         <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
           <ol className="flex flex-wrap items-center gap-2">
             <li>
@@ -107,7 +107,7 @@ export default async function ReserverPage({
   const settings = await getCachedSalonSettings();
 
   return (
-    <main className="page-main page-main-medium space-y-8">
+    <main className="page-main space-y-8">
       <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-2">
           <li>

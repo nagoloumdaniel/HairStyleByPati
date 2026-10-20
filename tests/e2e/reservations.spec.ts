@@ -21,6 +21,7 @@ import { randomBytes } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { test, expect, type Page } from '@playwright/test';
 import type { PrismaClient } from '@prisma/client';
+import { pickDateTime, pickDate } from './helpers/fields';
 
 const stamp = Date.now().toString(36);
 const categorySlug = `zz-e2e-resa-categorie-${stamp}`;
@@ -145,8 +146,7 @@ async function fillBookingDetailsToSummary(page: Page, slot: string, email: stri
   await expect(page.getByRole('heading', { name: 'Options et précisions' })).toBeVisible();
   await page.getByLabel(new RegExp(optionName)).check();
   await page.getByRole('button', { name: 'Choisir un créneau' }).click();
-  const dateInput = page.getByLabel('Date souhaitée');
-  await dateInput.fill(dateISO);
+  await pickDate(page, 'Date souhaitée', dateISO);
   const slotButton = page.getByRole('button', { name: slot, exact: true });
   await expect(slotButton).toBeVisible({ timeout: 20_000 });
   await slotButton.click();
@@ -492,10 +492,9 @@ test.describe('Réservations, annulations et calendrier', () => {
     await login(page, '/dashboard/disponibilites');
     await expect(page.getByRole('heading', { name: 'Disponibilités', exact: true })).toBeVisible();
 
-    const dateTimeInputs = page.locator('input[type="datetime-local"]');
     const fillBlockForm = async () => {
-      await dateTimeInputs.nth(0).fill(`${dateISO}T15:30`);
-      await dateTimeInputs.nth(1).fill(`${dateISO}T17:00`);
+      await pickDateTime(page, 'startsAtLocal', `${dateISO}T15:30`);
+      await pickDateTime(page, 'endsAtLocal', `${dateISO}T17:00`);
       await page.getByLabel('Motif (facultatif)').fill('Blocage test E2E');
     };
     await fillBlockForm();
@@ -527,8 +526,8 @@ test.describe('Réservations, annulations et calendrier', () => {
     browser,
   }) => {
     test.setTimeout(180_000);
-    const contextA = await browser.newContext();
-    const contextB = await browser.newContext();
+    const contextA = await browser.newContext({ timezoneId: 'Africa/Dakar' });
+    const contextB = await browser.newContext({ timezoneId: 'Africa/Dakar' });
     const pageA = await contextA.newPage();
     const pageB = await contextB.newPage();
 
@@ -580,7 +579,7 @@ test.describe('Réservations, annulations et calendrier', () => {
   test('should release an expired pending hold when slots are requested', async ({ page }) => {
     await page.goto(`/reserver?service=${serviceSlug}`);
     await page.getByRole('button', { name: 'Choisir un créneau' }).click();
-    await page.getByLabel('Date souhaitée').fill(dateISO);
+    await pickDate(page, 'Date souhaitée', dateISO);
     await expect(page.getByRole('button', { name: '09:00', exact: true })).toBeVisible({
       timeout: 20_000,
     });

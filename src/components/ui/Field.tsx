@@ -46,3 +46,21 @@ export const fieldBox = (error?: string) =>
   `w-full rounded-[var(--radius-md)] border bg-card px-4 py-2.5 text-fg transition ${
     error ? 'border-alert' : 'border-line focus:border-cacao'
   }`;
+
+/* Placeholder par défaut quand aucun n'est fourni : selon type/nom, sinon dérivé du libellé. */
+export function autoPlaceholder(label: string, type?: string, name?: string): string {
+  const n = name ?? '';
+  if (type === 'email' || /mail/i.test(n)) return 'vous@exemple.com';
+  if (type === 'tel' || /phone|tel/i.test(n)) return '+221 77 123 45 67';
+  if (type === 'password') return 'Votre mot de passe';
+  if (type === 'search') return 'Rechercher…';
+  if (type === 'url') return 'https://';
+  if (type === 'number') return /price|prix|amount|value|montant/i.test(n) ? 'Ex. 15000' : 'Ex. 0';
+  if (/^(name|nom|fullname|customerName|requesterName)$/i.test(n)) return 'Votre nom et prénom';
+  if (/subject|objet/i.test(n)) return 'Objet de votre message';
+  const clean = label
+    .replace(/\s*\((facultatif|obligatoire)\)\s*/gi, ' ')
+    .replace(/\s*[*:]\s*$/, '')
+    .trim();
+  return clean ? `Saisir ${clean.charAt(0).toLowerCase()}${clean.slice(1)}` : 'Saisir…';
+}

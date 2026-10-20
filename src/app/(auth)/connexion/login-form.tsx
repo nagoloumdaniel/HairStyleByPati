@@ -15,6 +15,7 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
         <input
           type="email"
           name="email"
+          placeholder="admin@exemple.com"
           required
           autoComplete="email"
           className="rounded-lg border border-cacao/30 bg-card px-3 py-2 focus:outline-2 focus:outline-accent"
@@ -26,6 +27,7 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
         <input
           type="password"
           name="password"
+          placeholder="Votre mot de passe"
           required
           autoComplete="current-password"
           className="rounded-lg border border-cacao/30 bg-card px-3 py-2 focus:outline-2 focus:outline-accent"

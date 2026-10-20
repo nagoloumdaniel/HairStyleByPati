@@ -247,21 +247,26 @@ html[data-theme='dark'] {
 .nav-floating {
   position: fixed;
   top: 0.75rem;
-  left: 0.75rem;
-  right: 0.75rem;
+  left: 1rem;
+  right: 1rem;
   z-index: 40;
   margin-inline: auto;
-  max-width: 72rem;
+  max-width: calc(80rem - 2rem);
   border-radius: var(--radius-full);
 }
 .nav-floating[data-open='true'] {
   border-radius: var(--radius-xl);
 }
+@media (min-width: 640px) {
+  .nav-floating {
+    left: 1.5rem;
+    right: 1.5rem;
+    max-width: calc(80rem - 3rem);
+  }
+}
 @media (min-width: 768px) {
   .nav-floating {
     top: 1rem;
-    left: 1.5rem;
-    right: 1.5rem;
   }
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -397,12 +402,4 @@ body:has([data-fullscreen]) {
   .page-main {
     padding-block: 3rem;
   }
-}
-.page-main-narrow > * {
-  max-width: 42rem;
-  margin-inline: auto;
-}
-.page-main-medium > * {
-  max-width: 56rem;
-  margin-inline: auto;
 }

@@ -16,7 +16,7 @@ export default async function ListeAttentePage() {
   });
 
   return (
-    <main className="page-main page-main-narrow">
+    <main className="page-main">
       <Title as="h1" size="display" className="">
         Liste d’attente
       </Title>

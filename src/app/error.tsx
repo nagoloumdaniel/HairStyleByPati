@@ -6,7 +6,7 @@ import { Title } from '@/components/ui/Title';
 
 export default function GlobalError({ reset }: { error: Error; reset: () => void }) {
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col items-center px-4 py-20 text-center sm:px-6">
+    <main className="page-main flex flex-col items-center text-center">
       <Title as="h1" size="display" className="">
         Une erreur est survenue
       </Title>

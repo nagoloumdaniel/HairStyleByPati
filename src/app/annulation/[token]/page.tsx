@@ -33,7 +33,7 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
 
   if (!appointment) {
     return (
-      <main className="page-main page-main-narrow">
+      <main className="page-main">
         <div className="rounded-[var(--radius-lg)] border border-alert bg-alert-soft p-8 text-center">
           <h1 className="font-heading text-2xl font-bold text-alert">Lien d’annulation invalide</h1>
           <p className="mt-3 text-fg">
@@ -61,7 +61,7 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
   });
 
   return (
-    <main className="page-main page-main-narrow space-y-6">
+    <main className="page-main space-y-6">
       <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-2">
           <li>

@@ -17,6 +17,7 @@ import { readFileSync } from 'node:fs';
 import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { test, expect, type Page } from '@playwright/test';
 import type { PrismaClient } from '@prisma/client';
+import { selectOption } from './helpers/fields';
 
 const stamp = Date.now().toString(36);
 const categorySlug = `zz-e2e-compat-categorie-${stamp}`;
@@ -315,7 +316,7 @@ test.describe('Compatibilité capillaire', () => {
       )
       .toBe(true);
 
-    await page.getByLabel('Décision').selectOption({ label: 'Accepter la compatibilité' });
+    await selectOption(page, 'Décision', { label: 'Accepter la compatibilité' });
     await page
       .getByLabel(/^Message transmis à la cliente/)
       .fill('Vos cheveux sont compatibles, vous pouvez réserver un créneau.');

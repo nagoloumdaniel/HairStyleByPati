@@ -94,7 +94,11 @@ export function Select({
           className={`${fieldBox(error)} flex items-center gap-2 text-left disabled:opacity-60`}
         >
           {Icon ? <Icon aria-hidden="true" className="size-4 shrink-0 text-cacao" /> : null}
-          <span className="min-w-0 flex-1 truncate">{selected?.label ?? ' '}</span>
+          <span
+            className={`min-w-0 flex-1 truncate ${selected && selected.label ? '' : 'text-muted'}`}
+          >
+            {selected?.label || 'Sélectionner…'}
+          </span>
           <ChevronDown
             aria-hidden="true"
             className={`size-4 shrink-0 text-muted transition ${open ? 'rotate-180' : ''}`}
@@ -111,6 +115,7 @@ export function Select({
                 key={o.value}
                 role="option"
                 aria-selected={o.value === current}
+                data-value={o.value}
                 onPointerDown={(e) => e.preventDefault()}
                 onClick={() => pick(o.value)}
                 onPointerEnter={() => setCursor(i)}

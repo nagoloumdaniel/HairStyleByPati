@@ -1,9 +1,12 @@
-import { FaInstagram, FaTiktok } from 'react-icons/fa6';
+import { FaTiktok } from 'react-icons/fa6';
 
 /* Réseaux sociaux (icônes). Remplacer les URL par les comptes réels de Patricia. */
 export const SOCIALS = [
-  { href: 'https://instagram.com', label: 'Instagram', Icon: FaInstagram },
-  { href: 'https://tiktok.com', label: 'TikTok', Icon: FaTiktok },
+  {
+    href: 'https://www.tiktok.com/@hairstyle.by.pati?_r=1&_t=ZS-9AhxNxbeson',
+    label: 'TikTok',
+    Icon: FaTiktok,
+  },
 ] as const;
 
 export function SocialLinks({ className = '' }: { className?: string }) {

@@ -51,6 +51,7 @@ export function ContactForm() {
           </label>
           <input
             id="name"
+            placeholder="Votre nom et prénom"
             name="name"
             type="text"
             required
@@ -66,6 +67,7 @@ export function ContactForm() {
           </label>
           <input
             id="email"
+            placeholder="vous@exemple.com"
             name="email"
             type="email"
             required
@@ -80,6 +82,7 @@ export function ContactForm() {
           </label>
           <input
             id="phone"
+            placeholder="+221 77 123 45 67"
             name="phone"
             type="tel"
             maxLength={30}
@@ -93,6 +96,7 @@ export function ContactForm() {
           </label>
           <input
             id="subject"
+            placeholder="Objet de votre message"
             name="subject"
             type="text"
             required
@@ -107,6 +111,7 @@ export function ContactForm() {
           </label>
           <textarea
             id="message"
+            placeholder="Écrivez votre message ici…"
             name="message"
             required
             minLength={10}

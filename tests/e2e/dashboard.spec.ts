@@ -20,6 +20,7 @@
 
 import { readFileSync } from 'node:fs';
 import { test, expect, type Page } from '@playwright/test';
+import { selectOption } from './helpers/fields';
 
 const stamp = Date.now().toString(36);
 const categoryName = `ZZ E2E Catégorie ${stamp}`;
@@ -125,7 +126,7 @@ test.describe('Back-office catalogue', () => {
     await page
       .getByLabel(/^Description/)
       .fill('Prestation créée par le test de non-régression P4.10.');
-    await page.getByLabel(/^Catégorie/).selectOption({ label: categoryName });
+    await selectOption(page, /^Catégorie/, { label: categoryName });
     await page.getByLabel(/^Prix \(FCFA\)/).fill('65');
     await page.getByLabel(/^Durée \(minutes\)/).fill('180');
     await page.getByRole('button', { name: 'Créer la prestation' }).click();
@@ -233,7 +234,7 @@ test.describe('Back-office catalogue', () => {
     await page.getByRole('tab', { name: 'Compatibilité' }).click();
     await page.getByLabel('Cheveux longs').check();
     await page.getByLabel(/Les locs sont incompatibles/).check();
-    await page.getByLabel('Photo de la cliente').selectOption({ label: 'Photo obligatoire' });
+    await selectOption(page, 'Photo de la cliente', { label: 'Photo obligatoire' });
     await page
       .getByLabel('Message si la prestation est incompatible')
       .fill('Cette prestation demande une longueur suffisante.');

@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function CustomRequestPage() {
   return (
-    <main className="page-main page-main-medium">
+    <main className="page-main">
       <nav aria-label="Fil d'Ariane" className="text-sm text-ink-soft">
         <ol className="flex flex-wrap items-center gap-2">
           <li>

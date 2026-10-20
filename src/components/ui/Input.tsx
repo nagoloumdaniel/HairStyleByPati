@@ -13,7 +13,7 @@ import {
 import type { ChangeEvent, InputHTMLAttributes } from 'react';
 import { DateField } from './DateField';
 import { DateTimeField } from './DateTimeField';
-import { Field } from './Field';
+import { Field, autoPlaceholder } from './Field';
 import { TimeField } from './TimeField';
 
 type InputProps = InputHTMLAttributes<HTMLInputElement> & {
@@ -110,6 +110,12 @@ export function Input({ label, error, hint, id, required, icon, type, ...rest }:
         ) : null}
         <input
           {...rest}
+          placeholder={
+            rest.placeholder ??
+            (type && /^(checkbox|radio|file|hidden|range|color)$/.test(type)
+              ? undefined
+              : autoPlaceholder(label, type, rest.name))
+          }
           type={type}
           id={inputId}
           required={required}
