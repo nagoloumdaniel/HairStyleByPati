@@ -174,41 +174,41 @@ function layout(input: LayoutInput): string {
     .map(
       ([label, value]) => `
         <tr>
-          <td style="padding:6px 0;color:#6b5b4b;font-size:14px;vertical-align:top;width:38%">${escapeHtml(label)}</td>
-          <td style="padding:6px 0;color:#191919;font-size:14px;font-weight:600">${escapeHtml(value)}</td>
+          <td style="padding:6px 0;color:#5a5224;font-size:14px;vertical-align:top;width:38%">${escapeHtml(label)}</td>
+          <td style="padding:6px 0;color:#28230c;font-size:14px;font-weight:600">${escapeHtml(value)}</td>
         </tr>`,
     )
     .join('');
   const paragraphs = (input.paragraphs ?? [])
     .map(
       (paragraph) =>
-        `<p style="margin:0 0 14px;color:#3f352c;font-size:15px;line-height:1.6">${escapeHtml(paragraph)}</p>`,
+        `<p style="margin:0 0 14px;color:#28230c;font-size:15px;line-height:1.6">${escapeHtml(paragraph)}</p>`,
     )
     .join('');
   const cta =
     input.ctaLabel && input.ctaUrl
-      ? `<p style="margin:22px 0"><a href="${escapeHtml(input.ctaUrl)}" style="display:inline-block;background:#f4c542;color:#191919;text-decoration:none;font-weight:700;padding:12px 20px;border-radius:10px">${escapeHtml(input.ctaLabel)}</a></p>`
+      ? `<p style="margin:22px 0"><a href="${escapeHtml(input.ctaUrl)}" style="display:inline-block;background:#8a6400;color:#ffffff;text-decoration:none;font-weight:700;padding:12px 20px;border-radius:10px">${escapeHtml(input.ctaLabel)}</a></p>`
       : '';
   const note = input.note
-    ? `<p style="margin:18px 0 0;color:#6b5b4b;font-size:13px;line-height:1.5">${escapeHtml(input.note)}</p>`
+    ? `<p style="margin:18px 0 0;color:#5a5224;font-size:13px;line-height:1.5">${escapeHtml(input.note)}</p>`
     : '';
 
   return `<!doctype html>
 <html lang="fr">
-  <body style="margin:0;padding:24px 12px;background:#fff8e9;font-family:Arial,Helvetica,sans-serif">
+  <body style="margin:0;padding:24px 12px;background:#fffcf0;font-family:Arial,Helvetica,sans-serif">
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
       <tr>
         <td align="center">
-          <table role="presentation" width="100%" style="max-width:560px;background:#ffffff;border-radius:16px;padding:28px;border:1px solid #f0e2c6">
+          <table role="presentation" width="100%" style="max-width:560px;background:#ffffff;border-radius:16px;padding:28px;border:1px solid #eadfb0">
             <tr><td>
-              <p style="margin:0 0 4px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#76513d;font-weight:700">${SALON_NAME}</p>
-              <h1 style="margin:0 0 16px;font-family:Georgia,serif;color:#191919;font-size:24px;line-height:1.3">${escapeHtml(input.title)}</h1>
-              <p style="margin:0 0 16px;color:#3f352c;font-size:15px;line-height:1.6">${escapeHtml(input.intro)}</p>
-              ${rows ? `<table role="presentation" width="100%" style="border-top:1px solid #f0e2c6;border-bottom:1px solid #f0e2c6;margin:8px 0 18px">${rows}</table>` : ''}
+              <p style="margin:0 0 4px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#8a6400;font-weight:700">${SALON_NAME}</p>
+              <h1 style="margin:0 0 16px;font-family:Georgia,serif;color:#28230c;font-size:24px;line-height:1.3">${escapeHtml(input.title)}</h1>
+              <p style="margin:0 0 16px;color:#28230c;font-size:15px;line-height:1.6">${escapeHtml(input.intro)}</p>
+              ${rows ? `<table role="presentation" width="100%" style="border-top:1px solid #eadfb0;border-bottom:1px solid #eadfb0;margin:8px 0 18px">${rows}</table>` : ''}
               ${paragraphs}
               ${cta}
               ${note}
-              <p style="margin:24px 0 0;border-top:1px solid #f0e2c6;padding-top:16px;color:#6b5b4b;font-size:12px;line-height:1.6">
+              <p style="margin:24px 0 0;border-top:1px solid #eadfb0;padding-top:16px;color:#5a5224;font-size:12px;line-height:1.6">
                 ${SALON_NAME}${SALON_PHONE ? ` · ${escapeHtml(SALON_PHONE)}` : ''}<br />
                 Paiement sur place. Merci de votre confiance.
               </p>

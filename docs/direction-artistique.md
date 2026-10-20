@@ -9,7 +9,7 @@ premium chaleureux, tokens or/crème/cacao existants conservés.
 
 1. Photos avant tout : rondes ou légèrement arrondies, jamais de placeholders gris.
 2. Or (#F4C542) réservé aux CTA et accents, texte bouton toujours ink (#191919).
-3. Typo : Playfair Display (titres), Manrope (texte). Hiérarchie stricte.
+3. Typo : Playfair Display (titres), Lato (texte, toutes graisses). Hiérarchie stricte.
 4. Espaces généreux, mobile-first, zéro scroll horizontal.
 5. Animations : reveal discret au scroll, `prefers-reduced-motion` respecté.
 6. Anti-template IA : pas de dégradé violet, pas de hero centré sur mesh sombre,
