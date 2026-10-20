@@ -334,7 +334,6 @@ test.describe('Demandes personnalisées, clientes et pilotage', () => {
     await page.goto('/dashboard/parametres');
     await page.getByLabel('Nom de l’entreprise').fill(`Salon E2E ${stamp}`);
     await page.getByLabel('E-mail public').fill(`${prefix}-salon@example.com`);
-    await page.getByLabel('Téléphone', { exact: true }).fill('01 23 45 67 89');
     await page.getByLabel('Adresse').fill('12 rue de Test, Dakar');
     await page.getByLabel('Règles d’annulation affichées').fill('Annulation au moins 24 h avant.');
     await page.getByLabel('Règles de réservation affichées').fill('Paiement sur place.');

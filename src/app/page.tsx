@@ -1,4 +1,4 @@
-import { Clock, Mail, MapPin, Phone } from 'lucide-react';
+import { Clock, Mail, MapPin } from 'lucide-react';
 import Image from 'next/image';
 import { IMAGE_BLUR_DATA_URL } from '@/lib/image-placeholder';
 import Link from 'next/link';
@@ -279,10 +279,6 @@ export default async function HomePage() {
                 <br />
                 Dakar, Sénégal
               </span>
-            </p>
-            <p className="flex items-start gap-3 text-fg">
-              <Phone aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-accent" />
-              <span>01 23 45 67 89</span>
             </p>
             <p className="flex items-start gap-3 text-fg">
               <Mail aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-accent" />

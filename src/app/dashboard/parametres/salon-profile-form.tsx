@@ -12,7 +12,6 @@ export function SalonProfileForm({
   settings: {
     name: string;
     contactEmail: string | null;
-    phone: string | null;
     address: string | null;
     logoUrl: string | null;
     emailSignature: string | null;
@@ -42,13 +41,6 @@ export function SalonProfileForm({
           type="email"
           defaultValue={settings.contactEmail ?? ''}
           maxLength={200}
-        />
-        <Input
-          label="Téléphone"
-          name="phone"
-          type="tel"
-          defaultValue={settings.phone ?? ''}
-          maxLength={30}
         />
         <Input
           label="Logo (URL https, facultatif)"

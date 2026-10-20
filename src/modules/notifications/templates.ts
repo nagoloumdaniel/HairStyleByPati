@@ -92,7 +92,6 @@ export interface RenderedEmail {
 
 const APP_URL = (process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000').replace(/\/$/, '');
 const SALON_NAME = 'Hairstyle by Patricia';
-const SALON_PHONE = process.env.ADMIN_PHONE?.trim();
 
 function escapeHtml(value: unknown): string {
   return String(value ?? '')
@@ -209,7 +208,7 @@ function layout(input: LayoutInput): string {
               ${cta}
               ${note}
               <p style="margin:24px 0 0;border-top:1px solid #eadfb0;padding-top:16px;color:#5a5224;font-size:12px;line-height:1.6">
-                ${SALON_NAME}${SALON_PHONE ? ` · ${escapeHtml(SALON_PHONE)}` : ''}<br />
+                ${SALON_NAME}<br />
                 Paiement sur place. Merci de votre confiance.
               </p>
             </td></tr>

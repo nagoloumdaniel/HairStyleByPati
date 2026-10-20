@@ -37,7 +37,6 @@ export default async function SettingsPage() {
           <p className="mt-1 text-sm text-ink-soft">
             {settings.address ?? 'Adresse non renseignée'}
           </p>
-          <p className="text-sm text-ink-soft">{settings.phone ?? 'Téléphone non renseigné'}</p>
           <p className="text-sm text-ink-soft">{settings.contactEmail ?? 'E-mail non renseigné'}</p>
           <p className="mt-4 text-sm text-ink-soft">
             Délai de rappel : {settings.reminderLeadHours} h · Annulation : au moins{' '}

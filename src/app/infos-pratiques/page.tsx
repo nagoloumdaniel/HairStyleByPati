@@ -84,11 +84,6 @@ export default function InfosPratiquesPage() {
             Dakar, Sénégal
           </p>
           <p className="text-muted">
-            <span className="font-semibold text-fg">Téléphone</span>
-            <br />
-            01 23 45 67 89
-          </p>
-          <p className="text-muted">
             <span className="font-semibold text-fg">E-mail</span>
             <br />
             zepatricia7@gmail.com

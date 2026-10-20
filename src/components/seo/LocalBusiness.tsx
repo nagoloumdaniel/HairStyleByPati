@@ -1,7 +1,7 @@
 /**
  * P3.8 — Données structurées LocalBusiness (JSON-LD) pour Patricia.
  * Aide les moteurs de recherche à afficher les infos de l’activité (nom, adresse,
- * horaires, téléphone) dans les résultats enrichis.
+ * horaires) dans les résultats enrichis.
  */
 
 export interface LocalBusinessData {
@@ -12,7 +12,6 @@ export interface LocalBusinessData {
     addressRegion: string;
     addressCountry: string;
   };
-  telephone: string;
   email: string;
   priceRange: string;
   servesCity: string;
@@ -27,7 +26,6 @@ export const LOCAL_BUSINESS: LocalBusinessData = {
     addressRegion: 'Dakar',
     addressCountry: 'SN',
   },
-  telephone: '+221770000000',
   email: 'zepatricia7@gmail.com',
   priceRange: 'FCFA',
   servesCity: 'Dakar',
@@ -60,7 +58,6 @@ export default function LocalBusiness({ data }: { data: LocalBusinessData }) {
       addressRegion: data.address.addressRegion,
       addressCountry: data.address.addressCountry,
     },
-    telephone: data.telephone,
     email: data.email,
     priceRange: data.priceRange,
     servesCity: data.servesCity,
