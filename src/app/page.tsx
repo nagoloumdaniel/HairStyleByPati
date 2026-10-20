@@ -117,10 +117,10 @@ export default async function HomePage() {
 
           {/* Portrait dans un cercle qui se déforme en continu */}
           <div
-            className="reveal relative mx-auto flex w-full max-w-[20rem] justify-center sm:max-w-[26rem] lg:max-w-none lg:justify-end lg:pr-10"
+            className="reveal relative mx-auto flex w-full max-w-[16rem] justify-center sm:max-w-[21rem] lg:max-w-none lg:justify-end lg:pr-10"
             style={{ animationDelay: '120ms' }}
           >
-            <div className="landing-blob-ring relative aspect-square w-full max-w-[26rem] lg:h-[min(72svh,36rem)] lg:w-auto lg:max-w-none">
+            <div className="landing-blob-ring relative aspect-square w-full max-w-[21rem] lg:h-[min(58svh,29rem)] lg:w-auto lg:max-w-none">
               <div className="landing-blob relative size-full shadow-lift">
                 <Image
                   src="/landing/landing.jpeg"
@@ -128,7 +128,7 @@ export default async function HomePage() {
                   fill
                   priority
                   quality={90}
-                  sizes="(max-width: 1024px) 26rem, 36rem"
+                  sizes="(max-width: 1024px) 21rem, 29rem"
                   className="object-cover object-[62%_30%]"
                 />
               </div>

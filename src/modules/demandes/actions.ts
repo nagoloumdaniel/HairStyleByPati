@@ -1,5 +1,6 @@
 'use server';
 
+import { flushEmailsSoon } from '@/modules/notifications/flush';
 import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import type { CustomRequestStatus, Prisma } from '@prisma/client';
@@ -157,6 +158,7 @@ export async function submitCustomRequest(
 
     revalidatePath('/dashboard/demandes');
     revalidatePath('/dashboard', 'layout');
+    flushEmailsSoon();
     return {
       success: 'Votre demande a bien été envoyée. Patricia vous répondra personnellement.',
       requestId: request.id,

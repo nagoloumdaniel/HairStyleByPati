@@ -1,5 +1,6 @@
 ﻿'use server';
 
+import { flushEmailsSoon } from '@/modules/notifications/flush';
 import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
 import type { z } from 'zod';
@@ -82,6 +83,7 @@ function handleError(error: unknown): { error: string } {
 }
 
 function revalidateBookingPaths(appointmentId?: string) {
+  flushEmailsSoon();
   revalidatePath('/reserver');
   revalidatePath('/dashboard');
   revalidatePath('/dashboard/calendrier');
@@ -244,6 +246,7 @@ export async function cancelAppointmentByCustomer(
       token: parsed.data.token,
       reason: parsed.data.reason,
     });
+    flushEmailsSoon();
     revalidatePath('/dashboard');
     revalidatePath('/dashboard/calendrier');
     revalidatePath('/dashboard/reservations');

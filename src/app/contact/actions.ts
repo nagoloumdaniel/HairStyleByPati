@@ -1,5 +1,6 @@
 'use server';
 
+import { flushEmailsSoon } from '@/modules/notifications/flush';
 import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
@@ -119,6 +120,7 @@ export async function createConversation(
       });
     });
     revalidatePath('/dashboard', 'layout');
+    flushEmailsSoon();
     return { ok: true };
   } catch {
     return { ok: false, error: "Échec de l'enregistrement du message, réessayez." };

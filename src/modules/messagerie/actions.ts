@@ -1,5 +1,6 @@
 'use server';
 
+import { flushEmailsSoon } from '@/modules/notifications/flush';
 import { revalidatePath } from 'next/cache';
 import type { Prisma } from '@prisma/client';
 import { db } from '@/lib/db';
@@ -22,6 +23,7 @@ function handleError(error: unknown): ConversationActionState {
 }
 
 function revalidateConversations(id?: string): void {
+  flushEmailsSoon();
   revalidatePath('/dashboard/messages');
   if (id) revalidatePath(`/dashboard/messages/${id}`);
   revalidatePath('/dashboard', 'layout');
