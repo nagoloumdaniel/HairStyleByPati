@@ -56,5 +56,5 @@
 - etats de chargement et rate limiting sur les boutons d'actions
 - icones partout ou c'est necessaire
 - animation des etats de chargements
-
+- evite les hovers scale sur les cards et boutons
 - Global : navbar flottante verre. Page 404 : `src/app/not-found.tsx` (dégradé + verre).
