@@ -60,11 +60,13 @@ export default function InfosPratiquesPage() {
       </nav>
 
       <header className="max-w-3xl space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-[0.14em] text-cacao">Pratique</p>
+        <p className="hidden text-sm font-semibold uppercase tracking-[0.14em] text-cacao md:block">
+          Pratique
+        </p>
         <Title as="h1" size="display" className="">
           Informations pratiques
         </Title>
-        <p className="text-lg leading-relaxed text-muted">
+        <p className="hidden text-lg leading-relaxed text-muted md:block">
           Tout ce qu&apos;il faut savoir avant votre venue : horaires, préparation du rendez-vous et
           conditions d&apos;annulation.
         </p>
@@ -93,11 +95,7 @@ export default function InfosPratiquesPage() {
           <Title as="h2" className="">
             Horaires
           </Title>
-          <p className="text-muted">
-            Mardi – Samedi : 10h – 19h
-            <br />
-            Fermé dimanche et lundi
-          </p>
+          <p className="text-muted">Lundi – Dimanche : 5h – 22h</p>
           <p className="text-muted">
             Les rendez-vous sont strictement sur réservation. Merci de respecter l&apos;heure
             convenue : chaque retard réduit le temps de votre prestation.
@@ -151,7 +149,7 @@ export default function InfosPratiquesPage() {
             Nous contacter
           </Link>
           <Link
-            href="/reserver"
+            href="/coiffures"
             className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] border border-line bg-card px-6 py-3 font-semibold text-fg shadow-soft transition hover:border-cacao hover:bg-page"
           >
             Réserver un créneau

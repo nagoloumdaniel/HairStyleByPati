@@ -55,7 +55,7 @@ export function Header() {
             <SocialLinks className="hidden lg:flex" />
             <ThemeToggle />
             <Link
-              href="/reserver"
+              href="/coiffures"
               className="bg-gradient-primary rounded-full px-5 py-2.5 text-sm font-bold text-accent-fg shadow-soft transition hover:brightness-110 active:scale-[0.98]"
             >
               Réserver

@@ -64,3 +64,6 @@
 - FAQ : questions sur 2 colonnes (md+) ; bloc « Une autre question » centré.
 - Champs : menu déroulant `Select`, calendrier `DateField`, heure `TimeField`, `DateTimeField` personnalisés (jamais de select/date natifs) ; icône dans chaque champ (`Input` en ajoute automatiquement selon type/nom).
 - Navbar : icônes réseaux sociaux (`SocialLinks`, react-icons) ; icônes via lucide-react, jamais d'emoji.
+- Landing `/` : hero plein écran sur fond `bg-hero` + dégradés (`.landing-hero`), SANS fond blanc ni carte. Gauche : titre (Title, aligné à gauche, grand), sous-titre « Départ et retwist de locs, nattes collées, vanilles. », boutons Réserver/Catalogue (→ `/coiffures`). Droite : photo `public/landing/landing.jpeg` dans un cercle qui se déforme en continu (`.landing-blob`, 12 s, fluide, désactivé si reduced-motion). AUCUNE petite carte/UI autour. Photo jamais étirée (carré natif). Section « À propos » sans image.
+- Horaires : Lundi – Dimanche, 5h – 22h (partout). Landing : mêmes polices que le reste du site (Playfair Display + Lato), aucune exception.
+- Boutons « Réserver » (navbar, landing, contact, infos) → `/coiffures`. `/reserver` sans `?service=` redirige vers le catalogue (plus de liste de noms) ; `/reserver?service=slug` reste le parcours de réservation.

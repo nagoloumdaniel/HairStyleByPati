@@ -31,11 +31,13 @@ export default function ContactPage() {
       </nav>
 
       <header className="max-w-3xl space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-[0.14em] text-cacao">Contact</p>
+        <p className="hidden text-sm font-semibold uppercase tracking-[0.14em] text-cacao md:block">
+          Contact
+        </p>
         <Title as="h1" size="display" className="">
           Écrivez-nous
         </Title>
-        <p className="text-lg leading-relaxed text-muted">
+        <p className="hidden text-lg leading-relaxed text-muted md:block">
           Une question sur une prestation, un rendez-vous ou les horaires ? Patricia vous répond
           personnellement.
         </p>
@@ -61,7 +63,7 @@ export default function ContactPage() {
             Voir le catalogue
           </Link>
           <Link
-            href="/reserver"
+            href="/coiffures"
             className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
           >
             Réserver un créneau

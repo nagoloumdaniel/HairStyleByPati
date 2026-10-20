@@ -403,3 +403,50 @@ body:has([data-fullscreen]) {
     padding-block: 3rem;
   }
 }
+
+/* ============================================================
+   Landing : hero sur fond ocre/olive en dégradés, navbar intacte.
+   ============================================================ */
+.landing-hero {
+  background-image:
+    radial-gradient(55% 50% at 12% 88%, rgb(255 216 77 / 0.3), transparent 70%),
+    radial-gradient(50% 50% at 90% 82%, rgb(255 216 77 / 0.26), transparent 70%),
+    radial-gradient(70% 45% at 50% 22%, rgb(255 230 128 / 0.22), transparent 72%),
+    linear-gradient(180deg, rgb(255 241 184 / 0.08) 0%, transparent 40%, rgb(23 21 11 / 0.5) 100%);
+}
+.landing-title {
+  font-size: clamp(2.1rem, min(8vw, 10svh), 5.25rem);
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+/* Portrait de la landing : cercle qui se déforme en continu (blob fluide) */
+.landing-blob-ring {
+  filter: drop-shadow(0 0 28px rgb(255 216 77 / 0.25));
+}
+.landing-blob {
+  overflow: hidden;
+  border-radius: 50%;
+  animation: landing-blob 12s ease-in-out infinite;
+  will-change: border-radius;
+}
+@keyframes landing-blob {
+  0%,
+  100% {
+    border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%;
+  }
+  25% {
+    border-radius: 58% 42% 46% 54% / 46% 56% 44% 54%;
+  }
+  50% {
+    border-radius: 44% 56% 58% 42% / 56% 44% 56% 44%;
+  }
+  75% {
+    border-radius: 52% 48% 40% 60% / 42% 52% 48% 58%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-blob {
+    animation: none;
+  }
+}
