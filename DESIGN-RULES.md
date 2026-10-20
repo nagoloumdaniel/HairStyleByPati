@@ -59,3 +59,8 @@
 - evite les hovers scale sur les cards et boutons
 - Global : navbar flottante verre. Page 404 : `src/app/not-found.tsx` (dégradé + verre).
 - Contenu : Patricia coiffe **à domicile** (pas de salon). Aucune page/lien/texte « salon » ; page `/salon` supprimée.
+- Marges : toutes les pages publiques utilisent `.page-main` (+ `page-main-narrow` / `page-main-medium` pour contenus étroits) : mêmes marges latérales et verticales partout.
+- Cartes prestation : toute la carte (photo comprise) mène à la fiche ; survol = changement de photo + points. Pas de carrousel horizontal : grille, 2 lignes max (6 par page), pagination sans « précédent » en page 1 ni « suivant » en dernière page.
+- FAQ : questions sur 2 colonnes (md+) ; bloc « Une autre question » centré.
+- Champs : menu déroulant `Select`, calendrier `DateField`, heure `TimeField`, `DateTimeField` personnalisés (jamais de select/date natifs) ; icône dans chaque champ (`Input` en ajoute automatiquement selon type/nom).
+- Navbar : icônes réseaux sociaux (`SocialLinks`, react-icons) ; icônes via lucide-react, jamais d'emoji.

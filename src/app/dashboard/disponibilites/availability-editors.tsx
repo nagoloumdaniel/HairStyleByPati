@@ -130,7 +130,7 @@ function WeekdayForm({
       <input type="hidden" name="weekday" value={weekday} />
       <input type="hidden" name="timeZone" value={timeZone} />
       <div className="flex flex-wrap items-end gap-3">
-        <div className="w-24">
+        <div className="w-32">
           <Input
             label="Début"
             name="start"
@@ -139,7 +139,7 @@ function WeekdayForm({
             required
           />
         </div>
-        <div className="w-24">
+        <div className="w-32">
           <Input
             label="Fin"
             name="end"
@@ -203,10 +203,10 @@ export function SpecificDatesEditor({ rules }: { rules: SpecificRuleView[] }) {
         <div className="w-40">
           <Input label="Date" name="dateISO" type="date" required />
         </div>
-        <div className="w-24">
+        <div className="w-32">
           <Input label="Début" name="start" type="time" defaultValue="09:00" required />
         </div>
-        <div className="w-24">
+        <div className="w-32">
           <Input label="Fin" name="end" type="time" defaultValue="18:00" required />
         </div>
         <label className="flex items-center gap-2 pb-2 text-sm font-semibold">

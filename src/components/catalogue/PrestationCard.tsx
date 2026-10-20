@@ -34,14 +34,17 @@ export function PrestationCard({
       <div aria-hidden="true" className="card-blur pointer-events-none absolute inset-0" />
       <div aria-hidden="true" className="card-scrim pointer-events-none absolute inset-0" />
 
-      <span className="absolute left-4 top-4 z-[2] rounded-full bg-black/35 px-3 py-1 text-xs font-bold text-white backdrop-blur-md">
+      {/* Photo cliquable : lien étiré couvrant toute la carte (sous le bouton Réserver). */}
+      <Link href={href} aria-hidden="true" tabIndex={-1} className="absolute inset-0 z-[1]" />
+
+      <span className="pointer-events-none absolute left-4 top-4 z-[2] rounded-full bg-black/35 px-3 py-1 text-xs font-bold text-white backdrop-blur-md">
         {badge}
       </span>
 
-      <div className="absolute inset-x-0 bottom-0 z-[2] p-5">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] p-5">
         <div className="flex items-start justify-between gap-3">
           <h3 className="min-w-0 font-heading text-xl font-bold leading-tight">
-            <Link href={href} className="stretched-link rounded-sm outline-none">
+            <Link href={href} className="pointer-events-auto rounded-sm outline-none">
               {title}
             </Link>
           </h3>
@@ -61,7 +64,7 @@ export function PrestationCard({
           ) : null}
           <Link
             href={bookHref}
-            className="relative z-[3] rounded-full bg-[#ffd84d] px-3.5 py-1.5 text-xs font-black text-[#17150b] transition hover:brightness-110"
+            className="pointer-events-auto relative z-[3] rounded-full bg-[#ffd84d] px-3.5 py-1.5 text-xs font-black text-[#17150b] transition hover:brightness-110"
           >
             Réserver
           </Link>

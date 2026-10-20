@@ -63,7 +63,7 @@ const faqItems = [
 
 export default function FaqPage() {
   return (
-    <main className="mx-auto w-full max-w-7xl space-y-12 px-4 py-8 sm:px-6 md:py-12">
+    <main className="page-main space-y-12">
       <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
@@ -94,14 +94,14 @@ export default function FaqPage() {
         </p>
       </header>
 
-      <section aria-labelledby="faq-titre" className="max-w-3xl">
+      <section aria-labelledby="faq-titre">
         <h2 id="faq-titre" className="sr-only">
           Liste des questions fréquentes
         </h2>
         <Accordion items={faqItems} />
       </section>
 
-      <section className="max-w-3xl rounded-2xl bg-page p-8 text-center md:p-10">
+      <section className="mx-auto w-full max-w-3xl rounded-2xl bg-page p-8 text-center md:p-10">
         <Title as="h2" className="">
           Une autre question ?
         </Title>

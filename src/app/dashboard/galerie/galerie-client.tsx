@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
 import { Badge } from '@/components/ui/Badge';
 import {
   adminDeleteGalleryPhoto,
@@ -42,23 +43,15 @@ function UploadForm({ services }: { services: { id: string; name: string }[] }) 
         Photo
       </label>
       <input id="gallery-file" type="file" name="file" accept="image/*" required />
-      <div>
-        <label className="text-sm font-semibold text-fg" htmlFor="gallery-service">
-          Prestation associée (facultatif)
-        </label>
-        <select
-          id="gallery-service"
-          name="serviceId"
-          className="mt-1 w-full max-w-sm rounded-[var(--radius-md)] border border-line bg-card px-4 py-2.5 text-fg"
-        >
-          <option value="">Aucune</option>
-          {services.map((service) => (
-            <option key={service.id} value={service.id}>
-              {service.name}
-            </option>
-          ))}
-        </select>
-      </div>
+      <Select
+        label="Prestation associée (facultatif)"
+        name="serviceId"
+        className="max-w-sm"
+        options={[
+          { value: '', label: 'Aucune' },
+          ...services.map((service) => ({ value: service.id, label: service.name })),
+        ]}
+      />
       <Input label="Texte alternatif" name="alt" maxLength={200} />
       <label className="flex items-center gap-2 text-sm font-semibold text-fg">
         <input type="checkbox" name="consentConfirmed" className="size-4" required />

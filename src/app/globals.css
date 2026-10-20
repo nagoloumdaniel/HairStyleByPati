@@ -380,3 +380,29 @@ html[data-theme='dark'] {
 body:has([data-fullscreen]) {
   overflow: hidden;
 }
+
+/* Gabarit de page publique : mêmes marges latérales/verticales partout (DESIGN-RULES.md). */
+.page-main {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 80rem;
+  padding: 2rem 1rem;
+}
+@media (min-width: 640px) {
+  .page-main {
+    padding-inline: 1.5rem;
+  }
+}
+@media (min-width: 768px) {
+  .page-main {
+    padding-block: 3rem;
+  }
+}
+.page-main-narrow > * {
+  max-width: 42rem;
+  margin-inline: auto;
+}
+.page-main-medium > * {
+  max-width: 56rem;
+  margin-inline: auto;
+}

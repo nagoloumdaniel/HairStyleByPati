@@ -15,7 +15,7 @@ export default async function GaleriePage() {
   const photos = await listPublishedGalleryPhotos();
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
+    <main className="page-main">
       <Title as="h1" size="display" className="">
         Galerie de réalisations
       </Title>

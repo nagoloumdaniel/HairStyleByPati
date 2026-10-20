@@ -1,3 +1,4 @@
+import { MessageSquareText } from 'lucide-react';
 import type { TextareaHTMLAttributes } from 'react';
 
 type TextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
@@ -22,17 +23,23 @@ export function Textarea({ label, error, hint, id, required, ...rest }: Textarea
         ) : null}
         {required ? <span className="sr-only">(obligatoire)</span> : null}
       </label>
-      <textarea
-        {...rest}
-        id={inputId}
-        required={required}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={describedBy || undefined}
-        rows={rest.rows ?? 4}
-        className={`w-full rounded-[var(--radius-md)] border bg-card px-4 py-2.5 text-fg placeholder:text-muted transition ${
-          error ? 'border-alert' : 'border-line focus:border-cacao'
-        }`}
-      />
+      <div className="relative">
+        <MessageSquareText
+          aria-hidden="true"
+          className="pointer-events-none absolute left-3.5 top-3.5 size-4 text-cacao"
+        />
+        <textarea
+          {...rest}
+          id={inputId}
+          required={required}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={describedBy || undefined}
+          rows={rest.rows ?? 4}
+          className={`w-full rounded-[var(--radius-md)] border bg-card py-2.5 pl-10 pr-4 text-fg placeholder:text-muted transition ${
+            error ? 'border-alert' : 'border-line focus:border-cacao'
+          }`}
+        />
+      </div>
       {hint && !error ? (
         <p id={`${inputId}-hint`} className="text-sm text-muted">
           {hint}

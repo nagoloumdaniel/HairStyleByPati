@@ -20,12 +20,12 @@ export const catalogueQuerySchema = z.object({
     z.string().min(1).max(80).optional(),
   ),
   page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(50).default(9),
+  pageSize: z.coerce.number().int().min(1).max(50).default(6),
 });
 
 export type CatalogueQuery = z.infer<typeof catalogueQuerySchema>;
 
-export const DEFAULT_PAGE_SIZE = 9;
+export const DEFAULT_PAGE_SIZE = 6;
 
 /**
  * Normalise et valide les `searchParams` d'une page publique.

@@ -3,6 +3,7 @@
 import { useActionState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
 import { getDeviceTimezone, deviceTimeToUtc } from '@/lib/dates';
 import { joinWaitlistAction, type WaitlistActionState } from '@/modules/liste-attente/actions';
 
@@ -37,23 +38,12 @@ export function WaitlistForm({ services }: { services: { id: string; name: strin
       }}
       className="flex flex-col gap-4"
     >
-      <div>
-        <label className="text-sm font-semibold text-fg" htmlFor="waitlist-service">
-          Prestation souhaitée
-        </label>
-        <select
-          id="waitlist-service"
-          name="serviceId"
-          required
-          className="mt-1 w-full rounded-[var(--radius-md)] border border-line bg-card px-4 py-2.5 text-fg"
-        >
-          {services.map((service) => (
-            <option key={service.id} value={service.id}>
-              {service.name}
-            </option>
-          ))}
-        </select>
-      </div>
+      <Select
+        label="Prestation souhaitée"
+        name="serviceId"
+        required
+        options={services.map((service) => ({ value: service.id, label: service.name }))}
+      />
       <div className="flex flex-wrap gap-4">
         <Input label="Date souhaitée" name="date" type="date" required />
         <Input label="Heure souhaitée" name="time" type="time" required />

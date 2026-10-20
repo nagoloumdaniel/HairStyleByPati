@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { IMAGE_BLUR_DATA_URL } from '@/lib/image-placeholder';
 
 type Img = { src: string; alt: string };
@@ -12,6 +12,7 @@ export function CardImages({ images, priority = false }: { images: Img[]; priori
   const [index, setIndex] = useState(0);
   const [active, setActive] = useState(false);
   const count = images.length;
+  const root = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!active || count < 2) return;
@@ -20,19 +21,29 @@ export function CardImages({ images, priority = false }: { images: Img[]; priori
     return () => window.clearInterval(id);
   }, [active, count]);
 
-  function stop() {
-    setActive(false);
-    setIndex(0);
-  }
+  /* Le survol est écouté sur la carte entière (le lien étiré recouvre la photo). */
+  useEffect(() => {
+    const card = root.current?.closest('article');
+    if (!card) return;
+    const start = () => setActive(true);
+    const stop = () => {
+      setActive(false);
+      setIndex(0);
+    };
+    card.addEventListener('pointerenter', start);
+    card.addEventListener('pointerleave', stop);
+    card.addEventListener('focusin', start);
+    card.addEventListener('focusout', stop);
+    return () => {
+      card.removeEventListener('pointerenter', start);
+      card.removeEventListener('pointerleave', stop);
+      card.removeEventListener('focusin', start);
+      card.removeEventListener('focusout', stop);
+    };
+  }, []);
 
   return (
-    <div
-      className="absolute inset-0"
-      onPointerEnter={() => setActive(true)}
-      onPointerLeave={stop}
-      onFocus={() => setActive(true)}
-      onBlur={stop}
-    >
+    <div ref={root} className="absolute inset-0">
       {images.map((image, i) => (
         <Image
           key={image.src}

@@ -34,7 +34,7 @@ export default async function CompatibilitePage({
   if (slug === '') {
     const services = await listPublishedServicesForCompatibility();
     return (
-      <main className="mx-auto w-full max-w-5xl space-y-8 px-4 py-8 sm:px-6 md:py-12">
+      <main className="page-main page-main-medium space-y-8">
         <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
           <ol className="flex flex-wrap items-center gap-2">
             <li>
@@ -104,7 +104,7 @@ export default async function CompatibilitePage({
   const questions = questionsForService(service);
 
   return (
-    <main className="mx-auto w-full max-w-4xl space-y-8 px-4 py-8 sm:px-6 md:py-12">
+    <main className="page-main page-main-medium space-y-8">
       <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-2">
           <li>

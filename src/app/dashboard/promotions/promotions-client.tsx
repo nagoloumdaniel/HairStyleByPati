@@ -4,6 +4,7 @@ import { ArrowRight } from 'lucide-react';
 import { useActionState, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
 import { Badge } from '@/components/ui/Badge';
 import { LocalDateTime } from '@/components/shared/LocalDateTime';
 import {
@@ -51,21 +52,16 @@ function NewPromotionForm({ services }: { services: { id: string; name: string }
       <h2 className="font-semibold text-fg">Nouvelle promotion</h2>
       <Input label="Nom" name="name" required placeholder="Offre de lancement" />
       <div className="flex flex-wrap gap-4">
-        <div>
-          <label className="text-sm font-semibold text-fg" htmlFor="promo-kind">
-            Type de réduction
-          </label>
-          <select
-            id="promo-kind"
-            name="kind"
-            value={kind}
-            onChange={(event) => setKind(event.target.value as 'PERCENT' | 'FIXED')}
-            className="mt-1 rounded-[var(--radius-md)] border border-line bg-card px-4 py-2.5 text-fg"
-          >
-            <option value="PERCENT">Pourcentage</option>
-            <option value="FIXED">Montant fixe</option>
-          </select>
-        </div>
+        <Select
+          label="Type de réduction"
+          name="kind"
+          value={kind}
+          onChange={(event) => setKind(event.target.value as 'PERCENT' | 'FIXED')}
+          options={[
+            { value: 'PERCENT', label: 'Pourcentage' },
+            { value: 'FIXED', label: 'Montant fixe' },
+          ]}
+        />
         <div className="max-w-40">
           <Input
             label={kind === 'PERCENT' ? 'Pourcentage (1-100)' : 'Montant (FCFA)'}

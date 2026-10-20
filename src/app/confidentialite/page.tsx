@@ -20,7 +20,7 @@ export default async function ConfidentialitePage() {
     process.env.AUTH_ADMIN_EMAIL?.trim() ||
     'contact@hairstylebypati.fr';
   return (
-    <main className="mx-auto w-full max-w-7xl space-y-12 px-4 py-8 sm:px-6 md:py-12">
+    <main className="page-main space-y-12">
       <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-2">
           <li>

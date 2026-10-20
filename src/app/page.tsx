@@ -6,7 +6,6 @@ import type { Metadata } from 'next';
 
 import { getApprovedReviews } from '@/modules/avis/queries';
 import { Title } from '@/components/ui/Title';
-import { CardCarousel } from '@/components/catalogue/CardCarousel';
 import { PrestationCard } from '@/components/catalogue/PrestationCard';
 import { bookingHref } from '@/lib/catalogue';
 
@@ -80,7 +79,7 @@ const steps = [
 export default async function HomePage() {
   const reviews = await getApprovedReviews(3);
   return (
-    <main className="mx-auto max-w-7xl px-6 space-y-20">
+    <main className="page-main space-y-20">
       {/* Hero */}
       <section
         className="relative rounded-2xl bg-hero p-8 md:p-16 text-panel-fg overflow-hidden reveal"
@@ -143,20 +142,24 @@ export default async function HomePage() {
             Voir toutes les coiffures
           </Link>
         </div>
-        <CardCarousel label="Coiffures populaires">
-          {popularServices.map((service) => (
-            <PrestationCard
-              key={service.slug}
-              href={`/coiffures/${service.slug}`}
-              bookHref={bookingHref(service.slug)}
-              images={[{ src: service.image, alt: service.alt }]}
-              badge={service.category}
-              title={service.title}
-              price={service.price}
-              duration={service.duration}
-            />
+        <ul
+          aria-label="Coiffures populaires"
+          className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          {popularServices.slice(0, 6).map((service) => (
+            <li key={service.slug}>
+              <PrestationCard
+                href={`/coiffures/${service.slug}`}
+                bookHref={bookingHref(service.slug)}
+                images={[{ src: service.image, alt: service.alt }]}
+                badge={service.category}
+                title={service.title}
+                price={service.price}
+                duration={service.duration}
+              />
+            </li>
           ))}
-        </CardCarousel>
+        </ul>
       </section>
 
       {/* Étapes de réservation */}

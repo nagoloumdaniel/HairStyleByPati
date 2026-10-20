@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Logo } from '@/components/shared/Logo';
+import { SocialLinks } from './SocialLinks';
 import { ThemeToggle } from './ThemeToggle';
 
 /* Navbar flottante en verre (web + mobile) : pilule détachée du bord, flou,
@@ -51,6 +52,7 @@ export function Header() {
             })}
           </nav>
           <div className="flex items-center gap-2">
+            <SocialLinks className="hidden lg:flex" />
             <ThemeToggle />
             <Link
               href="/reserver"
@@ -95,6 +97,7 @@ export function Header() {
                 </li>
               ))}
             </ul>
+            <SocialLinks className="mt-2 justify-center border-t border-line pt-2" />
           </nav>
         ) : null}
       </header>

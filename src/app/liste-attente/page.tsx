@@ -16,7 +16,7 @@ export default async function ListeAttentePage() {
   });
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-12 sm:px-6">
+    <main className="page-main page-main-narrow">
       <Title as="h1" size="display" className="">
         Liste d’attente
       </Title>
