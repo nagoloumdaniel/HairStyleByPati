@@ -58,3 +58,10 @@ Aucun service externe n'est branché à ce jour (limite documentée dans `docs/s
   3. Respecter les frontières de domaine de `docs/architecture.md` (catalogue, compatibilité, disponibilités, réservations, etc.) — une nouvelle fonctionnalité qui traverse plusieurs domaines passe par les fonctions publiques de chaque module, jamais par un accès direct à la base d'un autre domaine.
   4. `npm run ci` + suite e2e concernée doivent rester verts avant toute PR.
   5. Mettre à jour `ROADMAP.md` et le document pertinent (`docs/acceptation.md` si la fonctionnalité touche un critère §17) dans la même PR.
+
+### Gmail SMTP (sans domaine)
+
+1. Compte Google de Patricia : activer la validation en deux étapes, puis créer un « mot de passe d'application ».
+2. Variables Vercel (Production) : `EMAIL_MODE=smtp`, `SMTP_USER=<adresse Gmail>`, `SMTP_PASSWORD=<mot de passe d'application>`. Redéployer.
+3. Limite Gmail : environ 500 e-mails par jour. Les messages partent de l'adresse Gmail ; les réponses y arrivent.
+4. Relancer les envois échoués depuis Dashboard > Notifications.
