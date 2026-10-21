@@ -345,7 +345,6 @@ export function PromotionsClient({
       <PageHeader
         icon={Tag}
         title="Promotions"
-        description="Réductions automatiques ou sur code promo, appliquées à la réservation."
         actions={
           <Button icon={Plus} iconOnly="mobile" onClick={() => open('new')}>
             Nouvelle promotion
@@ -363,7 +362,7 @@ export function PromotionsClient({
           </span>
           <p className="font-heading text-lg font-bold text-fg">Aucune promotion</p>
           <p className="max-w-sm text-sm text-muted">
-            Créez une réduction en pourcentage ou en montant fixe sur une ou plusieurs prestations.
+            Créez une réduction en pourcentage ou en montant fixe.
           </p>
           <Button icon={Plus} onClick={() => open('new')}>
             Nouvelle promotion
@@ -390,7 +389,7 @@ export function PromotionsClient({
                     <span className="font-heading text-xl font-bold text-accent">
                       {formatValue(promotion.kind, promotion.value)}
                     </span>
-                    <Badge tone={phase.tone} className="px-2! py-0.5! text-xs!">
+                    <Badge tone={phase.tone} size="sm">
                       {phase.label}
                     </Badge>
                     {promotion.code ? (
@@ -430,7 +429,7 @@ export function PromotionsClient({
                   </Button>
                   <Button
                     type="button"
-                    variant="secondary"
+                    variant="danger"
                     size="sm"
                     iconOnly
                     icon={Trash2}

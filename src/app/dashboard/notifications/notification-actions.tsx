@@ -4,6 +4,7 @@ import { Check, CheckCheck, RotateCcw, Trash2, Undo2 } from 'lucide-react';
 import { useTransition } from 'react';
 import {
   deleteNotification,
+  deleteFailedEmails,
   deleteReadNotifications,
   markAllNotificationsRead,
   markNotificationRead,
@@ -60,7 +61,7 @@ export function NotificationRowActions({ id, read }: { id: string; read: boolean
       </Button>
       <Button
         type="button"
-        variant="ghost"
+        variant="danger"
         size="sm"
         iconOnly
         icon={Trash2}
@@ -93,9 +94,11 @@ export function RetryEmailButton({ id }: { id: string }) {
 export function NotificationsHeaderActions({
   hasUnread,
   hasRead,
+  hasFailed,
 }: {
   hasUnread: boolean;
   hasRead: boolean;
+  hasFailed: boolean;
 }) {
   const confirm = useConfirm();
   const { pending, run } = useRun();
@@ -116,7 +119,7 @@ export function NotificationsHeaderActions({
       {hasRead ? (
         <Button
           type="button"
-          variant="ghost"
+          variant="danger"
           icon={Trash2}
           iconOnly="mobile"
           disabled={pending}
@@ -130,6 +133,26 @@ export function NotificationsHeaderActions({
           }}
         >
           Supprimer les lues
+        </Button>
+      ) : null}
+      {hasFailed ? (
+        <Button
+          type="button"
+          variant="danger"
+          icon={Trash2}
+          iconOnly="mobile"
+          loading={pending}
+          onClick={async () => {
+            const ok = await confirm({
+              title: 'Supprimer les échecs d’envoi ?',
+              message:
+                'Seuls les e-mails en échec sont supprimés, sans nouvel envoi. Cette action est définitive.',
+              confirmLabel: 'Supprimer',
+            });
+            if (ok) run(() => deleteFailedEmails());
+          }}
+        >
+          Supprimer les échecs d’envoi
         </Button>
       ) : null}
     </>

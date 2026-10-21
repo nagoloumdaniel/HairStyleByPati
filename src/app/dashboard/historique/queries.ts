@@ -5,7 +5,7 @@ import { db } from '@/lib/db';
  * Aucune métadonnée n'est remontée (jamais de données sensibles à l'écran).
  * ============================================================ */
 
-export const HISTORY_PAGE_SIZE = 30;
+export const HISTORY_PAGE_SIZE = 20;
 
 export const HISTORY_GROUPS = {
   catalogue: {

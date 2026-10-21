@@ -15,7 +15,9 @@ import { getImageSignedUrl } from '@/modules/fichiers/storage';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Badge } from '@/components/ui/Badge';
 import { ButtonLink } from '@/components/ui/Button';
+import { Pagination } from '@/components/ui/Pagination';
 import { Tabs } from '@/components/ui/Tabs';
+import { parsePage } from '@/lib/pagination';
 import { ServiceActionsRow } from './service-actions-row';
 import { CategoriesTab } from './categories-tab';
 import { ServiceFilters } from './service-filters';
@@ -147,11 +149,13 @@ export default async function CataloguePage({
     ? filtersResult.data
     : { search: undefined, categoryId: undefined, status: undefined };
 
-  const [categories, services, stats] = await Promise.all([
+  const [categories, servicesPage, stats] = await Promise.all([
     listAdminCategories(),
-    listAdminServices(filters),
+    listAdminServices(filters, parsePage(rawParams.page)),
     getCatalogueStats(),
   ]);
+
+  const services = servicesPage.items;
 
   // Signature locale (HMAC, sans appel réseau) des vignettes, en parallèle.
   const thumbs = await Promise.all(
@@ -188,7 +192,7 @@ export default async function CataloguePage({
 
       <div className="p-3 sm:p-4">
         <p className="mb-3 text-sm text-muted" aria-live="polite">
-          {services.length} prestation{services.length > 1 ? 's' : ''}
+          {servicesPage.total} prestation{servicesPage.total > 1 ? 's' : ''}
           {hasFilters ? ' correspondent aux filtres' : ' au total'}
         </p>
 
@@ -218,6 +222,21 @@ export default async function CataloguePage({
             ))}
           </ul>
         )}
+
+        <Pagination
+          page={servicesPage.page}
+          totalPages={servicesPage.totalPages}
+          hrefFor={(next) => {
+            const query = new URLSearchParams();
+            if (search) query.set('search', search);
+            if (category) query.set('category', category);
+            if (status) query.set('status', status);
+            if (next > 1) query.set('page', String(next));
+            const value = query.toString();
+            return value ? `/dashboard/catalogue?${value}` : '/dashboard/catalogue';
+          }}
+          label="Pagination des prestations"
+        />
       </div>
     </div>
   );
@@ -227,7 +246,6 @@ export default async function CataloguePage({
       <PageHeader
         icon={Scissors}
         title="Catalogue"
-        description="Catégories, prestations, photos et règles de compatibilité."
         actions={
           <ButtonLink
             href="/dashboard/catalogue/prestations/nouvelle"

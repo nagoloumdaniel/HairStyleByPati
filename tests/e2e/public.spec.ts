@@ -63,7 +63,8 @@ test.describe('Page de prestation dynamique', () => {
   test('should navigate from catalogue to a service page', async ({ page }) => {
     await page.goto('/coiffures', { waitUntil: 'networkidle' });
 
-    const firstCard = page.locator('a[href^="/coiffures/"]').first();
+    // Le lien étiré de la carte est aria-hidden (hors arbre d'accessibilité) : on clique le lien du titre.
+    const firstCard = page.locator('a[href^="/coiffures/"]:not([aria-hidden="true"])').first();
     if ((await firstCard.count()) > 0) {
       await firstCard.click();
       await expect(page).toHaveURL(/\/coiffures\/[^/]+$/);

@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { getBookableServiceBySlug } from '@/modules/reservations/queries';
 import { getCachedSalonSettings } from '@/lib/public-cache';
+import { Breadcrumb } from '@/components/shared/Breadcrumb';
 import { Badge } from '@/components/ui/Badge';
 import { BookingWizard } from './booking-wizard';
 import { Title } from '@/components/ui/Title';
@@ -35,33 +35,14 @@ export default async function ReserverPage({
 
   return (
     <main className="page-main space-y-8">
-      <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
-        <ol className="flex flex-wrap items-center gap-2">
-          <li>
-            <Link href="/" className="transition hover:text-cacao">
-              Accueil
-            </Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li>
-            <Link href="/coiffures" className="transition hover:text-cacao">
-              Coiffures
-            </Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li>
-            <Link href={`/coiffures/${service.slug}`} className="transition hover:text-cacao">
-              {service.name}
-            </Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li>
-            <span aria-current="page" className="font-medium text-fg">
-              Réserver
-            </span>
-          </li>
-        </ol>
-      </nav>
+      <Breadcrumb
+        items={[
+          { label: 'Accueil', href: '/' },
+          { label: 'Coiffures', href: '/coiffures' },
+          { label: service.name, href: `/coiffures/${service.slug}` },
+          { label: 'Réserver' },
+        ]}
+      />
 
       <header className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
@@ -71,9 +52,6 @@ export default async function ReserverPage({
         <Title as="h1" size="display" className="">
           Réserver {service.name}
         </Title>
-        <p className="hidden max-w-2xl text-lg leading-relaxed text-muted md:block">
-          Huit étapes, sans paiement en ligne. Votre créneau est protégé dès l’enregistrement.
-        </p>
       </header>
 
       <BookingWizard

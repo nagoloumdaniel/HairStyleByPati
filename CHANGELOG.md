@@ -2,6 +2,17 @@
 
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/).
 
+## [Non publié]
+
+### Interface
+
+- Refonte premium : accueil, catalogue, fiche coiffure (galerie, bloc de réservation sticky, coiffures similaires), contact, demandes personnalisées, dashboard.
+- Page d'erreur plein écran ; boutons « Réessayer » et « Voir le catalogue » de même taille ; boutons de taille mesurée sur tout le site.
+
+### Dépôt
+
+- Ajout de LICENSE, SECURITY.md, modèle de PR, Dependabot ; captures E2E et archives retirées du suivi Git.
+
 ## [1.0.0] — Phase 12, lancement
 
 Version initiale complète correspondant au périmètre MVP du cahier des charges (§19).

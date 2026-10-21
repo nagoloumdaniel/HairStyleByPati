@@ -197,9 +197,6 @@ export function ServiceForm({
       <FormError message={state.error} />
 
       <div className="flex items-center justify-end gap-3">
-        <p className="hidden text-sm text-muted sm:block">
-          Les modifications sont enregistrées immédiatement et journalisées.
-        </p>
         <Button type="submit" icon={initial ? Save : Plus} loading={pending}>
           {submitLabel}
         </Button>

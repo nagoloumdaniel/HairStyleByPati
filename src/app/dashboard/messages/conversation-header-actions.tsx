@@ -109,7 +109,7 @@ export function ConversationHeaderActions({
       </Button>
       <Button
         type="button"
-        variant="ghost"
+        variant="danger"
         icon={Trash2}
         iconOnly="mobile"
         disabled={pending}

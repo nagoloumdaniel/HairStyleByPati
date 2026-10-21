@@ -11,6 +11,8 @@ import {
 import { PageHeader } from '@/components/layout/PageHeader';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { FilterChips } from '@/components/ui/FilterChips';
+import { Pagination } from '@/components/ui/Pagination';
+import { parsePage } from '@/lib/pagination';
 import { AvisClient } from './avis-client';
 
 export const metadata: Metadata = { title: 'Avis - Tableau de bord' };
@@ -35,14 +37,14 @@ export default async function AvisPage({
   const user = await requireAdmin();
   if (!user) redirect('/connexion?callbackUrl=/dashboard/avis');
 
-  const { status: rawStatus } = await searchParams;
+  const { status: rawStatus, page: rawPage } = await searchParams;
   const requested = Array.isArray(rawStatus) ? rawStatus[0] : rawStatus;
   const status: ModerationFilter = MODERATION_FILTERS.includes(requested as ModerationFilter)
     ? (requested as ModerationFilter)
     : 'SUBMITTED';
 
-  const [reviews, counts] = await Promise.all([
-    listReviewsForModeration(status),
+  const [result, counts] = await Promise.all([
+    listReviewsForModeration(status, parsePage(rawPage)),
     countReviewsByStatus(),
   ]);
 
@@ -51,7 +53,7 @@ export default async function AvisPage({
       <PageHeader
         icon={Star}
         title="Avis clients"
-        description="Modération des avis laissés après un rendez-vous terminé. Rien n’est visible sur le site avant approbation."
+        description="Rien n’est visible sur le site avant approbation."
       />
 
       <FilterChips
@@ -64,11 +66,11 @@ export default async function AvisPage({
         }))}
       />
 
-      {reviews.length === 0 ? (
+      {result.items.length === 0 ? (
         <EmptyState variant="compact" title="Aucun avis" message={EMPTY[status]} />
       ) : (
         <AvisClient
-          reviews={reviews.map((review) => ({
+          reviews={result.items.map((review) => ({
             id: review.id,
             rating: review.rating,
             comment: review.comment,
@@ -79,6 +81,19 @@ export default async function AvisPage({
           }))}
         />
       )}
+
+      <Pagination
+        page={result.page}
+        totalPages={result.totalPages}
+        hrefFor={(next) => {
+          const query = new URLSearchParams();
+          if (status !== 'SUBMITTED') query.set('status', status);
+          if (next > 1) query.set('page', String(next));
+          const value = query.toString();
+          return value ? `/dashboard/avis?${value}` : '/dashboard/avis';
+        }}
+        label="Pagination des avis"
+      />
     </div>
   );
 }

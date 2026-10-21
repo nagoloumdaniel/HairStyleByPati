@@ -280,7 +280,7 @@ function SpecificRow({ rule }: { rule: SpecificRuleView }) {
       </p>
       <Button
         type="button"
-        variant="ghost"
+        variant="danger"
         size="sm"
         icon={Trash2}
         iconOnly
@@ -379,7 +379,7 @@ function BlockedRow({ period }: { period: BlockedPeriodView }) {
       </div>
       <Button
         type="button"
-        variant="ghost"
+        variant="danger"
         size="sm"
         icon={Trash2}
         iconOnly

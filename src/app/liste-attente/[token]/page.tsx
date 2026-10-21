@@ -25,7 +25,9 @@ export default async function WaitlistTokenPage({
     return (
       <main className="page-main">
         <div className="rounded-[var(--radius-lg)] border border-alert bg-alert-soft p-8 text-center">
-          <h1 className="font-heading text-2xl font-bold text-alert">Lien invalide</h1>
+          <Title as="h1" size="display" className="">
+            Lien invalide
+          </Title>
           <p className="mt-3 text-fg">Ce lien ne correspond à aucune demande de liste d’attente.</p>
         </div>
       </main>
@@ -59,9 +61,7 @@ export default async function WaitlistTokenPage({
           Une place s’est libérée pour « {entry.service.name} »
         </Title>
         <p className="mt-2 text-muted">
-          Créneau du <LocalDateTime iso={entry.desiredStartsAt.toISOString()} />. Confirmez votre
-          réservation ci-dessous : la disponibilité est vérifiée à nouveau au moment de la
-          confirmation.
+          Créneau du <LocalDateTime iso={entry.desiredStartsAt.toISOString()} />.
         </p>
         <div className="mt-6">
           <ConfirmForm

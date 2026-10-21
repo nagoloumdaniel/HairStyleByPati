@@ -105,8 +105,8 @@ export function SessionsCard() {
   return (
     <SettingsSection icon={LogOut} title="Sessions">
       <p className="text-sm text-muted">
-        Si vous avez utilisé un appareil partagé ou perdu un téléphone, fermez toutes les sessions
-        ouvertes du tableau de bord.
+        Fermez toutes les sessions ouvertes si vous avez perdu un appareil ou utilisé un appareil
+        partagé.
       </p>
       {error ? (
         <p role="alert" className="text-sm font-medium text-alert">

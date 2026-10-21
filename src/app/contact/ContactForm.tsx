@@ -1,39 +1,58 @@
 'use client';
 
-import { useActionState } from 'react';
+import { CircleCheck, Send, TriangleAlert } from 'lucide-react';
+import { useActionState, useEffect, useRef } from 'react';
 
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Textarea } from '@/components/ui/Textarea';
 import { createConversation } from './actions';
-
-const inputClasses =
-  'w-full rounded-[var(--radius-md)] border border-line bg-card px-4 py-2.5 text-fg ' +
-  'focus:outline-none focus:border-cacao transition';
-
-const btnBase =
-  'inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] ' +
-  'px-6 py-3 font-semibold text-accent-fg shadow-soft transition disabled:opacity-70 disabled:cursor-not-allowed';
 
 export function ContactForm() {
   const [state, formAction, isPending] = useActionState(createConversation, null);
+  const successRef = useRef<HTMLDivElement>(null);
+
+  // Après un envoi réussi, le focus passe au message de confirmation.
+  useEffect(() => {
+    if (state?.ok) successRef.current?.focus();
+  }, [state?.ok]);
 
   if (state?.ok) {
     return (
-      <div className="space-y-4">
-        <p className="text-sm font-medium text-cacao">
-          Message envoyé. Patricia vous répondra personnellement, généralement sous 24 heures
-          ouvrées.
-        </p>
-        <button
+      <div
+        ref={successRef}
+        tabIndex={-1}
+        role="status"
+        className="flex flex-col items-start gap-4 rounded-[var(--radius-lg)] border border-success/30 bg-success-soft p-6 outline-none sm:p-8"
+      >
+        <span className="flex size-12 items-center justify-center rounded-full bg-card text-success">
+          <CircleCheck aria-hidden="true" className="size-6" />
+        </span>
+        <div className="space-y-2">
+          <h2 className="font-heading text-2xl font-bold text-fg">Merci, c’est bien reçu</h2>
+          <p className="font-medium text-fg">
+            Message envoyé. Patricia vous répond par e-mail sous 24 heures ouvrées (pensez à
+            vérifier vos courriers indésirables).
+          </p>
+        </div>
+        <Button
+          type="button"
+          variant="secondary"
+          icon={Send}
           onClick={() => window.location.reload()}
-          className={`${btnBase} bg-accent hover:bg-accent-hover`}
         >
           Envoyer un autre message
-        </button>
+        </Button>
       </div>
     );
   }
 
   return (
-    <form action={formAction} className="space-y-5">
+    <form
+      action={formAction}
+      aria-busy={isPending}
+      className="space-y-6 rounded-[var(--radius-lg)] bg-card p-5 shadow-soft sm:p-8"
+    >
       {/* Honeypot : invisible pour les humains, rempli par les bots. */}
       <input
         name="website"
@@ -44,93 +63,75 @@ export function ContactForm() {
         style={{ display: 'none' }}
       />
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-1">
-          <label htmlFor="name" className="text-sm font-medium text-fg">
-            Nom
-          </label>
-          <input
-            id="name"
-            placeholder="Votre nom et prénom"
-            name="name"
-            type="text"
-            required
-            minLength={2}
-            maxLength={100}
-            autoComplete="name"
-            className={inputClasses}
-          />
-        </div>
-        <div className="space-y-1">
-          <label htmlFor="email" className="text-sm font-medium text-fg">
-            E-mail
-          </label>
-          <input
-            id="email"
-            placeholder="vous@exemple.com"
-            name="email"
-            type="email"
-            required
-            maxLength={200}
-            autoComplete="email"
-            className={inputClasses}
-          />
-        </div>
-        <div className="space-y-1 sm:col-span-2">
-          <label htmlFor="phone" className="text-sm font-medium text-fg">
-            Téléphone (facultatif)
-          </label>
-          <input
-            id="phone"
-            placeholder="+221 77 123 45 67"
+      <h2 className="font-heading text-xl font-bold text-fg">Votre message</h2>
+
+      <div className="grid gap-5 sm:grid-cols-2">
+        <Input
+          label="Nom"
+          name="name"
+          placeholder="Votre nom et prénom"
+          required
+          minLength={2}
+          maxLength={100}
+          autoComplete="name"
+        />
+        <Input
+          label="E-mail"
+          name="email"
+          type="email"
+          placeholder="vous@exemple.com"
+          required
+          maxLength={200}
+          autoComplete="email"
+        />
+        <div className="sm:col-span-2">
+          <Input
+            label="Téléphone (facultatif)"
             name="phone"
             type="tel"
+            placeholder="+221 77 123 45 67"
             maxLength={30}
             autoComplete="tel"
-            className={inputClasses}
           />
         </div>
-        <div className="space-y-1 sm:col-span-2">
-          <label htmlFor="subject" className="text-sm font-medium text-fg">
-            Sujet
-          </label>
-          <input
-            id="subject"
-            placeholder="Objet de votre message"
+        <div className="sm:col-span-2">
+          <Input
+            label="Sujet"
             name="subject"
-            type="text"
+            placeholder="Objet de votre message"
             required
             minLength={3}
             maxLength={200}
-            className={inputClasses}
           />
         </div>
-        <div className="space-y-1 sm:col-span-2">
-          <label htmlFor="message" className="text-sm font-medium text-fg">
-            Message
-          </label>
-          <textarea
-            id="message"
-            placeholder="Écrivez votre message ici…"
+        <div className="sm:col-span-2">
+          <Textarea
+            label="Message"
             name="message"
+            placeholder="Écrivez votre message ici…"
             required
             minLength={10}
             maxLength={2000}
             rows={5}
             autoComplete="off"
-            className={`${inputClasses} resize-y`}
+            hint="Précisez la coiffure ou la date visée si vous en avez une."
           />
         </div>
       </div>
 
-      {state?.error && <p className="text-sm font-medium text-alert">{state.error}</p>}
+      {state?.error ? (
+        <p
+          role="alert"
+          className="flex items-start gap-2 rounded-[var(--radius-md)] bg-alert-soft px-4 py-3 text-sm font-medium text-alert"
+        >
+          <TriangleAlert aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+          {state.error}
+        </p>
+      ) : null}
 
-      <button
-        disabled={isPending}
-        className={`${btnBase} bg-accent hover:bg-accent-hover active:scale-[0.98]`}
-      >
+      <Button type="submit" icon={Send} loading={isPending} className="w-full sm:w-auto">
         {isPending ? 'Envoi en cours...' : 'Envoyer le message'}
-      </button>
+      </Button>
     </form>
   );
 }

@@ -33,7 +33,7 @@ async function login(page: Page): Promise<void> {
   await page.goto('/connexion?callbackUrl=/dashboard');
   await page.getByLabel('E-mail').fill(ADMIN_EMAIL || readEnv('AUTH_ADMIN_EMAIL') || '');
   await page
-    .getByLabel('Mot de passe')
+    .locator('input[name="password"]')
     .fill(ADMIN_PASSWORD || readEnv('AUTH_ADMIN_PASSWORD') || '');
   await page.getByRole('button', { name: 'Se connecter' }).click();
   await page.waitForURL((url) => url.pathname.startsWith('/dashboard'));
@@ -130,6 +130,7 @@ test.describe('Responsive et accessibilité de base', () => {
     const pages = ['/', '/coiffures', '/reserver', '/contact', '/demandes-personnalisees', '/faq'];
     for (const path of pages) {
       await page.goto(path);
+      await page.waitForTimeout(1500); // laisse finir l'animation d'entrée des titres
       await page.addScriptTag({ content: axeSource });
       const violations = await page.evaluate(async () => {
         const results = await (
@@ -152,6 +153,7 @@ test.describe('Responsive et accessibilité de base', () => {
       await login(page);
       for (const path of ['/dashboard', '/dashboard/calendrier', '/dashboard/notifications']) {
         await page.goto(path);
+        await page.waitForTimeout(1500); // laisse finir l'animation d'entrée des titres
         await page.addScriptTag({ content: axeSource });
         const violations = await page.evaluate(async () => {
           const results = await (
@@ -167,7 +169,13 @@ test.describe('Responsive et accessibilité de base', () => {
             .filter(
               (violation) => violation.impact === 'serious' || violation.impact === 'critical',
             )
-            .map((violation) => ({ id: violation.id, nodes: violation.nodes.length }));
+            .map((violation) => ({
+              id: violation.id,
+              nodes: violation.nodes.length,
+              sample: (violation.nodes as Array<{ html: string }>)
+                .slice(0, 3)
+                .map((n) => n.html.slice(0, 140)),
+            }));
         });
         expect(violations, `${path}: ${JSON.stringify(violations)}`).toEqual([]);
       }

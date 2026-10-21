@@ -90,21 +90,21 @@ function ReviewCard({ review }: { review: ReviewRow }) {
 
   const statusBadge =
     review.status === 'APPROVED' ? (
-      <Badge tone="success" className="px-2! py-0.5! text-xs!">
+      <Badge tone="success" size="sm">
         Publié
       </Badge>
     ) : review.status === 'REJECTED' ? (
-      <Badge tone="alert" className="px-2! py-0.5! text-xs!">
+      <Badge tone="alert" size="sm">
         Rejeté
       </Badge>
     ) : (
-      <Badge tone="accent" className="px-2! py-0.5! text-xs!">
+      <Badge tone="accent" size="sm">
         En attente
       </Badge>
     );
 
   return (
-    <Card className="p-3! sm:p-4!">
+    <Card>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Stars rating={review.rating} />
@@ -167,7 +167,7 @@ function ReviewCard({ review }: { review: ReviewRow }) {
         <Button
           type="button"
           size="sm"
-          variant="ghost"
+          variant="danger"
           icon={Trash2}
           iconOnly="mobile"
           className="ml-auto"

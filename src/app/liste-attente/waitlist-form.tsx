@@ -1,5 +1,6 @@
 'use client';
 
+import { Bell } from 'lucide-react';
 import { useActionState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -64,7 +65,7 @@ export function WaitlistForm({ services }: { services: { id: string; name: strin
           {state.error}
         </p>
       ) : null}
-      <Button type="submit" loading={pending}>
+      <Button type="submit" icon={Bell} loading={pending}>
         Rejoindre la liste d’attente
       </Button>
     </form>

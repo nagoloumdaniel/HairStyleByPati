@@ -1,16 +1,22 @@
 import type { Prisma } from '@prisma/client';
 import { db } from '@/lib/db';
+import { paginate } from '@/lib/pagination';
 import { findActivePromotion, type PromotionCandidate } from './pricing';
 
 /* ============================================================
  * Lecture des promotions (P8.12)
  * ============================================================ */
 
-export async function listPromotions() {
-  return db.promotion.findMany({
+export async function listPromotions(requestedPage = 1, pageSize = 12) {
+  const total = await db.promotion.count();
+  const { page, totalPages, skip, take } = paginate(total, requestedPage, pageSize);
+  const items = await db.promotion.findMany({
     orderBy: { createdAt: 'desc' },
     include: { services: { include: { service: { select: { id: true, name: true } } } } },
+    skip,
+    take,
   });
+  return { items, total, page, totalPages };
 }
 
 /**

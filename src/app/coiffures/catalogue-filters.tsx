@@ -1,9 +1,10 @@
 'use client';
 
+import { RotateCcw, Search, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
-import { Button } from '@/components/ui/Button';
+import { Button, buttonClasses } from '@/components/ui/Button';
 import type { CatalogueCategory } from '@/lib/catalogue';
 
 type CatalogueFiltersProps = {
@@ -22,9 +23,9 @@ function buildCatalogueHref(search: string, category: string): string {
 }
 
 /**
- * Recherche et filtres du catalogue (P3.2).
+ * Barre de recherche et filtres du catalogue.
  * - Recherche soumise au clavier (Entrée) ou après une courte pause de frappe.
- * - Filtres catégories en liens, donc fonctionnels sans JavaScript.
+ * - Catégories en puces-liens : fonctionnelles sans JavaScript, défilables sur mobile.
  * - État de chargement annoncé et visible pendant la navigation.
  */
 export function CatalogueFilters({
@@ -38,7 +39,7 @@ export function CatalogueFilters({
   const [isPending, startTransition] = useTransition();
   const categoryRef = useRef(initialCategory);
 
-  // Suit la catégorie réellement appliquée par l'URL (le select n'est pas contrôlé).
+  // Suit la catégorie réellement appliquée par l'URL.
   categoryRef.current = initialCategory;
 
   // Re-synchronise le champ après un retour navigateur ou un changement d'URL.
@@ -71,7 +72,7 @@ export function CatalogueFilters({
   return (
     <section
       aria-labelledby="filtres-titre"
-      className="space-y-5 rounded-[var(--radius-lg)] border border-card/70 bg-card/80 p-5 shadow-soft backdrop-blur-md md:p-6"
+      className="space-y-4 rounded-[var(--radius-xl)] border border-line bg-card/80 p-4 shadow-soft backdrop-blur-md md:p-5"
     >
       <h2 id="filtres-titre" className="sr-only">
         Rechercher et filtrer les coiffures
@@ -80,34 +81,22 @@ export function CatalogueFilters({
       <form
         action="/coiffures"
         method="get"
+        role="search"
         onSubmit={(event) => {
           event.preventDefault();
           navigate(search, initialCategory);
         }}
-        className="flex flex-col gap-3 sm:flex-row"
+        className="flex gap-2"
         aria-busy={isPending || undefined}
       >
-        <div className="relative flex-1">
+        <div className="relative min-w-0 flex-1">
           <label htmlFor="catalogue-search" className="sr-only">
             Rechercher une coiffure
           </label>
-          <span
+          <Search
             aria-hidden="true"
-            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted"
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            >
-              <circle cx="11" cy="11" r="7" />
-              <path d="m20 20-3.5-3.5" />
-            </svg>
-          </span>
+            className="pointer-events-none absolute left-3.5 top-1/2 size-[18px] -translate-y-1/2 text-muted"
+          />
           <input
             id="catalogue-search"
             name="search"
@@ -116,31 +105,46 @@ export function CatalogueFilters({
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Tresses, vanilles, locs…"
             autoComplete="off"
-            className="w-full rounded-[var(--radius-md)] border border-line bg-card py-2.5 pl-10 pr-10 text-fg placeholder:text-muted/70 focus:outline-none focus:border-cacao"
+            enterKeyHint="search"
+            className="h-10 w-full rounded-[var(--radius-md)] border border-line bg-page pl-10 pr-10 text-base text-fg placeholder:text-muted/70 focus:border-cacao focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 [&::-webkit-search-cancel-button]:appearance-none"
           />
           {isPending ? (
             <span
               aria-hidden="true"
-              className="absolute right-3.5 top-1/2 inline-block size-4 -translate-y-1/2 animate-spin rounded-full border-2 border-cacao border-t-transparent"
+              className="absolute right-3.5 top-1/2 inline-block size-4 -translate-y-1/2 animate-spin rounded-full border-2 border-cacao border-t-transparent motion-reduce:animate-none"
             />
+          ) : search ? (
+            <button
+              type="button"
+              onClick={() => {
+                setSearch('');
+                navigate('', categoryRef.current);
+              }}
+              aria-label="Effacer la recherche"
+              className="absolute right-1.5 top-1/2 inline-flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-muted transition hover:text-fg focus-visible:outline-2 focus-visible:outline-accent"
+            >
+              <X aria-hidden="true" className="size-4" />
+            </button>
           ) : null}
         </div>
 
-        <Button type="submit" loading={isPending} className="sm:px-6">
+        <Button type="submit" icon={Search} iconOnly="mobile" loading={isPending}>
           Rechercher
         </Button>
       </form>
 
-      <nav aria-label="Filtrer par catégorie" className="flex flex-wrap gap-2">
+      <nav
+        aria-label="Filtrer par catégorie"
+        className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 md:-mx-5 md:px-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
         <Link
           href={buildCatalogueHref(initialSearch, '')}
           scroll={false}
           aria-current={initialCategory === '' ? 'page' : undefined}
-          className={`inline-flex items-center gap-1.5 rounded-[var(--radius-full)] border px-3.5 py-1.5 text-sm font-medium transition ${
-            initialCategory === ''
-              ? 'border-cacao bg-cacao text-cacao-fg'
-              : 'border-line bg-card text-fg hover:border-cacao hover:bg-page'
-          }`}
+          className={buttonClasses({
+            size: 'sm',
+            variant: initialCategory === '' ? 'primary' : 'secondary',
+          })}
         >
           Toutes
         </Link>
@@ -152,20 +156,22 @@ export function CatalogueFilters({
               href={buildCatalogueHref(initialSearch, category.slug)}
               scroll={false}
               aria-current={active ? 'page' : undefined}
-              className={`inline-flex items-center gap-1.5 rounded-[var(--radius-full)] border px-3.5 py-1.5 text-sm font-medium transition ${
-                active
-                  ? 'border-cacao bg-cacao text-cacao-fg'
-                  : 'border-line bg-card text-fg hover:border-cacao hover:bg-page'
-              }`}
+              className={buttonClasses({ size: 'sm', variant: active ? 'primary' : 'secondary' })}
             >
               {category.name}
-              <span className={active ? 'text-cacao-fg/80' : 'text-muted'}>{category.count}</span>
+              <span
+                className={`rounded-full px-1.5 text-xs tabular-nums ${
+                  active ? 'bg-accent-fg/20' : 'bg-line text-muted'
+                }`}
+              >
+                {category.count}
+              </span>
             </Link>
           );
         })}
       </nav>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line/70 pt-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3">
         <p className="text-sm text-muted" aria-live="polite">
           {isPending ? 'Mise à jour des résultats…' : resultLabel}
         </p>
@@ -173,8 +179,9 @@ export function CatalogueFilters({
           <Link
             href="/coiffures"
             scroll={false}
-            className="text-sm font-semibold text-cacao underline-offset-4 hover:underline"
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-cacao underline-offset-4 hover:underline"
           >
+            <RotateCcw aria-hidden="true" className="size-3.5" />
             Réinitialiser les filtres
           </Link>
         ) : null}

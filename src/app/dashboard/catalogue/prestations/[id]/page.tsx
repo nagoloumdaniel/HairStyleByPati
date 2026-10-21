@@ -74,7 +74,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
           <>
             <ButtonLink
               href={`/dashboard/historique?entityId=${service.id}`}
-              variant="ghost"
+              variant="secondary"
               icon={History}
               iconOnly="mobile"
             >
@@ -85,7 +85,7 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
                 href={`/coiffures/${service.slug}`}
                 target="_blank"
                 rel="noopener"
-                variant="ghost"
+                variant="secondary"
                 icon={ExternalLink}
                 iconOnly="mobile"
               >

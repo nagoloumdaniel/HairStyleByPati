@@ -1,11 +1,13 @@
 'use client';
 
+import { Mail, XCircle } from 'lucide-react';
 import { useActionState } from 'react';
 import {
   cancelAppointmentByCustomer,
   type CustomerCancelState,
 } from '@/modules/reservations/actions';
-import { Button } from '@/components/ui/Button';
+import { Button, ButtonLink } from '@/components/ui/Button';
+import { Title } from '@/components/ui/Title';
 import { Textarea } from '@/components/ui/Textarea';
 
 /* ============================================================
@@ -21,7 +23,9 @@ export function CancelForm({ token, reasonRequired }: { token: string; reasonReq
   if (state.success) {
     return (
       <div className="rounded-[var(--radius-lg)] border border-success bg-success-soft p-6">
-        <h2 className="font-heading text-xl font-bold text-success">Rendez-vous annulé</h2>
+        <Title as="h2" className="">
+          Rendez-vous annulé
+        </Title>
         <p className="mt-2 text-sm text-fg">{state.success}</p>
       </div>
     );
@@ -35,7 +39,6 @@ export function CancelForm({ token, reasonRequired }: { token: string; reasonReq
         name="reason"
         required={reasonRequired}
         rows={3}
-        hint="Ce motif aide Patricia à mieux organiser ses rendez-vous."
       />
       {state.error ? (
         <p
@@ -46,15 +49,12 @@ export function CancelForm({ token, reasonRequired }: { token: string; reasonReq
         </p>
       ) : null}
       <div className="flex flex-wrap gap-3">
-        <Button type="submit" variant="danger" loading={pending}>
+        <Button type="submit" variant="danger" icon={XCircle} loading={pending}>
           Confirmer l’annulation
         </Button>
-        <a
-          href="/contact"
-          className="inline-flex items-center rounded-[var(--radius-md)] border border-line bg-card px-5 py-2.5 text-sm font-semibold text-fg transition hover:border-cacao"
-        >
+        <ButtonLink href="/contact" variant="secondary" icon={Mail}>
           Contacter Patricia
-        </a>
+        </ButtonLink>
       </div>
     </form>
   );

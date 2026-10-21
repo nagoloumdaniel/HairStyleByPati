@@ -17,14 +17,10 @@ export default async function SettingsPage() {
 
   return (
     <div>
-      <PageHeader
-        icon={Settings}
-        title="Paramètres"
-        description="Profil, coordonnées, horaires et messages affichés aux clientes."
-      />
+      <PageHeader icon={Settings} title="Paramètres" />
 
       {/* Règles de créneaux et d'annulation : carte entière cliquable vers Disponibilités. */}
-      <CardLink href="/dashboard/disponibilites" className="mb-3 p-3! sm:p-4!">
+      <CardLink href="/dashboard/disponibilites" className="mb-3">
         <div className="flex items-center gap-3">
           <span
             aria-hidden="true"

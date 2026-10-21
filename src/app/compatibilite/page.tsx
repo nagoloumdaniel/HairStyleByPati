@@ -7,6 +7,7 @@ import {
   listPublishedServicesForCompatibility,
   questionsForService,
 } from '@/modules/compatibilite/queries';
+import { Breadcrumb } from '@/components/shared/Breadcrumb';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { Badge } from '@/components/ui/Badge';
 import { CompatibilityWizard } from './compatibility-wizard';
@@ -35,33 +36,12 @@ export default async function CompatibilitePage({
     const services = await listPublishedServicesForCompatibility();
     return (
       <main className="page-main space-y-8">
-        <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
-          <ol className="flex flex-wrap items-center gap-2">
-            <li>
-              <Link href="/" className="transition hover:text-cacao">
-                Accueil
-              </Link>
-            </li>
-            <li aria-hidden="true">/</li>
-            <li>
-              <span aria-current="page" className="font-medium text-fg">
-                Compatibilité
-              </span>
-            </li>
-          </ol>
-        </nav>
+        <Breadcrumb items={[{ label: 'Accueil', href: '/' }, { label: 'Compatibilité' }]} />
 
-        <header className="max-w-3xl space-y-3">
-          <p className="hidden text-sm font-semibold uppercase tracking-[0.14em] text-cacao md:block">
-            Avant de réserver
-          </p>
+        <header className="max-w-3xl">
           <Title as="h1" size="display" className="">
             Vérifiez la compatibilité de votre coiffure
           </Title>
-          <p className="hidden text-lg leading-relaxed text-muted md:block">
-            Chaque prestation a ses propres exigences. Quelques questions suffisent pour savoir si
-            elle est réalisable sur vos cheveux, ou pour demander une évaluation à Patricia.
-          </p>
         </header>
 
         {services.length === 0 ? (
@@ -105,33 +85,14 @@ export default async function CompatibilitePage({
 
   return (
     <main className="page-main space-y-8">
-      <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
-        <ol className="flex flex-wrap items-center gap-2">
-          <li>
-            <Link href="/" className="transition hover:text-cacao">
-              Accueil
-            </Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li>
-            <Link href="/coiffures" className="transition hover:text-cacao">
-              Coiffures
-            </Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li>
-            <Link href={`/coiffures/${service.slug}`} className="transition hover:text-cacao">
-              {service.name}
-            </Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li>
-            <span aria-current="page" className="font-medium text-fg">
-              Compatibilité
-            </span>
-          </li>
-        </ol>
-      </nav>
+      <Breadcrumb
+        items={[
+          { label: 'Accueil', href: '/' },
+          { label: 'Coiffures', href: '/coiffures' },
+          { label: service.name, href: `/coiffures/${service.slug}` },
+          { label: 'Compatibilité' },
+        ]}
+      />
 
       <header className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
@@ -141,19 +102,13 @@ export default async function CompatibilitePage({
         <Title as="h1" size="display" className="">
           Votre coiffure est-elle compatible ?
         </Title>
-        <p className="hidden max-w-2xl text-lg leading-relaxed text-muted md:block">
-          Répondez uniquement aux questions utiles pour <strong>{service.name}</strong>. Aucune
-          réservation n’est créée à cette étape : Patricia valide les cas particuliers avant de
-          confirmer un rendez-vous.
+        <p className="max-w-2xl text-muted">
+          Questions utiles pour <strong>{service.name}</strong>. Aucune réservation n’est créée à
+          cette étape.
         </p>
       </header>
 
-      <CompatibilityWizard
-        serviceSlug={service.slug}
-        serviceName={service.name}
-        rule={service.rule}
-        questions={questions}
-      />
+      <CompatibilityWizard serviceSlug={service.slug} rule={service.rule} questions={questions} />
     </main>
   );
 }

@@ -103,14 +103,14 @@ export function SalonProfileForm({ settings }: { settings: Settings }) {
             error={errors.phone}
           />
           <Textarea
-            label="Adresse ou zone d’intervention"
+            label="Adresse ou quartier"
             name="address"
             rows={2}
             value={values.address}
             onChange={set('address')}
             maxLength={300}
             error={errors.address}
-            hint="Patricia se déplace à domicile : indiquez les quartiers desservis."
+            hint="Patricia reçoit sur rendez-vous : indiquez la ville ou le quartier."
           />
         </SettingsSection>
 

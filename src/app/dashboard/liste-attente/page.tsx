@@ -13,6 +13,8 @@ import { LocalDateTime } from '@/components/shared/LocalDateTime';
 import { Badge } from '@/components/ui/Badge';
 import { ButtonLink } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { Pagination } from '@/components/ui/Pagination';
+import { parsePage } from '@/lib/pagination';
 import { CancelEntryButton } from './cancel-entry-button';
 
 export const metadata: Metadata = { title: 'Liste d’attente - Tableau de bord' };
@@ -28,7 +30,10 @@ export default async function WaitlistPage({
   const params = await searchParams;
   const rawAll = params.all;
   const all = (Array.isArray(rawAll) ? rawAll[0] : rawAll) === '1';
-  const { rows, counts } = await listWaitlistEntries({ onlyOpen: !all });
+  const { rows, counts, page, totalPages } = await listWaitlistEntries({
+    onlyOpen: !all,
+    page: parsePage(params.page),
+  });
   const open = (counts.WAITING ?? 0) + (counts.NOTIFIED ?? 0);
   const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
 
@@ -37,7 +42,7 @@ export default async function WaitlistPage({
       <PageHeader
         icon={Hourglass}
         title="Liste d’attente"
-        description="Les clientes en attente d’un créneau sont prévenues par e-mail dès qu’il se libère. Elles confirment elles-mêmes via le lien reçu."
+        description="Les clientes sont prévenues par e-mail dès qu’un créneau se libère."
       />
 
       <nav aria-label="Filtres de la liste d’attente" className="mb-3 flex gap-2">
@@ -125,6 +130,19 @@ export default async function WaitlistPage({
           })}
         </ul>
       )}
+
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        hrefFor={(next) => {
+          const query = new URLSearchParams();
+          if (all) query.set('all', '1');
+          if (next > 1) query.set('page', String(next));
+          const value = query.toString();
+          return value ? `/dashboard/liste-attente?${value}` : '/dashboard/liste-attente';
+        }}
+        label="Pagination de la liste d’attente"
+      />
     </div>
   );
 }

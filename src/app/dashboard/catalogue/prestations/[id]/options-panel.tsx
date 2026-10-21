@@ -225,10 +225,7 @@ export function OptionsPanel({
   );
   return (
     <div className="flex flex-col gap-3 rounded-[var(--radius-lg)] bg-card p-3 shadow-soft sm:p-4">
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-sm text-muted">
-          Options facturées en plus de la prestation (mèches, soin, finition).
-        </p>
+      <div className="flex items-center justify-end gap-3">
         <Button
           type="button"
           size="sm"

@@ -1,6 +1,19 @@
 'use client';
 
-import { Check, Ticket, X } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  CalendarCheck,
+  CalendarClock,
+  Check,
+  ClipboardList,
+  Pencil,
+  Scissors,
+  ShieldCheck,
+  Ticket,
+  UserRound,
+  X,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useActionState, useEffect, useRef, useState } from 'react';
 import type { BookableService } from '@/modules/reservations/queries';
@@ -21,7 +34,7 @@ import {
 } from '@/modules/reservations/actions';
 import { QuestionField } from '@/app/compatibilite/compatibility-wizard';
 import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
+import { Button, ButtonLink } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
@@ -300,9 +313,6 @@ export function BookingWizard({
           >
             Vos informations capillaires
           </Title>
-          <p className="mt-2 text-muted">
-            Patricia utilise ces réponses pour vérifier que la prestation est réalisable.
-          </p>
           <form
             action={previewAction}
             onSubmit={submitQuestions}
@@ -337,15 +347,12 @@ export function BookingWizard({
               </p>
             ) : null}
             <div className="flex flex-wrap gap-3">
-              <Button type="submit" loading={previewPending}>
+              <Button type="submit" icon={ShieldCheck} loading={previewPending}>
                 Vérifier et continuer
               </Button>
-              <Link
-                href={`/coiffures/${service.slug}`}
-                className="self-center text-sm font-semibold text-cacao underline-offset-4 hover:underline"
-              >
+              <ButtonLink href={`/coiffures/${service.slug}`} variant="ghost" icon={ArrowLeft}>
                 Retour à la prestation
-              </Link>
+              </ButtonLink>
             </div>
           </form>
         </Card>
@@ -369,15 +376,16 @@ export function BookingWizard({
           </div>
           <p className="mt-4 whitespace-pre-line text-lg text-fg">{previewState.preview.message}</p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link
+            <ButtonLink
               href={`/compatibilite?service=${encodeURIComponent(service.slug)}`}
-              className="inline-flex items-center justify-center rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover"
+              icon={ClipboardList}
             >
               Demander une évaluation à Patricia
-            </Link>
+            </ButtonLink>
             <Button
               type="button"
               variant="ghost"
+              icon={Pencil}
               onClick={() => {
                 setPhase('questions');
                 setClientError('');
@@ -386,10 +394,7 @@ export function BookingWizard({
               Modifier mes réponses
             </Button>
           </div>
-          <p className="mt-4 text-sm text-muted">
-            Aucun créneau n’est réservé. Une évaluation acceptée permettra de reprendre la
-            réservation.
-          </p>
+          <p className="mt-4 text-sm text-muted">Aucun créneau n’est réservé.</p>
         </Card>
       ) : null}
 
@@ -450,10 +455,15 @@ export function BookingWizard({
             <strong>{formatCents(priceCents)}</strong>
           </div>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Button type="button" onClick={() => setPhase('slot')}>
+            <Button type="button" icon={CalendarClock} onClick={() => setPhase('slot')}>
               Choisir un créneau
             </Button>
-            <Button type="button" variant="ghost" onClick={() => setPhase('questions')}>
+            <Button
+              type="button"
+              variant="ghost"
+              icon={ArrowLeft}
+              onClick={() => setPhase('questions')}
+            >
               Retour
             </Button>
           </div>
@@ -471,9 +481,6 @@ export function BookingWizard({
           >
             Choisissez votre créneau
           </Title>
-          <p className="mt-2 text-muted">
-            Seuls les créneaux réellement disponibles sont proposés, selon les horaires de Patricia.
-          </p>
           <div className="mt-4 max-w-xs">
             <Input
               label="Date souhaitée"
@@ -508,22 +515,21 @@ export function BookingWizard({
             ) : !slotState.slots || slotState.slots.length === 0 ? (
               <div className="rounded-[var(--radius-md)] border border-dashed border-line p-6 text-center text-muted">
                 <p className="font-semibold text-fg">Aucun créneau ce jour</p>
-                <p className="mt-1 text-sm">
-                  Essayez une autre date. Les créneaux dépendent des horaires et des rendez-vous
-                  déjà enregistrés.
-                </p>
+                <p className="mt-1 text-sm">Essayez une autre date.</p>
               </div>
             ) : (
               <div>
                 <p className="mb-3 text-sm text-muted">
                   {slotState.slots.length} créneau{slotState.slots.length > 1 ? 'x' : ''} disponible
-                  {slotState.slots.length > 1 ? 's' : ''} · heure locale
+                  {slotState.slots.length > 1 ? 's' : ''}
                 </p>
                 <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
                   {slotState.slots.map((slot) => (
-                    <button
+                    <Button
                       key={slot.startsAt}
                       type="button"
+                      size="sm"
+                      variant={selectedSlot?.startsAt === slot.startsAt ? 'primary' : 'secondary'}
                       aria-pressed={selectedSlot?.startsAt === slot.startsAt}
                       onClick={() =>
                         setSelectedSlot({
@@ -532,14 +538,10 @@ export function BookingWizard({
                           startMinute: slot.startMinute,
                         })
                       }
-                      className={`rounded-[var(--radius-md)] border px-3 py-2.5 text-sm font-semibold transition ${
-                        selectedSlot?.startsAt === slot.startsAt
-                          ? 'border-cacao bg-cacao text-cacao-fg'
-                          : 'border-line bg-card text-fg hover:border-cacao'
-                      }`}
+                      className="w-full"
                     >
                       {timeLabel(slot.startMinute)}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -547,10 +549,20 @@ export function BookingWizard({
           </div>
 
           <div className="mt-6 flex flex-wrap gap-3">
-            <Button type="button" disabled={!selectedSlot} onClick={() => setPhase('contact')}>
+            <Button
+              type="button"
+              icon={ArrowRight}
+              disabled={!selectedSlot}
+              onClick={() => setPhase('contact')}
+            >
               Continuer
             </Button>
-            <Button type="button" variant="ghost" onClick={() => setPhase('options')}>
+            <Button
+              type="button"
+              variant="ghost"
+              icon={ArrowLeft}
+              onClick={() => setPhase('options')}
+            >
               Retour
             </Button>
           </div>
@@ -599,7 +611,6 @@ export function BookingWizard({
               value={comment}
               onChange={(event) => setComment(event.target.value)}
               rows={3}
-              hint="Précisez une information utile à Patricia : allergies, sensibilité du cuir chevelu, etc."
             />
           </div>
           <label className="mt-4 flex items-start gap-3 text-sm">
@@ -632,6 +643,7 @@ export function BookingWizard({
           <div className="mt-6 flex flex-wrap gap-3">
             <Button
               type="button"
+              icon={UserRound}
               onClick={() => {
                 if (!contactName.trim() || !contactEmail.trim() || !contactPhone.trim()) {
                   setClientError('Renseignez votre nom, votre e-mail et votre téléphone.');
@@ -647,7 +659,7 @@ export function BookingWizard({
             >
               Voir le récapitulatif
             </Button>
-            <Button type="button" variant="ghost" onClick={() => setPhase('slot')}>
+            <Button type="button" variant="ghost" icon={ArrowLeft} onClick={() => setPhase('slot')}>
               Retour
             </Button>
           </div>
@@ -791,8 +803,8 @@ export function BookingWizard({
           <div className="mt-4 rounded-[var(--radius-md)] bg-accent-soft px-4 py-3 text-sm text-fg">
             <p className="font-semibold">Paiement sur place</p>
             <p className="mt-1">
-              Aucun paiement en ligne n’est demandé. Annulation en ligne possible jusqu’à{' '}
-              {settings.minCancelNoticeHours} h avant le rendez-vous.
+              Annulation en ligne possible jusqu’à {settings.minCancelNoticeHours} h avant le
+              rendez-vous.
             </p>
           </div>
 
@@ -822,10 +834,15 @@ export function BookingWizard({
               </p>
             ) : null}
             <div className="flex flex-wrap gap-3">
-              <Button type="submit" loading={bookingPending}>
+              <Button type="submit" icon={CalendarCheck} loading={bookingPending}>
                 Confirmer ma réservation
               </Button>
-              <Button type="button" variant="ghost" onClick={() => setPhase('contact')}>
+              <Button
+                type="button"
+                variant="ghost"
+                icon={ArrowLeft}
+                onClick={() => setPhase('contact')}
+              >
                 Retour
               </Button>
             </div>
@@ -848,8 +865,8 @@ export function BookingWizard({
           </Title>
           <p className="mt-3 text-lg text-fg">
             {bookingState.success.status === 'CONFIRMED'
-              ? 'Votre créneau est réservé et protégé contre les doubles réservations.'
-              : 'Le créneau est réservé temporairement, en attente de confirmation par Patricia.'}
+              ? 'Votre créneau est réservé.'
+              : 'Créneau réservé temporairement, en attente de confirmation par Patricia.'}
           </p>
           <dl className="mt-4 space-y-2 rounded-[var(--radius-md)] bg-line px-4 py-3 text-sm text-fg">
             <div className="flex justify-between gap-4">
@@ -874,23 +891,14 @@ export function BookingWizard({
               <dd className="font-semibold">{formatCents(bookingState.success.priceCents)}</dd>
             </div>
           </dl>
-          <p className="mt-4 text-sm text-muted">
-            Paiement sur place. Conservez le lien ci-dessous pour annuler votre rendez-vous si
-            nécessaire.
-          </p>
+          <p className="mt-4 text-sm text-muted">Paiement sur place.</p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Link
-              href={bookingState.success.cancelUrl}
-              className="inline-flex items-center justify-center rounded-[var(--radius-md)] border border-line bg-card px-5 py-2.5 text-sm font-semibold text-fg transition hover:border-cacao"
-            >
+            <ButtonLink href={bookingState.success.cancelUrl} variant="secondary" icon={Pencil}>
               Gérer ou annuler mon rendez-vous
-            </Link>
-            <Link
-              href="/coiffures"
-              className="inline-flex items-center justify-center rounded-[var(--radius-md)] bg-accent px-5 py-2.5 text-sm font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover"
-            >
+            </ButtonLink>
+            <ButtonLink href="/coiffures" icon={Scissors}>
               Retour au catalogue
-            </Link>
+            </ButtonLink>
           </div>
         </Card>
       ) : null}

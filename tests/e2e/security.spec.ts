@@ -44,7 +44,7 @@ let requestId = '';
 async function login(page: Page): Promise<void> {
   await page.goto('/connexion?callbackUrl=/dashboard');
   await page.getByLabel('E-mail').fill(ADMIN_EMAIL);
-  await page.getByLabel('Mot de passe').fill(ADMIN_PASSWORD);
+  await page.locator('input[name="password"]').fill(ADMIN_PASSWORD);
   await page.getByRole('button', { name: 'Se connecter' }).click();
   await page.waitForURL((url) => url.pathname.startsWith('/dashboard'));
 }
@@ -218,9 +218,13 @@ test.describe('Sécurité et RGPD', () => {
     test.skip(ADMIN_EMAIL === '' || ADMIN_PASSWORD === '', 'Identifiants admin absents.');
     await login(page);
     await page.goto(`/dashboard/clients/${customerId}`);
-    await page.getByLabel(/Je confirme vouloir anonymiser définitivement/).check();
+    await page.getByLabel(/Pour confirmer, saisissez ANONYMISER/).fill('ANONYMISER');
     await page.getByRole('button', { name: 'Anonymiser la fiche' }).click();
-    await expect(page.getByText(/Fiche anonymisée/)).toBeVisible({ timeout: 20_000 });
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: 'Anonymiser définitivement' })
+      .click();
+    await expect(page.getByText(/Fiche anonymisée/).first()).toBeVisible({ timeout: 20_000 });
 
     const anonymized = await db.customer.findUnique({ where: { id: customerId } });
     expect(anonymized.name).toBe('Cliente supprimée');

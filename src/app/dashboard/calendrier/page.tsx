@@ -17,7 +17,6 @@ export default async function CalendrierPage() {
       <PageHeader
         icon={CalendarDays}
         title="Calendrier"
-        description="Jour, semaine, mois ou liste. Touchez un rendez-vous pour ouvrir sa fiche."
         actions={
           <ButtonLink
             href="/dashboard/disponibilites"

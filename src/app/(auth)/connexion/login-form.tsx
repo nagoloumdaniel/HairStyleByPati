@@ -1,5 +1,6 @@
 'use client';
 
+import { LogIn } from 'lucide-react';
 import { useActionState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -16,7 +17,7 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
         label="E-mail"
         type="email"
         name="email"
-        placeholder="zepatricia7@gmail.com"
+        placeholder="vous@exemple.com"
         required
         autoComplete="email"
       />
@@ -36,7 +37,7 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
         </p>
       ) : null}
 
-      <Button type="submit" loading={pending} className="w-full">
+      <Button type="submit" icon={LogIn} loading={pending} className="w-full">
         {pending ? 'Connexion…' : 'Se connecter'}
       </Button>
     </form>

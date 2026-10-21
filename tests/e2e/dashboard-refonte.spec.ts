@@ -142,7 +142,7 @@ async function measureHeights(page: Page) {
   return page.evaluate(`(() => {
     const sel = ${SELECTOR_FN};
     const visible = (e) => { const r = e.getBoundingClientRect(); const s = getComputedStyle(e); return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none'; };
-    const okH = (h) => [36, 40, 48].some((v) => Math.abs(h - v) <= 1);
+    const okH = (h) => [36, 40, 44].some((v) => Math.abs(h - v) <= 1);
     const buttons = Array.from(document.querySelectorAll('main a, main button, header a, header button')).filter((e) => {
       const c = e.getAttribute('class') || '';
       return c.includes('whitespace-nowrap') && c.includes('font-semibold') && c.includes('justify-center');

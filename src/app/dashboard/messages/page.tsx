@@ -64,7 +64,6 @@ export default async function MessagesPage({
       <PageHeader
         icon={MessageSquare}
         title="Messages"
-        description="Contacts et échanges avec les clientes. Les notes internes restent privées."
         actions={anyUnread ? <MarkAllConversationsRead /> : null}
       />
 
@@ -137,18 +136,15 @@ export default async function MessagesPage({
                       ) : null}
                       <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                         {unread ? (
-                          <Badge tone="accent" className="px-2! py-0.5! text-xs!">
+                          <Badge tone="accent" size="sm">
                             {conversation.unreadCount} non lu
                             {conversation.unreadCount > 1 ? 's' : ''}
                           </Badge>
                         ) : null}
-                        <Badge
-                          tone={CONVERSATION_STATUS_TONES[conversation.status]}
-                          className="px-2! py-0.5! text-xs!"
-                        >
+                        <Badge tone={CONVERSATION_STATUS_TONES[conversation.status]} size="sm">
                           {CONVERSATION_STATUS_LABELS[conversation.status]}
                         </Badge>
-                        <Badge tone="neutral" className="px-2! py-0.5! text-xs!">
+                        <Badge tone="neutral" size="sm">
                           {CONVERSATION_SOURCE_LABELS[conversation.source]}
                         </Badge>
                       </div>

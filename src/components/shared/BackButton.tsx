@@ -28,8 +28,7 @@ export function BackButton({
   }
 
   return (
-    <Button type="button" variant="secondary" size="sm" onClick={goBack}>
-      <ArrowLeft aria-hidden="true" className="size-4" />
+    <Button type="button" variant="secondary" size="sm" icon={ArrowLeft} onClick={goBack}>
       {label}
     </Button>
   );

@@ -139,7 +139,11 @@ h4 {
 :where(a, button, [tabindex]):focus-visible {
   outline: 3px solid var(--color-accent);
   outline-offset: 2px;
-  border-radius: var(--radius-sm);
+}
+
+/* Fonds ocre/sombres : l'anneau or serait invisible, on passe au jaune clair */
+:where(.bg-hero, .bg-panel) :where(a, button, [tabindex]):focus-visible {
+  outline-color: var(--color-bright);
 }
 
 /* Champs de formulaire : pas d'anneau, seule la bordure change au focus */
@@ -209,7 +213,7 @@ html[data-theme='dark'] .theme-icon-light {
    Effets : dégradés, verre (glass), flou, navbar flottante
    ============================================================ */
 :root {
-  --gradient-primary: linear-gradient(135deg, #a87c00 0%, #8a6400 45%, #6b4d00 100%);
+  --gradient-primary: linear-gradient(135deg, #8a6400 0%, #7a5800 45%, #6b4d00 100%);
   --gradient-soft: linear-gradient(160deg, #fff1b8 0%, #fffcf0 70%);
   --glass-bg: rgb(255 252 240 / 0.62);
   --glass-bg-strong: rgb(255 255 255 / 0.8);
@@ -381,6 +385,56 @@ html[data-theme='dark'] {
   -webkit-mask-image: linear-gradient(to top, #000 22%, transparent 48%);
   mask-image: linear-gradient(to top, #000 22%, transparent 48%);
 }
+/* Photos d'une carte prestation : balayage horizontal sur écran tactile, fondu à la souris. */
+.card-slides {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  cursor: pointer;
+}
+.card-slides::-webkit-scrollbar {
+  display: none;
+}
+.card-slide {
+  position: relative;
+  flex: 0 0 100%;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+}
+.card-dot {
+  transition:
+    width 0.25s ease,
+    opacity 0.25s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .card-slides {
+    z-index: auto;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .card-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.7s;
+  }
+  .card-slide[data-active='true'] {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-slide,
+  .card-dot {
+    transition: none;
+  }
+}
+
 .stretched-link::after {
   content: '';
   position: absolute;
@@ -457,3 +511,59 @@ body:has([data-fullscreen]) {
     animation: none;
   }
 }
+
+/* === erreur/accueil === */
+.error-halo {
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(12px);
+}
+.home-step-number {
+  font-size: clamp(3rem, 6vw, 4.5rem);
+  line-height: 1;
+  padding-bottom: 0.1em;
+}
+/* === fin erreur/accueil === */
+
+/* === dashboard === */
+/* Curseur main sur tout élément cliquable ; pas de scale au survol ; ombres atténuées */
+[data-dashboard]
+  :is(
+    button,
+    [role='button'],
+    [role='tab'],
+    [role='menuitem'],
+    summary,
+    select,
+    label[for],
+    a[href]
+  ):not(:disabled, [aria-disabled='true']),
+[data-dashboard]
+  input:is([type='checkbox'], [type='radio'], [type='file'], [type='submit']):not(:disabled) {
+  cursor: pointer;
+}
+[data-dashboard] :is(button, a, [role='button'], .dash-row):is(:hover, :active) {
+  scale: none;
+  transform: none;
+}
+[data-dashboard] {
+  --shadow-soft: 0 1px 3px rgb(40 35 12 / 0.07);
+  --shadow-lift: 0 3px 10px rgb(40 35 12 / 0.1);
+  --shadow-glass: 0 2px 8px rgb(40 35 12 / 0.08);
+}
+.dash-nav-link:focus-visible,
+.dash-row:focus-visible {
+  outline: 2px solid var(--color-bright);
+  outline-offset: -2px;
+}
+.dash-row:focus-visible {
+  outline-color: var(--color-accent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .dash-nav-link,
+  .dash-row {
+    transition: none;
+  }
+}
+/* === fin dashboard === */

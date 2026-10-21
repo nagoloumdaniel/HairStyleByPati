@@ -1,5 +1,5 @@
-import Link from 'next/link';
 import type { Metadata } from 'next';
+import { ButtonLink } from '@/components/ui/Button';
 import { Title } from '@/components/ui/Title';
 
 export const metadata: Metadata = {
@@ -11,7 +11,7 @@ export default function NotFound() {
   return (
     <main
       data-fullscreen
-      className="bg-gradient-soft fixed inset-0 z-30 flex flex-col items-center justify-center overflow-hidden px-6 pb-6 pt-24 text-center"
+      className="bg-gradient-soft fixed inset-0 z-30 flex flex-col items-center justify-center overflow-y-auto px-6 pb-6 pt-24 text-center"
     >
       <p
         aria-hidden="true"
@@ -27,18 +27,12 @@ export default function NotFound() {
         découvrir les prestations de Patricia.
       </p>
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-        <Link
-          href="/coiffures"
-          className="bg-gradient-primary inline-flex items-center justify-center rounded-full px-8 py-3.5 font-bold text-accent-fg shadow-soft transition hover:brightness-110 active:scale-[0.98]"
-        >
+        <ButtonLink href="/coiffures" className="sm:w-48">
           Voir le catalogue
-        </Link>
-        <Link
-          href="/"
-          className="glass inline-flex items-center justify-center rounded-full px-8 py-3.5 font-bold text-fg transition hover:bg-accent-soft"
-        >
+        </ButtonLink>
+        <ButtonLink href="/" variant="secondary" className="sm:w-48">
           Retour à l’accueil
-        </Link>
+        </ButtonLink>
       </div>
     </main>
   );

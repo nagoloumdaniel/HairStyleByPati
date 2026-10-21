@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { Mail, Scissors } from 'lucide-react';
 import { getCachedSalonSettings } from '@/lib/public-cache';
+import { Breadcrumb } from '@/components/shared/Breadcrumb';
+import { ButtonLink } from '@/components/ui/Button';
 import { Title } from '@/components/ui/Title';
 
 export const metadata: Metadata = {
@@ -21,33 +23,14 @@ export default async function ConfidentialitePage() {
     'zepatricia7@gmail.com';
   return (
     <main className="page-main space-y-12">
-      <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
-        <ol className="flex flex-wrap items-center gap-2">
-          <li>
-            <Link href="/" className="transition hover:text-cacao">
-              Accueil
-            </Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li>
-            <span aria-current="page" className="font-medium text-fg">
-              Politique de confidentialité
-            </span>
-          </li>
-        </ol>
-      </nav>
+      <Breadcrumb
+        items={[{ label: 'Accueil', href: '/' }, { label: 'Politique de confidentialité' }]}
+      />
 
-      <header className="max-w-3xl space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-[0.14em] text-cacao">
-          Protection des données
-        </p>
+      <header className="max-w-3xl">
         <Title as="h1" size="display" className="">
           Politique de confidentialité
         </Title>
-        <p className="text-lg leading-relaxed text-muted">
-          Ce que nous collectons, pourquoi, combien de temps nous conservons vos données et comment
-          exercer vos droits (RGPD).
-        </p>
       </header>
 
       <section className="max-w-3xl space-y-8">
@@ -82,10 +65,6 @@ export default async function ConfidentialitePage() {
             profilage), cookies de session si authentification dashboard.
           </li>
         </ul>
-        <p className="text-sm text-muted opacity-80 mt-4">
-          Les données capillaires et photos ne sont collectées que dans la mesure nécessaire à la
-          prestation. Aucune donnée sensible inutile n’est enregistrée.
-        </p>
       </section>
 
       <section className="max-w-3xl space-y-8">
@@ -143,10 +122,6 @@ export default async function ConfidentialitePage() {
             supprimé.
           </li>
         </ul>
-        <p className="text-sm text-muted opacity-80 mt-4">
-          Vous pouvez demander la suppression ou la rectification de vos données à tout moment (voir
-          §6).
-        </p>
       </section>
 
       <section className="max-w-3xl space-y-8">
@@ -214,32 +189,22 @@ export default async function ConfidentialitePage() {
         </Title>
         <p className="text-muted leading-relaxed">
           Patricia met en œuvre des mesures de sécurité adaptées pour protéger vos données contre
-          toute destruction, perte, altération ou accès non autorisé : authentification protégée
-          côté serveur pour le dashboard, mots de passe hashés, requêtes minimales et validation des
-          entrées côté serveur.
+          toute destruction, perte, altération ou accès non autorisé : authentification protégée,
+          mots de passe hashés et validation des entrées côté serveur.
         </p>
       </section>
 
-      <section className="max-w-3xl rounded-2xl bg-page p-8 text-center md:p-10 border border-line">
+      <section className="max-w-3xl rounded-2xl border border-line bg-page p-8 text-center md:p-10">
         <Title as="h2" className="">
           Exercer vos droits
         </Title>
-        <p className="mx-auto mt-3 max-w-md text-muted">
-          Contactez Patricia pour toute question sur vos données personnelles.
-        </p>
         <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-          <Link
-            href="/contact"
-            className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
-          >
+          <ButtonLink href="/contact" icon={Mail}>
             Nous contacter
-          </Link>
-          <Link
-            href="/coiffures"
-            className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] border border-line bg-card px-6 py-3 font-semibold text-fg shadow-soft transition hover:border-cacao hover:bg-page"
-          >
+          </ButtonLink>
+          <ButtonLink href="/coiffures" variant="secondary" icon={Scissors}>
             Voir le catalogue
-          </Link>
+          </ButtonLink>
         </div>
       </section>
     </main>

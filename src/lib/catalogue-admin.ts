@@ -2,6 +2,7 @@ import { Prisma } from '@prisma/client';
 import type { AnswerType, HairLength, PhotoPolicy, ServiceStatus } from '@prisma/client';
 import { isPermutation, OPTION_ORDER_BY } from '@/modules/catalogue/ordering';
 import { db } from './db';
+import { paginate } from './pagination';
 import { AppError } from './errors';
 
 /* ============================================================
@@ -210,7 +211,9 @@ export interface ServiceWriteInput {
 
 export async function listAdminServices(
   filters: AdminServiceFilters = {},
-): Promise<AdminService[]> {
+  requestedPage = 1,
+  pageSize = 12,
+): Promise<{ items: AdminService[]; total: number; page: number; totalPages: number }> {
   const where: Prisma.ServiceWhereInput = {};
   if (filters.search) {
     where.OR = [
@@ -222,8 +225,12 @@ export async function listAdminServices(
   if (filters.categoryId) where.categoryId = filters.categoryId;
   if (filters.status) where.status = filters.status;
 
+  const total = await db.service.count({ where });
+  const { page, totalPages, skip, take } = paginate(total, requestedPage, pageSize);
   const rows = await db.service.findMany({
     where,
+    skip,
+    take,
     orderBy: [{ order: 'asc' }, { name: 'asc' }],
     select: {
       id: true,
@@ -242,7 +249,7 @@ export async function listAdminServices(
     },
   });
 
-  return rows.map((row) => ({
+  const items = rows.map((row) => ({
     id: row.id,
     name: row.name,
     slug: row.slug,
@@ -259,6 +266,7 @@ export async function listAdminServices(
     optionCount: row._count.options,
     thumbKey: row.images[0]?.key ?? null,
   }));
+  return { items, total, page, totalPages };
 }
 
 export interface AdminServiceImage {

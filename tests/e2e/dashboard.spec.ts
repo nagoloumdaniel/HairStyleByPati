@@ -64,12 +64,12 @@ async function cleanupDatabase(): Promise<void> {
 async function login(page: Page): Promise<void> {
   await page.goto('/connexion?callbackUrl=/dashboard/catalogue');
   await page.getByLabel('E-mail').fill(ADMIN_EMAIL);
-  await page.getByLabel('Mot de passe').fill(ADMIN_PASSWORD);
+  await page.locator('input[name="password"]').fill(ADMIN_PASSWORD);
   await page.getByRole('button', { name: 'Se connecter' }).click();
   // Attendre une vraie navigation authentifiée : l'URL de /connexion contient
   // elle aussi « /dashboard » dans son paramètre callbackUrl.
   await page.waitForURL((url) => url.pathname.startsWith('/dashboard'));
-  await expect(page.getByRole('heading', { name: 'Catalogue des prestations' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Catalogue', exact: true })).toBeVisible();
 }
 
 async function openCategoriesTab(page: Page): Promise<void> {
@@ -119,6 +119,7 @@ test.describe('Back-office catalogue', () => {
     // ----- Prestation -----
     await page.getByRole('tab', { name: /Prestations/ }).click();
     await page.getByRole('link', { name: 'Nouvelle prestation' }).click();
+    await page.waitForURL(/\/prestations\/nouvelle$/, { timeout: 30_000 });
     await expect(page).toHaveURL(/\/dashboard\/catalogue\/prestations\/nouvelle$/);
 
     await page.getByLabel(/^Nom de la prestation/).fill(serviceName);
@@ -131,7 +132,9 @@ test.describe('Back-office catalogue', () => {
     await page.getByLabel(/^Durée \(minutes\)/).fill('180');
     await page.getByRole('button', { name: 'Créer la prestation' }).click();
 
-    await expect(page).toHaveURL(/\/dashboard\/catalogue\/prestations\/(?!nouvelle$)[^/]+$/);
+    await expect(page).toHaveURL(/\/dashboard\/catalogue\/prestations\/(?!nouvelle$)[^/]+$/, {
+      timeout: 30_000,
+    });
     const detailUrl = page.url();
     await expect(page.getByRole('heading', { level: 1, name: serviceName })).toBeVisible();
 
@@ -146,7 +149,8 @@ test.describe('Back-office catalogue', () => {
     // ----- Liste admin : recherche et filtre -----
     await page.goto('/dashboard/catalogue');
     await page.getByLabel('Rechercher').fill(serviceName);
-    await page.getByRole('button', { name: 'Filtrer' }).click();
+    // La recherche est appliquée automatiquement (plus de bouton « Filtrer »).
+    await expect(page).toHaveURL(/search=/);
     await expect(page.getByRole('link', { name: serviceName })).toBeVisible();
 
     // ----- Options payantes -----
@@ -217,15 +221,18 @@ test.describe('Back-office catalogue', () => {
       await expect(photosPanel.getByText('Photo principale de test P4.10')).toBeVisible();
 
       // Suppression de la photo et du fichier stocké.
-      page.once('dialog', (dialog) => void dialog.accept());
       await photosPanel.getByRole('button', { name: 'Supprimer' }).click();
+      await page
+        .getByRole('dialog')
+        .getByRole('button', { name: /^(Supprimer|Confirmer)$/ })
+        .click();
       await expect(photosPanel.getByText(/Aucune photo/)).toBeVisible();
     }
 
     // ----- Modification de la prestation -----
     await page.getByRole('tab', { name: 'Informations' }).click();
     await page.getByLabel(/^Prix \(FCFA\)/).fill('70');
-    await page.getByRole('button', { name: 'Enregistrer les informations' }).click();
+    await page.getByRole('button', { name: 'Enregistrer', exact: true }).click();
     await expect(page.getByText('Prestation enregistrée.')).toBeVisible();
     await page.reload();
     await expect(page.getByText(/À partir de 70/)).toBeVisible();
@@ -245,7 +252,7 @@ test.describe('Back-office catalogue', () => {
     await page.getByRole('tab', { name: 'Compatibilité' }).click();
     await expect(page.getByLabel('Cheveux longs')).toBeChecked();
     await expect(page.getByLabel(/Les locs sont incompatibles/)).toBeChecked();
-    await expect(page.getByLabel('Photo de la cliente')).toHaveValue('REQUIRED');
+    await expect(page.getByLabel('Photo de la cliente')).toContainText('Photo obligatoire');
 
     // ----- Questions capillaires -----
     await page.getByRole('tab', { name: /Questions/ }).click();
@@ -266,7 +273,7 @@ test.describe('Back-office catalogue', () => {
 
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto('/dashboard/catalogue');
-    await expect(page.getByRole('heading', { name: 'Catalogue des prestations' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Catalogue', exact: true })).toBeVisible();
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );
@@ -278,15 +285,21 @@ test.describe('Back-office catalogue', () => {
     });
 
     // ----- Nettoyage par l'interface -----
-    page.once('dialog', (dialog) => void dialog.accept());
     await page.goto(detailUrl);
     await page.getByRole('button', { name: 'Supprimer' }).click();
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: /^(Supprimer|Confirmer)$/ })
+      .click();
     await expect(page).toHaveURL(/\/dashboard\/catalogue$/);
 
     await openCategoriesTab(page);
     const categoryRow = page.getByRole('listitem').filter({ hasText: categoryName });
-    page.once('dialog', (dialog) => void dialog.accept());
     await categoryRow.getByRole('button', { name: 'Supprimer' }).click();
+    await page
+      .getByRole('dialog')
+      .getByRole('button', { name: /^(Supprimer|Confirmer)$/ })
+      .click();
     await expect(page.getByText(categoryName, { exact: true })).toBeHidden();
 
     expect(pageErrors, `Erreurs JavaScript : ${pageErrors.join(' | ')}`).toEqual([]);

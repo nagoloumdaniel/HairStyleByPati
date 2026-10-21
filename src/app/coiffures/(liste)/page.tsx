@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ServiceCard } from '@/components/catalogue/ServiceCard';
@@ -6,6 +6,7 @@ import { EmptyState } from '@/components/shared/EmptyState';
 import { parseCatalogueQuery } from '@/lib/catalogue';
 import { getCachedCategories, getCachedServices } from '@/lib/public-cache';
 import { CatalogueFilters } from '../catalogue-filters';
+import { Pagination } from '@/components/ui/Pagination';
 import { Title } from '@/components/ui/Title';
 
 export const metadata: Metadata = {
@@ -32,15 +33,13 @@ export default async function CataloguePage({
   const query = parseCatalogueQuery(await searchParams);
   const [categories, result] = await Promise.all([getCachedCategories(), getCachedServices(query)]);
 
-  const { services, total, page, totalPages, pageSize } = result;
+  const { services, total, page, totalPages } = result;
   const search = query.search ?? '';
   const category = query.category ?? '';
   const hasFilters = search !== '' || category !== '';
-  const firstResult = total === 0 ? 0 : (page - 1) * pageSize + 1;
-  const lastResult = Math.min(page * pageSize, total);
 
   return (
-    <main className="page-main space-y-10">
+    <main className="page-main space-y-8 md:space-y-10">
       <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
@@ -48,7 +47,9 @@ export default async function CataloguePage({
               Accueil
             </Link>
           </li>
-          <li aria-hidden="true">/</li>
+          <li aria-hidden="true">
+            <ChevronRight className="size-3.5" />
+          </li>
           <li>
             <span aria-current="page" className="font-medium text-fg">
               Coiffures
@@ -58,15 +59,11 @@ export default async function CataloguePage({
       </nav>
 
       <header className="max-w-3xl space-y-3">
-        <p className="hidden text-sm font-semibold uppercase tracking-[0.14em] text-cacao md:block">
-          Catalogue
-        </p>
-        <Title as="h1" size="display" className="">
+        <Title as="h1" size="display">
           Coiffures et prestations
         </Title>
-        <p className="hidden text-lg leading-relaxed text-muted md:block">
-          Chaque prestation est réalisée sur mesure par Patricia, selon votre nature de cheveux et
-          vos envies. Prix, durée et options sont affichés avant la réservation.
+        <p className="max-w-prose text-base leading-relaxed text-muted md:text-lg">
+          Prix et durée affichés avant la réservation. Patricia vous reçoit sur rendez-vous à Dakar.
         </p>
       </header>
 
@@ -78,24 +75,17 @@ export default async function CataloguePage({
       />
 
       <section aria-labelledby="resultats-titre" className="space-y-6">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <Title as="h2" id="resultats-titre" className="">
-            {hasFilters ? 'Résultats de votre recherche' : 'Toutes les coiffures'}
-          </Title>
-          {total > 0 ? (
-            <p className="text-sm text-muted">
-              Affichage de {firstResult} à {lastResult} sur {total}
-            </p>
-          ) : null}
-        </div>
+        <Title as="h2" id="resultats-titre">
+          {hasFilters ? 'Résultats de votre recherche' : 'Toutes les coiffures'}
+        </Title>
 
         {services.length === 0 ? (
           <EmptyState
             title="Aucune coiffure ne correspond"
             message={
               hasFilters
-                ? 'Essayez un autre mot-clé ou une autre catégorie pour trouver la prestation qui vous convient.'
-                : 'Le catalogue est en cours de mise à jour. Revenez très bientôt pour découvrir les prestations.'
+                ? 'Essayez un autre mot-clé ou une autre catégorie.'
+                : 'Le catalogue est en cours de mise à jour. Revenez bientôt.'
             }
             actionLabel={hasFilters ? 'Voir toutes les coiffures' : undefined}
             actionHref={hasFilters ? '/coiffures' : undefined}
@@ -113,40 +103,12 @@ export default async function CataloguePage({
           </ul>
         )}
 
-        {totalPages > 1 ? (
-          <nav
-            aria-label="Pagination du catalogue"
-            className="flex flex-wrap items-center justify-between gap-4 border-t border-line pt-6"
-          >
-            {page > 1 ? (
-              <Link
-                href={pageHref(search, category, page - 1)}
-                rel="prev"
-                className="inline-flex items-center gap-2 rounded-[var(--radius-md)] border border-line bg-card px-4 py-2.5 text-sm font-semibold text-fg transition hover:border-cacao hover:bg-page"
-              >
-                <ArrowLeft aria-hidden="true" className="size-4" /> Page précédente
-              </Link>
-            ) : (
-              <span aria-hidden="true" />
-            )}
-
-            <p className="text-sm text-muted" aria-current="page">
-              Page {page} sur {totalPages}
-            </p>
-
-            {page < totalPages ? (
-              <Link
-                href={pageHref(search, category, page + 1)}
-                rel="next"
-                className="inline-flex items-center gap-2 rounded-[var(--radius-md)] border border-line bg-card px-4 py-2.5 text-sm font-semibold text-fg transition hover:border-cacao hover:bg-page"
-              >
-                Page suivante <ArrowRight aria-hidden="true" className="size-4" />
-              </Link>
-            ) : (
-              <span aria-hidden="true" />
-            )}
-          </nav>
-        ) : null}
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          hrefFor={(target) => pageHref(search, category, target)}
+          label="Pagination du catalogue"
+        />
       </section>
     </main>
   );

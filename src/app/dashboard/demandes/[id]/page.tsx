@@ -237,9 +237,6 @@ export default async function CustomRequestDetailPage({
 
           <Card>
             <h2 className="font-heading text-lg font-bold text-fg">Décider</h2>
-            <p className="mb-3 mt-1 text-sm text-muted">
-              La cliente reçoit votre message par e-mail, sauf pour une simple prise en charge.
-            </p>
             <CustomRequestDecisionForm
               requestId={request.id}
               services={services}

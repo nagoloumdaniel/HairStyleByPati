@@ -122,10 +122,7 @@ function NotificationRow({ notification }: { notification: AdminNotificationView
             />
             <span aria-hidden="true">·</span>
             <span>{isInApp ? 'Dashboard' : 'E-mail'}</span>
-            <Badge
-              tone={failedEmail ? 'alert' : team ? 'accent' : 'neutral'}
-              className="px-2! py-0.5! text-xs!"
-            >
+            <Badge tone={failedEmail ? 'alert' : team ? 'accent' : 'neutral'} size="sm">
               {failedEmail ? 'Échec' : team ? 'Équipe' : 'Cliente'}
             </Badge>
           </p>
@@ -164,18 +161,23 @@ export default async function NotificationsPage({
       <PageHeader
         icon={Bell}
         title="Notifications"
-        description="Alertes du dashboard, e-mails envoyés et échecs. Chaque alerte ouvre la fiche concernée."
-        actions={<NotificationsHeaderActions hasUnread={unreadCount > 0} hasRead={hasRead} />}
+        actions={
+          <NotificationsHeaderActions
+            hasUnread={unreadCount > 0}
+            hasRead={hasRead}
+            hasFailed={stats.failed > 0}
+          />
+        }
       />
 
       <div className="mb-3 flex flex-wrap gap-1.5">
-        <Badge tone="accent" className="px-2.5! py-0.5! text-xs!">
+        <Badge tone="accent" size="sm">
           E-mails en attente : {stats.pending}
         </Badge>
-        <Badge tone="success" className="px-2.5! py-0.5! text-xs!">
+        <Badge tone="success" size="sm">
           Envoyés : {stats.sent}
         </Badge>
-        <Badge tone={stats.failed > 0 ? 'alert' : 'neutral'} className="px-2.5! py-0.5! text-xs!">
+        <Badge tone={stats.failed > 0 ? 'alert' : 'neutral'} size="sm">
           Échecs : {stats.failed}
         </Badge>
       </div>
@@ -225,8 +227,7 @@ export default async function NotificationsPage({
             Derniers échecs d’envoi
           </h2>
           <p className="mb-2 mt-0.5 text-sm text-muted">
-            Un échec est réessayé automatiquement avec un délai progressif. Relancez à la main après
-            vérification.
+            Réessayé automatiquement ; relancez à la main après vérification.
           </p>
           <ul className="flex flex-col gap-2">
             {failed.map((item) => (

@@ -4,7 +4,9 @@ import type { ReactNode } from 'react';
 /* P2.3 : carte surface blanche, angles arrondis, ombre douce. */
 export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`rounded-[var(--radius-lg)] bg-card p-4 shadow-soft sm:p-5 ${className}`}>
+    <div
+      className={`rounded-[var(--radius-lg)] border border-line/60 bg-card p-4 shadow-soft sm:p-5 ${className}`}
+    >
       {children}
     </div>
   );
@@ -31,7 +33,7 @@ export function CardLink({
       href={href}
       aria-label={label}
       prefetch={prefetch}
-      className={`block rounded-[var(--radius-lg)] border border-transparent bg-card p-4 shadow-soft transition hover:border-cacao hover:shadow-lift sm:p-5 ${className}`}
+      className={`block rounded-[var(--radius-lg)] border border-line/60 bg-card p-4 shadow-soft transition hover:border-cacao hover:shadow-lift sm:p-5 ${className}`}
     >
       {children}
     </Link>

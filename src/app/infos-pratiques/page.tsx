@@ -1,6 +1,7 @@
-import { Check } from 'lucide-react';
-import Link from 'next/link';
+import { CalendarCheck, Check, Mail } from 'lucide-react';
 import type { Metadata } from 'next';
+import { Breadcrumb } from '@/components/shared/Breadcrumb';
+import { ButtonLink } from '@/components/ui/Button';
 import { Title } from '@/components/ui/Title';
 import { formatOpeningHours } from '@/modules/parametres/hours';
 import { getCachedSalonSettings } from '@/lib/public-cache';
@@ -17,7 +18,6 @@ export const metadata: Metadata = {
 const preparation = [
   'Venez avec des cheveux propres, démêlés et séchés.',
   'Si vous portez une coiffure existante (locs, tresses), ne la défaites pas la veille.',
-  'Prévoyez une tenue confortable : certaines coiffures demandent plusieurs heures.',
   'Apportez une photo ou une inspiration de la coiffure souhaitée si vous en avez une.',
 ];
 
@@ -71,33 +71,12 @@ export default async function InfosPratiquesPage() {
   const bookingParagraphs = splitParagraphs(resolveBookingPolicy(settings.bookingPolicy));
   return (
     <main className="page-main space-y-12">
-      <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
-        <ol className="flex flex-wrap items-center gap-2">
-          <li>
-            <Link href="/" className="transition hover:text-cacao">
-              Accueil
-            </Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li>
-            <span aria-current="page" className="font-medium text-fg">
-              Informations pratiques
-            </span>
-          </li>
-        </ol>
-      </nav>
+      <Breadcrumb items={[{ label: 'Accueil', href: '/' }, { label: 'Informations pratiques' }]} />
 
-      <header className="max-w-3xl space-y-3">
-        <p className="hidden text-sm font-semibold uppercase tracking-[0.14em] text-cacao md:block">
-          Pratique
-        </p>
+      <header className="max-w-3xl">
         <Title as="h1" size="display" className="">
           Informations pratiques
         </Title>
-        <p className="hidden text-lg leading-relaxed text-muted md:block">
-          Tout ce qu&apos;il faut savoir avant votre venue : horaires, préparation du rendez-vous et
-          conditions d&apos;annulation.
-        </p>
       </header>
 
       {/* Coordonnées et horaires */}
@@ -139,8 +118,7 @@ export default async function InfosPratiquesPage() {
             </p>
           ))}
           <p className="text-muted">
-            Les rendez-vous sont strictement sur réservation. Merci de respecter l&apos;heure
-            convenue : chaque retard réduit le temps de votre prestation.
+            Sur réservation uniquement. Merci d&apos;être à l&apos;heure.
           </p>
         </div>
       </section>
@@ -203,23 +181,13 @@ export default async function InfosPratiquesPage() {
         <Title as="h2" className="">
           Une question ?
         </Title>
-        <p className="mx-auto mt-3 max-w-md text-muted">
-          Pour toute demande particulière (groupe, coiffure sur mesure, situation particulière),
-          contactez-nous avant de réserver.
-        </p>
         <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-          <Link
-            href="/contact"
-            className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
-          >
+          <ButtonLink href="/contact" icon={Mail}>
             Nous contacter
-          </Link>
-          <Link
-            href="/coiffures"
-            className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] border border-line bg-card px-6 py-3 font-semibold text-fg shadow-soft transition hover:border-cacao hover:bg-page"
-          >
+          </ButtonLink>
+          <ButtonLink href="/coiffures" variant="secondary" icon={CalendarCheck}>
             Réserver un créneau
-          </Link>
+          </ButtonLink>
         </div>
       </section>
     </main>

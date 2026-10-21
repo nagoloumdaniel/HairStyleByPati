@@ -1,17 +1,16 @@
 import { Bell, ExternalLink, LogOut, MessageSquare, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { logout } from '@/modules/auth/actions';
+import { Button, ButtonLink } from '@/components/ui/Button';
+import { TopbarSettingsLink } from '@/components/layout/TopbarSettingsLink';
 import { Logo } from '@/components/shared/Logo';
 
 /* Barre du haut du dashboard : messages, notifications, site public, déconnexion.
-   Icônes seules (libellé en infobulle / lecteur d'écran) ; libellé visible dès xl. */
-const ACTION =
-  'relative inline-flex size-10 shrink-0 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-line bg-card text-sm font-semibold text-fg shadow-soft transition hover:border-cacao xl:w-auto xl:px-3.5';
-
+   Boutons icône seule (libellé en infobulle et pour les lecteurs d'écran). */
 function IconLink({
   href,
   label,
-  icon: Icon,
+  icon,
   badge = 0,
 }: {
   href: string;
@@ -20,18 +19,26 @@ function IconLink({
   badge?: number;
 }) {
   return (
-    <Link href={href} aria-label={label} title={label} className={ACTION}>
-      <Icon aria-hidden="true" className="size-[18px]" />
-      <span className="hidden xl:inline">{label}</span>
+    <span className="relative inline-flex">
+      <ButtonLink
+        href={href}
+        variant="ghost"
+        size="sm"
+        iconOnly
+        icon={icon}
+        aria-label={badge > 0 ? `${label}, ${badge} non lu${badge > 1 ? 's' : ''}` : label}
+      >
+        {label}
+      </ButtonLink>
       {badge > 0 ? (
         <span
-          aria-label={`${badge} non lu${badge > 1 ? 's' : ''}`}
-          className="absolute -right-1 -top-1 inline-flex min-w-5 items-center justify-center rounded-full bg-accent px-1.5 py-0.5 text-xs font-bold text-accent-fg"
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-0.5 -top-0.5 inline-flex min-w-4 items-center justify-center rounded-full bg-accent px-1 text-xs font-bold leading-4 text-accent-fg tabular-nums ring-2 ring-page"
         >
           {badge > 99 ? '99+' : badge}
         </span>
       ) : null}
-    </Link>
+    </span>
   );
 }
 
@@ -43,7 +50,7 @@ export function DashboardTopbar({
   unreadNotifications?: number;
 }) {
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-2 border-b border-line bg-page/90 px-3 backdrop-blur sm:px-5 lg:px-6">
+    <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-2 border-b border-line/70 bg-page/85 px-3 backdrop-blur sm:px-5 lg:justify-end lg:px-8">
       <Link
         href="/dashboard"
         aria-label="Hairstyle by Patricia — accueil administration"
@@ -52,7 +59,7 @@ export function DashboardTopbar({
         <Logo markClassName="h-7 w-auto text-fg" showWordmark={false} />
         <span className="font-heading text-sm font-bold sm:hidden">Hairstyle by Patricia</span>
       </Link>
-      <nav aria-label="Actions rapides" className="flex items-center gap-2">
+      <nav aria-label="Actions rapides" className="flex items-center gap-1">
         <IconLink
           href="/dashboard/messages"
           label="Messages"
@@ -66,16 +73,11 @@ export function DashboardTopbar({
           badge={unreadNotifications}
         />
         <IconLink href="/" label="Voir le site" icon={ExternalLink} />
+        <TopbarSettingsLink />
         <form action={logout}>
-          <button
-            type="submit"
-            aria-label="Se déconnecter"
-            title="Se déconnecter"
-            className={ACTION}
-          >
-            <LogOut aria-hidden="true" className="size-[18px]" />
-            <span className="hidden xl:inline">Déconnexion</span>
-          </button>
+          <Button type="submit" variant="dangerGhost" size="sm" iconOnly icon={LogOut}>
+            Se déconnecter
+          </Button>
         </form>
       </nav>
     </header>

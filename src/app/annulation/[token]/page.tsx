@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { Mail } from 'lucide-react';
 import { getAppointmentByCancelToken } from '@/modules/reservations/queries';
 import {
   evaluateCancellationPolicy,
@@ -12,8 +12,10 @@ import {
 import { getSalonSettings } from '@/modules/disponibilites/queries';
 import { resolveCancellationPolicy, splitParagraphs } from '@/modules/parametres/policies';
 import { LocalDateTime } from '@/components/shared/LocalDateTime';
+import { Breadcrumb } from '@/components/shared/Breadcrumb';
 import { Badge } from '@/components/ui/Badge';
 import { CancelForm } from './cancel-form';
+import { ButtonLink } from '@/components/ui/Button';
 import { Title } from '@/components/ui/Title';
 
 export const metadata: Metadata = {
@@ -36,16 +38,13 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
     return (
       <main className="page-main">
         <div className="rounded-[var(--radius-lg)] border border-alert bg-alert-soft p-8 text-center">
-          <h1 className="font-heading text-2xl font-bold text-alert">Lien d’annulation invalide</h1>
-          <p className="mt-3 text-fg">
-            Ce lien ne correspond à aucun rendez-vous. Vérifiez le lien reçu ou contactez Patricia.
-          </p>
-          <Link
-            href="/contact"
-            className="mt-6 inline-flex rounded-[var(--radius-md)] bg-accent px-5 py-2.5 font-semibold text-accent-fg"
-          >
+          <Title as="h1" size="display" className="">
+            Lien invalide
+          </Title>
+          <p className="mt-3 text-fg">Ce lien ne correspond à aucun rendez-vous.</p>
+          <ButtonLink href="/contact" icon={Mail} className="mt-6">
             Contacter Patricia
-          </Link>
+          </ButtonLink>
         </div>
       </main>
     );
@@ -66,21 +65,7 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
 
   return (
     <main className="page-main space-y-6">
-      <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
-        <ol className="flex flex-wrap items-center gap-2">
-          <li>
-            <Link href="/" className="transition hover:text-cacao">
-              Accueil
-            </Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li>
-            <span aria-current="page" className="font-medium text-fg">
-              Mon rendez-vous
-            </span>
-          </li>
-        </ol>
-      </nav>
+      <Breadcrumb items={[{ label: 'Accueil', href: '/' }, { label: 'Mon rendez-vous' }]} />
 
       <header className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
@@ -92,9 +77,6 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
         <Title as="h1" size="display" className="">
           Gérer mon rendez-vous
         </Title>
-        <p className="text-lg text-muted">
-          Retrouvez ici les informations de votre rendez-vous et les conditions d’annulation.
-        </p>
       </header>
 
       <section className="rounded-[var(--radius-lg)] border border-line bg-card p-6 shadow-soft">
@@ -141,10 +123,13 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
 
       {!tokenValid ? (
         <section className="rounded-[var(--radius-lg)] border border-alert bg-alert-soft p-6">
-          <h2 className="font-heading text-xl font-bold text-alert">Lien expiré</h2>
-          <p className="mt-2 text-fg">
-            Ce lien d’annulation n’est plus valide. Contactez Patricia pour toute modification.
-          </p>
+          <Title as="h2" className="">
+            Lien expiré
+          </Title>
+          <p className="mt-2 text-fg">Ce lien n’est plus valide.</p>
+          <ButtonLink href="/contact" icon={Mail} className="mt-5">
+            Contacter Patricia
+          </ButtonLink>
         </section>
       ) : !active ? (
         <section className="rounded-[var(--radius-lg)] border border-line bg-page p-6">
@@ -158,16 +143,13 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
         </section>
       ) : !policy.allowed ? (
         <section className="rounded-[var(--radius-lg)] border border-alert bg-alert-soft p-6">
-          <h2 className="font-heading text-xl font-bold text-alert">
+          <Title as="h2" className="">
             Annulation en ligne indisponible
-          </h2>
+          </Title>
           <p className="mt-2 text-fg">{policy.message}</p>
-          <Link
-            href="/contact"
-            className="mt-5 inline-flex rounded-[var(--radius-md)] bg-accent px-5 py-2.5 font-semibold text-accent-fg"
-          >
+          <ButtonLink href="/contact" icon={Mail} className="mt-5">
             Contacter Patricia
-          </Link>
+          </ButtonLink>
         </section>
       ) : (
         <section className="rounded-[var(--radius-lg)] border border-line bg-card p-6 shadow-soft">
