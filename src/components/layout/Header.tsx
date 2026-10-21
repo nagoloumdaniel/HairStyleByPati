@@ -12,6 +12,7 @@ import { ThemeToggle } from './ThemeToggle';
 /* Navbar flottante en verre (web + mobile) : pilule détachée du bord, flou,
    menu mobile déployé dans la même capsule. Règles : DESIGN-RULES.md. */
 const LINKS = [
+  { href: '/', label: 'Accueil' },
   { href: '/coiffures', label: 'Catalogue' },
   { href: '/faq', label: 'FAQ' },
   { href: '/demandes-personnalisees', label: 'Sur mesure' },
@@ -39,7 +40,10 @@ export function Header() {
           </Link>
           <nav aria-label="Navigation principale" className="hidden items-center gap-1 md:flex">
             {LINKS.map((l) => {
-              const active = pathname === l.href || pathname.startsWith(`${l.href}/`);
+              const active =
+                l.href === '/'
+                  ? pathname === '/'
+                  : pathname === l.href || pathname.startsWith(`${l.href}/`);
               return (
                 <Link
                   key={l.href}

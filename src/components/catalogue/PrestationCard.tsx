@@ -37,7 +37,12 @@ export function PrestationCard({
       <div aria-hidden="true" className="card-scrim pointer-events-none absolute inset-0" />
 
       {/* Photo cliquable : lien étiré couvrant toute la carte (sous le bouton Réserver). */}
-      <Link href={href} aria-hidden="true" tabIndex={-1} className="absolute inset-0 z-[1]" />
+      <Link
+        href={href}
+        aria-hidden="true"
+        tabIndex={-1}
+        className="card-stretch absolute inset-0 z-[1]"
+      />
 
       <span className="pointer-events-none absolute left-4 top-4 z-[2] rounded-full bg-black/35 px-3 py-1 text-xs font-bold text-white backdrop-blur-md">
         {badge}
