@@ -389,7 +389,8 @@ html[data-theme='dark'] {
 .card-slides {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  /* Sous le flou et le voile (même contexte d'empilement, ordre du DOM) */
+  z-index: 0;
   display: flex;
   overflow-x: auto;
   overflow-y: hidden;
@@ -412,7 +413,14 @@ html[data-theme='dark'] {
     width 0.25s ease,
     opacity 0.25s ease;
 }
+/* Tactile : le lien étiré laisserait passer le balayage ; le clic est géré par le défilement. */
+.card-stretch {
+  pointer-events: none;
+}
 @media (hover: hover) and (pointer: fine) {
+  .card-stretch {
+    pointer-events: auto;
+  }
   .card-slides {
     z-index: auto;
     overflow: hidden;
