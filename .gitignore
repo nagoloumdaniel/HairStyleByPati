@@ -67,3 +67,8 @@ next-env.d.ts
 .claude/
 .clinerule
 .clinerules/
+
+# captures E2E et archives locales (non versionnées)
+/tests/e2e/screenshots/
+/docs/archivage/
+/docs/migration/

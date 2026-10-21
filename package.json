@@ -3,6 +3,24 @@
   "version": "0.1.0",
   "private": true,
   "description": "Site vitrine et réservation en ligne — Hairstyle by Patricia",
+  "license": "UNLICENSED",
+  "author": "Daniel Nagoloum Talla",
+  "homepage": "https://hairstylebypati.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nagoloumdaniel/HairStyleByPati.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nagoloumdaniel/HairStyleByPati/issues"
+  },
+  "keywords": [
+    "nextjs",
+    "prisma",
+    "booking",
+    "hairstyle",
+    "dakar",
+    "senegal"
+  ],
   "engines": {
     "node": ">=22"
   },
