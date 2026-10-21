@@ -152,6 +152,7 @@ const SERVICE_DETAIL_SELECT = {
     orderBy: OPTION_ORDER_BY,
     select: { id: true, name: true, priceCents: true, durationMinutes: true },
   },
+  _count: { select: { questions: { where: { active: true } } } },
   compatibility: {
     select: {
       acceptedLengths: true,
@@ -228,7 +229,7 @@ const CATEGORY_PLACEHOLDERS: Record<string, Placeholder[]> = {
   tresses: [
     {
       src: pexels(36441633),
-      alt: 'Tresses africaines en cours de réalisation à domicile (photo de démonstration)',
+      alt: 'Tresses africaines en cours de réalisation (photo de démonstration)',
     },
     {
       src: pexels(33664383),
@@ -330,15 +331,25 @@ export function serviceImage(service: Pick<CatalogueService, 'slug' | 'images' |
   };
 }
 
-const euroFormatter = new Intl.NumberFormat('fr-FR', {
-  style: 'currency',
-  currency: 'XOF',
+const amountFormatter = new Intl.NumberFormat('fr-FR', {
+  style: 'decimal',
   minimumFractionDigits: 0,
   maximumFractionDigits: 0,
 });
 
+const CURRENCY_UNIT = 'FCFA';
+
+/** Montant en FCFA sans décimale (valeur interne en 1/100 FCFA). */
 function formatEuros(cents: number): string {
-  return euroFormatter.format(cents / 100);
+  return `${amountFormatter.format(cents / 100)} ${CURRENCY_UNIT}`;
+}
+
+/**
+ * Fourchette de prix : « 50 – 75 FCFA » (demi-cadratin entouré d'espaces fines,
+ * unité affichée une seule fois). Valeurs en 1/100 FCFA (colonnes *Cents).
+ */
+export function formatPriceRange(fromCents: number, toCents: number): string {
+  return `${amountFormatter.format(fromCents / 100)} – ${formatEuros(toCents)}`;
 }
 
 /** Les 4 modes de prix du §4.4 : fixe, départ, fourchette, « Prix à confirmer ». */
@@ -353,7 +364,7 @@ export function formatPrice(service: {
 
   if (from != null && to != null) {
     if (from === to) return formatEuros(from);
-    return `De ${formatEuros(from)} à ${formatEuros(to)}`;
+    return formatPriceRange(from, to);
   }
   if (from != null) return `À partir de ${formatEuros(from)}`;
   if (to != null) return `Jusqu'à ${formatEuros(to)}`;

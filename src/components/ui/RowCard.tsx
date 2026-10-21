@@ -17,7 +17,7 @@ export function RowCard({
 }) {
   return (
     <div
-      className={`relative flex items-center gap-2 rounded-[var(--radius-lg)] border border-transparent p-3 shadow-soft transition hover:border-cacao hover:shadow-lift sm:p-4 ${
+      className={`relative flex items-center gap-2 rounded-[var(--radius-lg)] border border-line/60 p-3 shadow-soft transition hover:border-cacao hover:shadow-lift sm:p-4 ${
         highlighted ? 'bg-accent-soft/50' : 'bg-card'
       }`}
     >

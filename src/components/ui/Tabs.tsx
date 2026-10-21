@@ -36,7 +36,7 @@ export function Tabs({
 
   return (
     <div>
-      <div role="tablist" aria-label={label} className="flex flex-wrap gap-2">
+      <div role="tablist" aria-label={label} className="flex flex-wrap gap-1.5">
         {tabs.map((t, i) => (
           <button
             key={t.id}
@@ -51,7 +51,7 @@ export function Tabs({
             tabIndex={i === active ? 0 : -1}
             onClick={() => setActive(i)}
             onKeyDown={(e) => onKeyDown(e, i)}
-            className={`h-9 rounded-[var(--radius-md)] px-3.5 text-sm font-semibold transition ${
+            className={`h-9 rounded-[var(--radius-md)] px-3.5 text-sm font-semibold transition-colors ${
               i === active
                 ? 'bg-accent text-accent-fg'
                 : 'bg-card text-fg border border-line hover:border-cacao'

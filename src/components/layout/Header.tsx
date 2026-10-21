@@ -1,10 +1,11 @@
 'use client';
 
-import { Menu, X } from 'lucide-react';
+import { CalendarDays, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Logo } from '@/components/shared/Logo';
+import { Button, ButtonLink } from '@/components/ui/Button';
 import { SocialLinks } from './SocialLinks';
 import { ThemeToggle } from './ThemeToggle';
 
@@ -53,31 +54,26 @@ export function Header() {
               );
             })}
           </nav>
-          <div className="flex items-center gap-2">
-            <SocialLinks className="hidden lg:flex" />
+          <div className="flex items-center gap-1 sm:gap-2">
+            <SocialLinks />
             <ThemeToggle />
-            <Link
-              href="/coiffures"
-              className="bg-gradient-primary rounded-full px-5 py-2.5 text-sm font-bold text-accent-fg shadow-soft transition hover:brightness-110 active:scale-[0.98]"
-            >
+            <ButtonLink href="/coiffures" size="sm" icon={CalendarDays}>
               Réserver
-            </Link>
-            <button
+            </ButtonLink>
+            <Button
               type="button"
+              variant="ghost"
+              size="sm"
+              iconOnly
+              icon={open ? X : Menu}
               aria-expanded={open}
               aria-controls="menu-mobile"
-              aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
+              title={open ? 'Fermer le menu' : 'Ouvrir le menu'}
               onClick={() => setOpen((v) => !v)}
-              className="flex h-10 w-10 items-center justify-center rounded-full text-fg hover:bg-accent-soft md:hidden"
+              className="md:hidden"
             >
-              <span aria-hidden="true" className="text-xl leading-none">
-                {open ? (
-                  <X aria-hidden="true" className="size-5" />
-                ) : (
-                  <Menu aria-hidden="true" className="size-5" />
-                )}
-              </span>
-            </button>
+              {open ? 'Fermer le menu' : 'Ouvrir le menu'}
+            </Button>
           </div>
         </div>
         {open ? (
@@ -99,7 +95,6 @@ export function Header() {
                 </li>
               ))}
             </ul>
-            <SocialLinks className="mt-2 justify-center border-t border-line pt-2" />
           </nav>
         ) : null}
       </header>

@@ -2,7 +2,7 @@ import type { LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from 'react';
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'dangerGhost' | 'onDark';
 type ButtonSize = 'sm' | 'md' | 'lg';
 /* `true` : icône seule partout ; `'mobile'` : icône seule sous 640 px, libellé visible ensuite. */
 type IconOnly = boolean | 'mobile';
@@ -32,20 +32,24 @@ const VARIANTS: Record<ButtonVariant, string> = {
   secondary: 'bg-card text-fg border border-line hover:border-cacao shadow-soft',
   ghost: 'bg-transparent text-cacao hover:bg-accent-soft',
   danger: 'bg-alert text-alert-fg hover:brightness-95',
+  // Action destructive discrète (ex. déconnexion) : texte rouge, fond rouge doux au survol.
+  dangerGhost: 'bg-transparent text-alert hover:bg-alert-soft',
+  // Sur fond sombre/ocre (hero, panneaux) : verre translucide lisible.
+  onDark: 'border border-white/25 bg-white/10 text-panel-fg hover:bg-white/20',
 };
 
-/* Hauteurs uniques (boutons = champs = menus) : sm 36, md 40, lg 48. */
+/* Hauteurs uniques (boutons = champs = menus) : sm 36, md 40, lg 44. */
 const SIZES: Record<ButtonSize, string> = {
   sm: 'h-9 px-3 text-sm rounded-[var(--radius-md)]',
   md: 'h-10 px-4 text-sm rounded-[var(--radius-md)]',
-  lg: 'h-12 px-6 text-base rounded-[var(--radius-md)]',
+  lg: 'h-11 px-5 text-sm rounded-[var(--radius-md)]',
 };
 
-const SQUARE: Record<ButtonSize, string> = { sm: 'size-9', md: 'size-10', lg: 'size-12' };
+const SQUARE: Record<ButtonSize, string> = { sm: 'size-9', md: 'size-10', lg: 'size-11' };
 const SQUARE_MOBILE: Record<ButtonSize, string> = {
   sm: 'max-sm:size-9 max-sm:px-0',
   md: 'max-sm:size-10 max-sm:px-0',
-  lg: 'max-sm:size-12 max-sm:px-0',
+  lg: 'max-sm:size-11 max-sm:px-0',
 };
 
 export function buttonClasses({
@@ -58,7 +62,7 @@ export function buttonClasses({
     iconOnly === true
       ? `${SQUARE[size]} rounded-[var(--radius-md)] p-0`
       : `${SIZES[size]} ${iconOnly === 'mobile' ? SQUARE_MOBILE[size] : ''}`;
-  return `inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap font-semibold transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 ${VARIANTS[variant]} ${shape} ${className}`;
+  return `inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap font-semibold transition disabled:cursor-not-allowed disabled:opacity-60 ${VARIANTS[variant]} ${shape} ${className}`;
 }
 
 function Content({
@@ -79,7 +83,7 @@ function Content({
       {loading ? (
         <span
           aria-hidden="true"
-          className="inline-block size-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+          className="inline-block size-4 animate-spin rounded-full motion-reduce:animate-none border-2 border-current border-t-transparent"
         />
       ) : Icon ? (
         <Icon aria-hidden="true" className="size-[18px] shrink-0" />

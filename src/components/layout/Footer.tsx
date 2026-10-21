@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { LogoMark } from '@/components/shared/Logo';
 import { SOCIALS } from './SocialLinks';
 
-/* P2.5 : pied de page coordonnees, reseaux, liens legaux. Distinct du dashboard. */
+/* P2.5 : pied de page : coordonnées, réseaux, liens légaux. Distinct du dashboard. */
 export function Footer() {
   return (
     <footer className="mt-16 bg-footer text-panel-fg">
@@ -12,9 +12,7 @@ export function Footer() {
             <LogoMark className="h-8 w-auto text-panel-fg" />
             Hairstyle by Patricia
           </p>
-          <p className="mt-2 text-sm opacity-80">
-            Tresses, vanilles, locs et coiffures protectrices. Reservation en ligne.
-          </p>
+          <p className="mt-2 text-sm opacity-80">Locs, nattes collées et vanilles à Dakar.</p>
         </div>
         <nav aria-label="Liens pratiques">
           <p className="font-semibold">Pratique</p>
@@ -47,7 +45,7 @@ export function Footer() {
                 href="/mentions-legales"
                 className="opacity-80 hover:opacity-100 hover:underline"
               >
-                Mentions legales
+                Mentions légales
               </Link>
             </li>
             <li>
@@ -55,7 +53,7 @@ export function Footer() {
                 href="/confidentialite"
                 className="opacity-80 hover:opacity-100 hover:underline"
               >
-                Confidentialite
+                Confidentialité
               </Link>
             </li>
           </ul>
@@ -80,7 +78,7 @@ export function Footer() {
         </div>
       </div>
       <p className="border-t border-panel-fg/20 py-4 text-center text-xs opacity-70">
-        © {new Date().getFullYear()} Hairstyle by Patricia. Tous droits reserves.
+        © {new Date().getFullYear()} Hairstyle by Patricia. Tous droits réservés.
       </p>
     </footer>
   );

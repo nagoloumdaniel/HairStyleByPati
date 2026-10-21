@@ -58,7 +58,7 @@
 - animation des etats de chargements
 - evite les hovers scale sur les cards et boutons
 - Global : navbar flottante verre. Page 404 : `src/app/not-found.tsx` (dégradé + verre).
-- Contenu : Patricia coiffe **à domicile** (pas de salon). Aucune page/lien/texte « salon » ; page `/salon` supprimée.
+- Contenu : Patricia reçoit **sur rendez-vous à Dakar** (elle ne se déplace pas ; aucun texte « à domicile », « chez vous » ou déplacement ; pas de salon). Aucune page/lien/texte « salon » ; page `/salon` supprimée.
 - Marges : toutes les pages publiques utilisent `.page-main` (+ `page-main-narrow` / `page-main-medium` pour contenus étroits) : mêmes marges latérales et verticales partout.
 - Cartes prestation : toute la carte (photo comprise) mène à la fiche ; survol = changement de photo + points. Pas de carrousel horizontal : grille, 2 lignes max (6 par page), pagination sans « précédent » en page 1 ni « suivant » en dernière page.
 - FAQ : questions sur 2 colonnes (md+) ; bloc « Une autre question » centré.
@@ -76,7 +76,7 @@
   - Sidebar : pas de texte « Administration ». Mobile : barre d’onglets fixe (4 entrées + « Menu » qui ouvre toutes les pages en grille d’icônes).
   - Marges mobiles réduites au minimum (`px-3`), cartes `p-4`.
   - Cartes entièrement cliquables (`CardLink`) : jamais de bouton « Voir plus » / « Détails » sur une carte.
-  - Tailles uniformes : `Button`/`ButtonLink`/champs/`Select` = h-9 (sm), h-10 (md, défaut), h-12 (lg). Pas de classes de bouton ad hoc : utiliser `Button`, `ButtonLink` (`src/components/ui/Button.tsx`).
+  - Tailles uniformes : `Button`/`ButtonLink`/champs/`Select` = h-9 (sm), h-10 (md, défaut), h-11 (lg). Pas de classes de bouton ad hoc : utiliser `Button`, `ButtonLink` (`src/components/ui/Button.tsx`).
   - Mobile : boutons en icône seule (`iconOnly="mobile"` + `icon`), libellé en `sr-only` + `title`. Libellé visible dès `sm`.
   - Icône dans chaque champ (`Input`, `Select icon`, `Textarea`).
   - Popups : `Modal` (portail, fond flouté, bouton ✕, Échap, clic extérieur, focus piégé, page non scrollable derrière). Pas de `window.confirm` : utiliser `useConfirm()` (`src/components/ui/Confirm.tsx`).
