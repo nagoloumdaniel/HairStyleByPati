@@ -9,6 +9,7 @@ import { AppError } from '@/lib/errors';
 import { getClientIp } from '@/lib/client-ip';
 import { rateLimit } from '@/lib/rate-limit';
 import { flushEmailsSoon } from '@/modules/notifications/flush';
+import { adminNotificationRecipient } from '@/modules/notifications/service';
 import { logAudit } from '@/modules/stats/audit';
 import { deletePrivateImages, storePrivateImages } from '@/modules/fichiers/private-images';
 import {
@@ -288,6 +289,40 @@ export async function submitAssessment(
       },
     });
     assessmentId = assessment.id;
+
+    // Alerte admin (e-mail + notification dashboard) : un échec ne doit jamais faire perdre l'évaluation.
+    try {
+      const adminEmail = adminNotificationRecipient();
+      const payload = {
+        kind: 'assessment',
+        assessmentId: assessment.id,
+        customerName: customer.name,
+        customerEmail: customer.email,
+        serviceName: service.name,
+      } satisfies Prisma.InputJsonValue;
+      await db.notification.createMany({
+        data: [
+          {
+            idempotencyKey: `assessment:${assessment.id}:admin:email`,
+            recipient: adminEmail,
+            templateKey: 'admin_assessment_received',
+            payload,
+          },
+          {
+            idempotencyKey: `assessment:${assessment.id}:admin:inapp`,
+            recipient: adminEmail,
+            channel: 'IN_APP',
+            templateKey: 'admin_assessment_received',
+            link: `/dashboard/evaluations/${assessment.id}`,
+            payload,
+          },
+        ],
+        skipDuplicates: true,
+      });
+      flushEmailsSoon();
+    } catch (notifyError) {
+      console.error('[compatibilite] alerte admin non créée', notifyError);
+    }
   } catch (error) {
     console.error(error);
     // Ne pas laisser de photos orphelines si l'enregistrement échoue.

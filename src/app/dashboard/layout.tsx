@@ -4,14 +4,11 @@ import { Suspense } from 'react';
 import { DashboardThemeLock } from '@/components/layout/DashboardThemeLock';
 import { DashboardTopbar } from '@/components/layout/DashboardTopbar';
 import { MobileTabBar, Sidebar } from '@/components/layout/Sidebar';
+import { DASHBOARD_THEME_SCRIPT } from '@/lib/inline-scripts';
 import { Logo } from '@/components/shared/Logo';
 import { ConfirmProvider } from '@/components/ui/Confirm';
 import { countUnreadCustomerMessages } from '@/modules/messagerie/queries';
 import { countUnreadNotifications } from '@/modules/notifications/queries';
-
-/* Exécuté dans le HTML serveur avant le premier rendu : évite un flash sombre. */
-const THEME_SCRIPT =
-  "document.documentElement.setAttribute('data-theme','light');document.documentElement.style.colorScheme='light';";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -34,7 +31,7 @@ async function TopbarWithCounts() {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <ConfirmProvider>
-      <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+      <script dangerouslySetInnerHTML={{ __html: DASHBOARD_THEME_SCRIPT }} />
       <DashboardThemeLock />
       <div className="grid min-h-dvh w-full grid-cols-1 content-start lg:grid-cols-[232px_minmax(0,1fr)] lg:content-stretch">
         <aside className="hidden min-w-0 bg-ink p-3 text-panel-fg lg:sticky lg:top-0 lg:block lg:h-dvh lg:self-start lg:overflow-y-auto">

@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import { publicCsp } from './src/lib/csp';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -13,17 +14,6 @@ function storageHostname(): string | null {
   }
 }
 
-/** Sources d'images autorisées par la CSP : plus de https: générique. */
-const imgSrc = [
-  "'self'",
-  'data:',
-  'blob:',
-  'https://images.pexels.com',
-  // URLs signées du bucket R2 (path-style : <compte>.r2.cloudflarestorage.com) et hôte configuré.
-  'https://*.r2.cloudflarestorage.com',
-  ...(storageHostname() ? [`https://${storageHostname()}`] : []),
-];
-
 const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'X-Frame-Options', value: 'DENY' },
@@ -37,27 +27,10 @@ const securityHeaders = [
 ];
 
 if (isProduction) {
-  securityHeaders.push(
-    { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
-    {
-      key: 'Content-Security-Policy',
-      // Next.js injecte des scripts inline pour l'hydratation : 'unsafe-inline'
-      // reste nécessaire pour les scripts et styles générés par le framework.
-      value: [
-        "default-src 'self'",
-        "script-src 'self' 'unsafe-inline'",
-        "style-src 'self' 'unsafe-inline'",
-        `img-src ${imgSrc.join(' ')}`,
-        "font-src 'self' data:",
-        "connect-src 'self'",
-        "frame-ancestors 'none'",
-        "base-uri 'self'",
-        "form-action 'self'",
-        "object-src 'none'",
-        'upgrade-insecure-requests',
-      ].join('; '),
-    },
-  );
+  securityHeaders.push({
+    key: 'Strict-Transport-Security',
+    value: 'max-age=63072000; includeSubDomains; preload',
+  });
 }
 
 const nextConfig: NextConfig = {
@@ -90,7 +63,18 @@ const nextConfig: NextConfig = {
     ],
   },
   async headers() {
-    return [{ source: '/(.*)', headers: securityHeaders }];
+    return [
+      { source: '/(.*)', headers: securityHeaders },
+      // Pages privées (dashboard, connexion) : CSP stricte à nonce posée par le middleware.
+      ...(isProduction
+        ? [
+            {
+              source: '/((?!dashboard|connexion).*)',
+              headers: [{ key: 'Content-Security-Policy', value: publicCsp() }],
+            },
+          ]
+        : []),
+    ];
   },
 };
 

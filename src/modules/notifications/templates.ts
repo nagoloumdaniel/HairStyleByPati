@@ -24,7 +24,8 @@ export type NotificationTemplateKey =
   | 'custom_request_decision'
   | 'waitlist_slot_available'
   | 'review_request'
-  | 'assessment_decision';
+  | 'assessment_decision'
+  | 'admin_assessment_received';
 
 export interface AppointmentEmailPayload {
   kind?: 'appointment';
@@ -88,7 +89,8 @@ export interface AssessmentEmailPayload {
   customerName: string;
   customerEmail?: string;
   serviceName: string;
-  decision: AssessmentDecisionKind;
+  /** Absent pour l'alerte admin « évaluation reçue ». */
+  decision?: AssessmentDecisionKind;
   message?: string | null;
 }
 
@@ -540,11 +542,39 @@ const ASSESSMENT_DECISIONS: AssessmentDecisionKind[] = [
 
 /* Décision de Patricia sur une évaluation capillaire : jamais de réservation
    créée, le lien renvoie simplement vers le catalogue quand c'est accepté. */
+function renderAdminAssessmentReceived(
+  payload: AssessmentEmailPayload,
+  ctx: EmailContext,
+): RenderedEmail {
+  const link = payload.assessmentId
+    ? `${APP_URL}/dashboard/evaluations/${payload.assessmentId}`
+    : `${APP_URL}/dashboard/evaluations`;
+  const intro = `${payload.customerName} a envoyé une évaluation capillaire pour « ${payload.serviceName} ».`;
+  return {
+    subject: `Nouvelle évaluation : ${payload.serviceName}`,
+    html: layout(ctx, {
+      title: 'Nouvelle évaluation à traiter',
+      intro,
+      rows: [
+        ['Cliente', payload.customerName],
+        ['E-mail', payload.customerEmail ?? 'Non renseigné'],
+        ['Prestation', payload.serviceName],
+      ],
+      paragraphs: [],
+      ctaLabel: 'Ouvrir l’évaluation',
+      ctaUrl: link,
+    }),
+    text: `${intro}
+
+${link}`,
+  };
+}
+
 function renderAssessmentDecision(
   payload: AssessmentEmailPayload,
   ctx: EmailContext,
 ): RenderedEmail | null {
-  if (!ASSESSMENT_DECISIONS.includes(payload.decision)) return null;
+  if (!payload.decision || !ASSESSMENT_DECISIONS.includes(payload.decision)) return null;
   const name = payload.customerName;
   const service = payload.serviceName;
   const catalogUrl = `${APP_URL}/coiffures`;
@@ -609,6 +639,9 @@ function renderInner(
     return key === 'review_request' ? renderReview(payload as ReviewEmailPayload, ctx) : null;
   }
   if (isAssessment(payload as EmailPayload)) {
+    if (key === 'admin_assessment_received') {
+      return renderAdminAssessmentReceived(payload as AssessmentEmailPayload, ctx);
+    }
     return key === 'assessment_decision'
       ? renderAssessmentDecision(payload as AssessmentEmailPayload, ctx)
       : null;
@@ -674,5 +707,6 @@ export function notificationTemplateExists(templateKey: string): boolean {
     'waitlist_slot_available',
     'review_request',
     'assessment_decision',
+    'admin_assessment_received',
   ].includes(templateKey);
 }

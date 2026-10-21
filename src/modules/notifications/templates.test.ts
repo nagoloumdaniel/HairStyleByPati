@@ -178,3 +178,25 @@ describe('renderNotification : assessment_decision', () => {
     expect(renderNotification('booking_confirmed', { ...base, decision: 'ACCEPTED' })).toBeNull();
   });
 });
+
+describe('renderNotification : admin_assessment_received', () => {
+  const payload = {
+    kind: 'assessment',
+    assessmentId: 'eval123',
+    customerName: 'Amina <b>',
+    customerEmail: 'amina@example.com',
+    serviceName: 'Départ de locs',
+  };
+
+  it('should know the template', () => {
+    expect(notificationTemplateExists('admin_assessment_received')).toBe(true);
+  });
+
+  it('should alert the admin with an escaped name and a link to the assessment', () => {
+    const rendered = renderNotification('admin_assessment_received', payload);
+    expect(rendered?.subject).toContain('Départ de locs');
+    expect(rendered?.html).toContain('Amina &lt;b&gt;');
+    expect(rendered?.html).toContain('/dashboard/evaluations/eval123');
+    expect(rendered?.text).toContain('/dashboard/evaluations/eval123');
+  });
+});
