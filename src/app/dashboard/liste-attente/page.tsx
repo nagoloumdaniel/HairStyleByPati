@@ -1,71 +1,130 @@
+import { CalendarClock, Hourglass, Mail, Phone } from 'lucide-react';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/modules/auth/guards';
-import { db } from '@/lib/db';
+import {
+  WAITLIST_STATUS_LABELS,
+  WAITLIST_STATUS_TONES,
+  listWaitlistEntries,
+} from '@/modules/liste-attente/queries';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { LocalDateTime } from '@/components/shared/LocalDateTime';
 import { Badge } from '@/components/ui/Badge';
+import { ButtonLink } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { CancelEntryButton } from './cancel-entry-button';
 
 export const metadata: Metadata = { title: 'Liste d’attente - Tableau de bord' };
 
-const STATUS_LABELS: Record<string, { label: string; tone: 'success' | 'alert' | 'neutral' }> = {
-  WAITING: { label: 'En attente', tone: 'neutral' },
-  NOTIFIED: { label: 'Prévenue', tone: 'neutral' },
-  CONFIRMED: { label: 'Confirmée', tone: 'success' },
-  EXPIRED: { label: 'Expirée', tone: 'alert' },
-  CANCELLED: { label: 'Annulée', tone: 'alert' },
-};
-
-export default async function WaitlistPage() {
+export default async function WaitlistPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const user = await requireAdmin();
   if (!user) redirect('/connexion?callbackUrl=/dashboard/liste-attente');
 
-  const entries = await db.waitlistEntry.findMany({
-    orderBy: { createdAt: 'desc' },
-    take: 100,
-    include: { service: { select: { name: true } } },
-  });
+  const params = await searchParams;
+  const rawAll = params.all;
+  const all = (Array.isArray(rawAll) ? rawAll[0] : rawAll) === '1';
+  const { rows, counts } = await listWaitlistEntries({ onlyOpen: !all });
+  const open = (counts.WAITING ?? 0) + (counts.NOTIFIED ?? 0);
+  const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
 
   return (
-    <div className="p-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Liste d’attente</h1>
-        <p className="mt-1 text-ink-soft">
-          Clientes prévenues automatiquement par e-mail quand leur créneau se libère (hors v1
-          initial, §19). La confirmation reste manuelle : la cliente doit réserver elle-même via le
-          lien reçu, avec re-vérification complète de la disponibilité.
-        </p>
-      </div>
-      <ul className="mt-5 flex flex-col gap-2">
-        {entries.length === 0 ? (
-          <p className="rounded-[var(--radius-md)] border border-dashed border-line p-8 text-center text-muted">
-            Aucune demande de liste d’attente.
-          </p>
-        ) : (
-          entries.map((entry) => {
-            const status = STATUS_LABELS[entry.status] ?? {
-              label: entry.status,
-              tone: 'neutral' as const,
-            };
+    <div>
+      <PageHeader
+        icon={Hourglass}
+        title="Liste d’attente"
+        description="Les clientes en attente d’un créneau sont prévenues par e-mail dès qu’il se libère. Elles confirment elles-mêmes via le lien reçu."
+      />
+
+      <nav aria-label="Filtres de la liste d’attente" className="mb-3 flex gap-2">
+        <ButtonLink
+          href="/dashboard/liste-attente"
+          size="sm"
+          variant={!all ? 'primary' : 'secondary'}
+          aria-current={!all ? 'page' : undefined}
+        >
+          {`En cours (${open})`}
+        </ButtonLink>
+        <ButtonLink
+          href="/dashboard/liste-attente?all=1"
+          size="sm"
+          variant={all ? 'primary' : 'secondary'}
+          aria-current={all ? 'page' : undefined}
+        >
+          {`Tout (${total})`}
+        </ButtonLink>
+      </nav>
+
+      {rows.length === 0 ? (
+        <EmptyState
+          variant="compact"
+          title="Aucune demande"
+          message={
+            all
+              ? 'Aucune cliente ne s’est inscrite sur la liste d’attente.'
+              : 'Aucune cliente en attente pour le moment.'
+          }
+        />
+      ) : (
+        <ul className="grid gap-2">
+          {rows.map((entry) => {
+            const canCancel = entry.status === 'WAITING' || entry.status === 'NOTIFIED';
             return (
-              <li
-                key={entry.id}
-                className="rounded-[var(--radius-md)] border border-line bg-card p-4"
-              >
-                <p className="flex items-center gap-2 font-semibold text-fg">
-                  {entry.customerName} · {entry.service.name}
-                  <Badge tone={status.tone}>{status.label}</Badge>
-                </p>
-                <p className="text-sm text-muted">
-                  {entry.customerEmail} · {entry.customerPhone}
-                </p>
-                <p className="mt-1 text-sm text-muted">
-                  Créneau souhaité : <LocalDateTime iso={entry.desiredStartsAt.toISOString()} />
-                </p>
+              <li key={entry.id}>
+                <Card>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold text-fg">{entry.customerName}</p>
+                      <p className="truncate text-sm text-muted">{entry.service.name}</p>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <Badge tone={WAITLIST_STATUS_TONES[entry.status]}>
+                        {WAITLIST_STATUS_LABELS[entry.status]}
+                      </Badge>
+                      {canCancel ? (
+                        <CancelEntryButton
+                          entryId={entry.id}
+                          customerName={entry.customerName}
+                          notified={entry.status === 'NOTIFIED'}
+                        />
+                      ) : null}
+                    </div>
+                  </div>
+                  <p className="mt-2 flex items-center gap-1.5 text-sm text-muted">
+                    <CalendarClock aria-hidden="true" className="size-4 text-accent" />
+                    Créneau souhaité :{' '}
+                    <LocalDateTime
+                      iso={entry.desiredStartsAt.toISOString()}
+                      dateStyle="medium"
+                      timeStyle="short"
+                    />
+                  </p>
+                  <p className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+                    <a
+                      href={`mailto:${entry.customerEmail}`}
+                      className="inline-flex items-center gap-1.5 text-accent underline-offset-4 hover:underline"
+                    >
+                      <Mail aria-hidden="true" className="size-4" />
+                      {entry.customerEmail}
+                    </a>
+                    <a
+                      href={`tel:${entry.customerPhone.replace(/\s+/g, '')}`}
+                      className="inline-flex items-center gap-1.5 text-accent underline-offset-4 hover:underline"
+                    >
+                      <Phone aria-hidden="true" className="size-4" />
+                      {entry.customerPhone}
+                    </a>
+                  </p>
+                </Card>
               </li>
             );
-          })
-        )}
-      </ul>
+          })}
+        </ul>
+      )}
     </div>
   );
 }

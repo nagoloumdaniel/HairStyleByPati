@@ -1,5 +1,6 @@
 import type { AppointmentStatus, Prisma } from '@prisma/client';
 import { db } from '@/lib/db';
+import { OPTION_ORDER_BY } from '@/modules/catalogue/ordering';
 import { mapCompatibilityRule, type CompatibilityService } from '@/modules/compatibilite/queries';
 import { buildPublicQuestions, type PublicQuestion } from '@/modules/compatibilite/questions';
 
@@ -34,7 +35,7 @@ const BOOKABLE_SERVICE_SELECT = {
   category: { select: { name: true } },
   options: {
     where: { active: true },
-    orderBy: { name: 'asc' },
+    orderBy: OPTION_ORDER_BY,
     select: { id: true, name: true, priceCents: true, durationMinutes: true },
   },
   compatibility: true,

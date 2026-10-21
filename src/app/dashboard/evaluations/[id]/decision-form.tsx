@@ -1,18 +1,22 @@
 'use client';
 
-import { useActionState, useState } from 'react';
-import { decideAssessment, type AssessmentDecisionState } from '@/modules/compatibilite/actions';
+import { Save } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState, useTransition, type FormEvent } from 'react';
+import { decideAssessment } from '@/modules/compatibilite/actions';
 import {
   ASSESSMENT_DECISIONS,
   ASSESSMENT_DECISION_LABELS,
   type AssessmentDecision,
 } from '@/modules/compatibilite/schemas';
 import { Button } from '@/components/ui/Button';
+import { useConfirm } from '@/components/ui/Confirm';
 import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
+import { useToast } from '@/components/ui/Toast';
 
 /* ============================================================
- * P5.6 : décision de Patricia sur une évaluation.
+ * Décision de Patricia sur une évaluation.
  * Rappel : la décision ne crée aucune réservation.
  * ============================================================ */
 
@@ -28,6 +32,9 @@ const DECISION_HINTS: Record<AssessmentDecision, string> = {
     'Précisez les conditions de réalisation : longueur minimale, options, temps supplémentaire, soin préalable…',
 };
 
+/* Décisions définitives (le serveur refuse ensuite toute nouvelle décision). */
+const FINAL_DECISIONS: AssessmentDecision[] = ['ACCEPT', 'REFUSE'];
+
 export function DecisionForm({
   assessmentId,
   terminal,
@@ -35,27 +42,62 @@ export function DecisionForm({
   assessmentId: string;
   terminal: boolean;
 }) {
-  const [state, formAction, pending] = useActionState<AssessmentDecisionState, FormData>(
-    decideAssessment,
-    {},
-  );
+  const router = useRouter();
+  const confirm = useConfirm();
+  const { notify } = useToast();
+  const [pending, startTransition] = useTransition();
   const [decision, setDecision] = useState<AssessmentDecision>('ACCEPT');
+  const [message, setMessage] = useState('');
+  const [note, setNote] = useState('');
+  const [error, setError] = useState('');
 
   if (terminal) {
     return (
-      <p className="rounded-[var(--radius-md)] bg-line px-4 py-3 text-sm text-muted">
+      <p className="rounded-[var(--radius-md)] bg-line px-3 py-2.5 text-sm text-muted">
         Une décision définitive a déjà été enregistrée pour cette évaluation. L’historique
         ci-dessous conserve la décision et son message.
       </p>
     );
   }
 
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (FINAL_DECISIONS.includes(decision)) {
+      const ok = await confirm({
+        title: decision === 'ACCEPT' ? 'Accepter la compatibilité ?' : 'Refuser la prestation ?',
+        message: 'Cette décision est définitive : elle ne pourra plus être modifiée.',
+        confirmLabel: decision === 'ACCEPT' ? 'Accepter' : 'Refuser',
+        tone: decision === 'ACCEPT' ? 'primary' : 'danger',
+      });
+      if (!ok) return;
+    }
+    const data = new FormData();
+    data.set('assessmentId', assessmentId);
+    data.set('decision', decision);
+    data.set('decisionMessage', message);
+    data.set('decisionNote', note);
+    setError('');
+    startTransition(async () => {
+      try {
+        const state = await decideAssessment({}, data);
+        if (state.error) {
+          setError(state.error);
+          notify(state.error, 'error');
+          return;
+        }
+        notify(state.success ?? 'Décision enregistrée.', 'success');
+        router.refresh();
+      } catch {
+        setError('Connexion impossible. Réessayez.');
+        notify('Connexion impossible. Réessayez.', 'error');
+      }
+    });
+  }
+
   return (
-    <form action={formAction} className="flex flex-col gap-4">
-      <input type="hidden" name="assessmentId" value={assessmentId} />
+    <form onSubmit={onSubmit} className="grid gap-3">
       <Select
         label="Décision"
-        name="decision"
         value={decision}
         onChange={(event) => setDecision(event.target.value as AssessmentDecision)}
         options={ASSESSMENT_DECISIONS.map((value) => ({
@@ -63,41 +105,35 @@ export function DecisionForm({
           label: ASSESSMENT_DECISION_LABELS[value],
         }))}
       />
-      <p className="text-sm text-muted">{DECISION_HINTS[decision]}</p>
+      <p className="-mt-1 text-sm text-muted">{DECISION_HINTS[decision]}</p>
 
       <Textarea
-        label="Message transmis à la cliente"
-        name="decisionMessage"
+        label="Message pour la cliente"
         required
         rows={4}
-        hint="Ce message explique la décision et reste conservé dans l’historique."
+        minLength={3}
+        maxLength={1000}
+        value={message}
+        onChange={(event) => setMessage(event.target.value)}
+        hint="Conservé avec la décision dans l’historique."
       />
       <Textarea
         label="Note interne (facultatif)"
-        name="decisionNote"
         rows={2}
+        maxLength={1000}
+        value={note}
+        onChange={(event) => setNote(event.target.value)}
         hint="Visible uniquement dans le dashboard."
       />
 
-      {state.error ? (
-        <p
-          role="alert"
-          className="rounded-[var(--radius-md)] bg-alert-soft px-4 py-3 text-sm font-medium text-alert"
-        >
-          {state.error}
-        </p>
-      ) : null}
-      {state.success ? (
-        <p
-          role="status"
-          className="rounded-[var(--radius-md)] bg-success-soft px-4 py-3 text-sm font-medium text-success"
-        >
-          {state.success}
+      {error ? (
+        <p role="alert" className="text-sm font-medium text-alert">
+          {error}
         </p>
       ) : null}
 
       <div className="flex flex-wrap items-center gap-3">
-        <Button type="submit" loading={pending}>
+        <Button type="submit" icon={Save} loading={pending}>
           Enregistrer la décision
         </Button>
         <p className="text-sm text-muted">Aucun rendez-vous n’est créé par cette action.</p>

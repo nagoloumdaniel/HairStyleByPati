@@ -1,29 +1,60 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useId, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 
-/* P2.3 + P2.9 : onglets clavier (role tablist, aria-selected). */
+/* Onglets WAI-ARIA : flèches gauche/droite (en boucle), Home/End, tabIndex itinérant,
+   activation automatique au focus. */
 export function Tabs({
   tabs,
   defaultIndex = 0,
+  label = 'Onglets',
 }: {
   tabs: ReadonlyArray<{ id: string; label: string; content: ReactNode }>;
   defaultIndex?: number;
+  label?: string;
 }) {
   const [active, setActive] = useState(defaultIndex);
+  const uid = useId();
+  const refs = useRef<Array<HTMLButtonElement | null>>([]);
+
+  function goTo(index: number) {
+    setActive(index);
+    refs.current[index]?.focus();
+  }
+
+  function onKeyDown(e: KeyboardEvent<HTMLButtonElement>, i: number) {
+    const last = tabs.length - 1;
+    let next: number | null = null;
+    if (e.key === 'ArrowRight') next = i === last ? 0 : i + 1;
+    else if (e.key === 'ArrowLeft') next = i === 0 ? last : i - 1;
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = last;
+    if (next === null) return;
+    e.preventDefault();
+    goTo(next);
+  }
+
   return (
     <div>
-      <div role="tablist" aria-label="Onglets" className="flex flex-wrap gap-2">
+      <div role="tablist" aria-label={label} className="flex flex-wrap gap-2">
         {tabs.map((t, i) => (
           <button
             key={t.id}
+            ref={(el) => {
+              refs.current[i] = el;
+            }}
+            type="button"
             role="tab"
-            id={`tab-${t.id}`}
+            id={`${uid}-tab-${t.id}`}
             aria-selected={i === active}
-            aria-controls={`panel-${t.id}`}
+            aria-controls={`${uid}-panel-${t.id}`}
+            tabIndex={i === active ? 0 : -1}
             onClick={() => setActive(i)}
-            className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-              i === active ? 'bg-ink text-panel-fg' : 'bg-line text-fg hover:bg-accent-soft'
+            onKeyDown={(e) => onKeyDown(e, i)}
+            className={`h-9 rounded-[var(--radius-md)] px-3.5 text-sm font-semibold transition ${
+              i === active
+                ? 'bg-accent text-accent-fg'
+                : 'bg-card text-fg border border-line hover:border-cacao'
             }`}
           >
             {t.label}
@@ -32,8 +63,9 @@ export function Tabs({
       </div>
       <div
         role="tabpanel"
-        id={`panel-${tabs[active]?.id}`}
-        aria-labelledby={`tab-${tabs[active]?.id}`}
+        id={`${uid}-panel-${tabs[active]?.id}`}
+        aria-labelledby={`${uid}-tab-${tabs[active]?.id}`}
+        tabIndex={0}
         className="mt-4"
       >
         {tabs[active]?.content}

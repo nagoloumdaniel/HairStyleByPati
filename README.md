@@ -1,24 +1,41 @@
 # Hairstyle by Patricia
 
-Application web de réservation en ligne pour un salon de coiffure spécialisé (tresses, vanilles, locs, départ de locs, protectrices, coupes). Site public vitrine + catalogue, moteur de compatibilité capillaire configurable, réservation en ligne, messagerie et back-office d'administration.
+**Coiffure à domicile à Dakar (Sénégal)** : départ et retwist de locs, nattes collées, vanilles, pour hommes et femmes. Site vitrine et catalogue de prestations, diagnostic de compatibilité capillaire, réservation en ligne (paiement sur place), messagerie et back-office d'administration.
+
+🌐 **Site** : <https://hairstylebypati.vercel.app>
+
+![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=nextdotjs)
+![React](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Tailwind-v4-38bdf8?logo=tailwindcss&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-336791?logo=postgresql&logoColor=white)
+
+## Fonctionnalités
+
+- **Landing** : hero plein écran, portrait en cercle animé (forme fluide en boucle), accès direct au catalogue.
+- **Catalogue** de prestations (cartes immersives, photos, prix en FCFA, durée) et fiches détaillées.
+- **Compatibilité capillaire** configurable avant réservation.
+- **Réservation en ligne** en plusieurs étapes, créneaux protégés, liste d'attente, annulation en ligne.
+- **Demandes personnalisées** avec photos de référence, galerie, FAQ, avis approuvés.
+- **Back-office** : prestations, disponibilités, réservations, clients, messagerie, avis.
+- Thème clair / sombre, responsive, accessibilité WCAG 2.2 AA, SEO technique (métadonnées, Open Graph, sitemap, JSON-LD).
+
+## Démarrage rapide
+
+```bash
+npm install
+cp .env.example .env.local   # renseigner les variables (noms uniquement dans le dépôt)
+npx prisma migrate dev
+npm run dev                  # http://localhost:3000
+```
+
+Tests : `npm test` (Vitest) · `npx playwright test` (E2E).
 
 ## Statut
 
-Phase **11, tests, recette et revue**, terminée : 182 tests Vitest verts, parcours e2e complet visiteur + admin ajouté, suite Playwright rejouée en série (desktop) sans régression applicative, revue sécurité et qualité du diff réalisée sans anomalie résiduelle, 36 critères d'acceptation §17 couverts (voir [docs/acceptation.md](docs/acceptation.md)).
+Phases 0 à 11 terminées (tests, recette, revue sécurité, performance, accessibilité, SEO). En cours : phase **12, lancement et maintenance** (voir [ROADMAP.md](ROADMAP.md)). Direction visuelle et consignes design : [DESIGN-RULES.md](DESIGN-RULES.md).
 
-Phase **10, performance, accessibilité et SEO** : images AVIF/WebP responsives avec placeholders, cache ISR des fiches prestation, métadonnées SEO dans le head, image Open Graph, favicon, contrastes et libellés corrigés, tests responsive desktop/tablette/mobile/iPhone. Scores Lighthouse mobile de 96 à 98 en performance, 100 en accessibilité, bonnes pratiques et SEO sur les pages principales.
-
-Le thème **clair / sombre** est disponible sur toutes les interfaces via l'icône du header. La préférence système est détectée au chargement, le choix est mémorisé dans le navigateur et appliqué avant le premier rendu pour éviter tout flash. Vérifié par 4 parcours Playwright desktop et mobile.
-
-Prochaine étape : phase **12, lancement et maintenance**. Le seed crée des disponibilités par défaut du lundi au samedi, 9h-18h.
-
-### Notifications en local
-
-Avec `EMAIL_MODE="console"` dans `.env.local`, aucun e-mail réel n'est envoyé : les envois sont simulés et tracés. Les routes cron sont protégées par `CRON_SECRET` et définies dans `vercel.json` (`/api/cron/notifications` toutes les 10 minutes, `/api/cron/reminders` toutes les heures). Exemple local :
-
-```bash
-curl -H "Authorization: Bearer ${CRON_SECRET}" http://localhost:3000/api/cron/reminders
-```
+Avec `EMAIL_MODE="console"` dans `.env.local`, aucun e-mail réel n'est envoyé : les envois sont simulés et tracés. Les routes cron sont protégées par `CRON_SECRET` et définies dans `vercel.json`.
 
 ## Stack (figée — voir [docs/stack.md](docs/stack.md))
 

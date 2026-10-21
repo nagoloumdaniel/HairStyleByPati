@@ -1,3 +1,4 @@
+import type { Prisma, ReviewStatus } from '@prisma/client';
 import { db } from '@/lib/db';
 import { getSalonSettings } from '@/modules/disponibilites/queries';
 import { deletePrivateImages } from '@/modules/fichiers/private-images';
@@ -12,11 +13,57 @@ export function retentionCutoff(now: Date, days: number): Date {
   return new Date(now.getTime() - Math.max(0, days) * 24 * 60 * 60_000);
 }
 
+/** Même jour du mois, N mois plus tôt (UTC). */
+function monthsBefore(now: Date, months: number): Date {
+  const date = new Date(now.getTime());
+  date.setUTCMonth(date.getUTCMonth() - Math.max(0, months));
+  return date;
+}
+
+/* Durées de conservation (docs/rgpd.md) :
+   - avis non publiés (en attente, soumis non modérés, rejetés) : 12 mois ;
+   - notifications internes lues : 6 mois ;
+   - e-mails définitivement en échec : 3 mois.
+   Les avis publiés (APPROVED), les e-mails en attente/en cours et les notifications
+   non lues ne sont JAMAIS purgés ici. */
+export function retentionPolicyCutoffs(now: Date) {
+  return {
+    reviews: monthsBefore(now, 12),
+    readNotifications: monthsBefore(now, 6),
+    failedEmails: monthsBefore(now, 3),
+  };
+}
+
+const PURGEABLE_REVIEW_STATUSES: ReviewStatus[] = ['PENDING', 'SUBMITTED', 'REJECTED'];
+
+export function expiredReviewsWhere(cutoff: Date) {
+  return {
+    status: { in: PURGEABLE_REVIEW_STATUSES },
+    createdAt: { lt: cutoff },
+  } satisfies Prisma.ReviewWhereInput;
+}
+
+export function expiredNotificationsWhere(cutoffs: { readBefore: Date; failedBefore: Date }) {
+  return {
+    OR: [
+      { channel: 'IN_APP', readAt: { lt: cutoffs.readBefore } },
+      {
+        channel: 'EMAIL',
+        status: 'FAILED',
+        nextAttemptAt: null,
+        createdAt: { lt: cutoffs.failedBefore },
+      },
+    ],
+  } satisfies Prisma.NotificationWhereInput;
+}
+
 export interface RetentionSummary {
   assessmentsPurged: number;
   customRequestsPurged: number;
   photosDeleted: number;
   cancelTokensCleared: number;
+  reviewsPurged: number;
+  notificationsPurged: number;
   cutoff: string;
   photoRetentionDays: number;
 }
@@ -44,23 +91,24 @@ export async function purgeExpiredPhotoData(options?: { now?: Date }): Promise<R
   let photosDeleted = 0;
 
   for (const assessment of assessments) {
-    await deletePrivateImages(assessment.photoKeys);
+    // Les clés dont la suppression a échoué sont conservées pour une nouvelle tentative.
+    const result = await deletePrivateImages(assessment.photoKeys);
     await db.hairAssessment.update({
       where: { id: assessment.id },
-      data: { photoKeys: [] },
+      data: { photoKeys: result.failed },
     });
-    assessmentsPurged += 1;
-    photosDeleted += assessment.photoKeys.length;
+    if (result.failed.length === 0) assessmentsPurged += 1;
+    photosDeleted += result.deleted;
   }
 
   for (const request of customRequests) {
-    await deletePrivateImages(request.photoKeys);
+    const result = await deletePrivateImages(request.photoKeys);
     await db.customRequest.update({
       where: { id: request.id },
-      data: { photoKeys: [] },
+      data: { photoKeys: result.failed },
     });
-    customRequestsPurged += 1;
-    photosDeleted += request.photoKeys.length;
+    if (result.failed.length === 0) customRequestsPurged += 1;
+    photosDeleted += result.deleted;
   }
 
   // Les liens d'annulation expirés ne doivent plus rester utilisables ni stockés.
@@ -69,12 +117,43 @@ export async function purgeExpiredPhotoData(options?: { now?: Date }): Promise<R
     data: { cancelToken: null },
   });
 
+  const cutoffs = retentionPolicyCutoffs(now);
+  const reviewsPurged = await deleteBatch(
+    db.review.findMany({
+      where: expiredReviewsWhere(cutoffs.reviews),
+      select: { id: true },
+      take: 500,
+    }),
+    (ids) =>
+      db.review.deleteMany({ where: { id: { in: ids }, ...expiredReviewsWhere(cutoffs.reviews) } }),
+  );
+  const notificationsWhere = expiredNotificationsWhere({
+    readBefore: cutoffs.readNotifications,
+    failedBefore: cutoffs.failedEmails,
+  });
+  const notificationsPurged = await deleteBatch(
+    db.notification.findMany({ where: notificationsWhere, select: { id: true }, take: 500 }),
+    (ids) => db.notification.deleteMany({ where: { id: { in: ids }, ...notificationsWhere } }),
+  );
+
   return {
     assessmentsPurged,
     customRequestsPurged,
     photosDeleted,
     cancelTokensCleared: cleared.count,
+    reviewsPurged,
+    notificationsPurged,
     cutoff: cutoff.toISOString(),
     photoRetentionDays: settings.photoRetentionDays,
   };
+}
+
+/** Supprime un lot d'identifiants déjà filtrés ; le filtre est rejoué dans le DELETE. */
+async function deleteBatch(
+  rows: Promise<{ id: string }[]>,
+  remove: (ids: string[]) => Promise<{ count: number }>,
+): Promise<number> {
+  const ids = (await rows).map((row) => row.id);
+  if (ids.length === 0) return 0;
+  return (await remove(ids)).count;
 }

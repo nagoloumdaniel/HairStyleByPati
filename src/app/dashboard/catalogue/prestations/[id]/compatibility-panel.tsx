@@ -1,12 +1,13 @@
 'use client';
 
-import { useActionState } from 'react';
+import { Camera, Save } from 'lucide-react';
 import type { AdminCompatibilityRule } from '@/lib/catalogue-admin';
 import { HAIR_TYPE_OPTIONS } from '@/modules/compatibilite/questions';
 import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
-import { adminSaveCompatibility, type CatalogueActionState } from '@/modules/catalogue/actions';
+import { adminSaveCompatibility } from '@/modules/catalogue/actions';
+import { CheckboxField, FormError, useFormAction } from '../../catalogue-ui';
 
 /* ============================================================
  * P4.7 — Éditeur des règles de compatibilité capillaire.
@@ -33,119 +34,99 @@ export function CompatibilityPanel({
   serviceId: string;
   rule: AdminCompatibilityRule | null;
 }) {
-  const [state, formAction, pending] = useActionState<CatalogueActionState, FormData>(
-    adminSaveCompatibility,
-    {},
-  );
+  const { state, onSubmit, pending } = useFormAction(adminSaveCompatibility);
   const accepted = new Set(rule?.acceptedLengths ?? []);
   const acceptedHairTypes = new Set(rule?.acceptedHairTypes ?? []);
 
   return (
-    <form action={formAction} className="flex flex-col gap-5 p-4">
+    <form
+      onSubmit={onSubmit}
+      className="flex flex-col gap-4 rounded-[var(--radius-lg)] bg-card p-3 shadow-soft sm:p-4"
+    >
       <input type="hidden" name="serviceId" value={serviceId} />
 
-      <fieldset className="rounded-[var(--radius-md)] border border-line p-4">
-        <legend className="px-2 text-sm font-semibold">Longueurs de cheveux acceptées</legend>
-        <p className="mb-3 text-sm text-muted">
-          Si aucune longueur n’est cochée, aucune restriction de longueur n’est appliquée.
-        </p>
-        <div className="grid gap-2 sm:grid-cols-2">
-          {HAIR_LENGTHS.map((length) => (
-            <label key={length.value} className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
+      <div className="grid gap-4 lg:grid-cols-2">
+        <fieldset className="rounded-[var(--radius-md)] border border-line p-3">
+          <legend className="px-2 text-sm font-semibold">Longueurs de cheveux acceptées</legend>
+          <p className="mb-3 text-sm text-muted">
+            Aucune case cochée : aucune restriction de longueur.
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {HAIR_LENGTHS.map((length) => (
+              <CheckboxField
+                key={length.value}
                 name="acceptedLengths"
                 value={length.value}
+                label={length.label}
                 defaultChecked={accepted.has(length.value)}
-                className="size-4"
               />
-              {length.label}
-            </label>
-          ))}
-        </div>
-      </fieldset>
+            ))}
+          </div>
+        </fieldset>
 
-      <fieldset className="rounded-[var(--radius-md)] border border-line p-4">
-        <legend className="px-2 text-sm font-semibold">Types de cheveux acceptés</legend>
-        <p className="mb-3 text-sm text-muted">
-          Si aucun type n’est coché, tous les types sont acceptés. Un type non listé déclenche une
-          demande d’évaluation.
-        </p>
-        <div className="grid gap-2 sm:grid-cols-2">
-          {HAIR_TYPE_OPTIONS.map((hairType) => (
-            <label key={hairType} className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
+        <fieldset className="rounded-[var(--radius-md)] border border-line p-3">
+          <legend className="px-2 text-sm font-semibold">Types de cheveux acceptés</legend>
+          <p className="mb-3 text-sm text-muted">
+            Aucune case cochée : tous les types sont acceptés. Un type non listé déclenche une
+            demande d’évaluation.
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {HAIR_TYPE_OPTIONS.map((hairType) => (
+              <CheckboxField
+                key={hairType}
                 name="acceptedHairTypes"
                 value={hairType}
+                label={hairType}
                 defaultChecked={acceptedHairTypes.has(hairType)}
-                className="size-4"
               />
-              {hairType}
-            </label>
-          ))}
-        </div>
-      </fieldset>
+            ))}
+          </div>
+        </fieldset>
+      </div>
 
-      <fieldset className="rounded-[var(--radius-md)] border border-line p-4">
-        <legend className="px-2 text-sm font-semibold">Locs</legend>
-        <div className="flex flex-col gap-2">
-          <label className="flex items-start gap-2 text-sm">
-            <input
-              type="checkbox"
+      <div className="grid gap-4 lg:grid-cols-2">
+        <fieldset className="rounded-[var(--radius-md)] border border-line p-3">
+          <legend className="px-2 text-sm font-semibold">Locs</legend>
+          <div className="flex flex-col gap-3">
+            <CheckboxField
               name="requiresLocs"
+              label="Les locs sont obligatoires"
+              description="La cliente doit déjà porter des locs."
               defaultChecked={rule?.requiresLocs ?? false}
-              className="mt-0.5 size-4"
             />
-            <span>
-              Les locs sont obligatoires pour cette prestation.
-              <span className="block text-muted">La cliente doit déjà porter des locs.</span>
-            </span>
-          </label>
-          <label className="flex items-start gap-2 text-sm">
-            <input
-              type="checkbox"
+            <CheckboxField
               name="incompatibleLocs"
+              label="Les locs sont incompatibles"
+              description="La prestation est refusée si la cliente porte des locs."
               defaultChecked={rule?.incompatibleLocs ?? false}
-              className="mt-0.5 size-4"
             />
-            <span>
-              Les locs sont incompatibles avec cette prestation.
-              <span className="block text-muted">
-                La prestation est refusée si la cliente porte des locs.
-              </span>
-            </span>
-          </label>
-        </div>
-      </fieldset>
+          </div>
+        </fieldset>
 
-      <fieldset className="rounded-[var(--radius-md)] border border-line p-4">
-        <legend className="px-2 text-sm font-semibold">Photo et validation</legend>
-        <div className="flex flex-col gap-4">
-          <Select
-            label="Photo de la cliente"
-            name="photoPolicy"
-            defaultValue={rule?.photoPolicy ?? 'OPTIONAL'}
-            options={PHOTO_POLICIES.map((policy) => ({ value: policy.value, label: policy.label }))}
-          />
-          <label className="flex items-start gap-2 text-sm">
-            <input
-              type="checkbox"
+        <fieldset className="rounded-[var(--radius-md)] border border-line p-3">
+          <legend className="px-2 text-sm font-semibold">Photo et validation</legend>
+          <div className="flex flex-col gap-3">
+            <Select
+              label="Photo de la cliente"
+              name="photoPolicy"
+              icon={Camera}
+              defaultValue={rule?.photoPolicy ?? 'OPTIONAL'}
+              options={PHOTO_POLICIES.map((policy) => ({
+                value: policy.value,
+                label: policy.label,
+              }))}
+            />
+            <CheckboxField
               name="autoApprove"
+              label="Accepter automatiquement l’évaluation"
+              description="Décochée, l’évaluation arrive dans la file de validation."
               defaultChecked={rule?.autoApprove ?? false}
-              className="mt-0.5 size-4"
             />
-            <span>
-              Accepter automatiquement l’évaluation.
-              <span className="block text-muted">
-                Si cette case est décochée, l’évaluation arrive dans la file de validation.
-              </span>
-            </span>
-          </label>
-        </div>
-      </fieldset>
+          </div>
+        </fieldset>
+      </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-3">
         <Textarea
           label="Conditions particulières (facultatif)"
           name="conditionsNote"
@@ -157,7 +138,7 @@ export function CompatibilityPanel({
           label="Message si la prestation est incompatible"
           name="incompatibleMessage"
           defaultValue={rule?.incompatibleMessage ?? ''}
-          hint="Expliquez pourquoi et proposez une alternative. Laissez vide pour utiliser le message par défaut."
+          hint="Expliquez pourquoi et proposez une alternative. Vide : message par défaut."
           rows={3}
         />
         <Textarea
@@ -169,28 +150,11 @@ export function CompatibilityPanel({
         />
       </div>
 
-      {state.error ? (
-        <p
-          role="alert"
-          className="rounded-[var(--radius-md)] bg-alert-soft px-4 py-3 text-sm font-medium text-alert"
-        >
-          {state.error}
-        </p>
-      ) : null}
-      {state.success ? (
-        <p
-          role="status"
-          className="rounded-[var(--radius-md)] bg-success-soft px-4 py-3 text-sm font-medium text-success"
-        >
-          {state.success}
-        </p>
-      ) : null}
+      <FormError message={state.error} />
 
-      <div>
-        <Button type="submit" loading={pending}>
-          Enregistrer les règles
-        </Button>
-      </div>
+      <Button type="submit" icon={Save} loading={pending} className="self-end">
+        Enregistrer les règles
+      </Button>
     </form>
   );
 }

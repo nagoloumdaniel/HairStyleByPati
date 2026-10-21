@@ -18,6 +18,7 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     viewport: { width: 1280, height: 800 },
     ignoreHTTPSErrors: true,
+    timezoneId: 'Africa/Dakar',
   },
   projects: [
     {

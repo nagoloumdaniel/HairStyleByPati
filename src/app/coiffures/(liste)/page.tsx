@@ -1,7 +1,7 @@
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ServiceCard } from '@/components/catalogue/ServiceCard';
-import { CardCarousel } from '@/components/catalogue/CardCarousel';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { parseCatalogueQuery } from '@/lib/catalogue';
 import { getCachedCategories, getCachedServices } from '@/lib/public-cache';
@@ -40,7 +40,7 @@ export default async function CataloguePage({
   const lastResult = Math.min(page * pageSize, total);
 
   return (
-    <main className="mx-auto w-full max-w-7xl space-y-10 px-4 py-8 sm:px-6 md:py-12">
+    <main className="page-main space-y-10">
       <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
@@ -58,11 +58,13 @@ export default async function CataloguePage({
       </nav>
 
       <header className="max-w-3xl space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-[0.14em] text-cacao">Catalogue</p>
+        <p className="hidden text-sm font-semibold uppercase tracking-[0.14em] text-cacao md:block">
+          Catalogue
+        </p>
         <Title as="h1" size="display" className="">
           Coiffures et prestations
         </Title>
-        <p className="text-lg leading-relaxed text-muted">
+        <p className="hidden text-lg leading-relaxed text-muted md:block">
           Chaque prestation est réalisée sur mesure par Patricia, selon votre nature de cheveux et
           vos envies. Prix, durée et options sont affichés avant la réservation.
         </p>
@@ -99,11 +101,16 @@ export default async function CataloguePage({
             actionHref={hasFilters ? '/coiffures' : undefined}
           />
         ) : (
-          <CardCarousel label="Prestations du catalogue">
+          <ul
+            aria-label="Prestations du catalogue"
+            className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
+          >
             {services.map((service, index) => (
-              <ServiceCard key={service.id} service={service} priority={index < 3} />
+              <li key={service.id}>
+                <ServiceCard service={service} priority={index < 3} />
+              </li>
             ))}
-          </CardCarousel>
+          </ul>
         )}
 
         {totalPages > 1 ? (
@@ -117,12 +124,10 @@ export default async function CataloguePage({
                 rel="prev"
                 className="inline-flex items-center gap-2 rounded-[var(--radius-md)] border border-line bg-card px-4 py-2.5 text-sm font-semibold text-fg transition hover:border-cacao hover:bg-page"
               >
-                <span aria-hidden="true">←</span> Page précédente
+                <ArrowLeft aria-hidden="true" className="size-4" /> Page précédente
               </Link>
             ) : (
-              <span aria-disabled="true" className="text-sm text-muted">
-                <span aria-hidden="true">←</span> Page précédente
-              </span>
+              <span aria-hidden="true" />
             )}
 
             <p className="text-sm text-muted" aria-current="page">
@@ -135,12 +140,10 @@ export default async function CataloguePage({
                 rel="next"
                 className="inline-flex items-center gap-2 rounded-[var(--radius-md)] border border-line bg-card px-4 py-2.5 text-sm font-semibold text-fg transition hover:border-cacao hover:bg-page"
               >
-                Page suivante <span aria-hidden="true">→</span>
+                Page suivante <ArrowRight aria-hidden="true" className="size-4" />
               </Link>
             ) : (
-              <span aria-disabled="true" className="text-sm text-muted">
-                Page suivante <span aria-hidden="true">→</span>
-              </span>
+              <span aria-hidden="true" />
             )}
           </nav>
         ) : null}

@@ -18,3 +18,5 @@ export const reviewModerationSchema = z.object({
   id: z.string().trim().min(1).max(64),
   decision: z.enum(['APPROVED', 'REJECTED']),
 });
+
+export const reviewIdSchema = z.object({ id: z.string().trim().min(1).max(64) });

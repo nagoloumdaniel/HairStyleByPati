@@ -1,112 +1,225 @@
 'use client';
 
-import { useActionState } from 'react';
-import { adminSaveSalonProfile, type SalonProfileState } from '@/modules/parametres/actions';
+import { Clock, MessageSquareText, Save, UserRound } from 'lucide-react';
+import { useActionState, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
+import { useToast } from '@/components/ui/Toast';
+import { adminSaveSalonProfile, type SalonProfileState } from '@/modules/parametres/actions';
+import {
+  OPENING_MAX,
+  OPENING_MIN,
+  WEEKDAY_LABELS,
+  readOpeningHours,
+} from '@/modules/parametres/hours';
+import { SettingsSection } from './settings-section';
 
-export function SalonProfileForm({
-  settings,
-}: {
-  settings: {
-    name: string;
-    contactEmail: string | null;
-    phone: string | null;
-    address: string | null;
-    logoUrl: string | null;
-    emailSignature: string | null;
-    cancellationPolicy: string | null;
-    bookingPolicy: string | null;
-    openingHours: unknown;
-  };
-}) {
+type Settings = {
+  name: string;
+  contactEmail: string | null;
+  phone: string | null;
+  address: string | null;
+  emailSignature: string | null;
+  cancellationPolicy: string | null;
+  bookingPolicy: string | null;
+  openingHours: unknown;
+};
+
+/* Heures proposées : de 5 h à 22 h, par pas de 30 minutes. */
+const TIME_OPTIONS = (() => {
+  const out: { value: string; label: string }[] = [];
+  const [minH] = OPENING_MIN.split(':').map(Number) as [number];
+  const [maxH] = OPENING_MAX.split(':').map(Number) as [number];
+  for (let m = minH * 60; m <= maxH * 60; m += 30) {
+    const t = `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+    out.push({ value: t, label: t });
+  }
+  return out;
+})();
+
+export function SalonProfileForm({ settings }: { settings: Settings }) {
+  const { notify } = useToast();
   const [state, formAction, pending] = useActionState<SalonProfileState, FormData>(
     adminSaveSalonProfile,
     {},
   );
+  // Champs contrôlés : une erreur de validation ne réinitialise pas la saisie.
+  const initialHours = readOpeningHours(settings.openingHours);
+  const [values, setValues] = useState({
+    name: settings.name,
+    contactEmail: settings.contactEmail ?? '',
+    phone: settings.phone ?? '',
+    address: settings.address ?? '',
+    emailSignature: settings.emailSignature ?? '',
+    cancellationPolicy: settings.cancellationPolicy ?? '',
+    bookingPolicy: settings.bookingPolicy ?? '',
+  });
+  const [days, setDays] = useState<number[]>(initialHours.days);
+  const [open, setOpen] = useState(initialHours.open);
+  const [close, setClose] = useState(initialHours.close);
+
+  useEffect(() => {
+    if (state.success) notify(state.success, 'success');
+  }, [state, notify]);
+
+  const set = (key: keyof typeof values) => (event: { target: { value: string } }) =>
+    setValues((prev) => ({ ...prev, [key]: event.target.value }));
+  const errors = state.fieldErrors ?? {};
+  const hoursJson = JSON.stringify([...days].sort().map((weekday) => ({ weekday, open, close })));
+  const hoursInvalid = days.length === 0 || open >= close;
 
   return (
-    <form action={formAction} className="space-y-5">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Input
-          label="Nom du salon"
-          name="name"
-          defaultValue={settings.name}
-          required
-          maxLength={120}
-        />
-        <Input
-          label="E-mail public"
-          name="contactEmail"
-          type="email"
-          defaultValue={settings.contactEmail ?? ''}
-          maxLength={200}
-        />
-        <Input
-          label="Téléphone"
-          name="phone"
-          type="tel"
-          defaultValue={settings.phone ?? ''}
-          maxLength={30}
-        />
-        <Input
-          label="Logo (URL https, facultatif)"
-          name="logoUrl"
-          type="url"
-          defaultValue={settings.logoUrl ?? ''}
-          maxLength={500}
-        />
+    <form action={formAction} className="flex flex-col gap-3">
+      <input type="hidden" name="openingHours" value={hoursJson} />
+      <div className="grid items-start gap-3 lg:grid-cols-2">
+        <SettingsSection icon={UserRound} title="Profil">
+          <Input
+            label="Nom professionnel"
+            name="name"
+            value={values.name}
+            onChange={set('name')}
+            required
+            maxLength={120}
+            error={errors.name}
+          />
+          <Input
+            label="E-mail public"
+            name="contactEmail"
+            type="email"
+            value={values.contactEmail}
+            onChange={set('contactEmail')}
+            maxLength={200}
+            error={errors.contactEmail}
+          />
+          <Input
+            label="Téléphone"
+            name="phone"
+            type="tel"
+            value={values.phone}
+            onChange={set('phone')}
+            maxLength={30}
+            error={errors.phone}
+          />
+          <Textarea
+            label="Adresse ou zone d’intervention"
+            name="address"
+            rows={2}
+            value={values.address}
+            onChange={set('address')}
+            maxLength={300}
+            error={errors.address}
+            hint="Patricia se déplace à domicile : indiquez les quartiers desservis."
+          />
+        </SettingsSection>
+
+        <SettingsSection icon={Clock} title="Horaires de travail">
+          <fieldset>
+            <legend className="mb-1.5 text-sm font-semibold text-fg">Jours travaillés</legend>
+            <div className="flex flex-wrap gap-1.5">
+              {WEEKDAY_LABELS.map((label, weekday) => {
+                const on = days.includes(weekday);
+                return (
+                  <Button
+                    key={label}
+                    type="button"
+                    size="sm"
+                    variant={on ? 'primary' : 'secondary'}
+                    aria-pressed={on}
+                    onClick={() =>
+                      setDays((prev) =>
+                        prev.includes(weekday)
+                          ? prev.filter((d) => d !== weekday)
+                          : [...prev, weekday],
+                      )
+                    }
+                  >
+                    {label}
+                  </Button>
+                );
+              })}
+            </div>
+          </fieldset>
+          <div className="grid grid-cols-2 gap-3">
+            <Select
+              label="De"
+              icon={Clock}
+              value={open}
+              options={TIME_OPTIONS.filter((o) => o.value < OPENING_MAX)}
+              onChange={(event) => setOpen(event.target.value)}
+            />
+            <Select
+              label="À"
+              icon={Clock}
+              value={close}
+              options={TIME_OPTIONS.filter((o) => o.value > OPENING_MIN)}
+              onChange={(event) => setClose(event.target.value)}
+            />
+          </div>
+          {hoursInvalid ? (
+            <p role="alert" className="text-sm font-medium text-alert">
+              Choisissez au moins un jour et une fin après le début.
+            </p>
+          ) : (
+            <p className="text-sm text-muted">Horaires possibles : de 5 h à 22 h.</p>
+          )}
+          {errors.openingHours ? (
+            <p role="alert" className="text-sm font-medium text-alert">
+              {errors.openingHours}
+            </p>
+          ) : null}
+        </SettingsSection>
+
+        <SettingsSection
+          icon={MessageSquareText}
+          title="Messages affichés"
+          className="lg:col-span-2"
+        >
+          <div className="grid gap-3 lg:grid-cols-2">
+            <Textarea
+              label="Règles d’annulation"
+              name="cancellationPolicy"
+              rows={3}
+              value={values.cancellationPolicy}
+              onChange={set('cancellationPolicy')}
+              maxLength={3000}
+              error={errors.cancellationPolicy}
+              hint="Affichée sur la page d’annulation, /infos-pratiques et dans l’e-mail de confirmation. Vide : texte par défaut."
+            />
+            <Textarea
+              label="Règles de réservation"
+              name="bookingPolicy"
+              rows={3}
+              value={values.bookingPolicy}
+              onChange={set('bookingPolicy')}
+              maxLength={3000}
+              error={errors.bookingPolicy}
+              hint="Affichées sur /infos-pratiques et dans l’e-mail de confirmation. Vide : texte par défaut."
+            />
+          </div>
+          <Textarea
+            label="Signature des e-mails"
+            name="emailSignature"
+            rows={2}
+            value={values.emailSignature}
+            onChange={set('emailSignature')}
+            maxLength={1000}
+            error={errors.emailSignature}
+            hint="Ajoutée en pied de tous les e-mails envoyés."
+          />
+        </SettingsSection>
       </div>
-      <Textarea
-        label="Adresse"
-        name="address"
-        rows={2}
-        defaultValue={settings.address ?? ''}
-        maxLength={300}
-      />
-      <Textarea
-        label="Horaires affichés (JSON, facultatif)"
-        name="openingHoursText"
-        rows={4}
-        defaultValue={settings.openingHours ? JSON.stringify(settings.openingHours, null, 2) : ''}
-        hint='Exemple : [{"weekday":1,"open":"09:00","close":"18:00"}]'
-      />
-      <Textarea
-        label="Règles d’annulation affichées"
-        name="cancellationPolicy"
-        rows={3}
-        defaultValue={settings.cancellationPolicy ?? ''}
-        maxLength={3000}
-      />
-      <Textarea
-        label="Règles de réservation affichées"
-        name="bookingPolicy"
-        rows={3}
-        defaultValue={settings.bookingPolicy ?? ''}
-        maxLength={3000}
-      />
-      <Textarea
-        label="Signature des e-mails"
-        name="emailSignature"
-        rows={2}
-        defaultValue={settings.emailSignature ?? ''}
-        maxLength={1000}
-      />
-      <div className="flex flex-wrap items-center gap-3">
-        <Button type="submit" loading={pending}>
-          Enregistrer l’identité
-        </Button>
-        {state.error ? (
-          <p role="alert" className="text-sm text-alert">
+
+      <div className="flex flex-wrap items-center justify-end gap-3">
+        {state.error && !errors.openingHours ? (
+          <p role="alert" className="mr-auto text-sm font-medium text-alert">
             {state.error}
           </p>
         ) : null}
-        {state.success ? (
-          <p role="status" className="text-sm text-success">
-            {state.success}
-          </p>
-        ) : null}
+        <Button type="submit" icon={Save} loading={pending} disabled={hoursInvalid}>
+          Enregistrer
+        </Button>
       </div>
     </form>
   );

@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next';
+import { publicCsp } from './src/lib/csp';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -26,30 +27,15 @@ const securityHeaders = [
 ];
 
 if (isProduction) {
-  securityHeaders.push(
-    { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
-    {
-      key: 'Content-Security-Policy',
-      // Next.js injecte des scripts inline pour l'hydratation : 'unsafe-inline'
-      // reste nécessaire pour les scripts et styles générés par le framework.
-      value: [
-        "default-src 'self'",
-        "script-src 'self' 'unsafe-inline'",
-        "style-src 'self' 'unsafe-inline'",
-        "img-src 'self' data: blob: https:",
-        "font-src 'self' data:",
-        "connect-src 'self'",
-        "frame-ancestors 'none'",
-        "base-uri 'self'",
-        "form-action 'self'",
-        "object-src 'none'",
-        'upgrade-insecure-requests',
-      ].join('; '),
-    },
-  );
+  securityHeaders.push({
+    key: 'Strict-Transport-Security',
+    value: 'max-age=63072000; includeSubDomains; preload',
+  });
 }
 
 const nextConfig: NextConfig = {
+  // Dossier de build alternatif (tests E2E) pour ne pas écraser le serveur de dev.
+  distDir: process.env.NEXT_DIST_DIR || '.next',
   poweredByHeader: false,
   // P4.4 : les photos de prestation sont envoyées via server action.
   // La limite applicative reste de 5 Mo par fichier (voir image-validation.ts).
@@ -77,7 +63,18 @@ const nextConfig: NextConfig = {
     ],
   },
   async headers() {
-    return [{ source: '/(.*)', headers: securityHeaders }];
+    return [
+      { source: '/(.*)', headers: securityHeaders },
+      // Pages privées (dashboard, connexion) : CSP stricte à nonce posée par le middleware.
+      ...(isProduction
+        ? [
+            {
+              source: '/((?!dashboard|connexion).*)',
+              headers: [{ key: 'Content-Security-Policy', value: publicCsp() }],
+            },
+          ]
+        : []),
+    ];
   },
 };
 

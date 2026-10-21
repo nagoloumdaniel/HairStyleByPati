@@ -5,13 +5,13 @@ import { Title } from '@/components/ui/Title';
 export const metadata: Metadata = {
   title: 'Mentions légales',
   description:
-    'Mentions légales du salon Hairstyle by Patricia : identité, coordonnées, hébergement et publication du site.',
+    'Mentions légales de Hairstyle by Patricia : identité, coordonnées, hébergement et publication du site.',
   alternates: { canonical: '/mentions-legales' },
 };
 
 export default function MentionsLegalesPage() {
   return (
-    <main className="mx-auto w-full max-w-7xl space-y-12 px-4 py-8 sm:px-6 md:py-12">
+    <main className="page-main space-y-12">
       <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
@@ -36,8 +36,8 @@ export default function MentionsLegalesPage() {
           Mentions légales
         </Title>
         <p className="text-lg leading-relaxed text-muted">
-          Identité du salon, coordonnées, hébergement et conditions de publication du site Hairstyle
-          by Patricia.
+          Identité, coordonnées, hébergement et conditions de publication du site Hairstyle by
+          Patricia.
         </p>
       </header>
 
@@ -50,7 +50,7 @@ export default function MentionsLegalesPage() {
             <div className="bg-page p-6 rounded-xl border border-line">
               <dt className="font-medium text-fg mb-1">Nom commercial</dt>
               <dd>
-                Hairstyle by Patricia — salon de coiffure spécialisé dans les cheveux texturés.
+                Hairstyle by Patricia — coiffure à domicile spécialisée dans les cheveux texturés.
               </dd>
             </div>
             <div className="bg-page p-6 rounded-xl border border-line">
@@ -63,14 +63,14 @@ export default function MentionsLegalesPage() {
               <dt className="font-medium text-fg mb-1">Contact</dt>
               <dd>
                 E-mail :
-                <a href="mailto:contact@example.com" className="text-cacao underline">
-                  contact@example.com
+                <a href="mailto:zepatricia7@gmail.com" className="text-cacao underline">
+                  zepatricia7@gmail.com
                 </a>
               </dd>
             </div>
             <div className="bg-page p-6 rounded-xl border border-line">
               <dt className="font-medium text-fg mb-1">SIRET (à compléter)</dt>
-              <dd className="text-xs opacity-80">Numéro SIRET à renseigner par le salon.</dd>
+              <dd className="text-xs opacity-80">Numéro SIRET à renseigner par Patricia.</dd>
             </div>
           </div>
         </dl>
@@ -83,7 +83,7 @@ export default function MentionsLegalesPage() {
         <div className="bg-page p-6 rounded-xl border border-line">
           <p className="text-muted leading-relaxed">
             Ce site est hébergé sur une plateforme de cloud publique (ex. Vercel ou équivalent). Les
-            coordonnées précises de l’hébergeur doivent être renseignées ici par le salon.
+            coordonnées précises de l’hébergeur doivent être renseignées ici par Patricia.
           </p>
         </div>
       </section>
@@ -93,8 +93,8 @@ export default function MentionsLegalesPage() {
           3. Publication et contenus
         </Title>
         <p className="text-muted leading-relaxed">
-          La directrice de la publication est Patricia, gérante du salon Hairstyle by Patricia. Les
-          textes, photos et visuels du site sont la propriété du salon ou utilisés avec
+          La directrice de la publication est Patricia, gérante de Hairstyle by Patricia. Les
+          textes, photos et visuels du site sont la propriété de Patricia ou utilisés avec
           l’autorisation de leurs auteurs. Toute reproduction est interdite sans accord écrit.
         </p>
       </section>
@@ -110,8 +110,8 @@ export default function MentionsLegalesPage() {
           </Link>
           . Conformément au RGPD, vous disposez d’un droit d’accès, de rectification, de suppression
           et d’opposition sur vos données. Pour exercer ces droits, écrivez à{' '}
-          <a href="mailto:contact@example.com" className="text-cacao underline">
-            contact@example.com
+          <a href="mailto:zepatricia7@gmail.com" className="text-cacao underline">
+            zepatricia7@gmail.com
           </a>
           .
         </p>

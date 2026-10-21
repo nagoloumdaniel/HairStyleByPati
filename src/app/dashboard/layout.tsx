@@ -1,8 +1,12 @@
 import type { Metadata } from 'next';
-import { headers } from 'next/headers';
 import Link from 'next/link';
-import { Sidebar } from '@/components/layout/Sidebar';
+import { Suspense } from 'react';
+import { DashboardThemeLock } from '@/components/layout/DashboardThemeLock';
+import { DashboardTopbar } from '@/components/layout/DashboardTopbar';
+import { MobileTabBar, Sidebar } from '@/components/layout/Sidebar';
+import { DASHBOARD_THEME_SCRIPT } from '@/lib/inline-scripts';
 import { Logo } from '@/components/shared/Logo';
+import { ConfirmProvider } from '@/components/ui/Confirm';
 import { countUnreadCustomerMessages } from '@/modules/messagerie/queries';
 import { countUnreadNotifications } from '@/modules/notifications/queries';
 
@@ -10,33 +14,43 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-/* P2.6 : coquille dashboard, sidebar sombre distincte du public.
-   Sur mobile, la navigation devient une barre horizontale compacte. */
-export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const headersList = await headers();
-  const pathname = headersList.get('x-pathname') ?? undefined;
+/* Les compteurs de badges ne bloquent pas le rendu de la page : la barre s'affiche
+   immédiatement (sans badges) puis se complète en streaming. */
+async function TopbarWithCounts() {
   const [unreadMessages, unreadNotifications] = await Promise.all([
     countUnreadCustomerMessages().catch(() => 0),
     countUnreadNotifications().catch(() => 0),
   ]);
   return (
-    <div className="mx-auto grid max-w-6xl gap-4 px-4 py-6 sm:px-6 lg:grid-cols-[240px_1fr] lg:gap-6 lg:py-8">
-      <aside className="min-w-0 rounded-[var(--radius-lg)] bg-ink p-2 text-panel-fg shadow-lift lg:sticky lg:top-28 lg:self-start lg:p-4">
-        <Link href="/" className="hidden items-center gap-2 px-4 pb-4 lg:flex">
-          <Logo markClassName="h-7 w-auto text-panel-fg" showWordmark={false} />
-          <span className="font-heading text-sm font-bold text-panel-fg">
-            Hairstyle by Patricia
-          </span>
-        </Link>
-        <p className="hidden px-4 pb-3 font-heading text-sm font-bold uppercase tracking-wide text-bright lg:block">
-          Administration
-        </p>
-        <Sidebar
-          pathname={pathname}
-          badges={{ messages: unreadMessages, notifications: unreadNotifications }}
-        />
-      </aside>
-      <main className="min-w-0">{children}</main>
-    </div>
+    <DashboardTopbar unreadMessages={unreadMessages} unreadNotifications={unreadNotifications} />
+  );
+}
+
+/* Coquille dashboard : thème unique (clair), sidebar sombre sur desktop,
+   barre d'onglets fixe sur mobile. */
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <ConfirmProvider>
+      <script dangerouslySetInnerHTML={{ __html: DASHBOARD_THEME_SCRIPT }} />
+      <DashboardThemeLock />
+      <div className="grid min-h-dvh w-full grid-cols-1 content-start lg:grid-cols-[232px_minmax(0,1fr)] lg:content-stretch">
+        <aside className="hidden min-w-0 bg-ink p-3 text-panel-fg lg:sticky lg:top-0 lg:block lg:h-dvh lg:self-start lg:overflow-y-auto">
+          <Link href="/dashboard" className="flex h-14 items-center gap-2 px-3">
+            <Logo markClassName="h-7 w-auto text-panel-fg" showWordmark={false} />
+            <span className="font-heading text-sm font-bold text-panel-fg">
+              Hairstyle by Patricia
+            </span>
+          </Link>
+          <Sidebar />
+        </aside>
+        <div className="min-w-0">
+          <Suspense fallback={<DashboardTopbar />}>
+            <TopbarWithCounts />
+          </Suspense>
+          <main className="px-3 pb-24 pt-3 sm:px-5 sm:pt-4 lg:px-6 lg:pb-8">{children}</main>
+        </div>
+      </div>
+      <MobileTabBar />
+    </ConfirmProvider>
   );
 }

@@ -3,11 +3,7 @@ import { CardSkeleton, Skeleton } from '@/components/shared/Skeleton';
 /** P2.7 + P3.2 : squelette du catalogue, même grille que la page chargée. */
 export default function CatalogueLoading() {
   return (
-    <main
-      aria-busy="true"
-      aria-live="polite"
-      className="mx-auto w-full max-w-7xl space-y-10 px-4 py-8 sm:px-6 md:py-12"
-    >
+    <main aria-busy="true" aria-live="polite" className="page-main space-y-10">
       <p className="sr-only">Chargement du catalogue…</p>
       <Skeleton className="h-4 w-44" />
       <div className="space-y-3">

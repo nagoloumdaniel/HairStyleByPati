@@ -23,7 +23,7 @@ export default async function WaitlistTokenPage({
 
   if (!entry) {
     return (
-      <main className="mx-auto w-full max-w-2xl px-4 py-12 sm:px-6">
+      <main className="page-main">
         <div className="rounded-[var(--radius-lg)] border border-alert bg-alert-soft p-8 text-center">
           <h1 className="font-heading text-2xl font-bold text-alert">Lien invalide</h1>
           <p className="mt-3 text-fg">Ce lien ne correspond à aucune demande de liste d’attente.</p>
@@ -37,7 +37,7 @@ export default async function WaitlistTokenPage({
 
   if (!valid) {
     return (
-      <main className="mx-auto w-full max-w-2xl px-4 py-12 sm:px-6">
+      <main className="page-main">
         <div className="rounded-[var(--radius-lg)] border border-line bg-card p-8 text-center">
           <Title as="h1" size="display" className="">
             {entry.status === 'CONFIRMED' ? 'Déjà confirmée' : 'Lien expiré'}
@@ -53,7 +53,7 @@ export default async function WaitlistTokenPage({
   }
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-12 sm:px-6">
+    <main className="page-main">
       <div className="rounded-[var(--radius-lg)] border border-line bg-card p-8 shadow-soft">
         <Title as="h1" size="display" className="">
           Une place s’est libérée pour « {entry.service.name} »

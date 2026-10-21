@@ -1,16 +1,17 @@
 'use client';
 
+import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Logo } from '@/components/shared/Logo';
+import { SocialLinks } from './SocialLinks';
 import { ThemeToggle } from './ThemeToggle';
 
 /* Navbar flottante en verre (web + mobile) : pilule détachée du bord, flou,
    menu mobile déployé dans la même capsule. Règles : DESIGN-RULES.md. */
 const LINKS = [
   { href: '/coiffures', label: 'Catalogue' },
-  { href: '/salon', label: 'Le salon' },
   { href: '/faq', label: 'FAQ' },
   { href: '/demandes-personnalisees', label: 'Sur mesure' },
   { href: '/contact', label: 'Contact' },
@@ -23,6 +24,8 @@ export function Header() {
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
+
+  if (pathname.startsWith('/connexion') || pathname.startsWith('/dashboard')) return null;
 
   return (
     <>
@@ -51,9 +54,10 @@ export function Header() {
             })}
           </nav>
           <div className="flex items-center gap-2">
+            <SocialLinks className="hidden lg:flex" />
             <ThemeToggle />
             <Link
-              href="/reserver"
+              href="/coiffures"
               className="bg-gradient-primary rounded-full px-5 py-2.5 text-sm font-bold text-accent-fg shadow-soft transition hover:brightness-110 active:scale-[0.98]"
             >
               Réserver
@@ -67,7 +71,11 @@ export function Header() {
               className="flex h-10 w-10 items-center justify-center rounded-full text-fg hover:bg-accent-soft md:hidden"
             >
               <span aria-hidden="true" className="text-xl leading-none">
-                {open ? '✕' : '☰'}
+                {open ? (
+                  <X aria-hidden="true" className="size-5" />
+                ) : (
+                  <Menu aria-hidden="true" className="size-5" />
+                )}
               </span>
             </button>
           </div>
@@ -91,6 +99,7 @@ export function Header() {
                 </li>
               ))}
             </ul>
+            <SocialLinks className="mt-2 justify-center border-t border-line pt-2" />
           </nav>
         ) : null}
       </header>

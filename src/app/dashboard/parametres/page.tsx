@@ -1,9 +1,11 @@
+import { CalendarOff, ChevronRight, Settings } from 'lucide-react';
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { CardLink } from '@/components/ui/Card';
 import { requireAdmin } from '@/modules/auth/guards';
 import { getSalonSettings } from '@/modules/disponibilites/queries';
-import { Card } from '@/components/ui/Card';
+import { PasswordCard, SessionsCard } from './account-security';
 import { SalonProfileForm } from './salon-profile-form';
 
 export const metadata: Metadata = { title: 'Paramètres - Tableau de bord' };
@@ -14,40 +16,41 @@ export default async function SettingsPage() {
   const settings = await getSalonSettings();
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold">Paramètres du salon</h1>
-      <p className="mt-1 text-ink-soft">
-        Identité, coordonnées, horaires affichés et messages de politique. Les règles de créneaux et
-        d’annulation se règlent dans{' '}
-        <Link href="/dashboard/disponibilites" className="font-semibold text-cacao hover:underline">
-          Disponibilités
-        </Link>
-        .
-      </p>
-      <div className="mt-6 grid items-start gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
-        <Card>
-          <h2 className="font-heading text-xl font-bold text-fg">Identité et communication</h2>
-          <div className="mt-4">
-            <SalonProfileForm settings={settings} />
-          </div>
-        </Card>
-        <Card>
-          <h2 className="font-heading text-xl font-bold text-fg">Aperçu</h2>
-          <p className="mt-3 font-heading text-2xl font-bold text-fg">{settings.name}</p>
-          <p className="mt-1 text-sm text-ink-soft">
-            {settings.address ?? 'Adresse non renseignée'}
-          </p>
-          <p className="text-sm text-ink-soft">{settings.phone ?? 'Téléphone non renseigné'}</p>
-          <p className="text-sm text-ink-soft">{settings.contactEmail ?? 'E-mail non renseigné'}</p>
-          <p className="mt-4 text-sm text-ink-soft">
-            Délai de rappel : {settings.reminderLeadHours} h · Annulation : au moins{' '}
-            {settings.minCancelNoticeHours} h avant.
-          </p>
-          <p className="mt-4 text-xs text-ink-soft">
-            Le logo et les horaires sont enregistrés dans les paramètres. Le logo n’est pas encore
-            affiché automatiquement dans l’en-tête public.
-          </p>
-        </Card>
+    <div>
+      <PageHeader
+        icon={Settings}
+        title="Paramètres"
+        description="Profil, coordonnées, horaires et messages affichés aux clientes."
+      />
+
+      {/* Règles de créneaux et d'annulation : carte entière cliquable vers Disponibilités. */}
+      <CardLink href="/dashboard/disponibilites" className="mb-3 p-3! sm:p-4!">
+        <div className="flex items-center gap-3">
+          <span
+            aria-hidden="true"
+            className="inline-flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-accent-soft text-accent"
+          >
+            <CalendarOff className="size-5" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-semibold text-fg">
+              Disponibilités et règles de réservation
+            </span>
+            <span className="block text-sm text-muted">
+              Rappel {settings.reminderLeadHours} h avant · annulation possible jusqu’à{' '}
+              {settings.minCancelNoticeHours} h avant
+            </span>
+          </span>
+          <ChevronRight aria-hidden="true" className="size-5 shrink-0 text-muted" />
+        </div>
+      </CardLink>
+
+      <SalonProfileForm settings={settings} />
+
+      {/* Sécurité du compte : mot de passe et sessions. */}
+      <div className="mt-3 grid items-start gap-3 lg:grid-cols-2">
+        <PasswordCard />
+        <SessionsCard />
       </div>
     </div>
   );

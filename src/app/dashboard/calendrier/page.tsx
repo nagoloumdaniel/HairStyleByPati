@@ -1,6 +1,9 @@
+import { CalendarDays, CalendarOff } from 'lucide-react';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/modules/auth/guards';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { ButtonLink } from '@/components/ui/Button';
 import { CalendarClient } from './calendar-client';
 
 export const metadata: Metadata = { title: 'Calendrier - Tableau de bord' };
@@ -10,17 +13,23 @@ export default async function CalendrierPage() {
   if (!user) redirect('/connexion?callbackUrl=/dashboard/calendrier');
 
   return (
-    <div className="p-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold">Calendrier</h1>
-        <p className="text-muted">
-          Vue jour, semaine, mois et liste des rendez-vous. Cliquez sur un rendez-vous pour ouvrir
-          sa fiche.
-        </p>
-      </div>
-      <div className="mt-6">
-        <CalendarClient />
-      </div>
+    <div>
+      <PageHeader
+        icon={CalendarDays}
+        title="Calendrier"
+        description="Jour, semaine, mois ou liste. Touchez un rendez-vous pour ouvrir sa fiche."
+        actions={
+          <ButtonLink
+            href="/dashboard/disponibilites"
+            variant="secondary"
+            icon={CalendarOff}
+            iconOnly="mobile"
+          >
+            Bloquer un créneau
+          </ButtonLink>
+        }
+      />
+      <CalendarClient />
     </div>
   );
 }

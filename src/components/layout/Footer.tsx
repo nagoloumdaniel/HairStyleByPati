@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import { LogoMark } from '@/components/shared/Logo';
+import { SOCIALS } from './SocialLinks';
 
 /* P2.5 : pied de page coordonnees, reseaux, liens legaux. Distinct du dashboard. */
 export function Footer() {
   return (
     <footer className="mt-16 bg-footer text-panel-fg">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-3 sm:px-6">
+      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:grid-cols-3 sm:px-6">
         <div>
           <p className="flex items-center gap-2 font-heading text-lg font-bold">
             <LogoMark className="h-8 w-auto text-panel-fg" />
@@ -21,11 +22,6 @@ export function Footer() {
             <li>
               <Link href="/coiffures" className="opacity-80 hover:opacity-100 hover:underline">
                 Catalogue
-              </Link>
-            </li>
-            <li>
-              <Link href="/salon" className="opacity-80 hover:opacity-100 hover:underline">
-                Le salon
               </Link>
             </li>
             <li>
@@ -66,27 +62,20 @@ export function Footer() {
         </nav>
         <div>
           <p className="font-semibold">Nous suivre</p>
-          <ul className="mt-2 space-y-1.5 text-sm">
-            <li>
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noreferrer"
-                className="opacity-80 hover:opacity-100 hover:underline"
-              >
-                Instagram
-              </a>
-            </li>
-            <li>
-              <a
-                href="https://tiktok.com"
-                target="_blank"
-                rel="noreferrer"
-                className="opacity-80 hover:opacity-100 hover:underline"
-              >
-                TikTok
-              </a>
-            </li>
+          <ul className="mt-3 flex gap-2" aria-label="Réseaux sociaux">
+            {SOCIALS.map(({ href, label, Icon }) => (
+              <li key={label}>
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={`${label} (nouvel onglet)`}
+                  className="flex size-10 items-center justify-center rounded-full bg-panel-fg/10 transition hover:bg-panel-fg/20"
+                >
+                  <Icon aria-hidden="true" className="size-[1.1rem]" />
+                </a>
+              </li>
+            ))}
           </ul>
         </div>
       </div>

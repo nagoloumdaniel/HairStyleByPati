@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { getSalonSettings } from '@/modules/disponibilites/queries';
 import { getEmailProvider, type EmailProvider } from './provider';
 import { MAX_EMAIL_ATTEMPTS, retryDelayMinutes } from './retry';
+import { emailContextFromSettings, type EmailContext } from '@/modules/parametres/policies';
 import { renderNotification } from './templates';
 
 /* ============================================================
@@ -15,10 +16,24 @@ export { MAX_EMAIL_ATTEMPTS, retryDelayMinutes } from './retry';
 
 export function adminNotificationRecipient(fallback?: string | null): string {
   return (
-    (fallback && fallback.trim()) ||
-    process.env.ADMIN_EMAIL?.trim() ||
-    'admin@hairstylebypati.local'
+    (fallback && fallback.trim()) || process.env.ADMIN_EMAIL?.trim() || 'zepatricia7@gmail.com'
   );
+}
+
+/* Signature et politiques lues une fois par passage ; en cas d'échec de lecture,
+   l'envoi continue avec les valeurs par défaut (jamais bloquant). */
+async function loadEmailContext(): Promise<EmailContext> {
+  try {
+    return emailContextFromSettings(await getSalonSettings());
+  } catch (error) {
+    console.error('[email] paramètres du salon illisibles, valeurs par défaut', error);
+    return emailContextFromSettings({
+      emailSignature: null,
+      cancellationPolicy: null,
+      bookingPolicy: null,
+      minCancelNoticeHours: 24,
+    });
+  }
 }
 
 export interface DispatchSummary {
@@ -61,6 +76,8 @@ export async function processPendingEmails(options?: {
     take: limit,
   });
 
+  const emailContext = due.length > 0 ? await loadEmailContext() : {};
+
   for (const notification of due) {
     const claimed = await db.notification.updateMany({
       where: {
@@ -78,7 +95,11 @@ export async function processPendingEmails(options?: {
     if (claimed.count === 0) continue;
 
     summary.processed += 1;
-    const rendered = renderNotification(notification.templateKey, notification.payload);
+    const rendered = renderNotification(
+      notification.templateKey,
+      notification.payload,
+      emailContext,
+    );
     if (!rendered) {
       summary.failed += 1;
       await db.notification.update({

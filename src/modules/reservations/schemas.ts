@@ -63,6 +63,17 @@ export const bookingRequestSchema = z.object({
   phone: phoneSchema,
   comment: commentSchema,
   consent: consentSchema,
+  // Code promo facultatif : seulement borné ici, la validité réelle est revérifiée par createBooking.
+  promoCode: z.string().trim().max(40, 'Code promo invalide.').default(''),
+});
+
+export const promoCodeRequestSchema = z.object({
+  serviceSlug: z.string().trim().min(1, 'Prestation manquante.').max(160),
+  code: z
+    .string()
+    .trim()
+    .min(1, 'Saisissez un code promo.')
+    .max(40, 'Ce code promo n’est pas valide.'),
 });
 
 export type BookingRequestInput = z.infer<typeof bookingRequestSchema>;

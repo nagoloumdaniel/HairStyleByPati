@@ -1,7 +1,7 @@
 /**
- * P3.8 — Données structurées LocalBusiness (JSON-LD) pour le salon.
- * Aide les moteurs de recherche à afficher les infos du salon (nom, adresse,
- * horaires, téléphone) dans les résultats enrichis.
+ * P3.8 — Données structurées LocalBusiness (JSON-LD) pour Patricia.
+ * Aide les moteurs de recherche à afficher les infos de l’activité (nom, adresse,
+ * horaires) dans les résultats enrichis.
  */
 
 export interface LocalBusinessData {
@@ -12,7 +12,6 @@ export interface LocalBusinessData {
     addressRegion: string;
     addressCountry: string;
   };
-  telephone: string;
   email: string;
   priceRange: string;
   servesCity: string;
@@ -22,21 +21,22 @@ export interface LocalBusinessData {
 export const LOCAL_BUSINESS: LocalBusinessData = {
   name: 'Hairstyle by Patricia',
   address: {
-    streetAddress: 'Dakar',
+    streetAddress: 'Ouest - Foire',
     addressLocality: 'Dakar',
     addressRegion: 'Dakar',
     addressCountry: 'SN',
   },
-  telephone: '+221770000000',
-  email: 'contact@hairstylebypati.fr',
+  email: 'zepatricia7@gmail.com',
   priceRange: 'FCFA',
   servesCity: 'Dakar',
   openingHours: [
-    { dayOfWeek: 'https://schema.org/Tuesday', opens: '10:00', closes: '19:00' },
-    { dayOfWeek: 'https://schema.org/Wednesday', opens: '10:00', closes: '19:00' },
-    { dayOfWeek: 'https://schema.org/Thursday', opens: '10:00', closes: '19:00' },
-    { dayOfWeek: 'https://schema.org/Friday', opens: '10:00', closes: '19:00' },
-    { dayOfWeek: 'https://schema.org/Saturday', opens: '10:00', closes: '19:00' },
+    { dayOfWeek: 'https://schema.org/Monday', opens: '05:00', closes: '22:00' },
+    { dayOfWeek: 'https://schema.org/Tuesday', opens: '05:00', closes: '22:00' },
+    { dayOfWeek: 'https://schema.org/Wednesday', opens: '05:00', closes: '22:00' },
+    { dayOfWeek: 'https://schema.org/Thursday', opens: '05:00', closes: '22:00' },
+    { dayOfWeek: 'https://schema.org/Friday', opens: '05:00', closes: '22:00' },
+    { dayOfWeek: 'https://schema.org/Saturday', opens: '05:00', closes: '22:00' },
+    { dayOfWeek: 'https://schema.org/Sunday', opens: '05:00', closes: '22:00' },
   ],
 };
 
@@ -60,7 +60,6 @@ export default function LocalBusiness({ data }: { data: LocalBusinessData }) {
       addressRegion: data.address.addressRegion,
       addressCountry: data.address.addressCountry,
     },
-    telephone: data.telephone,
     email: data.email,
     priceRange: data.priceRange,
     servesCity: data.servesCity,
@@ -75,7 +74,7 @@ export default function LocalBusiness({ data }: { data: LocalBusinessData }) {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
     />
   );
 }

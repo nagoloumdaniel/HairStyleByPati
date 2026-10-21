@@ -3,7 +3,7 @@ import { Skeleton } from '@/components/shared/Skeleton';
 /* P2.7 / P5.3 : squelette du parcours public de compatibilité. */
 export default function CompatibiliteLoading() {
   return (
-    <main className="mx-auto w-full max-w-4xl space-y-6 px-4 py-8 sm:px-6 md:py-12">
+    <main className="page-main space-y-6">
       <Skeleton className="h-4 w-64" />
       <Skeleton className="h-10 w-full max-w-xl" />
       <Skeleton className="h-5 w-full max-w-2xl" />

@@ -33,10 +33,14 @@ function preprocessCheckbox(value: unknown): boolean {
 /** Case à cocher : absente du FormData signifie décochée. */
 export const checkbox = z.preprocess(preprocessCheckbox, z.boolean().default(false));
 
-/** Montant en euros, converti en centimes côté serveur. */
+/** Montant saisi en FCFA (le nom « Euros » est historique), converti en 1/100 FCFA côté serveur. */
 export const priceEuros = z.preprocess(
   preprocessDecimal,
-  z.number().min(0, 'Le prix ne peut pas être négatif.').max(100000, 'Prix trop élevé.').optional(),
+  z
+    .number()
+    .min(0, 'Le prix ne peut pas être négatif.')
+    .max(5_000_000, 'Prix trop élevé.')
+    .optional(),
 );
 
 /** Durée en minutes, vide accepté (durée à confirmer). */
@@ -71,12 +75,11 @@ export const categoryInputSchema = z.object({
 
 export type CategoryInput = z.infer<typeof categoryInputSchema>;
 
-export const categoryOrderSchema = z
-  .array(z.object({ id: z.string().min(1), order: z.coerce.number().int().min(0) }))
-  .min(1)
-  .max(200);
-
-export type CategoryOrderItem = z.infer<typeof categoryOrderSchema>[number];
+/** Liste ordonnée d'identifiants (monter / descendre) : l'ordre vient de la position dans la liste. */
+export const orderedIdsSchema = z
+  .array(z.string().min(1).max(64))
+  .min(1, 'Liste vide.')
+  .max(200, 'Liste trop longue.');
 
 /* ------------------------------------------------------------------ */
 /* Prestations (P4.3)                                                  */
@@ -162,7 +165,10 @@ export const serviceOptionInputSchema = z.object({
   name: z.string().trim().min(2, "Le nom de l'option est trop court.").max(80),
   priceEuros: z.preprocess(
     preprocessDecimal,
-    z.number().min(0, "Le prix de l'option ne peut pas être négatif.").max(10000),
+    z
+      .number()
+      .min(0, "Le prix de l'option ne peut pas être négatif.")
+      .max(1_000_000, "Prix de l'option trop élevé."),
   ),
   durationMinutes: z.preprocess(preprocessDecimal, z.number().int().min(0).max(480).default(0)),
   active: checkbox,
@@ -180,8 +186,6 @@ export const imageAltSchema = z.object({
     z.string().trim().max(160, 'Le texte alternatif est limité à 160 caractères.').default(''),
   ),
 });
-
-export const imageOrderSchema = z.array(z.string().min(1)).min(1).max(30);
 
 /* ------------------------------------------------------------------ */
 /* Règles de compatibilité (P4.7)                                      */
@@ -288,8 +292,3 @@ export const questionInputSchema = z
   });
 
 export type QuestionInput = z.infer<typeof questionInputSchema>;
-
-export const questionOrderSchema = z
-  .array(z.object({ id: z.string().min(1), order: z.coerce.number().int().min(0) }))
-  .min(1)
-  .max(100);

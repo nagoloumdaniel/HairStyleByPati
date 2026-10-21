@@ -1,6 +1,8 @@
 'use client';
 
 import { useActionState } from 'react';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { login } from '@/modules/auth/actions';
 
 export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
@@ -10,27 +12,23 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
     <form action={formAction} className="flex flex-col gap-4">
       {callbackUrl ? <input type="hidden" name="callbackUrl" value={callbackUrl} /> : null}
 
-      <label className="flex flex-col gap-1 text-sm font-medium">
-        E-mail
-        <input
-          type="email"
-          name="email"
-          required
-          autoComplete="email"
-          className="rounded-lg border border-cacao/30 bg-card px-3 py-2 focus:outline-2 focus:outline-accent"
-        />
-      </label>
+      <Input
+        label="E-mail"
+        type="email"
+        name="email"
+        placeholder="zepatricia7@gmail.com"
+        required
+        autoComplete="email"
+      />
 
-      <label className="flex flex-col gap-1 text-sm font-medium">
-        Mot de passe
-        <input
-          type="password"
-          name="password"
-          required
-          autoComplete="current-password"
-          className="rounded-lg border border-cacao/30 bg-card px-3 py-2 focus:outline-2 focus:outline-accent"
-        />
-      </label>
+      <Input
+        label="Mot de passe"
+        type="password"
+        name="password"
+        placeholder="Votre mot de passe"
+        required
+        autoComplete="current-password"
+      />
 
       {state.error ? (
         <p role="alert" className="text-sm font-medium text-alert">
@@ -38,13 +36,9 @@ export function LoginForm({ callbackUrl }: { callbackUrl?: string }) {
         </p>
       ) : null}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded-lg bg-accent px-4 py-2 font-semibold text-accent-fg transition hover:brightness-95 disabled:opacity-60"
-      >
+      <Button type="submit" loading={pending} className="w-full">
         {pending ? 'Connexion…' : 'Se connecter'}
-      </button>
+      </Button>
     </form>
   );
 }

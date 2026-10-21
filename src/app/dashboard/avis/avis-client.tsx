@@ -1,68 +1,193 @@
 'use client';
 
-import { useActionState } from 'react';
+import { Check, Star, Trash2, X } from 'lucide-react';
+import Link from 'next/link';
+import { useState, useTransition } from 'react';
+import { adminDeleteReview, adminModerateReview } from '@/modules/avis/actions';
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { adminModerateReview, type ReviewActionState } from '@/modules/avis/actions';
+import { Card } from '@/components/ui/Card';
+import { useConfirm } from '@/components/ui/Confirm';
+import { useToast } from '@/components/ui/Toast';
 
-type ReviewRow = {
+export type ReviewRow = {
   id: string;
   rating: number | null;
   comment: string | null;
-  customer: { name: string; email: string };
+  status: 'SUBMITTED' | 'APPROVED' | 'REJECTED' | string;
+  /** ISO : transmis sérialisé depuis le serveur. */
+  submittedAt: string | null;
+  customer: { id: string; name: string; email: string };
   service: { name: string };
-  submittedAt: Date | null;
 };
 
-function ModerationForm({ review }: { review: ReviewRow }) {
-  const [state, formAction, pending] = useActionState<ReviewActionState, FormData>(
-    adminModerateReview,
-    {},
-  );
+const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
+  dateStyle: 'medium',
+  timeZone: 'Africa/Dakar',
+});
+
+function Stars({ rating }: { rating: number | null }) {
+  const value = rating ?? 0;
   return (
-    <form action={formAction} className="flex flex-wrap items-center gap-2">
-      <input type="hidden" name="id" value={review.id} />
-      <Button type="submit" name="decision" value="APPROVED" size="sm" loading={pending}>
-        Approuver
-      </Button>
-      <Button
-        type="submit"
-        name="decision"
-        value="REJECTED"
-        variant="danger"
-        size="sm"
-        loading={pending}
-      >
-        Rejeter
-      </Button>
-      {state.error ? (
-        <span role="alert" className="text-xs text-alert">
-          {state.error}
-        </span>
-      ) : null}
-    </form>
+    <span role="img" aria-label={`Note : ${value} sur 5`} className="inline-flex gap-0.5">
+      {[1, 2, 3, 4, 5].map((n) => (
+        <Star
+          key={n}
+          aria-hidden="true"
+          className={`size-4 ${n <= value ? 'fill-accent text-accent' : 'text-line'}`}
+        />
+      ))}
+    </span>
+  );
+}
+
+type Action = 'APPROVED' | 'REJECTED' | 'DELETE';
+
+function ReviewCard({ review }: { review: ReviewRow }) {
+  const confirm = useConfirm();
+  const { notify } = useToast();
+  const [pending, startTransition] = useTransition();
+  const [active, setActive] = useState<Action | null>(null);
+
+  function moderate(decision: 'APPROVED' | 'REJECTED') {
+    setActive(decision);
+    startTransition(async () => {
+      try {
+        const data = new FormData();
+        data.set('id', review.id);
+        data.set('decision', decision);
+        const result = await adminModerateReview({}, data);
+        if (result.error) notify(result.error, 'error');
+        else notify(result.success ?? 'Avis mis à jour.', 'success');
+      } catch {
+        notify('Action impossible. Réessayez.', 'error');
+      } finally {
+        setActive(null);
+      }
+    });
+  }
+
+  async function remove() {
+    const ok = await confirm({
+      title: 'Supprimer cet avis ?',
+      message: `L’avis de ${review.customer.name} sera supprimé définitivement, y compris s’il est publié sur le site.`,
+      confirmLabel: 'Supprimer',
+    });
+    if (!ok) return;
+    setActive('DELETE');
+    startTransition(async () => {
+      try {
+        const result = await adminDeleteReview(review.id);
+        if (result.error) notify(result.error, 'error');
+        else notify(result.success ?? 'Avis supprimé.', 'success');
+      } catch {
+        notify('Action impossible. Réessayez.', 'error');
+      } finally {
+        setActive(null);
+      }
+    });
+  }
+
+  const statusBadge =
+    review.status === 'APPROVED' ? (
+      <Badge tone="success" className="px-2! py-0.5! text-xs!">
+        Publié
+      </Badge>
+    ) : review.status === 'REJECTED' ? (
+      <Badge tone="alert" className="px-2! py-0.5! text-xs!">
+        Rejeté
+      </Badge>
+    ) : (
+      <Badge tone="accent" className="px-2! py-0.5! text-xs!">
+        En attente
+      </Badge>
+    );
+
+  return (
+    <Card className="p-3! sm:p-4!">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <Stars rating={review.rating} />
+          {statusBadge}
+        </div>
+        {review.submittedAt ? (
+          <time dateTime={review.submittedAt} className="text-xs text-muted">
+            {dateFormatter.format(new Date(review.submittedAt))}
+          </time>
+        ) : null}
+      </div>
+
+      <p className="mt-2 text-sm">
+        <Link
+          href={`/dashboard/clients/${review.customer.id}`}
+          className="font-semibold text-fg hover:text-cacao hover:underline"
+        >
+          {review.customer.name}
+        </Link>
+        <span className="text-muted"> · {review.service.name}</span>
+      </p>
+      <p className="truncate text-xs text-muted">{review.customer.email}</p>
+
+      {review.comment ? (
+        <blockquote className="mt-2 whitespace-pre-wrap wrap-break-word rounded-[var(--radius-md)] bg-page p-3 text-sm text-fg">
+          {review.comment}
+        </blockquote>
+      ) : (
+        <p className="mt-2 text-sm text-muted">Note seule, sans commentaire.</p>
+      )}
+
+      <div className="mt-3 flex items-center gap-2">
+        {review.status !== 'APPROVED' ? (
+          <Button
+            type="button"
+            size="sm"
+            icon={Check}
+            iconOnly="mobile"
+            loading={pending && active === 'APPROVED'}
+            disabled={pending}
+            onClick={() => moderate('APPROVED')}
+          >
+            {review.status === 'REJECTED' ? 'Republier' : 'Approuver'}
+          </Button>
+        ) : null}
+        {review.status !== 'REJECTED' ? (
+          <Button
+            type="button"
+            size="sm"
+            variant="secondary"
+            icon={X}
+            iconOnly="mobile"
+            loading={pending && active === 'REJECTED'}
+            disabled={pending}
+            onClick={() => moderate('REJECTED')}
+          >
+            {review.status === 'APPROVED' ? 'Retirer' : 'Rejeter'}
+          </Button>
+        ) : null}
+        <Button
+          type="button"
+          size="sm"
+          variant="ghost"
+          icon={Trash2}
+          iconOnly="mobile"
+          className="ml-auto"
+          loading={pending && active === 'DELETE'}
+          disabled={pending}
+          onClick={remove}
+        >
+          Supprimer
+        </Button>
+      </div>
+    </Card>
   );
 }
 
 export function AvisClient({ reviews }: { reviews: ReviewRow[] }) {
-  if (reviews.length === 0) {
-    return (
-      <p className="rounded-[var(--radius-md)] border border-dashed border-line p-8 text-center text-muted">
-        Aucun avis en attente de modération.
-      </p>
-    );
-  }
   return (
-    <ul className="flex flex-col gap-3">
+    <ul className="flex flex-col gap-2">
       {reviews.map((review) => (
-        <li key={review.id} className="rounded-[var(--radius-md)] border border-line bg-card p-4">
-          <p className="font-semibold text-fg">
-            {review.customer.name} · {review.service.name} · {review.rating ?? '—'} / 5
-          </p>
-          <p className="text-sm text-muted">{review.customer.email}</p>
-          {review.comment ? <p className="mt-2 text-fg">{review.comment}</p> : null}
-          <div className="mt-3">
-            <ModerationForm review={review} />
-          </div>
+        <li key={review.id}>
+          <ReviewCard review={review} />
         </li>
       ))}
     </ul>

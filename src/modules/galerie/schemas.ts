@@ -19,3 +19,8 @@ export const galleryPhotoMetaSchema = z.object({
     z.boolean(),
   ),
 });
+
+export const galleryPhotoMoveSchema = z.object({
+  id: z.string().trim().min(1).max(64),
+  direction: z.enum(['up', 'down']),
+});

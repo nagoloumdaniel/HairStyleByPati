@@ -13,14 +13,18 @@ import {
   mapSalonSettings,
   type SalonSettingsData,
 } from '@/modules/disponibilites/queries';
+import { OPTION_ORDER_BY } from '@/modules/catalogue/ordering';
 import { logAudit } from '@/modules/stats/audit';
 import { getBookableServiceBySlug, type BookableService } from './queries';
 import { computeBookingSnapshot, type SelectedOptionSnapshot } from './pricing';
 import {
   applyPromotion,
-  findActivePromotion,
-  type PromotionCandidate,
+  findBestPromotion,
+  INVALID_PROMO_CODE_MESSAGE,
+  normalizePromoCode,
+  resolvePromoCode,
 } from '@/modules/promotions/pricing';
+import { fetchPromotionCandidates } from '@/modules/promotions/queries';
 import {
   buildCancellationExpiry,
   evaluateCancellationPolicy,
@@ -56,29 +60,6 @@ async function settingsInTx(tx: Prisma.TransactionClient): Promise<SalonSettings
   return row ? mapSalonSettings(row) : DEFAULT_SALON_SETTINGS;
 }
 
-/** Promotion active (P8.12) pour une prestation, au moment de la réservation. */
-async function activePromotionInTx(
-  tx: Prisma.TransactionClient,
-  serviceId: string,
-  now: Date,
-): Promise<PromotionCandidate | null> {
-  const rows = await tx.promotion.findMany({
-    where: { active: true, startsAt: { lte: now }, endsAt: { gte: now } },
-    include: { services: { select: { serviceId: true } } },
-  });
-  const candidates = rows.map((row) => ({
-    id: row.id,
-    name: row.name,
-    kind: row.kind,
-    value: row.value,
-    startsAt: row.startsAt,
-    endsAt: row.endsAt,
-    active: row.active,
-    serviceIds: row.services.map((s) => s.serviceId),
-  }));
-  return findActivePromotion(candidates, serviceId, now);
-}
-
 async function serviceInTx(
   tx: Prisma.TransactionClient,
   slug: string,
@@ -98,7 +79,7 @@ async function serviceInTx(
       category: { select: { name: true } },
       options: {
         where: { active: true },
-        orderBy: { name: 'asc' },
+        orderBy: OPTION_ORDER_BY,
         select: { id: true, name: true, priceCents: true, durationMinutes: true },
       },
       compatibility: true,
@@ -215,7 +196,7 @@ export async function getBookingSlots(input: {
   if (snapshot.durationMinutes <= 0) {
     throw new AppError(
       'INVALID_DURATION',
-      'La durée de cette prestation n’est pas renseignée. Contactez le salon.',
+      'La durée de cette prestation n’est pas renseignée. Contactez Patricia.',
       409,
     );
   }
@@ -271,6 +252,83 @@ export async function getBookingSlots(input: {
   };
 }
 
+export interface PromoCodePreview {
+  code: string;
+  promotionName: string;
+  /** false : une promotion automatique plus avantageuse s'applique déjà, le code n'ajoute rien. */
+  codeApplied: boolean;
+  basePriceCents: number;
+  discountCents: number;
+  finalPriceCents: number;
+}
+
+/**
+ * Valide un code promo pour une prestation + options et calcule le prix remisé (aperçu).
+ * Le prix réel est refigé par createBooking, qui revalide le code.
+ * Échec unique et générique : aucune information sur l'existence d'autres codes.
+ */
+export async function previewPromoCode(input: {
+  serviceSlug: string;
+  optionIds: string[];
+  code: string;
+}): Promise<PromoCodePreview> {
+  const code = normalizePromoCode(input.code);
+  const service = await getBookableServiceBySlug(input.serviceSlug);
+  if (!code || !service) throw new AppError('INVALID_PROMO', INVALID_PROMO_CODE_MESSAGE, 409);
+
+  const snapshot = computeBookingSnapshot(service, input.optionIds, service.options);
+  if (snapshot.invalidOptionIds.length > 0) {
+    throw new AppError('INVALID_OPTION', 'Une option sélectionnée n’est plus disponible.', 409);
+  }
+  const now = new Date();
+  const candidates = await fetchPromotionCandidates(db, now);
+  const resolved = resolvePromoCode(candidates, service.id, now, code);
+  if (!resolved.ok || snapshot.priceCents == null) {
+    throw new AppError('INVALID_PROMO', INVALID_PROMO_CODE_MESSAGE, 409);
+  }
+
+  const best = findBestPromotion(candidates, service.id, now, snapshot.priceCents, code);
+  const discount = applyPromotion(snapshot.priceCents, best ?? resolved.promotion);
+  return {
+    code,
+    promotionName: discount.promotionName,
+    codeApplied: (best ?? resolved.promotion).id === resolved.promotion.id,
+    basePriceCents: snapshot.priceCents,
+    discountCents: discount.discountCents,
+    finalPriceCents: discount.finalPriceCents,
+  };
+}
+
+export interface AutoPromotionPreview {
+  promotionName: string;
+  basePriceCents: number;
+  discountCents: number;
+  finalPriceCents: number;
+}
+
+/** Aperçu de l'offre automatique (sans code) qui sera figée à l'enregistrement, ou null. */
+export async function previewAutomaticPromotion(input: {
+  serviceSlug: string;
+  optionIds: string[];
+}): Promise<AutoPromotionPreview | null> {
+  const service = await getBookableServiceBySlug(input.serviceSlug);
+  if (!service) return null;
+  const snapshot = computeBookingSnapshot(service, input.optionIds, service.options);
+  if (snapshot.invalidOptionIds.length > 0 || snapshot.priceCents == null) return null;
+  const now = new Date();
+  const candidates = await fetchPromotionCandidates(db, now);
+  const best = findBestPromotion(candidates, service.id, now, snapshot.priceCents, null);
+  if (!best) return null;
+  const discount = applyPromotion(snapshot.priceCents, best);
+  if (discount.discountCents <= 0) return null;
+  return {
+    promotionName: discount.promotionName,
+    basePriceCents: snapshot.priceCents,
+    discountCents: discount.discountCents,
+    finalPriceCents: discount.finalPriceCents,
+  };
+}
+
 async function getSalonSettingsForSlots(): Promise<SalonSettingsData> {
   const row = await db.salonSettings.findUnique({ where: { id: 1 } });
   return row ? mapSalonSettings(row) : DEFAULT_SALON_SETTINGS;
@@ -287,6 +345,8 @@ export interface CreateBookingInput {
   comment: string;
   answers: Record<string, unknown>;
   optionIds: string[];
+  /** Code promo saisi par la cliente (facultatif) : revalidé ici, jamais cru côté client. */
+  promoCode?: string | null;
   /** Confirmation depuis un lien de liste d'attente (P8.8), facultatif. */
   waitlistToken?: string | null;
 }
@@ -329,8 +389,17 @@ export async function createBooking(input: CreateBookingInput): Promise<CreatedB
       }
       const settings = await settingsInTx(tx);
       const snapshot = computeBookingSnapshot(service, input.optionIds, service.options);
+      // Promotions : automatiques + code saisi (revalidé), une seule appliquée, la plus avantageuse.
+      const enteredCode = input.promoCode?.trim() ? input.promoCode : null;
+      const promoCandidates =
+        snapshot.priceCents != null || enteredCode ? await fetchPromotionCandidates(tx, now) : [];
+      if (enteredCode && !resolvePromoCode(promoCandidates, service.id, now, enteredCode).ok) {
+        throw new AppError('INVALID_PROMO', INVALID_PROMO_CODE_MESSAGE, 409);
+      }
       const promotion =
-        snapshot.priceCents != null ? await activePromotionInTx(tx, service.id, now) : null;
+        snapshot.priceCents != null
+          ? findBestPromotion(promoCandidates, service.id, now, snapshot.priceCents, enteredCode)
+          : null;
       const discount =
         promotion && snapshot.priceCents != null
           ? applyPromotion(snapshot.priceCents, promotion)
@@ -650,17 +719,36 @@ export async function updateAppointmentStatus(input: {
   });
   if (!appointment) throw new AppError('NOT_FOUND', 'Rendez-vous introuvable.', 404);
   assertTransition(appointment.status, input.status);
+  // Terminer / marquer absente n'a de sens qu'une fois le rendez-vous commencé.
+  if (
+    (input.status === 'COMPLETED' || input.status === 'NO_SHOW') &&
+    appointment.startsAt.getTime() > Date.now()
+  ) {
+    throw new AppError(
+      'NOT_STARTED',
+      'Ce rendez-vous n’a pas encore commencé : impossible de le clôturer.',
+      409,
+    );
+  }
   const settings = await getSalonSettingsForSlots();
 
   await db.$transaction(async (tx) => {
-    await tx.appointment.update({
-      where: { id: appointment.id },
+    // Garde de concurrence : le statut ne doit pas avoir changé depuis la lecture.
+    const updated = await tx.appointment.updateMany({
+      where: { id: appointment.id, status: appointment.status },
       data: {
         status: input.status,
         holdExpiresAt: null,
         ...(input.status === 'CONFIRMED' ? { cancelledAt: null, cancelReason: null } : {}),
       },
     });
+    if (updated.count === 0) {
+      throw new AppError(
+        'CONFLICT',
+        'Ce rendez-vous vient d’être modifié. Rechargez la page puis réessayez.',
+        409,
+      );
+    }
     if (input.status === 'CONFIRMED') {
       await queueAppointmentNotifications(tx, 'confirmed', {
         appointmentId: appointment.id,
@@ -714,14 +802,22 @@ export async function cancelAppointmentByAdmin(input: {
   const settings = await getSalonSettingsForSlots();
 
   await db.$transaction(async (tx) => {
-    await tx.appointment.update({
-      where: { id: appointment.id },
+    // Garde de concurrence : évite d'annuler un rendez-vous déjà clos entre-temps.
+    const updated = await tx.appointment.updateMany({
+      where: { id: appointment.id, status: appointment.status },
       data: {
         status: 'CANCELLED_BY_ADMIN',
         cancelledAt: new Date(),
         cancelReason: input.reason || null,
       },
     });
+    if (updated.count === 0) {
+      throw new AppError(
+        'CONFLICT',
+        'Ce rendez-vous vient d’être modifié. Rechargez la page puis réessayez.',
+        409,
+      );
+    }
     await queueAppointmentNotifications(tx, 'cancelled_by_admin', {
       appointmentId: appointment.id,
       customerName: appointment.customer.name,
@@ -748,7 +844,11 @@ export async function cancelAppointmentByAdmin(input: {
     action: 'appointment.cancel_admin',
     entityType: 'Appointment',
     entityId: appointment.id,
-    metadata: { reason: input.reason || '' },
+    // Pas de texte libre (PII) dans l'audit : le motif reste sur le rendez-vous.
+    metadata: {
+      hasReason: input.reason.trim().length > 0,
+      reasonLength: input.reason.trim().length,
+    },
   });
 }
 
@@ -817,7 +917,11 @@ export async function cancelAppointmentByCustomer(input: {
     action: 'appointment.cancel_customer',
     entityType: 'Appointment',
     entityId: appointment.id,
-    metadata: { reason: input.reason || '' },
+    // Pas de texte libre (PII) dans l'audit : le motif reste sur le rendez-vous.
+    metadata: {
+      hasReason: input.reason.trim().length > 0,
+      reasonLength: input.reason.trim().length,
+    },
   });
 
   return { startsAt: appointment.startsAt, serviceName: appointment.service.name };

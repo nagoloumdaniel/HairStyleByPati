@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og';
 
-export const alt = 'Hairstyle by Patricia, tresses, vanilles et locs sur mesure';
+export const alt = 'Hairstyle by Patricia, retwist de locs, nattes collées, vanilles à Dakar';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -42,7 +42,7 @@ export default function OpenGraphImage() {
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
         <div style={{ fontSize: 74, lineHeight: 1.08, fontWeight: 700, maxWidth: 900 }}>
-          Tresses, vanilles et locs sur mesure
+          Retwist de locs, nattes collées, vanilles
         </div>
         <div style={{ fontSize: 30, color: '#5A5224' }}>
           Réservation en ligne · Paiement sur place · Dakar

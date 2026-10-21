@@ -1,3 +1,4 @@
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -82,7 +83,7 @@ export default async function ServicePage({ params }: ServicePageProps) {
       Boolean(compatibility?.uncertainMessage));
 
   return (
-    <main className="mx-auto w-full max-w-7xl space-y-8 px-4 py-8 sm:px-6 md:py-12">
+    <main className="page-main space-y-8">
       <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
@@ -176,9 +177,7 @@ export default async function ServicePage({ params }: ServicePageProps) {
                 Quelques questions, sans engagement et sans réservation.
               </span>
             </span>
-            <span aria-hidden="true" className="text-cacao">
-              →
-            </span>
+            <ArrowRight aria-hidden="true" className="size-4 text-cacao" />
           </Link>
 
           {service.options.length > 0 ? (
@@ -294,7 +293,7 @@ export default async function ServicePage({ params }: ServicePageProps) {
           href="/coiffures"
           className="inline-flex items-center gap-2 font-semibold text-cacao transition hover:text-fg"
         >
-          <span aria-hidden="true">←</span> Retour au catalogue
+          <ArrowLeft aria-hidden="true" className="size-4" /> Retour au catalogue
         </Link>
       </div>
     </main>

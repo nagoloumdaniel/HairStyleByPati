@@ -1,33 +1,46 @@
 'use client';
 
-import { useActionState, useEffect, useRef, useState } from 'react';
+import { Eye, EyeOff, Pencil, Plus, Save, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 import type { AdminServiceOption } from '@/lib/catalogue-admin';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { useConfirm } from '@/components/ui/Confirm';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import {
   adminCreateOption,
   adminDeleteOption,
+  adminReorderOptions,
   adminToggleOption,
   adminUpdateOption,
   type CatalogueActionState,
 } from '@/modules/catalogue/actions';
+import {
+  CheckboxField,
+  EmptyBlock,
+  FormError,
+  ReorderButtons,
+  formDataOf,
+  useFormAction,
+  useReorderableList,
+  useRunAction,
+} from '../../catalogue-ui';
 
 /* ============================================================
  * P4.3 — Options payantes d'une prestation (prix et durée
- * additionnels). Elles alimenteront le parcours de réservation.
+ * additionnels). Prix en FCFA (colonne en 1/100 FCFA).
  * ============================================================ */
 
-const euroFormatter = new Intl.NumberFormat('fr-FR', {
+const priceFormatter = new Intl.NumberFormat('fr-FR', {
   style: 'currency',
   currency: 'XOF',
   minimumFractionDigits: 0,
-  maximumFractionDigits: 2,
+  maximumFractionDigits: 0,
 });
 
 function formatCents(cents: number): string {
-  return euroFormatter.format(cents / 100);
+  return priceFormatter.format(cents / 100);
 }
 
 function OptionForm({
@@ -41,28 +54,29 @@ function OptionForm({
   serviceId: string;
   initial?: AdminServiceOption;
   submitLabel: string;
-  onDone?: () => void;
+  onDone: () => void;
 }) {
-  const [state, formAction, pending] = useActionState<CatalogueActionState, FormData>(action, {});
-  const doneRef = useRef(onDone);
-  doneRef.current = onDone;
-
-  useEffect(() => {
-    if (state.success) doneRef.current?.();
-  }, [state.success]);
+  const { state, onSubmit, pending } = useFormAction(action, onDone);
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
+    <form onSubmit={onSubmit} className="flex flex-col gap-3">
       <input type="hidden" name="serviceId" value={serviceId} />
       {initial?.id ? <input type="hidden" name="id" value={initial.id} /> : null}
-      <Input label="Nom de l'option" name="name" required defaultValue={initial?.name ?? ''} />
-      <div className="grid gap-4 sm:grid-cols-2">
+      <Input
+        label="Nom de l'option"
+        name="name"
+        required
+        autoFocus
+        defaultValue={initial?.name ?? ''}
+      />
+      <div className="grid gap-3 sm:grid-cols-2">
         <Input
           label="Prix (FCFA)"
           name="priceEuros"
           type="number"
+          inputMode="numeric"
           min={0}
-          step="0.01"
+          step={1}
           required
           defaultValue={initial ? String(initial.priceCents / 100) : ''}
         />
@@ -70,107 +84,131 @@ function OptionForm({
           label="Durée ajoutée (minutes)"
           name="durationMinutes"
           type="number"
+          inputMode="numeric"
           min={0}
           max={480}
           defaultValue={String(initial?.durationMinutes ?? 0)}
           hint="0 si l'option n'allonge pas la prestation."
         />
       </div>
-      <label className="flex items-center gap-2 text-sm font-semibold">
-        <input
-          type="checkbox"
-          name="active"
-          defaultChecked={initial?.active ?? true}
-          className="size-4"
-        />
-        Option active
-      </label>
-      {state.error ? (
-        <p role="alert" className="text-sm font-medium text-alert">
-          {state.error}
-        </p>
-      ) : null}
-      {state.success ? (
-        <p role="status" className="text-sm font-medium text-success">
-          {state.success}
-        </p>
-      ) : null}
-      <Button type="submit" loading={pending}>
+      <CheckboxField name="active" label="Option active" defaultChecked={initial?.active ?? true} />
+      <FormError message={state.error} />
+      <Button type="submit" icon={Save} loading={pending} className="self-end">
         {submitLabel}
       </Button>
     </form>
   );
 }
 
-function EditOptionButton({
+function OptionRow({
   serviceId,
   option,
+  index,
+  count,
+  pendingOrder,
+  onMove,
 }: {
   serviceId: string;
   option: AdminServiceOption;
+  index: number;
+  count: number;
+  pendingOrder: boolean;
+  onMove: (index: number, direction: -1 | 1) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const confirm = useConfirm();
+  const toggle = useRunAction();
+  const remove = useRunAction();
+  const nextActive = !option.active;
+
+  async function onDelete() {
+    const ok = await confirm({
+      title: 'Supprimer cette option ?',
+      message: `« ${option.name} » sera retirée de la prestation.`,
+    });
+    if (!ok) return;
+    remove.run(() => adminDeleteOption({}, formDataOf({ id: option.id })));
+  }
+
   return (
-    <>
-      <Button type="button" variant="secondary" size="sm" onClick={() => setOpen(true)}>
-        Modifier
-      </Button>
-      <Modal open={open} onClose={() => setOpen(false)} title={`Modifier ${option.name}`}>
+    <li className="flex items-center gap-2 rounded-[var(--radius-md)] border border-line bg-card p-2 sm:gap-3 sm:p-3">
+      <ReorderButtons
+        index={index}
+        count={count}
+        pending={pendingOrder}
+        onMove={(direction) => onMove(index, direction)}
+        label={option.name}
+      />
+      {/* Toute la zone texte ouvre la modification. */}
+      <button
+        type="button"
+        onClick={() => setEditOpen(true)}
+        aria-label={`Modifier l'option ${option.name}`}
+        className="group flex min-w-0 flex-1 items-center gap-3 rounded-[var(--radius-sm)] p-1 text-left transition hover:bg-accent-soft/50"
+      >
+        <span className="min-w-0 flex-1">
+          <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="truncate font-semibold">{option.name}</span>
+            {option.active ? (
+              <Badge tone="success">Active</Badge>
+            ) : (
+              <Badge tone="alert">Désactivée</Badge>
+            )}
+          </span>
+          <span className="mt-0.5 block text-sm text-muted">
+            {formatCents(option.priceCents)}
+            {option.durationMinutes > 0
+              ? ` · +${option.durationMinutes} min`
+              : ' · sans durée ajoutée'}
+          </span>
+        </span>
+        <Pencil
+          aria-hidden="true"
+          className="size-4 shrink-0 text-muted transition group-hover:text-accent"
+        />
+      </button>
+      <div className="flex shrink-0 flex-col gap-1 sm:flex-row sm:gap-2">
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          iconOnly
+          icon={option.active ? EyeOff : Eye}
+          loading={toggle.pending}
+          onClick={() =>
+            toggle.run(() =>
+              adminToggleOption({}, formDataOf({ id: option.id, active: nextActive })),
+            )
+          }
+          aria-label={`${nextActive ? 'Activer' : 'Désactiver'} l'option ${option.name}`}
+          title={nextActive ? 'Activer' : 'Désactiver'}
+        >
+          {nextActive ? 'Activer' : 'Désactiver'}
+        </Button>
+        <Button
+          type="button"
+          variant="danger"
+          size="sm"
+          iconOnly
+          icon={Trash2}
+          loading={remove.pending}
+          onClick={onDelete}
+          aria-label={`Supprimer l'option ${option.name}`}
+          title="Supprimer"
+        >
+          Supprimer
+        </Button>
+      </div>
+      <Modal open={editOpen} onClose={() => setEditOpen(false)} title={`Modifier ${option.name}`}>
         <OptionForm
           action={adminUpdateOption}
           serviceId={serviceId}
           initial={option}
           submitLabel="Enregistrer"
-          onDone={() => setOpen(false)}
+          onDone={() => setEditOpen(false)}
         />
       </Modal>
-    </>
-  );
-}
-
-function ToggleOptionForm({ option }: { option: AdminServiceOption }) {
-  const [state, formAction, pending] = useActionState<CatalogueActionState, FormData>(
-    adminToggleOption,
-    {},
-  );
-  return (
-    <form action={formAction}>
-      <input type="hidden" name="id" value={option.id} />
-      <input type="hidden" name="active" value={String(!option.active)} />
-      <Button type="submit" variant="ghost" size="sm" loading={pending}>
-        {option.active ? 'Désactiver' : 'Activer'}
-      </Button>
-      {state.error ? (
-        <p role="alert" className="text-xs text-alert">
-          {state.error}
-        </p>
-      ) : null}
-    </form>
-  );
-}
-
-function DeleteOptionForm({ option }: { option: AdminServiceOption }) {
-  const [state, formAction, pending] = useActionState<CatalogueActionState, FormData>(
-    adminDeleteOption,
-    {},
-  );
-  return (
-    <form
-      action={formAction}
-      onSubmit={(event) => {
-        if (!window.confirm(`Supprimer l'option « ${option.name} » ?`)) event.preventDefault();
-      }}
-    >
-      <input type="hidden" name="id" value={option.id} />
-      <Button type="submit" variant="danger" size="sm" loading={pending}>
-        Supprimer
-      </Button>
-      {state.error ? (
-        <p role="alert" className="text-xs text-alert">
-          {state.error}
-        </p>
-      ) : null}
-    </form>
+    </li>
   );
 }
 
@@ -182,13 +220,22 @@ export function OptionsPanel({
   options: AdminServiceOption[];
 }) {
   const [createOpen, setCreateOpen] = useState(false);
+  const { list, move, pending } = useReorderableList(options, (orderedIds) =>
+    adminReorderOptions(serviceId, orderedIds),
+  );
   return (
-    <div className="flex flex-col gap-4 p-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="flex flex-col gap-3 rounded-[var(--radius-lg)] bg-card p-3 shadow-soft sm:p-4">
+      <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-muted">
           Options facturées en plus de la prestation (mèches, soin, finition).
         </p>
-        <Button type="button" size="sm" onClick={() => setCreateOpen(true)}>
+        <Button
+          type="button"
+          size="sm"
+          icon={Plus}
+          iconOnly="mobile"
+          onClick={() => setCreateOpen(true)}
+        >
           Ajouter une option
         </Button>
       </div>
@@ -201,39 +248,20 @@ export function OptionsPanel({
         />
       </Modal>
 
-      {options.length === 0 ? (
-        <p className="rounded-[var(--radius-md)] border border-dashed border-line p-8 text-center text-muted">
-          Aucune option. La prestation s’ajoute au panier sans supplément.
-        </p>
+      {list.length === 0 ? (
+        <EmptyBlock>Aucune option. La prestation s’ajoute au panier sans supplément.</EmptyBlock>
       ) : (
         <ul className="flex flex-col gap-2">
-          {options.map((option) => (
-            <li
+          {list.map((option, index) => (
+            <OptionRow
               key={option.id}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-md)] border border-line bg-card p-3"
-            >
-              <div className="min-w-0">
-                <p className="flex flex-wrap items-center gap-2 font-semibold">
-                  <span className="truncate">{option.name}</span>
-                  {option.active ? (
-                    <Badge tone="success">Active</Badge>
-                  ) : (
-                    <Badge tone="alert">Désactivée</Badge>
-                  )}
-                </p>
-                <p className="mt-1 text-sm text-muted">
-                  {formatCents(option.priceCents)}
-                  {option.durationMinutes > 0
-                    ? ` · +${option.durationMinutes} min`
-                    : ' · sans durée ajoutée'}
-                </p>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <EditOptionButton serviceId={serviceId} option={option} />
-                <ToggleOptionForm option={option} />
-                <DeleteOptionForm option={option} />
-              </div>
-            </li>
+              serviceId={serviceId}
+              option={option}
+              index={index}
+              count={list.length}
+              pendingOrder={pending}
+              onMove={move}
+            />
           ))}
         </ul>
       )}

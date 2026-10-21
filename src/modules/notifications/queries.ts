@@ -32,6 +32,12 @@ function readablePayload(payload: unknown): { title: string; detail: string } {
   const service = typeof data.serviceName === 'string' ? data.serviceName : '';
   const subject = typeof data.subject === 'string' ? data.subject : '';
   const reason = typeof data.reason === 'string' ? data.reason : '';
+  if (data.kind === 'assessment') {
+    return {
+      title: 'Évaluation capillaire',
+      detail: [customer, service].filter(Boolean).join(' · '),
+    };
+  }
   if (requester)
     return {
       title: 'Demande personnalisée',

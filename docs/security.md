@@ -103,3 +103,9 @@ Le build de production a été démarré localement sur un port dédié et contr
 - `npm run ci` : typecheck, format, lint, tests Vitest, build.
 - `tests/e2e/security.spec.ts` : redirection dashboard, API admin 401, en-têtes, cookie, export RGPD, XSS échappé, cron de purge protégé.
 - `docs/rgpd.md` : registre, bases légales, durées et procédures.
+
+## CSP à nonce (dashboard et connexion)
+
+- Les pages privées dynamiques (`/dashboard/**`, `/connexion`) reçoivent une CSP stricte posée par `src/middleware.ts` : `script-src 'self' 'nonce-…' 'strict-dynamic'` plus l'empreinte sha256 des deux scripts inline de thème (`src/lib/inline-scripts.ts`). Plus de `'unsafe-inline'` pour les scripts.
+- Les pages publiques statiques gardent `script-src 'self' 'unsafe-inline'` (`next.config.ts`) : un nonce les rendrait dynamiques et ferait perdre le cache statique / ISR. Elles n'exécutent que du contenu serveur maîtrisé.
+- La CSP n'est active qu'en production (le mode dev exige `unsafe-eval`). Toute modification d'un script inline doit passer par `src/lib/inline-scripts.ts` (l'empreinte est recalculée automatiquement).

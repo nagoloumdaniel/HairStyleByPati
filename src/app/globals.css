@@ -136,10 +136,17 @@ h4 {
 }
 
 /* Focus visible — accessibilité P2.9 : anneau or toujours perceptible */
-:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+:where(a, button, [tabindex]):focus-visible {
   outline: 3px solid var(--color-accent);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
+}
+
+/* Champs de formulaire : pas d'anneau, seule la bordure change au focus */
+:where(input, select, textarea):focus,
+:where(input, select, textarea):focus-visible {
+  outline: none;
+  box-shadow: none;
 }
 
 /* Squelettes de chargement (P2.7) */
@@ -247,21 +254,26 @@ html[data-theme='dark'] {
 .nav-floating {
   position: fixed;
   top: 0.75rem;
-  left: 0.75rem;
-  right: 0.75rem;
+  left: 1rem;
+  right: 1rem;
   z-index: 40;
   margin-inline: auto;
-  max-width: 72rem;
+  max-width: calc(80rem - 2rem);
   border-radius: var(--radius-full);
 }
 .nav-floating[data-open='true'] {
   border-radius: var(--radius-xl);
 }
+@media (min-width: 640px) {
+  .nav-floating {
+    left: 1.5rem;
+    right: 1.5rem;
+    max-width: calc(80rem - 3rem);
+  }
+}
 @media (min-width: 768px) {
   .nav-floating {
     top: 1rem;
-    left: 1.5rem;
-    right: 1.5rem;
   }
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -374,4 +386,74 @@ html[data-theme='dark'] {
   position: absolute;
   inset: 0;
   z-index: 1;
+}
+
+/* Page plein écran (404) : pas de défilement, le fond couvre aussi derrière la navbar. */
+body:has([data-fullscreen]) {
+  overflow: hidden;
+}
+
+/* Gabarit de page publique : mêmes marges latérales/verticales partout (DESIGN-RULES.md). */
+.page-main {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 80rem;
+  padding: 2rem 1rem;
+}
+@media (min-width: 640px) {
+  .page-main {
+    padding-inline: 1.5rem;
+  }
+}
+@media (min-width: 768px) {
+  .page-main {
+    padding-block: 3rem;
+  }
+}
+
+/* ============================================================
+   Landing : hero sur fond ocre/olive en dégradés, navbar intacte.
+   ============================================================ */
+.landing-hero {
+  background-image:
+    radial-gradient(55% 50% at 12% 88%, rgb(255 216 77 / 0.3), transparent 70%),
+    radial-gradient(50% 50% at 90% 82%, rgb(255 216 77 / 0.26), transparent 70%),
+    radial-gradient(70% 45% at 50% 22%, rgb(255 230 128 / 0.22), transparent 72%),
+    linear-gradient(180deg, rgb(255 241 184 / 0.08) 0%, transparent 40%, rgb(23 21 11 / 0.5) 100%);
+}
+.landing-title {
+  font-size: clamp(2.1rem, min(8vw, 10svh), 5.25rem);
+  line-height: 1.02;
+  text-wrap: balance;
+}
+
+/* Portrait de la landing : cercle qui se déforme en continu (blob fluide) */
+.landing-blob-ring {
+  filter: drop-shadow(0 0 28px rgb(255 216 77 / 0.25));
+}
+.landing-blob {
+  overflow: hidden;
+  border-radius: 50%;
+  animation: landing-blob 12s ease-in-out infinite;
+  will-change: border-radius;
+}
+@keyframes landing-blob {
+  0%,
+  100% {
+    border-radius: 50% 50% 50% 50% / 50% 50% 50% 50%;
+  }
+  25% {
+    border-radius: 58% 42% 46% 54% / 46% 56% 44% 54%;
+  }
+  50% {
+    border-radius: 44% 56% 58% 42% / 56% 44% 56% 44%;
+  }
+  75% {
+    border-radius: 52% 48% 40% 60% / 42% 52% 48% 58%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-blob {
+    animation: none;
+  }
 }

@@ -6,7 +6,7 @@ import { Title } from '@/components/ui/Title';
 export const metadata: Metadata = {
   title: 'FAQ',
   description:
-    "Questions fréquentes sur les prestations, la réservation, l'annulation et les cheveux au salon Hairstyle by Patricia.",
+    "Questions fréquentes sur les prestations, la réservation, l'annulation et les cheveux avec Hairstyle by Patricia.",
   alternates: { canonical: '/faq' },
 };
 
@@ -27,7 +27,7 @@ const faqItems = [
     id: 'cheveux',
     title: 'Quels types de cheveux accueillez-vous ?',
     content:
-      'Le salon est spécialisé dans les cheveux texturés : tresses, vanilles, locs, départ de locs, coiffures protectrices et coupes. Chaque prestation est adaptée à votre nature de cheveux après un diagnostic capillaire.',
+      'Patricia est spécialisée dans les cheveux texturés : tresses, vanilles, locs, départ de locs, coiffures protectrices et coupes. Chaque prestation est adaptée à votre nature de cheveux après un diagnostic capillaire.',
   },
   {
     id: 'preparation',
@@ -39,7 +39,7 @@ const faqItems = [
     id: 'duree',
     title: 'Combien de temps dure une prestation ?',
     content:
-      'La durée dépend de la coiffure et de votre longueur de cheveux. Chaque fiche du catalogue indique une durée indicative ; la durée réelle est confirmée lors du diagnostic au salon.',
+      'La durée dépend de la coiffure et de votre longueur de cheveux. Chaque fiche du catalogue indique une durée indicative ; la durée réelle est confirmée lors du diagnostic à votre domicile.',
   },
   {
     id: 'prix',
@@ -51,7 +51,7 @@ const faqItems = [
     id: 'annulation',
     title: 'Quelle est la politique d’annulation ?',
     content:
-      'Vous pouvez annuler ou déplacer votre rendez-vous gratuitement jusqu’à 24 heures avant l’heure convenue, via le lien sécurisé reçu par e-mail. Passé ce délai ou en cas d’absence, le salon applique les conditions détaillées dans les informations pratiques.',
+      'Vous pouvez annuler ou déplacer votre rendez-vous gratuitement jusqu’à 24 heures avant l’heure convenue, via le lien sécurisé reçu par e-mail. Passé ce délai ou en cas d’absence, Patricia applique les conditions détaillées dans les informations pratiques.',
   },
   {
     id: 'options',
@@ -63,7 +63,7 @@ const faqItems = [
 
 export default function FaqPage() {
   return (
-    <main className="mx-auto w-full max-w-7xl space-y-12 px-4 py-8 sm:px-6 md:py-12">
+    <main className="page-main space-y-12">
       <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
@@ -81,27 +81,27 @@ export default function FaqPage() {
       </nav>
 
       <header className="max-w-3xl space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-[0.14em] text-cacao">
+        <p className="hidden text-sm font-semibold uppercase tracking-[0.14em] text-cacao md:block">
           Questions fréquentes
         </p>
         <Title as="h1" size="display" className="">
           Vos questions, nos réponses
         </Title>
-        <p className="text-lg leading-relaxed text-muted">
+        <p className="hidden text-lg leading-relaxed text-muted md:block">
           Réservation, préparation, prix, annulation : retrouvez les réponses aux questions les plus
           courantes. Une question reste sans réponse ? Contactez-nous, nous vous répondrons
           rapidement.
         </p>
       </header>
 
-      <section aria-labelledby="faq-titre" className="max-w-3xl">
+      <section aria-labelledby="faq-titre">
         <h2 id="faq-titre" className="sr-only">
           Liste des questions fréquentes
         </h2>
         <Accordion items={faqItems} />
       </section>
 
-      <section className="max-w-3xl rounded-2xl bg-page p-8 text-center md:p-10">
+      <section className="mx-auto w-full max-w-3xl rounded-2xl bg-page p-8 text-center md:p-10">
         <Title as="h2" className="">
           Une autre question ?
         </Title>

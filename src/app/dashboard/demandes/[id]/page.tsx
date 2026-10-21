@@ -1,5 +1,5 @@
+import { Mail, Phone, Wand2 } from 'lucide-react';
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { requireAdmin } from '@/modules/auth/guards';
 import {
@@ -8,6 +8,9 @@ import {
   getCustomRequestAdmin,
   listPublishedServiceOptions,
 } from '@/modules/demandes/queries';
+import { formatFcfa } from '@/modules/reservations/format';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { BackButton } from '@/components/shared/BackButton';
 import { LocalDateTime } from '@/components/shared/LocalDateTime';
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
@@ -31,12 +34,6 @@ const ACTION_LABELS: Record<string, string> = {
   CLOSED: 'Demande clôturée',
 };
 
-const euroFormatter = new Intl.NumberFormat('fr-FR', {
-  style: 'currency',
-  currency: 'XOF',
-  maximumFractionDigits: 2,
-});
-
 export default async function CustomRequestDetailPage({
   params,
 }: {
@@ -53,49 +50,53 @@ export default async function CustomRequestDetailPage({
   if (!request) notFound();
 
   return (
-    <div className="p-6">
-      <nav aria-label="Fil d'Ariane" className="text-sm text-ink-soft">
-        <ol className="flex flex-wrap items-center gap-2">
-          <li>
-            <Link href="/dashboard/demandes" className="transition hover:text-cacao">
-              Demandes
-            </Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li>
-            <span aria-current="page" className="font-medium text-fg">
-              {request.requesterName}
+    <div>
+      <PageHeader
+        icon={Wand2}
+        back={<BackButton fallbackHref="/dashboard/demandes" />}
+        title={`Demande de ${request.requesterName}`}
+        description={
+          <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <Badge tone={CUSTOM_REQUEST_STATUS_TONES[request.status]}>
+              {CUSTOM_REQUEST_STATUS_LABELS[request.status]}
+            </Badge>
+            <span>
+              Reçue le <LocalDateTime iso={request.createdAt.toISOString()} dateStyle="long" />
             </span>
-          </li>
-        </ol>
-      </nav>
+          </span>
+        }
+      />
 
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        <h1 className="text-2xl font-semibold">Demande de {request.requesterName}</h1>
-        <Badge tone={CUSTOM_REQUEST_STATUS_TONES[request.status]}>
-          {CUSTOM_REQUEST_STATUS_LABELS[request.status]}
-        </Badge>
-      </div>
-      <p className="mt-1 text-sm text-ink-soft">
-        Reçue le <LocalDateTime iso={request.createdAt.toISOString()} />
-      </p>
-
-      <div className="mt-6 grid items-start gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
-        <div className="space-y-6">
+      <div className="grid items-start gap-3 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
+        <div className="grid gap-3">
           <Card>
-            <h2 className="font-heading text-xl font-bold text-fg">Demande</h2>
+            <h2 className="font-heading text-lg font-bold text-fg">Demande</h2>
+            <ul className="mt-2 grid gap-1.5 text-sm">
+              <li>
+                <a
+                  href={`mailto:${request.requesterEmail}`}
+                  className="inline-flex items-center gap-2 text-accent underline-offset-4 hover:underline"
+                >
+                  <Mail aria-hidden="true" className="size-4" />
+                  {request.requesterEmail}
+                </a>
+              </li>
+              {request.requesterPhone ? (
+                <li>
+                  <a
+                    href={`tel:${request.requesterPhone.replace(/\s+/g, '')}`}
+                    className="inline-flex items-center gap-2 text-accent underline-offset-4 hover:underline"
+                  >
+                    <Phone aria-hidden="true" className="size-4" />
+                    {request.requesterPhone}
+                  </a>
+                </li>
+              ) : null}
+            </ul>
             <dl className="mt-3 space-y-2 text-sm">
               <div className="flex flex-wrap justify-between gap-2">
-                <dt className="font-semibold">E-mail</dt>
-                <dd className="text-ink-soft">{request.requesterEmail}</dd>
-              </div>
-              <div className="flex flex-wrap justify-between gap-2">
-                <dt className="font-semibold">Téléphone</dt>
-                <dd className="text-ink-soft">{request.requesterPhone ?? 'Non renseigné'}</dd>
-              </div>
-              <div className="flex flex-wrap justify-between gap-2">
                 <dt className="font-semibold">Date souhaitée</dt>
-                <dd className="text-ink-soft">
+                <dd className="text-muted">
                   {request.desiredDate
                     ? new Intl.DateTimeFormat('fr-FR', { dateStyle: 'full' }).format(
                         request.desiredDate,
@@ -107,51 +108,55 @@ export default async function CustomRequestDetailPage({
                 <>
                   <div className="flex flex-wrap justify-between gap-2">
                     <dt className="font-semibold">Longueur</dt>
-                    <dd className="text-ink-soft">
+                    <dd className="text-muted">
                       {HAIR_LABELS[String(request.hairInfo.length)] ?? 'Non précisée'}
                     </dd>
                   </div>
                   <div className="flex flex-wrap justify-between gap-2">
                     <dt className="font-semibold">Type de cheveux</dt>
-                    <dd className="text-ink-soft">{String(request.hairInfo.type ?? '')}</dd>
+                    <dd className="text-muted">{String(request.hairInfo.type ?? '')}</dd>
                   </div>
                   {request.hairInfo.currentStyle ? (
                     <div className="flex flex-wrap justify-between gap-2">
                       <dt className="font-semibold">Coiffure actuelle</dt>
-                      <dd className="text-ink-soft">{String(request.hairInfo.currentStyle)}</dd>
+                      <dd className="text-muted">{String(request.hairInfo.currentStyle)}</dd>
                     </div>
                   ) : null}
                   {request.hairInfo.comment ? (
                     <div className="flex flex-wrap justify-between gap-2">
                       <dt className="font-semibold">Précisions</dt>
-                      <dd className="text-ink-soft">{String(request.hairInfo.comment)}</dd>
+                      <dd className="text-muted">{String(request.hairInfo.comment)}</dd>
                     </div>
                   ) : null}
                 </>
               ) : null}
             </dl>
-            <p className="mt-4 whitespace-pre-line rounded-[var(--radius-md)] bg-page p-3 text-sm text-fg">
+            <p className="mt-3 whitespace-pre-line rounded-[var(--radius-md)] bg-page p-3 text-sm text-fg">
               {request.description}
             </p>
           </Card>
 
           <Card>
-            <h2 className="font-heading text-xl font-bold text-fg">Photos de référence</h2>
+            <h2 className="font-heading text-lg font-bold text-fg">Photos de référence</h2>
             {request.photos.length === 0 ? (
-              <p className="mt-2 text-sm text-ink-soft">Aucune photo transmise.</p>
+              <p className="mt-2 text-sm text-muted">Aucune photo transmise.</p>
             ) : (
-              <ul className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                {request.photos.map((photo) => (
+              <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {request.photos.map((photo, index) => (
                   <li key={photo.key}>
                     {photo.url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={photo.url}
-                        alt="Photo de référence de la demande"
-                        className="aspect-square w-full rounded-[var(--radius-md)] object-cover"
-                      />
+                      <a href={photo.url} target="_blank" rel="noreferrer" className="block">
+                        {/* URL signée privée : next/image la mettrait en cache optimisé, on garde <img>. */}
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={photo.url}
+                          alt={`Photo de référence ${index + 1}`}
+                          loading="lazy"
+                          className="aspect-square w-full rounded-[var(--radius-md)] object-cover"
+                        />
+                      </a>
                     ) : (
-                      <p className="rounded-[var(--radius-md)] bg-page p-3 text-xs text-ink-soft">
+                      <p className="rounded-[var(--radius-md)] bg-page p-3 text-xs text-muted">
                         Photo privée indisponible pour le moment.
                       </p>
                     )}
@@ -162,11 +167,11 @@ export default async function CustomRequestDetailPage({
           </Card>
 
           <Card>
-            <h2 className="font-heading text-xl font-bold text-fg">Historique des décisions</h2>
+            <h2 className="font-heading text-lg font-bold text-fg">Historique des décisions</h2>
             {request.decisions.length === 0 ? (
-              <p className="mt-2 text-sm text-ink-soft">Aucune décision enregistrée.</p>
+              <p className="mt-2 text-sm text-muted">Aucune décision enregistrée.</p>
             ) : (
-              <ol className="mt-3 space-y-3">
+              <ol className="mt-3 space-y-2">
                 {request.decisions.map((decision) => (
                   <li
                     key={decision.id}
@@ -176,22 +181,22 @@ export default async function CustomRequestDetailPage({
                       <p className="text-sm font-semibold text-fg">
                         {ACTION_LABELS[decision.action] ?? decision.action}
                       </p>
-                      <p className="text-xs text-ink-soft">
-                        <LocalDateTime iso={decision.createdAt.toISOString()} />
+                      <p className="text-xs text-muted">
+                        <LocalDateTime iso={decision.createdAt.toISOString()} dateStyle="medium" />
                         {decision.userName ? ` · ${decision.userName}` : ''}
                       </p>
                     </div>
                     {decision.message ? (
-                      <p className="mt-2 whitespace-pre-line text-sm text-ink-soft">
+                      <p className="mt-2 whitespace-pre-line text-sm text-muted">
                         {decision.message}
                       </p>
                     ) : null}
                     {decision.priceCents != null ||
                     decision.proposedServiceName ||
                     decision.proposedSlot ? (
-                      <p className="mt-2 text-xs text-ink-soft">
+                      <p className="mt-2 text-xs text-muted">
                         {decision.priceCents != null
-                          ? `Prix : ${euroFormatter.format(decision.priceCents / 100)}`
+                          ? `Prix : ${formatFcfa(decision.priceCents)}`
                           : ''}
                         {decision.proposedServiceName
                           ? ` · Prestation : ${decision.proposedServiceName}`
@@ -211,19 +216,19 @@ export default async function CustomRequestDetailPage({
           </Card>
         </div>
 
-        <div className="space-y-6">
+        <div className="grid gap-3">
           {request.adminReply ? (
             <Card>
-              <h2 className="font-heading text-xl font-bold text-fg">Proposition actuelle</h2>
+              <h2 className="font-heading text-lg font-bold text-fg">Proposition actuelle</h2>
               <p className="mt-2 whitespace-pre-line text-sm text-fg">{request.adminReply}</p>
-              <p className="mt-2 text-sm text-ink-soft">
+              <p className="mt-2 text-sm text-muted">
                 {request.estimatedPriceCents != null
-                  ? `Prix estimé : ${euroFormatter.format(request.estimatedPriceCents / 100)}`
+                  ? `Prix estimé : ${formatFcfa(request.estimatedPriceCents)}`
                   : 'Prix non estimé'}
                 {request.proposedService ? ` · ${request.proposedService.name}` : ''}
               </p>
               {request.proposedSlot ? (
-                <p className="mt-1 text-sm text-ink-soft">
+                <p className="mt-1 text-sm text-muted">
                   Créneau proposé : <LocalDateTime iso={request.proposedSlot.toISOString()} />
                 </p>
               ) : null}
@@ -231,17 +236,15 @@ export default async function CustomRequestDetailPage({
           ) : null}
 
           <Card>
-            <h2 className="font-heading text-xl font-bold text-fg">Décider</h2>
-            <p className="mt-1 text-sm text-ink-soft">
-              La cliente reçoit le message par e-mail sauf pour une simple prise en charge.
+            <h2 className="font-heading text-lg font-bold text-fg">Décider</h2>
+            <p className="mb-3 mt-1 text-sm text-muted">
+              La cliente reçoit votre message par e-mail, sauf pour une simple prise en charge.
             </p>
-            <div className="mt-4">
-              <CustomRequestDecisionForm
-                requestId={request.id}
-                services={services}
-                currentStatus={request.status}
-              />
-            </div>
+            <CustomRequestDecisionForm
+              requestId={request.id}
+              services={services}
+              currentStatus={request.status}
+            />
           </Card>
         </div>
       </div>

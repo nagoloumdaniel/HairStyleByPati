@@ -15,7 +15,6 @@ import { test, expect } from '@playwright/test';
 const PUBLIC_PAGES = [
   { path: '/', label: 'Accueil' },
   { path: '/coiffures', label: 'Catalogue des coiffures' },
-  { path: '/salon', label: 'Le salon' },
   { path: '/contact', label: 'Contact' },
   { path: '/faq', label: 'FAQ' },
   { path: '/infos-pratiques', label: 'Informations pratiques' },

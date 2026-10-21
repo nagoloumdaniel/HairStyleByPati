@@ -46,7 +46,7 @@
 
 ## Page 404
 
-- Plein écran, sans carte englobante (`src/app/not-found.tsx`).
+- Plein écran (`fixed inset-0`), sans scroll, sans carte englobante (`src/app/not-found.tsx`). Même fond (dégradé) derrière la navbar que derrière le 404.
 
 ## Consignes par interface
 
@@ -58,3 +58,26 @@
 - animation des etats de chargements
 - evite les hovers scale sur les cards et boutons
 - Global : navbar flottante verre. Page 404 : `src/app/not-found.tsx` (dégradé + verre).
+- Contenu : Patricia coiffe **à domicile** (pas de salon). Aucune page/lien/texte « salon » ; page `/salon` supprimée.
+- Marges : toutes les pages publiques utilisent `.page-main` (+ `page-main-narrow` / `page-main-medium` pour contenus étroits) : mêmes marges latérales et verticales partout.
+- Cartes prestation : toute la carte (photo comprise) mène à la fiche ; survol = changement de photo + points. Pas de carrousel horizontal : grille, 2 lignes max (6 par page), pagination sans « précédent » en page 1 ni « suivant » en dernière page.
+- FAQ : questions sur 2 colonnes (md+) ; bloc « Une autre question » centré.
+- Champs : menu déroulant `Select`, calendrier `DateField`, heure `TimeField`, `DateTimeField` personnalisés (jamais de select/date natifs) ; icône dans chaque champ (`Input` en ajoute automatiquement selon type/nom).
+- Navbar : icônes réseaux sociaux (`SocialLinks`, react-icons) ; icônes via lucide-react, jamais d'emoji.
+- Landing `/` : hero plein écran sur fond `bg-hero` + dégradés (`.landing-hero`), SANS fond blanc ni carte. Gauche : titre (Title, aligné à gauche, grand), sous-titre « Départ et retwist de locs, nattes collées, vanilles. », boutons Réserver/Catalogue (→ `/coiffures`). Droite : photo `public/landing/landing.jpeg` dans un cercle qui se déforme en continu (`.landing-blob`, 12 s, fluide, désactivé si reduced-motion). AUCUNE petite carte/UI autour. Photo jamais étirée (carré natif). Section « À propos » sans image.
+- Horaires : Lundi – Dimanche, 5h – 22h (partout). Landing : mêmes polices que le reste du site (Playfair Display + Lato), aucune exception.
+- Boutons « Réserver » (navbar, landing, contact, infos) → `/coiffures`. `/reserver` sans `?service=` redirige vers le catalogue (plus de liste de noms) ; `/reserver?service=slug` reste le parcours de réservation.
+- Dashboard admin : SANS navbar publique ni footer (masqués sous `/dashboard`). Sidebar avec icônes lucide, « Voir le site » et bascule de thème ; chaque titre de page dashboard a son icône.
+- Dashboard : plein écran (pas de `max-w` global ni de marges autour), sidebar collée à gauche pleine hauteur (`lg:h-dvh`, sticky), contenu qui remplit toute la largeur restante ; responsive (mobile : barre de navigation horizontale en haut, contenu pleine largeur).
+- Dashboard mobile = app mobile : barre d’'app en haut (titre, voir le site, thème) + barre d’onglets fixe en bas (icône + libellé, défilement horizontal, safe-area), contenu avec marge basse.
+- Dashboard : navbar (DashboardTopbar) avec Messages, Notifications (badges), Voir le site, thème, Déconnexion ; la sidebar ne garde que les pages de gestion.
+- **Refonte dashboard (consignes utilisateur)** :
+  - Thème unique : le dashboard est toujours en thème clair (`DashboardThemeLock`), plus de bascule clair/sombre. Aucune couleur en dur.
+  - Sidebar : pas de texte « Administration ». Mobile : barre d’onglets fixe (4 entrées + « Menu » qui ouvre toutes les pages en grille d’icônes).
+  - Marges mobiles réduites au minimum (`px-3`), cartes `p-4`.
+  - Cartes entièrement cliquables (`CardLink`) : jamais de bouton « Voir plus » / « Détails » sur une carte.
+  - Tailles uniformes : `Button`/`ButtonLink`/champs/`Select` = h-9 (sm), h-10 (md, défaut), h-12 (lg). Pas de classes de bouton ad hoc : utiliser `Button`, `ButtonLink` (`src/components/ui/Button.tsx`).
+  - Mobile : boutons en icône seule (`iconOnly="mobile"` + `icon`), libellé en `sr-only` + `title`. Libellé visible dès `sm`.
+  - Icône dans chaque champ (`Input`, `Select icon`, `Textarea`).
+  - Popups : `Modal` (portail, fond flouté, bouton ✕, Échap, clic extérieur, focus piégé, page non scrollable derrière). Pas de `window.confirm` : utiliser `useConfirm()` (`src/components/ui/Confirm.tsx`).
+  - En-tête de page : `PageHeader` (icône + titre + description + actions).

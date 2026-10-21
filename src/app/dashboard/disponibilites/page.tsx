@@ -1,3 +1,4 @@
+import { CalendarOff } from 'lucide-react';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/modules/auth/guards';
@@ -6,6 +7,7 @@ import {
   listAvailabilityRules,
   listBlockedPeriods,
 } from '@/modules/disponibilites/queries';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@/components/ui/Card';
 import {
   BlockedPeriodsEditor,
@@ -26,6 +28,8 @@ export default async function DisponibilitesPage() {
     getSalonSettings(),
   ]);
 
+  // Les exceptions passées n'ont plus d'effet : on n'affiche que celles à venir.
+  const today = new Date().toISOString().slice(0, 10);
   const weekly = rules
     .filter((rule) => rule.kind === 'WEEKLY' && rule.active)
     .map((rule) => ({
@@ -35,7 +39,7 @@ export default async function DisponibilitesPage() {
       endMinute: rule.endMinute,
     }));
   const specific = rules
-    .filter((rule) => rule.kind === 'SPECIFIC' && rule.active && rule.date)
+    .filter((rule) => rule.kind === 'SPECIFIC' && rule.active && rule.date && rule.date >= today)
     .map((rule) => ({
       id: rule.id,
       date: rule.date as string,
@@ -51,43 +55,45 @@ export default async function DisponibilitesPage() {
   }));
 
   return (
-    <div className="p-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold">Disponibilités</h1>
-        <p className="text-muted">
-          Horaires habituels, exceptions, pauses et paramètres de réservation. Toute modification
-          qui touche des rendez-vous existants demande une confirmation explicite.
-        </p>
-      </div>
+    <div>
+      <PageHeader
+        icon={CalendarOff}
+        title="Disponibilités"
+        description="Horaires, exceptions, congés et règles de réservation. Une modification qui touche des rendez-vous demande confirmation."
+      />
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+      <div className="grid items-start gap-3 xl:grid-cols-2">
         <Card>
-          <h2 className="font-heading text-xl font-bold text-fg">Horaires habituels</h2>
-          <p className="mb-4 mt-1 text-sm text-muted">
-            Un jour non coché est fermé. Une date spécifique remplace les horaires habituels.
+          <h2 className="font-heading text-lg font-bold text-fg">Horaires habituels</h2>
+          <p className="mb-3 mt-1 text-sm text-muted">
+            Un jour non coché est fermé. Une date spécifique remplace l’horaire habituel.
           </p>
           <WeeklyScheduleEditor rules={weekly} />
         </Card>
 
-        <Card>
-          <h2 className="font-heading text-xl font-bold text-fg">Dates spécifiques</h2>
-          <p className="mb-4 mt-1 text-sm text-muted">
-            Pour un horaire différent ou une ouverture exceptionnelle à une date précise.
-          </p>
-          <SpecificDatesEditor rules={specific} />
-        </Card>
+        <div className="grid gap-3">
+          <Card>
+            <h2 className="font-heading text-lg font-bold text-fg">Dates spécifiques</h2>
+            <p className="mb-3 mt-1 text-sm text-muted">
+              Horaire différent ou ouverture exceptionnelle à une date précise. Décochez « Ouvert »
+              pour fermer ce jour-là.
+            </p>
+            <SpecificDatesEditor rules={specific} />
+          </Card>
 
-        <Card>
-          <h2 className="font-heading text-xl font-bold text-fg">Indisponibilités</h2>
-          <p className="mb-4 mt-1 text-sm text-muted">
-            Pauses, congés et blocages exceptionnels. Ils retirent les créneaux correspondants.
-          </p>
-          <BlockedPeriodsEditor periods={blocked} />
-        </Card>
+          <Card>
+            <h2 className="font-heading text-lg font-bold text-fg">Indisponibilités</h2>
+            <p className="mb-3 mt-1 text-sm text-muted">
+              Pauses, congés et blocages exceptionnels : les créneaux concernés disparaissent de la
+              réservation.
+            </p>
+            <BlockedPeriodsEditor periods={blocked} />
+          </Card>
+        </div>
 
-        <Card>
-          <h2 className="font-heading text-xl font-bold text-fg">Paramètres de réservation</h2>
-          <p className="mb-4 mt-1 text-sm text-muted">
+        <Card className="xl:col-span-2">
+          <h2 className="font-heading text-lg font-bold text-fg">Paramètres de réservation</h2>
+          <p className="mb-3 mt-1 text-sm text-muted">
             Ces valeurs pilotent les créneaux, la validation manuelle et les annulations.
           </p>
           <BookingSettingsEditor settings={settings} />

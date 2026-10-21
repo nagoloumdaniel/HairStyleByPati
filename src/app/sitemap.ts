@@ -11,7 +11,6 @@ const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 const STATIC_ROUTES = [
   { url: '/', changeFrequency: 'weekly' as const, priority: 1 },
   { url: '/coiffures', changeFrequency: 'monthly' as const, priority: 0.9 },
-  { url: '/salon', changeFrequency: 'monthly' as const, priority: 0.8 },
   { url: '/contact', changeFrequency: 'monthly' as const, priority: 0.8 },
   { url: '/faq', changeFrequency: 'monthly' as const, priority: 0.7 },
   { url: '/infos-pratiques', changeFrequency: 'monthly' as const, priority: 0.7 },

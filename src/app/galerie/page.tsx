@@ -15,11 +15,11 @@ export default async function GaleriePage() {
   const photos = await listPublishedGalleryPhotos();
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
+    <main className="page-main">
       <Title as="h1" size="display" className="">
         Galerie de réalisations
       </Title>
-      <p className="mt-2 max-w-2xl text-muted">
+      <p className="mt-2 hidden max-w-2xl text-muted md:block">
         Un aperçu de réalisations de Patricia, partagées avec l’autorisation explicite des clientes
         concernées.
       </p>

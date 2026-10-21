@@ -1,14 +1,15 @@
 'use client';
 
-import { useActionState } from 'react';
+import { Archive, Eye, EyeOff, RotateCcw, Trash2 } from 'lucide-react';
 import type { AdminServiceDetail } from '@/lib/catalogue-admin';
 import { Button } from '@/components/ui/Button';
+import { useConfirm } from '@/components/ui/Confirm';
 import {
   adminArchiveService,
   adminDeleteService,
   adminSetServiceStatus,
-  type CatalogueActionState,
 } from '@/modules/catalogue/actions';
+import { formDataOf, useRunAction } from '../../catalogue-ui';
 
 /* ============================================================
  * P4.6 — Publication, dépublication et archivage d'une
@@ -20,98 +21,91 @@ export function ServiceHeaderActions({
   service,
   canDelete,
 }: {
-  service: AdminServiceDetail;
+  service: Pick<AdminServiceDetail, 'id' | 'name' | 'status'>;
   canDelete: boolean;
 }) {
-  const [publishState, publishAction, publishPending] = useActionState<
-    CatalogueActionState,
-    FormData
-  >(adminSetServiceStatus, {});
-  const [archiveState, archiveAction, archivePending] = useActionState<
-    CatalogueActionState,
-    FormData
-  >(adminArchiveService, {});
-  const [deleteState, deleteAction, deletePending] = useActionState<CatalogueActionState, FormData>(
-    adminDeleteService,
-    {},
-  );
+  const confirm = useConfirm();
+  const publish = useRunAction();
+  const archive = useRunAction();
+  const remove = useRunAction();
 
   const isPublished = service.status === 'PUBLISHED';
   const isArchived = service.status === 'ARCHIVED';
-  const error = publishState.error ?? archiveState.error ?? deleteState.error;
+  const nextStatus = isPublished || isArchived ? 'DRAFT' : 'PUBLISHED';
+  const statusLabel = isArchived ? 'Rétablir' : isPublished ? 'Dépublier' : 'Publier';
+
+  async function onToggleStatus() {
+    if (isPublished) {
+      const ok = await confirm({
+        title: 'Dépublier cette prestation ?',
+        message: `« ${service.name} » ne sera plus visible sur le site ni réservable. Vous pourrez la republier à tout moment.`,
+        confirmLabel: 'Dépublier',
+        tone: 'primary',
+      });
+      if (!ok) return;
+    }
+    publish.run(() =>
+      adminSetServiceStatus({}, formDataOf({ id: service.id, status: nextStatus })),
+    );
+  }
+
+  async function onArchive() {
+    const ok = await confirm({
+      title: 'Archiver cette prestation ?',
+      message: 'Elle disparaîtra du site public et restera dans l’historique.',
+      confirmLabel: 'Archiver',
+      tone: 'primary',
+    });
+    if (!ok) return;
+    archive.run(() => adminArchiveService({}, formDataOf({ id: service.id })));
+  }
+
+  async function onDelete() {
+    const ok = await confirm({
+      title: 'Supprimer cette prestation ?',
+      message: `« ${service.name} » sera supprimée définitivement avec ses photos. Cette action est irréversible.`,
+      confirmLabel: 'Supprimer',
+    });
+    if (!ok) return;
+    remove.run(() => adminDeleteService({}, formDataOf({ id: service.id })));
+  }
 
   return (
-    <div className="flex flex-col items-stretch gap-2 lg:items-end">
-      <div className="flex flex-wrap gap-2">
-        <form action={publishAction}>
-          <input type="hidden" name="id" value={service.id} />
-          <input
-            type="hidden"
-
-            name="status"
-            value={isPublished ? 'DRAFT' : 'PUBLISHED'}
-          />
-          <Button
-            type="submit"
-            variant={isPublished ? 'secondary' : 'primary'}
-            size="sm"
-            loading={publishPending}
-          >
-            {isPublished ? 'Dépublier' : 'Publier'}
-          </Button>
-        </form>
-
-        {!isArchived ? (
-          <form
-            action={archiveAction}
-            onSubmit={(event) => {
-              if (
-                !window.confirm(
-                  "Archiver cette prestation ? Elle disparaîtra du site public et restera dans l'historique.",
-                )
-              ) {
-                event.preventDefault();
-              }
-            }}
-          >
-            <input type="hidden" name="id" value={service.id} />
-            <Button type="submit" variant="ghost" size="sm" loading={archivePending}>
-              Archiver
-            </Button>
-          </form>
-        ) : null}
-
-        {canDelete ? (
-          <form
-            action={deleteAction}
-            onSubmit={(event) => {
-              if (
-                !window.confirm(
-                  `Supprimer définitivement « ${service.name} » ? Cette action est irréversible.`,
-                )
-              ) {
-                event.preventDefault();
-              }
-            }}
-          >
-            <input type="hidden" name="id" value={service.id} />
-            <Button type="submit" variant="danger" size="sm" loading={deletePending}>
-              Supprimer
-            </Button>
-          </form>
-        ) : null}
-      </div>
-
-      {error ? (
-        <p role="alert" className="max-w-72 text-sm font-medium text-alert">
-          {error}
-        </p>
+    <>
+      <Button
+        type="button"
+        variant={isPublished || isArchived ? 'secondary' : 'primary'}
+        icon={isArchived ? RotateCcw : isPublished ? EyeOff : Eye}
+        iconOnly="mobile"
+        loading={publish.pending}
+        onClick={onToggleStatus}
+      >
+        {statusLabel}
+      </Button>
+      {isArchived ? null : (
+        <Button
+          type="button"
+          variant="secondary"
+          icon={Archive}
+          iconOnly="mobile"
+          loading={archive.pending}
+          onClick={onArchive}
+        >
+          Archiver
+        </Button>
+      )}
+      {canDelete ? (
+        <Button
+          type="button"
+          variant="danger"
+          icon={Trash2}
+          iconOnly="mobile"
+          loading={remove.pending}
+          onClick={onDelete}
+        >
+          Supprimer
+        </Button>
       ) : null}
-      {publishState.success || archiveState.success ? (
-        <p role="status" className="max-w-72 text-sm font-medium text-success">
-          {publishState.success ?? archiveState.success}
-        </p>
-      ) : null}
-    </div>
+    </>
   );
 }

@@ -10,6 +10,7 @@ import {
   isActiveAppointmentStatus,
 } from '@/modules/reservations/status';
 import { getSalonSettings } from '@/modules/disponibilites/queries';
+import { resolveCancellationPolicy, splitParagraphs } from '@/modules/parametres/policies';
 import { LocalDateTime } from '@/components/shared/LocalDateTime';
 import { Badge } from '@/components/ui/Badge';
 import { CancelForm } from './cancel-form';
@@ -33,17 +34,17 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
 
   if (!appointment) {
     return (
-      <main className="mx-auto w-full max-w-2xl px-4 py-12 sm:px-6">
+      <main className="page-main">
         <div className="rounded-[var(--radius-lg)] border border-alert bg-alert-soft p-8 text-center">
           <h1 className="font-heading text-2xl font-bold text-alert">Lien d’annulation invalide</h1>
           <p className="mt-3 text-fg">
-            Ce lien ne correspond à aucun rendez-vous. Vérifiez le lien reçu ou contactez le salon.
+            Ce lien ne correspond à aucun rendez-vous. Vérifiez le lien reçu ou contactez Patricia.
           </p>
           <Link
             href="/contact"
             className="mt-6 inline-flex rounded-[var(--radius-md)] bg-accent px-5 py-2.5 font-semibold text-accent-fg"
           >
-            Contacter le salon
+            Contacter Patricia
           </Link>
         </div>
       </main>
@@ -54,6 +55,9 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
   const now = new Date();
   const tokenValid = isCancellationTokenValid(appointment.cancelTokenExpiresAt, now);
   const active = isActiveAppointmentStatus(appointment.status);
+  const policyParagraphs = splitParagraphs(
+    resolveCancellationPolicy(settings.cancellationPolicy, settings.minCancelNoticeHours),
+  );
   const policy = evaluateCancellationPolicy({
     startsAt: appointment.startsAt,
     now,
@@ -61,7 +65,7 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
   });
 
   return (
-    <main className="mx-auto w-full max-w-2xl space-y-6 px-4 py-10 sm:px-6 md:py-14">
+    <main className="page-main space-y-6">
       <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
@@ -124,11 +128,22 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
         </dl>
       </section>
 
+      <section className="rounded-[var(--radius-lg)] border border-line bg-page p-6">
+        <Title as="h2" className="">
+          Conditions d’annulation
+        </Title>
+        <div className="mt-3 space-y-2 text-sm leading-relaxed text-muted">
+          {policyParagraphs.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
+        </div>
+      </section>
+
       {!tokenValid ? (
         <section className="rounded-[var(--radius-lg)] border border-alert bg-alert-soft p-6">
           <h2 className="font-heading text-xl font-bold text-alert">Lien expiré</h2>
           <p className="mt-2 text-fg">
-            Ce lien d’annulation n’est plus valide. Contactez le salon pour toute modification.
+            Ce lien d’annulation n’est plus valide. Contactez Patricia pour toute modification.
           </p>
         </section>
       ) : !active ? (
@@ -151,7 +166,7 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
             href="/contact"
             className="mt-5 inline-flex rounded-[var(--radius-md)] bg-accent px-5 py-2.5 font-semibold text-accent-fg"
           >
-            Contacter le salon
+            Contacter Patricia
           </Link>
         </section>
       ) : (

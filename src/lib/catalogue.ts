@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type { HairLength, PhotoPolicy, Prisma } from '@prisma/client';
 import { db } from './db';
+import { OPTION_ORDER_BY } from '@/modules/catalogue/ordering';
 
 /* ------------------------------------------------------------------ */
 /* Paramètres de requête publique (P1.9, P3.2)                        */
@@ -20,12 +21,12 @@ export const catalogueQuerySchema = z.object({
     z.string().min(1).max(80).optional(),
   ),
   page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(50).default(9),
+  pageSize: z.coerce.number().int().min(1).max(50).default(6),
 });
 
 export type CatalogueQuery = z.infer<typeof catalogueQuerySchema>;
 
-export const DEFAULT_PAGE_SIZE = 9;
+export const DEFAULT_PAGE_SIZE = 6;
 
 /**
  * Normalise et valide les `searchParams` d'une page publique.
@@ -65,7 +66,7 @@ const CATALOGUE_SERVICE_SELECT = {
   },
   options: {
     where: { active: true },
-    orderBy: { name: 'asc' },
+    orderBy: OPTION_ORDER_BY,
     select: { name: true, priceCents: true },
   },
 } satisfies Prisma.ServiceSelect;
@@ -148,7 +149,7 @@ const SERVICE_DETAIL_SELECT = {
   },
   options: {
     where: { active: true },
-    orderBy: { name: 'asc' },
+    orderBy: OPTION_ORDER_BY,
     select: { id: true, name: true, priceCents: true, durationMinutes: true },
   },
   compatibility: {
@@ -227,7 +228,7 @@ const CATEGORY_PLACEHOLDERS: Record<string, Placeholder[]> = {
   tresses: [
     {
       src: pexels(36441633),
-      alt: 'Tresses africaines en cours de réalisation dans un salon (photo de démonstration)',
+      alt: 'Tresses africaines en cours de réalisation à domicile (photo de démonstration)',
     },
     {
       src: pexels(33664383),

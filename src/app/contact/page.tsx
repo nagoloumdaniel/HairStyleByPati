@@ -7,13 +7,13 @@ import { Title } from '@/components/ui/Title';
 export const metadata: Metadata = {
   title: 'Contact',
   description:
-    'Contactez le salon Hairstyle by Patricia : questions, réservation, informations pratiques. Réponse rapide.',
+    'Contactez Patricia Hairstyle by Patricia : questions, réservation, informations pratiques. Réponse rapide.',
   alternates: { canonical: '/contact' },
 };
 
 export default function ContactPage() {
   return (
-    <main className="mx-auto w-full max-w-7xl space-y-12 px-4 py-8 sm:px-6 md:py-12">
+    <main className="page-main space-y-12">
       <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
@@ -31,11 +31,13 @@ export default function ContactPage() {
       </nav>
 
       <header className="max-w-3xl space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-[0.14em] text-cacao">Contact</p>
+        <p className="hidden text-sm font-semibold uppercase tracking-[0.14em] text-cacao md:block">
+          Contact
+        </p>
         <Title as="h1" size="display" className="">
           Écrivez-nous
         </Title>
-        <p className="text-lg leading-relaxed text-muted">
+        <p className="hidden text-lg leading-relaxed text-muted md:block">
           Une question sur une prestation, un rendez-vous ou les horaires ? Patricia vous répond
           personnellement.
         </p>
@@ -50,7 +52,7 @@ export default function ContactPage() {
           Retrouvez-nous aussi
         </Title>
         <p className="mx-auto mt-3 max-w-md text-muted">
-          Salon Hairstyle by Patricia – coiffures texturées, tresses, vanilles, locs et coiffures
+          Hairstyle by Patricia – coiffures texturées, tresses, vanilles, locs et coiffures
           protectrices.
         </p>
         <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
@@ -61,7 +63,7 @@ export default function ContactPage() {
             Voir le catalogue
           </Link>
           <Link
-            href="/reserver"
+            href="/coiffures"
             className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
           >
             Réserver un créneau

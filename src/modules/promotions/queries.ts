@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client';
 import { db } from '@/lib/db';
 import { findActivePromotion, type PromotionCandidate } from './pricing';
 
@@ -12,14 +13,23 @@ export async function listPromotions() {
   });
 }
 
-async function activePromotionCandidates(): Promise<PromotionCandidate[]> {
-  const rows = await db.promotion.findMany({
-    where: { active: true },
+/**
+ * Promotions actives (période en cours) sous forme de candidats pour le moteur de prix.
+ * Fonctionne avec `db` ou avec un client de transaction. Triées de la plus récente à la plus ancienne.
+ */
+export async function fetchPromotionCandidates(
+  client: Pick<Prisma.TransactionClient, 'promotion'>,
+  now: Date,
+): Promise<PromotionCandidate[]> {
+  const rows = await client.promotion.findMany({
+    where: { active: true, startsAt: { lte: now }, endsAt: { gte: now } },
+    orderBy: { createdAt: 'desc' },
     include: { services: { select: { serviceId: true } } },
   });
   return rows.map((row) => ({
     id: row.id,
     name: row.name,
+    code: row.code,
     kind: row.kind,
     value: row.value,
     startsAt: row.startsAt,
@@ -29,11 +39,11 @@ async function activePromotionCandidates(): Promise<PromotionCandidate[]> {
   }));
 }
 
-/** Promotion active pour une prestation à l'instant présent, ou null. */
+/** Promotion automatique (sans code) active pour une prestation à l'instant présent, ou null. */
 export async function getActivePromotionForService(
   serviceId: string,
   now: Date = new Date(),
 ): Promise<PromotionCandidate | null> {
-  const candidates = await activePromotionCandidates();
+  const candidates = await fetchPromotionCandidates(db, now);
   return findActivePromotion(candidates, serviceId, now);
 }

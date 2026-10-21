@@ -1,23 +1,22 @@
+import { ArrowRight, CalendarDays, Clock, Mail, MapPin } from 'lucide-react';
 import Image from 'next/image';
-import { IMAGE_BLUR_DATA_URL } from '@/lib/image-placeholder';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 
 import { getApprovedReviews } from '@/modules/avis/queries';
 import { Title } from '@/components/ui/Title';
-import { CardCarousel } from '@/components/catalogue/CardCarousel';
 import { PrestationCard } from '@/components/catalogue/PrestationCard';
 import { bookingHref } from '@/lib/catalogue';
 
 export const metadata: Metadata = {
-  title: 'Hairstyle by Patricia — Coiffures texturées, tresses, vanilles et locs à Dakar',
+  title: { absolute: 'Hairstyle by Patricia — Locs, nattes collées et vanilles à Dakar' },
   description:
-    'Salon de coiffure spécialisé en tresses, vanilles et locs. Diagnostic capillaire sur mesure et réservation en ligne. Dakar, Sénégal.',
+    'Départ et retwist de locs, nattes collées, vanilles. Coiffure à domicile à Dakar, diagnostic capillaire et réservation en ligne.',
   alternates: { canonical: '/' },
   openGraph: {
-    title: 'Hairstyle by Patricia — Sublimez vos cheveux avec Patricia',
+    title: 'Hairstyle by Patricia — Locs, nattes collées et vanilles à Dakar',
     description:
-      'Coiffeuse spécialisée en tresses, vanilles et locs. Prenez rendez-vous en quelques clics pour une coiffure sur mesure.',
+      'Départ et retwist de locs, nattes collées, vanilles. Prenez rendez-vous en quelques clics.',
     type: 'website',
     url: '/',
   },
@@ -79,218 +78,219 @@ const steps = [
 export default async function HomePage() {
   const reviews = await getApprovedReviews(3);
   return (
-    <main className="mx-auto max-w-7xl px-6 space-y-20">
-      {/* Hero */}
+    <main>
+      {/* Hero plein écran : texte à gauche, portrait arrondi à droite avec petites cartes
+          qui débordent du cadre (pas de fond blanc). Navbar flottante intacte. */}
       <section
-        className="relative rounded-2xl bg-hero p-8 md:p-16 text-panel-fg overflow-hidden reveal"
         aria-labelledby="hero-title"
+        className="landing-hero relative -mt-[4.75rem] min-h-svh overflow-hidden bg-hero md:-mt-24 lg:h-svh lg:min-h-[40rem]"
       >
-        <div className="md:flex md:items-center gap-8">
-          <div className="md:w-1/2 space-y-6">
-            <Title as="h1" size="display" id="hero-title" className="title-on-dark">
-              Sublimez vos cheveux avec Patricia
+        <div className="mx-auto grid h-full max-w-7xl grid-cols-1 items-center gap-10 px-6 pb-12 pt-32 sm:px-10 md:pt-36 lg:grid-cols-2 lg:gap-8 lg:pb-8 lg:pt-28">
+          {/* Texte + actions */}
+          <div className="flex flex-col items-center gap-5 text-center lg:items-start lg:text-left">
+            <Title as="h1" size="display" id="hero-title" className="landing-title title-on-dark">
+              Hairstyle by Patricia
             </Title>
-            <p className="text-lg md:text-xl text-panel-fg/90 max-w-md leading-relaxed">
-              Coiffeuse spécialisée en tresses, vanilles et locs. Prenez rendez-vous en quelques
-              clics pour une coiffure sur mesure.
+            <p className="reveal max-w-xl text-lg text-panel-fg/85 md:text-xl">
+              Départ et retwist de locs, nattes collées, vanilles.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div
+              className="reveal flex w-full max-w-md flex-row gap-3 lg:max-w-xl"
+              style={{ animationDelay: '200ms' }}
+            >
               <Link
-                href="/reserver"
-                className="inline-flex items-center justify-center gap-2 font-semibold bg-accent text-accent-fg hover:bg-accent-hover shadow-soft px-7 py-3.5 text-lg rounded-[var(--radius-md)] transition active:scale-[0.98]"
+                href="/coiffures"
+                className="bg-gradient-primary inline-flex flex-1 items-center justify-center gap-2 rounded-full px-7 py-4 text-lg font-bold text-accent-fg shadow-soft transition hover:brightness-110 active:scale-[0.98]"
               >
-                Réserver un créneau
+                <CalendarDays aria-hidden="true" className="size-5" />
+                Réserver
               </Link>
               <Link
                 href="/coiffures"
-                className="inline-flex items-center justify-center gap-2 font-semibold bg-card text-fg border border-line hover:border-cacao shadow-soft px-7 py-3.5 text-lg rounded-[var(--radius-md)] transition active:scale-[0.98]"
+                className="inline-flex border border-white/20 bg-white/10 backdrop-blur-md flex-1 items-center justify-center gap-2 rounded-full px-7 py-4 text-lg font-bold text-panel-fg transition hover:bg-white/10 active:scale-[0.98]"
               >
-                Découvrir le catalogue
+                Catalogue
+                <ArrowRight aria-hidden="true" className="size-5" />
               </Link>
             </div>
           </div>
-          <div className="md:w-1/2 flex justify-center">
-            <Image
-              src="https://images.pexels.com/photos/33664383/pexels-photo-33664383.jpeg?auto=compress&cs=tinysrgb&w=900"
-              alt="Coiffure tressée réalisée en salon (photo de démonstration)"
-              className="rounded-xl shadow-lift"
-              width={600}
-              height={600}
-              sizes="(max-width: 768px) 100vw, 45vw"
-              placeholder="blur"
-              blurDataURL={IMAGE_BLUR_DATA_URL}
-              quality={80}
-              priority
-            />
-          </div>
-        </div>
-      </section>
 
-      {/* Coiffures populaires */}
-      <section id="coiffures" className="space-y-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <Title as="h2" className="">
-              Coiffures populaires
-            </Title>
-            <p className="text-muted">Nos prestations les plus demandées.</p>
-          </div>
-          <Link
-            href="/coiffures"
-            className="inline-flex items-center justify-center gap-2 font-semibold bg-accent text-accent-fg hover:bg-accent-hover shadow-soft px-7 py-3.5 text-lg rounded-[var(--radius-md)] transition active:scale-[0.98]"
+          {/* Portrait dans un cercle qui se déforme en continu */}
+          <div
+            className="reveal relative mx-auto flex w-full max-w-[16rem] justify-center sm:max-w-[21rem] lg:max-w-none lg:justify-end lg:pr-10"
+            style={{ animationDelay: '120ms' }}
           >
-            Voir toutes les coiffures
-          </Link>
-        </div>
-        <CardCarousel label="Coiffures populaires">
-          {popularServices.map((service) => (
-            <PrestationCard
-              key={service.slug}
-              href={`/coiffures/${service.slug}`}
-              bookHref={bookingHref(service.slug)}
-              images={[{ src: service.image, alt: service.alt }]}
-              badge={service.category}
-              title={service.title}
-              price={service.price}
-              duration={service.duration}
-            />
-          ))}
-        </CardCarousel>
-      </section>
-
-      {/* Étapes de réservation */}
-      <section id="etapes" className="space-y-8">
-        <Title as="h2" className="">
-          Comment ça marche
-        </Title>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {steps.map((step) => (
-            <div key={step.number} className="text-center">
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent text-accent-fg font-heading font-bold text-xl mb-4">
-                {step.number}
+            <div className="landing-blob-ring relative aspect-square w-full max-w-[21rem] lg:h-[min(58svh,29rem)] lg:w-auto lg:max-w-none">
+              <div className="landing-blob relative size-full shadow-lift">
+                <Image
+                  src="/landing/landing.jpeg"
+                  alt="Patricia coiffe un client : retwist de locs et nattes collées"
+                  fill
+                  priority
+                  quality={90}
+                  sizes="(max-width: 1024px) 21rem, 29rem"
+                  className="object-cover object-[62%_30%]"
+                />
               </div>
-              <h3 className="text-xl font-heading font-bold text-fg mb-2">{step.title}</h3>
-              <p className="text-muted leading-relaxed">{step.description}</p>
             </div>
-          ))}
+          </div>
         </div>
       </section>
 
-      {/* Présentation Patricia */}
-      <section id="patricia" className="flex flex-col md:flex-row gap-12 items-center reveal">
-        <div className="md:w-1/2 flex justify-center">
-          <Image
-            src="https://images.pexels.com/photos/10825829/pexels-photo-10825829.jpeg?auto=compress&cs=tinysrgb&w=700"
-            alt="Portrait de démonstration — coiffeuse experte en tresses, vanilles et locs"
-            className="rounded-full shadow-lift"
-            width={500}
-            height={500}
-            sizes="(max-width: 768px) 80vw, 40vw"
-            placeholder="blur"
-            blurDataURL={IMAGE_BLUR_DATA_URL}
-            quality={80}
-            loading="lazy"
-          />
-        </div>
-        <div className="md:w-1/2 space-y-6">
+      <div className="page-main space-y-20">
+        {/* Coiffures populaires */}
+        <section id="coiffures" className="space-y-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+              <Title as="h2" className="">
+                Coiffures populaires
+              </Title>
+              <p className="text-muted">Nos prestations les plus demandées.</p>
+            </div>
+            <Link
+              href="/coiffures"
+              className="inline-flex items-center justify-center gap-2 font-semibold bg-accent text-accent-fg hover:bg-accent-hover shadow-soft px-7 py-3.5 text-lg rounded-[var(--radius-md)] transition active:scale-[0.98]"
+            >
+              Voir toutes les coiffures
+            </Link>
+          </div>
+          <ul
+            aria-label="Coiffures populaires"
+            className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {popularServices.slice(0, 6).map((service) => (
+              <li key={service.slug}>
+                <PrestationCard
+                  href={`/coiffures/${service.slug}`}
+                  bookHref={bookingHref(service.slug)}
+                  images={[{ src: service.image, alt: service.alt }]}
+                  badge={service.category}
+                  title={service.title}
+                  price={service.price}
+                  duration={service.duration}
+                />
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        {/* Étapes de réservation */}
+        <section id="etapes" className="space-y-8">
+          <Title as="h2" className="">
+            Comment ça marche
+          </Title>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {steps.map((step) => (
+              <div key={step.number} className="text-center">
+                <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent text-accent-fg font-heading font-bold text-xl mb-4">
+                  {step.number}
+                </div>
+                <h3 className="text-xl font-heading font-bold text-fg mb-2">{step.title}</h3>
+                <p className="text-muted leading-relaxed">{step.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Présentation Patricia */}
+        <section id="patricia" className="reveal mx-auto max-w-3xl space-y-6 text-center">
           <Title as="h2" className="">
             À propos de Patricia
           </Title>
           <p className="text-muted leading-relaxed">
-            Coiffeuse passionnée et expérimentée, Patricia met son savoir-faire au service de vos
-            cheveux depuis plus de 10 ans. Spécialiste des tresses, vanilles et locs, elle vous
-            accueille dans une ambiance chaleureuse et professionnelle pour sublimer votre
-            chevelure.
+            Moi, c&apos;est Patricia. Depuis novembre 2025, je coiffe les cheveux naturels : locs et
+            nattes collées, pour les hommes comme pour les femmes. J&apos;ai tout appris seule, à
+            force de pratique, et j&apos;ai déjà coiffé plus de 40 clients.
           </p>
           <p className="text-muted leading-relaxed">
-            Chaque prestation est personnalisée : diagnostic capillaire, conseils d&apos;entretien
-            et coiffure adaptée à votre nature de cheveux.
+            Chez moi, on mise sur la rapidité, une belle finition, la bonne humeur et votre confort.
+            Avant de commencer, on regarde ensemble votre nature de cheveux pour choisir la coiffure
+            qui vous va.
           </p>
-        </div>
-      </section>
+          <p className="font-heading text-xl font-bold text-fg">
+            Si vous êtes content, je le suis aussi.
+          </p>
+        </section>
 
-      {/* Témoignages (P8.10) : avis réels approuvés uniquement, jamais inventés. */}
-      {reviews.length > 0 ? (
-        <section id="temoinages" className="space-y-8">
+        {/* Témoignages (P8.10) : avis réels approuvés uniquement, jamais inventés. */}
+        {reviews.length > 0 ? (
+          <section id="temoinages" className="space-y-8">
+            <Title as="h2" className="">
+              Elles nous font confiance
+            </Title>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {reviews.map((review) => (
+                <blockquote
+                  key={review.id}
+                  className="card p-6 italic text-muted border-none bg-card shadow-soft"
+                >
+                  {review.comment ? <p className="text-lg mb-4">« {review.comment} »</p> : null}
+                  <footer className="text-sm font-semibold text-fg not-italic">
+                    — {review.customer.name.split(' ')[0]} · {review.service.name}
+                    {review.rating ? ` · ${review.rating}/5` : ''}
+                  </footer>
+                </blockquote>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {/* Demande personnalisée */}
+        <section className="rounded-2xl border border-line bg-card p-8 text-center shadow-soft md:p-12">
           <Title as="h2" className="">
-            Elles nous font confiance
+            Une coiffure sur mesure en tête ?
           </Title>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {reviews.map((review) => (
-              <blockquote
-                key={review.id}
-                className="card p-6 italic text-muted border-none bg-card shadow-soft"
+          <p className="mx-auto mt-3 max-w-2xl text-ink-soft">
+            Décrivez votre projet et joignez jusqu’à trois photos de référence. Patricia étudie
+            votre demande et vous propose une prestation adaptée, sans réservation automatique.
+          </p>
+          <Link
+            href="/demandes-personnalisees"
+            className="mt-6 inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-7 py-3.5 text-lg font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
+          >
+            Demander une coiffure personnalisée
+          </Link>
+        </section>
+
+        {/* Contact / Coordonnées */}
+        <section id="contact" className="rounded-2xl bg-page p-8 md:p-12 reveal">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div className="space-y-6">
+              <Title as="h2" className="">
+                Contactez-nous
+              </Title>
+              <p className="text-muted leading-relaxed">
+                Une question sur une prestation ou sur la disponibilité d&apos;un créneau ?
+                Contactez-nous, nous vous répondrons rapidement.
+              </p>
+              <Link
+                href="/contact"
+                className="inline-flex items-center justify-center gap-2 font-semibold bg-accent text-accent-fg hover:bg-accent-hover shadow-soft px-7 py-3.5 text-lg rounded-[var(--radius-md)] transition active:scale-[0.98]"
               >
-                {review.comment ? <p className="text-lg mb-4">« {review.comment} »</p> : null}
-                <footer className="text-sm font-semibold text-fg not-italic">
-                  — {review.customer.name.split(' ')[0]} · {review.service.name}
-                  {review.rating ? ` · ${review.rating}/5` : ''}
-                </footer>
-              </blockquote>
-            ))}
+                Envoyer un message
+              </Link>
+            </div>
+            <div className="space-y-4">
+              <p className="flex items-start gap-3 text-fg">
+                <MapPin aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-accent" />
+                <span>
+                  Hairstyle by Patricia
+                  <br />
+                  Ouest - Foire, Dakar, Sénégal
+                </span>
+              </p>
+              <p className="flex items-start gap-3 text-fg">
+                <Mail aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-accent" />
+                <span>zepatricia7@gmail.com</span>
+              </p>
+              <p className="flex items-start gap-3 text-fg">
+                <Clock aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-accent" />
+                <span>Lundi – Dimanche : 5h – 22h</span>
+              </p>
+            </div>
           </div>
         </section>
-      ) : null}
-
-      {/* Demande personnalisée */}
-      <section className="rounded-2xl border border-line bg-card p-8 text-center shadow-soft md:p-12">
-        <Title as="h2" className="">
-          Une coiffure sur mesure en tête ?
-        </Title>
-        <p className="mx-auto mt-3 max-w-2xl text-ink-soft">
-          Décrivez votre projet et joignez jusqu’à trois photos de référence. Patricia étudie votre
-          demande et vous propose une prestation adaptée, sans réservation automatique.
-        </p>
-        <Link
-          href="/demandes-personnalisees"
-          className="mt-6 inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-7 py-3.5 text-lg font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
-        >
-          Demander une coiffure personnalisée
-        </Link>
-      </section>
-
-      {/* Contact / Coordonnées */}
-      <section id="contact" className="rounded-2xl bg-page p-8 md:p-12 reveal">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          <div className="space-y-6">
-            <Title as="h2" className="">
-              Contactez-nous
-            </Title>
-            <p className="text-muted leading-relaxed">
-              Une question sur une prestation ou sur la disponibilité d&apos;un créneau ?
-              Contactez-nous, nous vous répondrons rapidement.
-            </p>
-            <Link
-              href="/contact"
-              className="inline-flex items-center justify-center gap-2 font-semibold bg-accent text-accent-fg hover:bg-accent-hover shadow-soft px-7 py-3.5 text-lg rounded-[var(--radius-md)] transition active:scale-[0.98]"
-            >
-              Envoyer un message
-            </Link>
-          </div>
-          <div className="space-y-4">
-            <p className="flex items-start gap-3 text-fg">
-              <span className="text-accent font-bold">📍</span>
-              <span>
-                Salon Hairstyle by Patricia
-                <br />
-                Dakar, Sénégal
-              </span>
-            </p>
-            <p className="flex items-start gap-3 text-fg">
-              <span className="text-accent font-bold">📞</span>
-              <span>01 23 45 67 89</span>
-            </p>
-            <p className="flex items-start gap-3 text-fg">
-              <span className="text-accent font-bold">✉️</span>
-              <span>contact@hairstylebypati.fr</span>
-            </p>
-            <p className="flex items-start gap-3 text-fg">
-              <span className="text-accent font-bold">🕒</span>
-              <span>Mardi – Samedi : 10h – 19h</span>
-            </p>
-          </div>
-        </div>
-      </section>
+      </div>
     </main>
   );
 }

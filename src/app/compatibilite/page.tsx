@@ -1,3 +1,4 @@
+import { ArrowRight } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -33,7 +34,7 @@ export default async function CompatibilitePage({
   if (slug === '') {
     const services = await listPublishedServicesForCompatibility();
     return (
-      <main className="mx-auto w-full max-w-5xl space-y-8 px-4 py-8 sm:px-6 md:py-12">
+      <main className="page-main space-y-8">
         <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
           <ol className="flex flex-wrap items-center gap-2">
             <li>
@@ -51,13 +52,13 @@ export default async function CompatibilitePage({
         </nav>
 
         <header className="max-w-3xl space-y-3">
-          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-cacao">
+          <p className="hidden text-sm font-semibold uppercase tracking-[0.14em] text-cacao md:block">
             Avant de réserver
           </p>
           <Title as="h1" size="display" className="">
             Vérifiez la compatibilité de votre coiffure
           </Title>
-          <p className="text-lg leading-relaxed text-muted">
+          <p className="hidden text-lg leading-relaxed text-muted md:block">
             Chaque prestation a ses propres exigences. Quelques questions suffisent pour savoir si
             elle est réalisable sur vos cheveux, ou pour demander une évaluation à Patricia.
           </p>
@@ -86,9 +87,7 @@ export default async function CompatibilitePage({
                       <span className="block font-semibold text-fg">{service.name}</span>
                       <span className="text-sm text-muted">{service.categoryName}</span>
                     </span>
-                    <span aria-hidden="true" className="text-cacao">
-                      →
-                    </span>
+                    <ArrowRight aria-hidden="true" className="size-4 text-cacao" />
                   </Link>
                 </li>
               ))}
@@ -105,7 +104,7 @@ export default async function CompatibilitePage({
   const questions = questionsForService(service);
 
   return (
-    <main className="mx-auto w-full max-w-4xl space-y-8 px-4 py-8 sm:px-6 md:py-12">
+    <main className="page-main space-y-8">
       <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
@@ -142,7 +141,7 @@ export default async function CompatibilitePage({
         <Title as="h1" size="display" className="">
           Votre coiffure est-elle compatible ?
         </Title>
-        <p className="max-w-2xl text-lg leading-relaxed text-muted">
+        <p className="hidden max-w-2xl text-lg leading-relaxed text-muted md:block">
           Répondez uniquement aux questions utiles pour <strong>{service.name}</strong>. Aucune
           réservation n’est créée à cette étape : Patricia valide les cas particuliers avant de
           confirmer un rendez-vous.

@@ -1,3 +1,4 @@
+import { MessageSquare } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -11,10 +12,15 @@ import {
   countConversationsByStatus,
   listConversations,
 } from '@/modules/messagerie/queries';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { LocalDateTime } from '@/components/shared/LocalDateTime';
 import { Badge } from '@/components/ui/Badge';
-import { Card } from '@/components/ui/Card';
-import { EmptyState } from '@/components/shared/EmptyState';
+import { FilterChips } from '@/components/ui/FilterChips';
+import { Pagination } from '@/components/ui/Pagination';
+import { Avatar } from '@/components/ui/Avatar';
+import { RowCard, rowLinkClass } from '@/components/ui/RowCard';
+import { ConversationRowActions, MarkAllConversationsRead } from './conversation-list-actions';
 
 export const metadata: Metadata = { title: 'Messages - Tableau de bord' };
 
@@ -42,6 +48,8 @@ export default async function MessagesPage({
     countConversationsByStatus(),
     listConversations({ status, page }),
   ]);
+  const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
+  const anyUnread = result.items.some((item) => item.unreadCount > 0);
 
   const hrefFor = (nextStatus?: ConversationStatus, nextPage = 1) => {
     const query = new URLSearchParams();
@@ -52,118 +60,113 @@ export default async function MessagesPage({
   };
 
   return (
-    <div className="p-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Messages</h1>
-        <p className="mt-1 text-ink-soft">
-          Contacts, questions et échanges avec les clientes. Les notes internes restent privées.
-        </p>
-      </div>
+    <div>
+      <PageHeader
+        icon={MessageSquare}
+        title="Messages"
+        description="Contacts et échanges avec les clientes. Les notes internes restent privées."
+        actions={anyUnread ? <MarkAllConversationsRead /> : null}
+      />
 
-      <div className="mt-5 flex flex-wrap gap-2" role="navigation" aria-label="Filtres messages">
-        <Link
-          href={hrefFor()}
-          aria-current={!status ? 'page' : undefined}
-          className={`rounded-[var(--radius-full)] border px-4 py-1.5 text-sm font-semibold transition ${
-            !status
-              ? 'border-cacao bg-cacao text-cacao-fg'
-              : 'border-line bg-card text-fg hover:border-cacao'
-          }`}
-        >
-          Toutes ({Object.values(counts).reduce((sum, count) => sum + count, 0)})
-        </Link>
-        {CONVERSATION_STATUSES.map((item) => (
-          <Link
-            key={item}
-            href={hrefFor(item)}
-            aria-current={status === item ? 'page' : undefined}
-            className={`rounded-[var(--radius-full)] border px-4 py-1.5 text-sm font-semibold transition ${
-              status === item
-                ? 'border-cacao bg-cacao text-cacao-fg'
-                : 'border-line bg-card text-fg hover:border-cacao'
-            }`}
-          >
-            {CONVERSATION_STATUS_LABELS[item]} ({counts[item]})
-          </Link>
-        ))}
-      </div>
+      <FilterChips
+        label="Filtrer par statut"
+        items={[
+          { href: hrefFor(), label: 'Toutes', count: total, active: !status },
+          ...CONVERSATION_STATUSES.map((item) => ({
+            href: hrefFor(item),
+            label: CONVERSATION_STATUS_LABELS[item],
+            count: counts[item],
+            active: status === item,
+          })),
+        ]}
+      />
 
-      <Card className="mt-5 p-0">
-        {result.items.length === 0 ? (
-          <div className="p-4">
-            <EmptyState
-              title="Aucune conversation"
-              message="Les messages envoyés depuis la page contact apparaîtront ici avec leur statut."
-            />
-          </div>
-        ) : (
-          <ul className="divide-y divide-line">
-            {result.items.map((conversation) => (
+      {result.items.length === 0 ? (
+        <EmptyState
+          variant="compact"
+          title="Aucune conversation"
+          message={
+            status
+              ? 'Aucune conversation avec ce statut pour le moment.'
+              : 'Les messages envoyés depuis la page contact apparaîtront ici avec leur statut.'
+          }
+        />
+      ) : (
+        <ul className="flex flex-col gap-2">
+          {result.items.map((conversation) => {
+            const unread = conversation.unreadCount > 0;
+            return (
               <li key={conversation.id}>
-                <Link
-                  href={`/dashboard/messages/${conversation.id}`}
-                  className="flex flex-col gap-3 p-4 transition hover:bg-page sm:flex-row sm:items-center sm:justify-between"
+                <RowCard
+                  highlighted={unread}
+                  actions={
+                    <ConversationRowActions
+                      conversationId={conversation.id}
+                      unread={unread}
+                      subject={conversation.subject}
+                    />
+                  }
                 >
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-semibold text-fg">{conversation.subject}</p>
-                      {conversation.unreadCount > 0 ? (
-                        <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-accent px-1.5 py-0.5 text-xs font-bold text-accent-fg">
-                          {conversation.unreadCount} non lu{conversation.unreadCount > 1 ? 's' : ''}
-                        </span>
+                  <div className="flex items-start gap-3">
+                    <Avatar name={conversation.customerName} />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <Link
+                          href={`/dashboard/messages/${conversation.id}`}
+                          className={`truncate ${unread ? 'font-bold' : 'font-semibold'} text-fg ${rowLinkClass}`}
+                        >
+                          {conversation.subject}
+                        </Link>
+                        <LocalDateTime
+                          iso={conversation.lastMessageAt.toISOString()}
+                          dateStyle="short"
+                          timeStyle="short"
+                          className="shrink-0 text-xs text-muted"
+                        />
+                      </div>
+                      <p className="truncate text-sm text-muted">
+                        {conversation.customerName}
+                        {conversation.customerEmail ? ` · ${conversation.customerEmail}` : ''}
+                      </p>
+                      {conversation.lastMessage ? (
+                        <p
+                          className={`mt-0.5 line-clamp-1 text-sm ${unread ? 'text-fg' : 'text-muted'}`}
+                        >
+                          {conversation.lastMessage}
+                        </p>
                       ) : null}
-                      <Badge tone={CONVERSATION_STATUS_TONES[conversation.status]}>
-                        {CONVERSATION_STATUS_LABELS[conversation.status]}
-                      </Badge>
-                      <Badge tone="neutral">
-                        {CONVERSATION_SOURCE_LABELS[conversation.source]}
-                      </Badge>
+                      <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                        {unread ? (
+                          <Badge tone="accent" className="px-2! py-0.5! text-xs!">
+                            {conversation.unreadCount} non lu
+                            {conversation.unreadCount > 1 ? 's' : ''}
+                          </Badge>
+                        ) : null}
+                        <Badge
+                          tone={CONVERSATION_STATUS_TONES[conversation.status]}
+                          className="px-2! py-0.5! text-xs!"
+                        >
+                          {CONVERSATION_STATUS_LABELS[conversation.status]}
+                        </Badge>
+                        <Badge tone="neutral" className="px-2! py-0.5! text-xs!">
+                          {CONVERSATION_SOURCE_LABELS[conversation.source]}
+                        </Badge>
+                      </div>
                     </div>
-                    <p className="mt-1 text-sm font-medium text-ink-soft">
-                      {conversation.customerName}
-                      {conversation.customerEmail ? ` · ${conversation.customerEmail}` : ''}
-                    </p>
-                    <p className="mt-1 line-clamp-2 text-sm text-ink-soft">
-                      {conversation.lastMessage}
-                    </p>
                   </div>
-                  <p className="shrink-0 text-xs text-ink-soft">
-                    <LocalDateTime iso={conversation.lastMessageAt.toISOString()} />
-                  </p>
-                </Link>
+                </RowCard>
               </li>
-            ))}
-          </ul>
-        )}
-      </Card>
+            );
+          })}
+        </ul>
+      )}
 
-      {result.totalPages > 1 ? (
-        <nav aria-label="Pagination des messages" className="mt-4 flex justify-between text-sm">
-          {result.page > 1 ? (
-            <Link
-              href={hrefFor(status, result.page - 1)}
-              className="font-semibold text-cacao hover:underline"
-            >
-              Précédent
-            </Link>
-          ) : (
-            <span />
-          )}
-          <span className="text-ink-soft">
-            Page {result.page} sur {result.totalPages}
-          </span>
-          {result.page < result.totalPages ? (
-            <Link
-              href={hrefFor(status, result.page + 1)}
-              className="font-semibold text-cacao hover:underline"
-            >
-              Suivant
-            </Link>
-          ) : (
-            <span />
-          )}
-        </nav>
-      ) : null}
+      <Pagination
+        page={result.page}
+        totalPages={result.totalPages}
+        hrefFor={(nextPage) => hrefFor(status, nextPage)}
+        label="Pagination des messages"
+      />
     </div>
   );
 }

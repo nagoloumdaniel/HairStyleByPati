@@ -1,15 +1,16 @@
+import { Camera, ChevronLeft, ChevronRight, ClipboardCheck } from 'lucide-react';
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import type { AssessmentStatus } from '@prisma/client';
 import { requireAdmin } from '@/modules/auth/guards';
 import { countAssessmentsByStatus, listAssessments } from '@/modules/compatibilite/queries';
 import { ASSESSMENT_STATUS_LABELS } from '@/modules/compatibilite/schemas';
-import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { Select } from '@/components/ui/Select';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { LocalDateTime } from '@/components/shared/LocalDateTime';
+import { Badge } from '@/components/ui/Badge';
+import { ButtonLink } from '@/components/ui/Button';
+import { CardLink } from '@/components/ui/Card';
 
 export const metadata: Metadata = { title: 'Évaluations capillaires - Tableau de bord' };
 
@@ -23,10 +24,7 @@ const STATUS_TONES: Record<string, 'accent' | 'success' | 'alert' | 'neutral'> =
   CONFIRMED: 'success',
 };
 
-const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
-  dateStyle: 'short',
-  timeStyle: 'short',
-});
+const STATUSES = Object.keys(ASSESSMENT_STATUS_LABELS) as AssessmentStatus[];
 
 function firstValue(value: string | string[] | undefined): string {
   return Array.isArray(value) ? (value[0] ?? '') : (value ?? '');
@@ -50,7 +48,7 @@ export default async function EvaluationsPage({
 
   const params = await searchParams;
   const rawStatus = firstValue(params.status);
-  const status = (Object.keys(ASSESSMENT_STATUS_LABELS).includes(rawStatus) ? rawStatus : '') as
+  const status = (STATUSES.includes(rawStatus as AssessmentStatus) ? rawStatus : '') as
     AssessmentStatus | '';
   const rawPage = Number.parseInt(firstValue(params.page), 10);
   const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
@@ -60,200 +58,132 @@ export default async function EvaluationsPage({
     listAssessments({
       status: status || undefined,
       page,
-      order: status === 'ACCEPTED' || status === 'REFUSED' ? 'desc' : 'asc',
+      // À traiter : les plus anciennes d'abord ; décisions prises : les plus récentes d'abord.
+      order:
+        status === 'ACCEPTED' || status === 'REFUSED' || status === 'CONFIRMED' ? 'desc' : 'asc',
     }),
   ]);
-
-  const cards: Array<{ status: AssessmentStatus; label: string }> = [
-    { status: 'RECEIVED', label: 'Reçues' },
-    { status: 'INFO_REQUESTED', label: 'Infos demandées' },
-    { status: 'ACCEPTED', label: 'Acceptées' },
-    { status: 'REFUSED', label: 'Refusées' },
-  ];
+  const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
 
   return (
-    <div className="p-6">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold">Évaluations capillaires</h1>
-        <p className="text-muted">
-          Demandes envoyées depuis le site public. Une décision ne crée jamais de réservation : le
-          créneau reste vérifié séparément.
-        </p>
-      </div>
+    <div>
+      <PageHeader
+        icon={ClipboardCheck}
+        title="Évaluations capillaires"
+        description="Demandes envoyées depuis le site. Une décision ne crée jamais de réservation."
+      />
 
-      <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {cards.map((card) => (
-          <Link
-            key={card.status}
-            href={pageHref(card.status, 1)}
-            className={`rounded-[var(--radius-lg)] border bg-card p-4 shadow-soft transition hover:border-cacao ${
-              status === card.status ? 'border-cacao' : 'border-line'
-            }`}
-          >
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted">{card.label}</p>
-            <p className="mt-1 font-heading text-3xl font-bold text-fg">{counts[card.status]}</p>
-          </Link>
-        ))}
-      </div>
-
-      <Card className="mt-6 p-0">
-        <form
-          method="get"
-          action="/dashboard/evaluations"
-          className="flex flex-wrap items-end gap-3 border-b border-line p-4"
+      <nav
+        aria-label="Filtres des évaluations"
+        className="-mx-3 mb-3 flex gap-2 overflow-x-auto px-3 pb-1 sm:mx-0 sm:flex-wrap sm:px-0"
+      >
+        <ButtonLink
+          href={pageHref('', 1)}
+          size="sm"
+          variant={!status ? 'primary' : 'secondary'}
+          aria-current={!status ? 'page' : undefined}
         >
-          <div className="min-w-52">
-            <Select
-              label="Statut"
-              name="status"
-              defaultValue={status}
-              options={[
-                { value: '', label: 'Toutes les évaluations' },
-                ...Object.entries(ASSESSMENT_STATUS_LABELS).map(([value, label]) => ({
-                  value,
-                  label,
-                })),
-              ]}
-            />
-          </div>
-          <Button type="submit">Filtrer</Button>
-          {status ? (
-            <Link
-              href="/dashboard/evaluations"
-              className="pb-3 text-sm font-semibold text-cacao underline-offset-4 hover:underline"
-            >
-              Réinitialiser
-            </Link>
-          ) : null}
-        </form>
+          {`Toutes (${total})`}
+        </ButtonLink>
+        {STATUSES.map((item) => (
+          <ButtonLink
+            key={item}
+            href={pageHref(item, 1)}
+            size="sm"
+            variant={status === item ? 'primary' : 'secondary'}
+            aria-current={status === item ? 'page' : undefined}
+          >
+            {`${ASSESSMENT_STATUS_LABELS[item]} (${counts[item] ?? 0})`}
+          </ButtonLink>
+        ))}
+      </nav>
 
-        {result.items.length === 0 ? (
-          <div className="p-4">
-            <EmptyState
-              title="Aucune évaluation"
-              message={
-                status
-                  ? 'Aucune évaluation ne correspond à ce statut.'
-                  : 'Les demandes envoyées depuis /compatibilite apparaîtront ici.'
-              }
-              actionLabel={status ? 'Voir toutes les évaluations' : undefined}
-              actionHref={status ? '/dashboard/evaluations' : undefined}
-            />
-          </div>
-        ) : (
-          <>
-            <ul className="divide-y divide-line md:hidden">
-              {result.items.map((assessment) => (
-                <li key={assessment.id} className="flex flex-col gap-2 p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="truncate font-semibold">{assessment.customerName}</p>
-                      <p className="truncate text-sm text-muted">{assessment.serviceName}</p>
-                    </div>
+      {result.items.length === 0 ? (
+        <EmptyState
+          variant="compact"
+          title="Aucune évaluation"
+          message={
+            status
+              ? 'Aucune évaluation ne correspond à ce statut.'
+              : 'Les demandes envoyées depuis le parcours de compatibilité apparaîtront ici.'
+          }
+        />
+      ) : (
+        <ul className="grid gap-2">
+          {result.items.map((assessment) => (
+            <li key={assessment.id}>
+              <CardLink
+                href={`/dashboard/evaluations/${assessment.id}`}
+                label={`Évaluation de ${assessment.customerName}, ${assessment.serviceName}`}
+              >
+                <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold text-fg">{assessment.customerName}</p>
+                    <p className="truncate text-sm text-muted">{assessment.serviceName}</p>
+                  </div>
+                  <div className="flex shrink-0 items-center justify-between gap-3 sm:justify-end">
+                    <span className="flex items-center gap-3 text-sm text-muted">
+                      <LocalDateTime
+                        iso={assessment.createdAt.toISOString()}
+                        dateStyle="medium"
+                        timeStyle="short"
+                      />
+                      <span className="inline-flex items-center gap-1">
+                        <Camera aria-hidden="true" className="size-4 text-accent" />
+                        {assessment.photoCount}
+                        <span className="sr-only">
+                          {' '}
+                          photo{assessment.photoCount > 1 ? 's' : ''}
+                        </span>
+                      </span>
+                    </span>
                     <Badge tone={STATUS_TONES[assessment.status] ?? 'neutral'}>
                       {ASSESSMENT_STATUS_LABELS[assessment.status] ?? assessment.status}
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted">
-                    {dateFormatter.format(assessment.createdAt)} · {assessment.photoCount} photo
-                    {assessment.photoCount > 1 ? 's' : ''}
-                  </p>
-                  <Link
-                    href={`/dashboard/evaluations/${assessment.id}`}
-                    className="self-start rounded-[var(--radius-sm)] border border-line px-3 py-1.5 text-sm font-semibold transition hover:border-cacao"
-                  >
-                    Ouvrir la demande
-                  </Link>
-                </li>
-              ))}
-            </ul>
-
-            <div className="hidden overflow-x-auto md:block">
-              <table className="w-full border-collapse text-left">
-                <thead>
-                  <tr className="border-b border-line">
-                    <th scope="col" className="p-4 pb-3 text-sm font-semibold">
-                      Cliente
-                    </th>
-                    <th scope="col" className="p-4 pb-3 text-sm font-semibold">
-                      Prestation
-                    </th>
-                    <th scope="col" className="p-4 pb-3 text-sm font-semibold">
-                      Reçue le
-                    </th>
-                    <th scope="col" className="p-4 pb-3 text-sm font-semibold">
-                      Photos
-                    </th>
-                    <th scope="col" className="p-4 pb-3 text-sm font-semibold">
-                      Statut
-                    </th>
-                    <th scope="col" className="p-4 pb-3 text-right text-sm font-semibold">
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {result.items.map((assessment) => (
-                    <tr key={assessment.id} className="border-b border-line">
-                      <td className="p-4">
-                        <p className="font-semibold">{assessment.customerName}</p>
-                        <p className="text-xs text-muted">{assessment.customerEmail}</p>
-                      </td>
-                      <td className="p-4 text-sm">{assessment.serviceName}</td>
-                      <td className="p-4 text-sm">{dateFormatter.format(assessment.createdAt)}</td>
-                      <td className="p-4 text-sm">{assessment.photoCount}</td>
-                      <td className="p-4">
-                        <Badge tone={STATUS_TONES[assessment.status] ?? 'neutral'}>
-                          {ASSESSMENT_STATUS_LABELS[assessment.status] ?? assessment.status}
-                        </Badge>
-                      </td>
-                      <td className="p-4 text-right">
-                        <Link
-                          href={`/dashboard/evaluations/${assessment.id}`}
-                          className="text-sm font-semibold text-cacao underline-offset-4 hover:underline"
-                        >
-                          Ouvrir
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </>
-        )}
-      </Card>
+                </div>
+              </CardLink>
+            </li>
+          ))}
+        </ul>
+      )}
 
       {result.totalPages > 1 ? (
         <nav
           aria-label="Pagination des évaluations"
-          className="mt-4 flex flex-wrap items-center justify-between gap-3"
+          className="mt-4 flex items-center justify-between gap-3"
         >
           {result.page > 1 ? (
-            <Link
+            <ButtonLink
               href={pageHref(status, result.page - 1)}
               rel="prev"
-              className="rounded-[var(--radius-md)] border border-line bg-card px-4 py-2 text-sm font-semibold transition hover:border-cacao"
+              variant="secondary"
+              size="sm"
+              icon={ChevronLeft}
+              iconOnly="mobile"
             >
               Page précédente
-            </Link>
+            </ButtonLink>
           ) : (
-            <span className="text-sm text-muted">Page précédente</span>
+            <span aria-hidden="true" className="size-9" />
           )}
-          <p className="text-sm text-muted">
+          <p className="text-center text-sm text-muted">
             Page {result.page} sur {result.totalPages} · {result.total} demande
             {result.total > 1 ? 's' : ''}
           </p>
           {result.page < result.totalPages ? (
-            <Link
+            <ButtonLink
               href={pageHref(status, result.page + 1)}
               rel="next"
-              className="rounded-[var(--radius-md)] border border-line bg-card px-4 py-2 text-sm font-semibold transition hover:border-cacao"
+              variant="secondary"
+              size="sm"
+              icon={ChevronRight}
+              iconOnly="mobile"
             >
               Page suivante
-            </Link>
+            </ButtonLink>
           ) : (
-            <span className="text-sm text-muted">Page suivante</span>
+            <span aria-hidden="true" className="size-9" />
           )}
         </nav>
       ) : null}

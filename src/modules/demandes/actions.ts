@@ -1,10 +1,11 @@
 'use server';
 
-import { headers } from 'next/headers';
+import { flushEmailsSoon } from '@/modules/notifications/flush';
 import { revalidatePath } from 'next/cache';
 import type { CustomRequestStatus, Prisma } from '@prisma/client';
 import { db } from '@/lib/db';
 import { AppError, parseInput } from '@/lib/errors';
+import { getClientIp } from '@/lib/client-ip';
 import { rateLimit } from '@/lib/rate-limit';
 import { deviceTimeToUtc } from '@/lib/dates';
 import { requireAdmin } from '@/modules/auth/guards';
@@ -24,12 +25,6 @@ function handleError(error: unknown): { error: string } {
   if (error instanceof AppError) return { error: error.message };
   console.error(error);
   return { error: 'Une erreur est survenue. Réessayez.' };
-}
-
-async function clientIp(): Promise<string> {
-  const headersList = await headers();
-  const forwarded = headersList.get('x-forwarded-for');
-  return forwarded ? (forwarded.split(',')[0] ?? '').trim() : 'unknown';
 }
 
 function parseDesiredDate(dateISO: string): Date | null {
@@ -68,8 +63,8 @@ export async function submitCustomRequest(
   _state: CustomRequestSubmitState,
   formData: FormData,
 ): Promise<CustomRequestSubmitState> {
-  const ip = await clientIp();
-  const limit = rateLimit(`demandes:submit:${ip}`, { max: 4, windowMs: 60 * 60_000 });
+  const ip = await getClientIp();
+  const limit = await rateLimit(`demandes:submit:${ip}`, { max: 4, windowMs: 60 * 60_000 });
   if (!limit.allowed) {
     return { error: 'Trop de demandes envoyées. Réessayez dans un moment.' };
   }
@@ -157,6 +152,7 @@ export async function submitCustomRequest(
 
     revalidatePath('/dashboard/demandes');
     revalidatePath('/dashboard', 'layout');
+    flushEmailsSoon();
     return {
       success: 'Votre demande a bien été envoyée. Patricia vous répondra personnellement.',
       requestId: request.id,
@@ -174,11 +170,15 @@ export async function decideCustomRequest(
   try {
     const user = await requireAdmin();
     if (!user) return { error: 'Session expirée.' };
-    const input = parseInput(customRequestDecisionSchema, Object.fromEntries(formData));
+    const parsedInput = customRequestDecisionSchema.safeParse(Object.fromEntries(formData));
+    if (!parsedInput.success) {
+      return { error: parsedInput.error.issues[0]?.message ?? 'Données invalides.' };
+    }
+    const input = parsedInput.data;
     const request = await db.customRequest.findUnique({ where: { id: input.requestId } });
     if (!request) return { error: 'Demande introuvable.' };
-    if (request.status === 'CLOSED' && input.action === 'CLOSED') {
-      return { error: 'Cette demande est déjà clôturée.' };
+    if (request.status === 'CLOSED') {
+      return { error: 'Cette demande est clôturée : aucune décision supplémentaire possible.' };
     }
 
     let serviceName: string | null = null;
@@ -204,8 +204,14 @@ export async function decideCustomRequest(
         (hours ?? 0) * 60 + (minutes ?? 0),
         input.timeZone,
       );
+      if (Number.isNaN(proposedSlot.getTime())) return { error: 'Créneau proposé invalide.' };
+      if (proposedSlot.getTime() < Date.now()) {
+        return { error: 'Le créneau proposé doit être dans le futur.' };
+      }
     }
 
+    // Une simple prise en charge n'écrase pas la dernière réponse envoyée à la cliente.
+    const message = input.message || null;
     const status = input.action as CustomRequestStatus;
     await db.$transaction(async (tx) => {
       const decision = await tx.customRequestDecision.create({
@@ -213,8 +219,8 @@ export async function decideCustomRequest(
           customRequestId: request.id,
           userId: user.id,
           action: input.action,
-          message: input.message,
-          priceCents: input.estimatedPriceEuros,
+          message,
+          priceCents: input.estimatedPriceFcfa,
           proposedServiceName: serviceName,
           proposedSlot,
         },
@@ -223,10 +229,14 @@ export async function decideCustomRequest(
         where: { id: request.id },
         data: {
           status,
-          adminReply: input.message,
-          estimatedPriceCents: input.estimatedPriceEuros,
-          proposedServiceId: input.serviceId || null,
-          proposedSlot,
+          ...(message ? { adminReply: message } : {}),
+          ...(input.action !== 'IN_REVIEW'
+            ? {
+                estimatedPriceCents: input.estimatedPriceFcfa,
+                proposedServiceId: input.serviceId || null,
+                proposedSlot,
+              }
+            : {}),
           decidedAt: new Date(),
         },
       });
@@ -238,8 +248,8 @@ export async function decideCustomRequest(
               recipient: request.requesterEmail,
               templateKey: 'custom_request_decision',
               payload: customPayload(request, {
-                adminReply: input.message,
-                estimatedPriceCents: input.estimatedPriceEuros,
+                adminReply: message,
+                estimatedPriceCents: input.estimatedPriceFcfa,
                 proposedServiceName: serviceName,
                 proposedSlot: proposedSlot?.toISOString() ?? null,
               }),
@@ -260,7 +270,14 @@ export async function decideCustomRequest(
     revalidatePath('/dashboard/demandes');
     revalidatePath(`/dashboard/demandes/${request.id}`);
     revalidatePath('/dashboard', 'layout');
-    return { success: 'Décision enregistrée et réponse mise en file d’attente.' };
+    // Le courriel de décision part tout de suite (sinon il attend le prochain cron).
+    flushEmailsSoon();
+    return {
+      success:
+        input.action === 'IN_REVIEW'
+          ? 'Demande prise en charge.'
+          : 'Décision enregistrée. La cliente est prévenue par e-mail.',
+    };
   } catch (error) {
     return handleError(error);
   }

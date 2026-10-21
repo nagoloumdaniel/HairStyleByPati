@@ -1,4 +1,4 @@
-import { Children, type ElementType, type ReactNode, type Ref } from 'react';
+import { Children, Fragment, type ElementType, type ReactNode, type Ref } from 'react';
 
 type TitleProps = {
   as?: 'h1' | 'h2' | 'h3';
@@ -43,16 +43,17 @@ export function Title({
   return (
     <Tag id={id} ref={ref} tabIndex={tabIndex} className={`${base} ${className}`}>
       {words.map((word, i) => (
-        <span
-          key={`${word}-${i}`}
-          className={
-            i >= firstAccent && words.length > 1 ? 'title-word title-accent' : 'title-word'
-          }
-          style={{ ['--i' as string]: i }}
-        >
-          {word}
+        <Fragment key={`${word}-${i}`}>
+          <span
+            className={
+              i >= firstAccent && words.length > 1 ? 'title-word title-accent' : 'title-word'
+            }
+            style={{ ['--i' as string]: i }}
+          >
+            {word}
+          </span>
           {i < words.length - 1 ? ' ' : ''}
-        </span>
+        </Fragment>
       ))}
     </Tag>
   );

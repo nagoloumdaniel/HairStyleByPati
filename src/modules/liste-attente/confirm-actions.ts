@@ -1,6 +1,10 @@
 'use server';
 
+import { z } from 'zod';
+import { db } from '@/lib/db';
 import { AppError } from '@/lib/errors';
+import { getClientIp } from '@/lib/client-ip';
+import { rateLimit } from '@/lib/rate-limit';
 import { createBooking } from '@/modules/reservations/service';
 import { bookingReference } from '@/modules/reservations/schemas';
 
@@ -22,6 +26,25 @@ export async function confirmWaitlistBookingAction(
   if (!serviceSlug || !startsAtISO || !dateISO || !timeZone || !name || !email || !phone) {
     return { error: 'Informations manquantes.' };
   }
+  if (
+    !waitlistToken ||
+    name.length > 120 ||
+    phone.length > 40 ||
+    !z.string().email().max(254).safeParse(email).success
+  ) {
+    return { error: 'Informations invalides.' };
+  }
+
+  // Endpoint public : limité par IP, et réservé aux inscrites prévenues (jeton NOTIFIED).
+  const ip = await getClientIp();
+  if (!(await rateLimit(`waitlist-confirm:${ip}`, { max: 10, windowMs: 15 * 60_000 })).allowed) {
+    return { error: 'Trop de tentatives. Réessayez dans quelques minutes.' };
+  }
+  const entry = await db.waitlistEntry.findFirst({
+    where: { notifyToken: waitlistToken, status: 'NOTIFIED' },
+    select: { id: true },
+  });
+  if (!entry) return { error: 'Ce lien n’est plus valide.' };
 
   try {
     const result = await createBooking({

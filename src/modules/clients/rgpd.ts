@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client';
 import { db } from '@/lib/db';
 import { deletePrivateImages } from '@/modules/fichiers/private-images';
+import { logAudit } from '@/modules/stats/audit';
 
 /* ============================================================
  * P9.6 : droits RGPD d'accès et d'effacement.
@@ -52,6 +53,20 @@ export interface CustomerDataExport {
     createdAt: string;
     messages: Array<{ author: string; content: string; sentAt: string }>;
   }>;
+  waitlistEntries: Array<{
+    id: string;
+    serviceName: string;
+    desiredStartsAt: string;
+    status: string;
+    createdAt: string;
+  }>;
+  reviews: Array<{
+    id: string;
+    status: string;
+    rating: number | null;
+    comment: string | null;
+    submittedAt: string | null;
+  }>;
 }
 
 /** Export lisible par la personne concernée. Les notes internes sont exclues. */
@@ -77,9 +92,19 @@ export async function collectCustomerData(id: string): Promise<CustomerDataExpor
           },
         },
       },
+      reviews: {
+        select: { id: true, status: true, rating: true, comment: true, submittedAt: true },
+      },
     },
   });
   if (!customer) return null;
+
+  // Inscriptions en liste d'attente faites avec la même adresse e-mail.
+  const waitlistEntries = await db.waitlistEntry.findMany({
+    where: { customerEmail: { equals: customer.email, mode: 'insensitive' } },
+    orderBy: { createdAt: 'desc' },
+    include: { service: { select: { name: true } } },
+  });
 
   return {
     exportedAt: new Date().toISOString(),
@@ -128,6 +153,20 @@ export async function collectCustomerData(id: string): Promise<CustomerDataExpor
         sentAt: message.sentAt.toISOString(),
       })),
     })),
+    waitlistEntries: waitlistEntries.map((entry) => ({
+      id: entry.id,
+      serviceName: entry.service.name,
+      desiredStartsAt: entry.desiredStartsAt.toISOString(),
+      status: entry.status,
+      createdAt: entry.createdAt.toISOString(),
+    })),
+    reviews: customer.reviews.map((review) => ({
+      id: review.id,
+      status: review.status,
+      rating: review.rating,
+      comment: review.comment,
+      submittedAt: review.submittedAt?.toISOString() ?? null,
+    })),
   };
 }
 
@@ -136,25 +175,44 @@ export interface AnonymizationSummary {
   conversationsDeleted: number;
   assessmentsDeleted: number;
   customRequestsDeleted: number;
+  /** Photos réellement supprimées du stockage (après le commit de la base). */
   photosDeleted: number;
+  /** Clés d'objets (identifiants aléatoires, sans donnée personnelle) dont la suppression a échoué. */
+  photosFailed: string[];
 }
 
-export async function anonymizeCustomerData(id: string): Promise<AnonymizationSummary | null> {
+export async function anonymizeCustomerData(
+  id: string,
+  actorId?: string,
+): Promise<AnonymizationSummary | { alreadyAnonymized: true } | null> {
   const customer = await db.customer.findUnique({
     where: { id },
     include: {
-      assessments: { select: { photoKeys: true } },
-      customRequests: { select: { photoKeys: true } },
+      appointments: { select: { id: true } },
+      assessments: { select: { id: true, photoKeys: true } },
+      customRequests: { select: { id: true, photoKeys: true } },
+      conversations: { select: { id: true } },
+      reviews: { select: { id: true } },
       _count: { select: { assessments: true, customRequests: true, conversations: true } },
     },
   });
   if (!customer) return null;
+  if (customer.email.endsWith('@invalid.local')) return { alreadyAnonymized: true };
 
   const photoKeys = [
     ...customer.assessments.flatMap((assessment) => assessment.photoKeys),
     ...customer.customRequests.flatMap((request) => request.photoKeys),
   ];
-  await deletePrivateImages(photoKeys);
+
+  // Entités dont les métadonnées d'audit peuvent contenir du texte libre (motifs, noms, e-mails).
+  const auditTargets: Array<{ entityType: string; ids: string[] }> = [
+    { entityType: 'Customer', ids: [customer.id] },
+    { entityType: 'Appointment', ids: customer.appointments.map((item) => item.id) },
+    { entityType: 'HairAssessment', ids: customer.assessments.map((item) => item.id) },
+    { entityType: 'CustomRequest', ids: customer.customRequests.map((item) => item.id) },
+    { entityType: 'Conversation', ids: customer.conversations.map((item) => item.id) },
+    { entityType: 'Review', ids: customer.reviews.map((item) => item.id) },
+  ];
 
   const anonymizedEmail = `deleted-${customer.id}@invalid.local`;
 
@@ -162,6 +220,28 @@ export async function anonymizeCustomerData(id: string): Promise<AnonymizationSu
     await tx.conversation.deleteMany({ where: { customerId: customer.id } });
     await tx.hairAssessment.deleteMany({ where: { customerId: customer.id } });
     await tx.customRequest.deleteMany({ where: { customerId: customer.id } });
+    // Avis (commentaire libre + jeton) : données personnelles, supprimés avec la fiche.
+    await tx.review.deleteMany({ where: { customerId: customer.id } });
+    // Notifications contenant l'e-mail / le nom de la cliente (file d'envoi et alertes dashboard).
+    await tx.notification.deleteMany({
+      where: {
+        OR: [
+          { recipient: customer.email },
+          { payload: { path: ['customerEmail'], equals: customer.email } },
+        ],
+      },
+    });
+    // Inscriptions en liste d'attente (nom, e-mail, téléphone) rattachées à cette adresse.
+    await tx.waitlistEntry.updateMany({
+      where: { customerEmail: { equals: customer.email, mode: 'insensitive' } },
+      data: {
+        customerName: 'Cliente supprimée',
+        customerEmail: anonymizedEmail,
+        customerPhone: '',
+        notifyToken: null,
+        notifyTokenExpiresAt: null,
+      },
+    });
     await tx.appointment.updateMany({
       where: { customerId: customer.id },
       data: {
@@ -176,8 +256,18 @@ export async function anonymizeCustomerData(id: string): Promise<AnonymizationSu
       where: { id: customer.id },
       data: { name: 'Cliente supprimée', email: anonymizedEmail, phone: '' },
     });
+    // Purge des métadonnées d'audit liées à la cliente (motif d'annulation, noms, e-mails...) :
+    // la trace de l'action est conservée, son contenu libre non.
+    for (const target of auditTargets) {
+      if (target.ids.length === 0) continue;
+      await tx.auditLog.updateMany({
+        where: { entityType: target.entityType, entityId: { in: target.ids } },
+        data: { metadata: Prisma.DbNull },
+      });
+    }
     await tx.auditLog.create({
       data: {
+        userId: actorId ?? null,
         action: 'customer.anonymize',
         entityType: 'Customer',
         entityId: customer.id,
@@ -185,17 +275,35 @@ export async function anonymizeCustomerData(id: string): Promise<AnonymizationSu
           conversationsDeleted: customer._count.conversations,
           assessmentsDeleted: customer._count.assessments,
           customRequestsDeleted: customer._count.customRequests,
-          photosDeleted: photoKeys.length,
+          photosQueuedForDeletion: photoKeys.length,
         },
       },
     });
   });
+
+  // Suppression S3 seulement APRÈS le commit : jamais d'objet supprimé pour une base non modifiée.
+  // Les échecs ne sont pas avalés : comptés, journalisés (clés seules, sans PII) et renvoyés.
+  const { deleted, failed } = await deletePrivateImages(photoKeys);
+  if (failed.length > 0) {
+    console.error(
+      `[rgpd] ${failed.length} photo(s) non supprimée(s) du stockage pour la fiche ${customer.id}`,
+      failed,
+    );
+    await logAudit({
+      userId: actorId ?? null,
+      action: 'customer.anonymize.photos_failed',
+      entityType: 'Customer',
+      entityId: customer.id,
+      metadata: { failedCount: failed.length, failedKeys: failed },
+    });
+  }
 
   return {
     customerId: customer.id,
     conversationsDeleted: customer._count.conversations,
     assessmentsDeleted: customer._count.assessments,
     customRequestsDeleted: customer._count.customRequests,
-    photosDeleted: photoKeys.length,
+    photosDeleted: deleted,
+    photosFailed: failed,
   };
 }

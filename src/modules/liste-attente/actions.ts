@@ -1,18 +1,12 @@
 'use server';
 
-import { headers } from 'next/headers';
 import { AppError } from '@/lib/errors';
+import { getClientIp } from '@/lib/client-ip';
 import { rateLimit } from '@/lib/rate-limit';
 import { addToWaitlist } from './service';
 import { waitlistEntrySchema } from './schemas';
 
 export type WaitlistActionState = { error?: string; success?: string };
-
-async function clientIp(): Promise<string> {
-  const headersList = await headers();
-  const forwarded = headersList.get('x-forwarded-for');
-  return forwarded ? (forwarded.split(',')[0] ?? '').trim() : 'unknown';
-}
 
 export async function joinWaitlistAction(
   _prev: WaitlistActionState,
@@ -34,8 +28,8 @@ export async function joinWaitlistAction(
     return { success: 'Votre demande a bien été enregistrée.' };
   }
 
-  const ip = await clientIp();
-  const limit = rateLimit(`waitlist:${ip}`, { max: 5, windowMs: 3_600_000 });
+  const ip = await getClientIp();
+  const limit = await rateLimit(`waitlist:${ip}`, { max: 5, windowMs: 3_600_000 });
   if (!limit.allowed) {
     return { error: 'Trop de demandes. Réessayez plus tard.' };
   }

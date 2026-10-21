@@ -1,62 +1,38 @@
+import { ChevronRight, History } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/modules/auth/guards';
-import {
-  AUDIT_PAGE_SIZE,
-  countCatalogueAuditLogs,
-  listCatalogueAuditLogs,
-} from '@/modules/stats/audit';
-import { Card } from '@/components/ui/Card';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { Badge } from '@/components/ui/Badge';
+import { ButtonLink } from '@/components/ui/Button';
+import { FilterChips } from '@/components/ui/FilterChips';
+import { Pagination } from '@/components/ui/Pagination';
+import { RowCard, rowLinkClass } from '@/components/ui/RowCard';
+import { actionLabel, entityHref, entityLabel } from './labels';
+import { HISTORY_GROUPS, HISTORY_GROUP_KEYS, listHistory, type HistoryGroup } from './queries';
 
 export const metadata: Metadata = { title: 'Historique - Tableau de bord' };
 
-const ACTION_LABELS: Record<string, string> = {
-  'category.create': 'Création de catégorie',
-  'category.update': 'Modification de catégorie',
-  'category.delete': 'Suppression de catégorie',
-  'category.publish': 'Activation de catégorie',
-  'category.unpublish': 'Désactivation de catégorie',
-  'category.reorder': 'Réordonnancement des catégories',
-  'service.create': 'Création de prestation',
-  'service.update': 'Modification de prestation',
-  'service.publish': 'Publication de prestation',
-  'service.unpublish': 'Dépublication de prestation',
-  'service.archive': 'Archivage de prestation',
-  'service.delete': 'Suppression de prestation',
-  'service.option.create': "Ajout d'une option",
-  'service.option.update': "Modification d'une option",
-  'service.option.delete': "Suppression d'une option",
-  'service.option.publish': "Activation d'une option",
-  'service.option.unpublish': "Désactivation d'une option",
-  'service.image.upload': 'Ajout de photo',
-  'service.image.alt': 'Texte alternatif de photo',
-  'service.image.primary': 'Photo principale',
-  'service.image.delete': 'Suppression de photo',
-  'service.image.reorder': 'Réordonnancement des photos',
-  'service.compatibility.update': 'Règles de compatibilité',
-  'service.question.create': 'Ajout de question',
-  'service.question.update': 'Modification de question',
-  'service.question.delete': 'Suppression de question',
-  'service.question.reorder': 'Réordonnancement des questions',
-};
-
+/* Heure de Dakar fixée côté serveur (UTC+0, pas d'heure d'été). */
 const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
-  dateStyle: 'short',
+  dateStyle: 'medium',
   timeStyle: 'short',
+  timeZone: 'Africa/Dakar',
 });
 
-function firstValue(value: string | string[] | undefined): string {
+function first(value: string | string[] | undefined): string {
   return Array.isArray(value) ? (value[0] ?? '') : (value ?? '');
 }
 
-function pageHref(page: number, entityId: string): string {
-  const params = new URLSearchParams();
-  if (page > 1) params.set('page', String(page));
-  if (entityId) params.set('entityId', entityId);
-  const query = params.toString();
-  return query ? `/dashboard/historique?${query}` : '/dashboard/historique';
+function hrefFor(group: HistoryGroup | undefined, entityId: string, page = 1): string {
+  const query = new URLSearchParams();
+  if (group) query.set('groupe', group);
+  if (entityId) query.set('entityId', entityId);
+  if (page > 1) query.set('page', String(page));
+  const value = query.toString();
+  return value ? `/dashboard/historique?${value}` : '/dashboard/historique';
 }
 
 export default async function HistoriquePage({
@@ -68,107 +44,111 @@ export default async function HistoriquePage({
   if (!user) redirect('/connexion?callbackUrl=/dashboard/historique');
 
   const params = await searchParams;
-  const entityId = firstValue(params.entityId);
-  const rawPage = Number.parseInt(firstValue(params.page), 10);
+  const rawGroup = first(params.groupe);
+  const group = HISTORY_GROUP_KEYS.includes(rawGroup as HistoryGroup)
+    ? (rawGroup as HistoryGroup)
+    : undefined;
+  // Référence d'élément : identifiant opaque, borné pour éviter toute requête abusive.
+  const entityId = first(params.entityId).slice(0, 64);
+  const rawPage = Number.parseInt(first(params.page), 10);
   const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
-  const skip = (page - 1) * AUDIT_PAGE_SIZE;
 
-  const [entries, total] = await Promise.all([
-    listCatalogueAuditLogs({ skip, entityId: entityId || undefined }),
-    countCatalogueAuditLogs(entityId || undefined),
-  ]);
-  const totalPages = Math.max(1, Math.ceil(total / AUDIT_PAGE_SIZE));
+  const result = await listHistory({ group, entityId: entityId || undefined, page });
 
   return (
-    <div className="p-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold">Historique du catalogue</h1>
-          <p className="mt-1 text-muted">
-            Toutes les actions de Patricia sur les catégories, prestations, photos, options, règles
-            et questions.
-          </p>
-        </div>
-        {entityId ? (
-          <Link
-            href="/dashboard/historique"
-            className="text-sm font-semibold text-cacao underline-offset-4 hover:underline"
-          >
-            Voir tout l’historique
-          </Link>
-        ) : null}
-      </div>
+    <div>
+      <PageHeader
+        icon={History}
+        title="Historique"
+        description="Les actions faites dans le dashboard : qui a fait quoi, et quand."
+        actions={
+          entityId ? (
+            <ButtonLink href={hrefFor(group, '')} variant="secondary">
+              Voir tout l’historique
+            </ButtonLink>
+          ) : null
+        }
+      />
 
-      <Card className="mt-6 p-0">
-        {entries.length === 0 ? (
-          <div className="p-4">
-            <EmptyState
-              title="Aucune action enregistrée"
-              message="Les modifications du catalogue apparaîtront ici avec leur auteur et leur date."
-              actionLabel="Ouvrir le catalogue"
-              actionHref="/dashboard/catalogue"
-            />
-          </div>
-        ) : (
-          <ul className="divide-y divide-line">
-            {entries.map((entry) => (
-              <li
-                key={entry.id}
-                className="flex flex-col gap-1 p-4 sm:flex-row sm:items-center sm:justify-between"
-              >
-                <div className="min-w-0">
-                  <p className="font-semibold">
-                    {ACTION_LABELS[entry.action] ?? entry.action}{' '}
-                    <span className="font-normal text-muted">({entry.entityType})</span>
-                  </p>
-                  <p className="text-sm text-muted">
-                    {entry.userName ?? 'Utilisateur inconnu'}
-                    {entry.entityId ? ` · référence ${entry.entityId}` : ''}
+      <FilterChips
+        label="Filtrer par domaine"
+        items={[
+          { href: hrefFor(undefined, entityId), label: 'Tout', active: !group },
+          ...HISTORY_GROUP_KEYS.map((key) => ({
+            href: hrefFor(key, entityId),
+            label: HISTORY_GROUPS[key].label,
+            active: group === key,
+          })),
+        ]}
+      />
+
+      {result.items.length === 0 ? (
+        <EmptyState
+          variant="compact"
+          title="Aucune action enregistrée"
+          message={
+            group || entityId
+              ? 'Aucune action ne correspond à ce filtre.'
+              : 'Les modifications faites dans le dashboard apparaîtront ici avec leur auteur et leur date.'
+          }
+        />
+      ) : (
+        <ul className="flex flex-col gap-2">
+          {result.items.map((entry) => {
+            const href = entityHref(entry.entityType, entry.entityId, entry.action);
+            const label = actionLabel(entry.action);
+            const body = (
+              <div className="flex items-center gap-2">
+                <div className="min-w-0 flex-1">
+                  {href ? (
+                    <Link href={href} className={`block font-semibold text-fg ${rowLinkClass}`}>
+                      {label}
+                    </Link>
+                  ) : (
+                    <p className="font-semibold text-fg">{label}</p>
+                  )}
+                  <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm text-muted">
+                    <Badge tone="neutral" className="px-2! py-0.5! text-xs!">
+                      {entityLabel(entry.entityType)}
+                    </Badge>
+                    <span>{entry.userName ?? 'Système'}</span>
+                    <span aria-hidden="true">·</span>
+                    <time dateTime={entry.createdAt.toISOString()}>
+                      {dateFormatter.format(entry.createdAt)}
+                    </time>
                   </p>
                 </div>
-                <time
-                  dateTime={entry.createdAt.toISOString()}
-                  className="shrink-0 text-sm text-muted"
-                >
-                  {dateFormatter.format(entry.createdAt)}
-                </time>
+                {href ? (
+                  <ChevronRight aria-hidden="true" className="size-4 shrink-0 text-muted" />
+                ) : null}
+              </div>
+            );
+            return (
+              <li key={entry.id}>
+                {href ? (
+                  <RowCard>{body}</RowCard>
+                ) : (
+                  <div className="rounded-[var(--radius-lg)] bg-card p-3 shadow-soft sm:p-4">
+                    {body}
+                  </div>
+                )}
               </li>
-            ))}
-          </ul>
-        )}
-      </Card>
+            );
+          })}
+        </ul>
+      )}
 
-      {totalPages > 1 ? (
-        <nav
-          aria-label="Pagination de l'historique"
-          className="mt-4 flex flex-wrap items-center justify-between gap-3"
-        >
-          {page > 1 ? (
-            <Link
-              href={pageHref(page - 1, entityId)}
-              rel="prev"
-              className="rounded-[var(--radius-md)] border border-line bg-card px-4 py-2 text-sm font-semibold transition hover:border-cacao"
-            >
-              Page précédente
-            </Link>
-          ) : (
-            <span className="text-sm text-muted">Page précédente</span>
-          )}
-          <p className="text-sm text-muted">
-            Page {page} sur {totalPages} · {total} action{total > 1 ? 's' : ''}
-          </p>
-          {page < totalPages ? (
-            <Link
-              href={pageHref(page + 1, entityId)}
-              rel="next"
-              className="rounded-[var(--radius-md)] border border-line bg-card px-4 py-2 text-sm font-semibold transition hover:border-cacao"
-            >
-              Page suivante
-            </Link>
-          ) : (
-            <span className="text-sm text-muted">Page suivante</span>
-          )}
-        </nav>
+      <Pagination
+        page={result.page}
+        totalPages={result.totalPages}
+        hrefFor={(nextPage) => hrefFor(group, entityId, nextPage)}
+        label="Pagination de l’historique"
+      />
+      {result.total > 0 ? (
+        <p className="mt-2 text-center text-xs text-muted">
+          {result.total} action{result.total > 1 ? 's' : ''} enregistrée
+          {result.total > 1 ? 's' : ''}
+        </p>
       ) : null}
     </div>
   );

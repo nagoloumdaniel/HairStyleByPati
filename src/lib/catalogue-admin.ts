@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client';
 import type { AnswerType, HairLength, PhotoPolicy, ServiceStatus } from '@prisma/client';
+import { isPermutation, OPTION_ORDER_BY } from '@/modules/catalogue/ordering';
 import { db } from './db';
 import { AppError } from './errors';
 
@@ -51,6 +52,16 @@ export async function listAdminCategories(): Promise<AdminCategory[]> {
     updatedAt: row.updatedAt,
     serviceCount: row._count.services,
   }));
+}
+
+/** Liste légère (id, nom, état) pour les menus : pas de comptage de prestations. */
+export async function listCategoryOptions(): Promise<
+  Array<{ id: string; name: string; active: boolean }>
+> {
+  return db.category.findMany({
+    orderBy: [{ order: 'asc' }, { name: 'asc' }],
+    select: { id: true, name: true, active: true },
+  });
 }
 
 export async function getAdminCategory(id: string) {
@@ -139,13 +150,19 @@ export async function setCategoryActive(id: string, active: boolean) {
   return db.category.update({ where: { id }, data: { active } });
 }
 
-export async function reorderCategories(items: { id: string; order: number }[]) {
-  const count = await db.category.count({ where: { id: { in: items.map((item) => item.id) } } });
-  if (count !== items.length) {
-    throw new AppError('NOT_FOUND', 'Une catégorie du réordonnancement est introuvable.', 404);
+/** Réordonne TOUTES les catégories : l'ordre est la position dans `orderedIds` (0..n-1). */
+export async function reorderCategories(orderedIds: string[]) {
+  const categories = await db.category.findMany({ select: { id: true } });
+  if (
+    !isPermutation(
+      orderedIds,
+      categories.map((category) => category.id),
+    )
+  ) {
+    throw new AppError('CONFLICT', 'La liste des catégories a changé, rechargez la page.', 409);
   }
   await db.$transaction(
-    items.map(({ id, order }) => db.category.update({ where: { id }, data: { order } })),
+    orderedIds.map((id, order) => db.category.update({ where: { id }, data: { order } })),
   );
 }
 
@@ -157,7 +174,6 @@ export interface AdminService {
   id: string;
   name: string;
   slug: string;
-  description: string | null;
   categoryId: string;
   categoryName: string;
   categorySlug: string;
@@ -169,9 +185,8 @@ export interface AdminService {
   order: number;
   imageCount: number;
   optionCount: number;
-  appointmentCount: number;
-  createdAt: Date;
-  updatedAt: Date;
+  /** Clé de la photo principale (vignette), null si aucune photo. */
+  thumbKey: string | null;
 }
 
 export interface AdminServiceFilters {
@@ -214,7 +229,6 @@ export async function listAdminServices(
       id: true,
       name: true,
       slug: true,
-      description: true,
       categoryId: true,
       category: { select: { name: true, slug: true } },
       priceFromCents: true,
@@ -223,9 +237,8 @@ export async function listAdminServices(
       durationMinutes: true,
       status: true,
       order: true,
-      createdAt: true,
-      updatedAt: true,
-      _count: { select: { images: true, options: true, appointments: true } },
+      images: { orderBy: [{ order: 'asc' }, { createdAt: 'asc' }], take: 1, select: { key: true } },
+      _count: { select: { images: true, options: true } },
     },
   });
 
@@ -233,7 +246,6 @@ export async function listAdminServices(
     id: row.id,
     name: row.name,
     slug: row.slug,
-    description: row.description,
     categoryId: row.categoryId,
     categoryName: row.category.name,
     categorySlug: row.category.slug,
@@ -245,9 +257,7 @@ export async function listAdminServices(
     order: row.order,
     imageCount: row._count.images,
     optionCount: row._count.options,
-    appointmentCount: row._count.appointments,
-    createdAt: row.createdAt,
-    updatedAt: row.updatedAt,
+    thumbKey: row.images[0]?.key ?? null,
   }));
 }
 
@@ -313,20 +323,34 @@ export interface AdminServiceDetail {
   appointmentCount: number;
 }
 
-export async function getAdminServiceDetail(id: string): Promise<AdminServiceDetail | null> {
+/** Fiche sans les panneaux lourds (photos, options, compatibilité, questions) : 1 requête légère. */
+export type AdminServiceCore = Omit<
+  AdminServiceDetail,
+  'images' | 'options' | 'compatibility' | 'questions'
+> & { counts: { images: number; options: number; questions: number } };
+
+export async function getAdminServiceCore(id: string): Promise<AdminServiceCore | null> {
   const service = await db.service.findUnique({
     where: { id },
-    include: {
-      category: { select: { id: true, name: true } },
-      images: { orderBy: [{ isPrimary: 'desc' }, { order: 'asc' }] },
-      options: { orderBy: { name: 'asc' } },
-      compatibility: true,
-      questions: { orderBy: [{ order: 'asc' }, { label: 'asc' }] },
-      _count: { select: { appointments: true } },
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      description: true,
+      categoryId: true,
+      category: { select: { name: true } },
+      priceFromCents: true,
+      priceToCents: true,
+      priceOnRequest: true,
+      durationMinutes: true,
+      status: true,
+      order: true,
+      createdAt: true,
+      updatedAt: true,
+      _count: { select: { appointments: true, images: true, options: true, questions: true } },
     },
   });
   if (!service) return null;
-
   return {
     id: service.id,
     name: service.name,
@@ -342,46 +366,83 @@ export async function getAdminServiceDetail(id: string): Promise<AdminServiceDet
     order: service.order,
     createdAt: service.createdAt,
     updatedAt: service.updatedAt,
-    images: service.images.map((image) => ({
-      id: image.id,
-      key: image.key,
-      alt: image.alt,
-      order: image.order,
-      isPrimary: image.isPrimary,
-    })),
-    options: service.options.map((option) => ({
-      id: option.id,
-      name: option.name,
-      priceCents: option.priceCents,
-      durationMinutes: option.durationMinutes,
-      active: option.active,
-    })),
-    compatibility: service.compatibility
-      ? {
-          acceptedLengths: service.compatibility.acceptedLengths,
-          acceptedHairTypes: service.compatibility.acceptedHairTypes,
-          requiresLocs: service.compatibility.requiresLocs,
-          incompatibleLocs: service.compatibility.incompatibleLocs,
-          photoPolicy: service.compatibility.photoPolicy,
-          autoApprove: service.compatibility.autoApprove,
-          conditionsNote: service.compatibility.conditionsNote,
-          incompatibleMessage: service.compatibility.incompatibleMessage,
-          uncertainMessage: service.compatibility.uncertainMessage,
-        }
-      : null,
-    questions: service.questions.map((question) => ({
-      id: question.id,
-      key: question.key,
-      label: question.label,
-      type: question.type,
-      options: question.options,
-      required: question.required,
-      order: question.order,
-      active: question.active,
-      condition: question.condition,
-    })),
     appointmentCount: service._count.appointments,
+    counts: {
+      images: service._count.images,
+      options: service._count.options,
+      questions: service._count.questions,
+    },
   };
+}
+
+export async function getAdminServiceImages(serviceId: string): Promise<AdminServiceImage[]> {
+  const rows = await db.serviceImage.findMany({
+    where: { serviceId },
+    orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
+    select: { id: true, key: true, alt: true, order: true, isPrimary: true },
+  });
+  return rows;
+}
+
+export async function getAdminServiceOptions(serviceId: string): Promise<AdminServiceOption[]> {
+  return db.serviceOption.findMany({
+    where: { serviceId },
+    orderBy: OPTION_ORDER_BY,
+    select: { id: true, name: true, priceCents: true, durationMinutes: true, active: true },
+  });
+}
+
+export async function getAdminServiceCompatibility(
+  serviceId: string,
+): Promise<AdminCompatibilityRule | null> {
+  const rule = await db.compatibilityRule.findUnique({
+    where: { serviceId },
+    select: {
+      acceptedLengths: true,
+      acceptedHairTypes: true,
+      requiresLocs: true,
+      incompatibleLocs: true,
+      photoPolicy: true,
+      autoApprove: true,
+      conditionsNote: true,
+      incompatibleMessage: true,
+      uncertainMessage: true,
+    },
+  });
+  return rule;
+}
+
+export async function getAdminServiceQuestions(serviceId: string): Promise<AdminQuestion[]> {
+  return db.questionDefinition.findMany({
+    where: { serviceId },
+    orderBy: [{ order: 'asc' }, { label: 'asc' }],
+    select: {
+      id: true,
+      key: true,
+      label: true,
+      type: true,
+      options: true,
+      required: true,
+      order: true,
+      active: true,
+      condition: true,
+    },
+  });
+}
+
+/** Fiche complète (toutes les sections) : les 5 lectures partent en parallèle. */
+export async function getAdminServiceDetail(id: string): Promise<AdminServiceDetail | null> {
+  const [core, images, options, compatibility, questions] = await Promise.all([
+    getAdminServiceCore(id),
+    getAdminServiceImages(id),
+    getAdminServiceOptions(id),
+    getAdminServiceCompatibility(id),
+    getAdminServiceQuestions(id),
+  ]);
+  if (!core) return null;
+  const { counts: _counts, ...rest } = core;
+  void _counts;
+  return { ...rest, images, options, compatibility, questions };
 }
 
 export interface CatalogueStats {
@@ -393,14 +454,17 @@ export interface CatalogueStats {
 }
 
 export async function getCatalogueStats(): Promise<CatalogueStats> {
-  const [total, published, draft, archived, categories] = await Promise.all([
-    db.service.count(),
-    db.service.count({ where: { status: 'PUBLISHED' } }),
-    db.service.count({ where: { status: 'DRAFT' } }),
-    db.service.count({ where: { status: 'ARCHIVED' } }),
+  // 2 requêtes (au lieu de 5 comptages) : répartition par statut + nombre de catégories.
+  const [byStatus, categories] = await Promise.all([
+    db.service.groupBy({ by: ['status'], _count: { _all: true } }),
     db.category.count(),
   ]);
-  return { total, published, draft, archived, categories };
+  const count = (status: ServiceStatus) =>
+    byStatus.find((row) => row.status === status)?._count._all ?? 0;
+  const published = count('PUBLISHED');
+  const draft = count('DRAFT');
+  const archived = count('ARCHIVED');
+  return { total: published + draft + archived, published, draft, archived, categories };
 }
 
 export async function serviceSlugExists(slug: string, excludeId?: string): Promise<boolean> {
@@ -507,7 +571,10 @@ export async function createServiceOption(
 ) {
   const service = await db.service.findUnique({ where: { id: serviceId }, select: { id: true } });
   if (!service) throw new AppError('NOT_FOUND', 'Prestation introuvable.', 404);
-  return db.serviceOption.create({ data: { serviceId, ...data } });
+  // Nouvelle option en dernière position.
+  const last = await db.serviceOption.aggregate({ where: { serviceId }, _max: { order: true } });
+  const order = (last._max.order ?? -1) + 1;
+  return db.serviceOption.create({ data: { serviceId, ...data, order } });
 }
 
 export async function updateServiceOption(
@@ -594,16 +661,17 @@ export async function updateServiceImageAlt(imageId: string, alt: string) {
   return db.serviceImage.update({ where: { id: imageId }, data: { alt } });
 }
 
+/** La photo principale est toujours la première : on la place en tête puis on renumérote. */
 export async function setPrimaryServiceImage(serviceId: string, imageId: string) {
-  const image = await db.serviceImage.findFirst({
-    where: { id: imageId, serviceId },
+  const images = await db.serviceImage.findMany({
+    where: { serviceId },
+    orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
     select: { id: true },
   });
-  if (!image) throw new AppError('NOT_FOUND', 'Photo introuvable.', 404);
-  await db.$transaction([
-    db.serviceImage.updateMany({ where: { serviceId }, data: { isPrimary: false } }),
-    db.serviceImage.update({ where: { id: imageId }, data: { isPrimary: true } }),
-  ]);
+  if (!images.some((image) => image.id === imageId)) {
+    throw new AppError('NOT_FOUND', 'Photo introuvable.', 404);
+  }
+  await applyImageOrder([imageId, ...images.map((i) => i.id).filter((id) => id !== imageId)]);
 }
 
 export async function deleteServiceImage(imageId: string) {
@@ -628,23 +696,29 @@ export async function deleteServiceImage(imageId: string) {
   return image;
 }
 
+/* Écrit l'ordre 0..n-1 ; la première photo devient la principale (une seule à la fois). */
+async function applyImageOrder(orderedIds: string[]) {
+  await db.$transaction(
+    orderedIds.map((id, index) =>
+      db.serviceImage.update({ where: { id }, data: { order: index, isPrimary: index === 0 } }),
+    ),
+  );
+}
+
 export async function reorderServiceImages(serviceId: string, orderedIds: string[]) {
   const images = await db.serviceImage.findMany({
     where: { serviceId },
     select: { id: true },
   });
-  if (images.length !== orderedIds.length) {
+  if (
+    !isPermutation(
+      orderedIds,
+      images.map((image) => image.id),
+    )
+  ) {
     throw new AppError('CONFLICT', 'La liste des photos a changé, rechargez la page.', 409);
   }
-  const known = new Set(images.map((image) => image.id));
-  if (orderedIds.some((id) => !known.has(id))) {
-    throw new AppError('CONFLICT', 'Photo inconnue dans le réordonnancement.', 409);
-  }
-  await db.$transaction(
-    orderedIds.map((id, index) =>
-      db.serviceImage.update({ where: { id }, data: { order: index } }),
-    ),
-  );
+  await applyImageOrder(orderedIds);
 }
 
 /* ------------------------------------------------------------------ */
@@ -790,21 +864,39 @@ export async function deleteServiceQuestion(questionId: string) {
   return db.questionDefinition.delete({ where: { id: questionId } });
 }
 
-export async function reorderServiceQuestions(
-  serviceId: string,
-  items: { id: string; order: number }[],
-) {
+export async function reorderServiceQuestions(serviceId: string, orderedIds: string[]) {
   const questions = await db.questionDefinition.findMany({
     where: { serviceId },
     select: { id: true },
   });
-  const known = new Set(questions.map((question) => question.id));
-  if (items.some((item) => !known.has(item.id))) {
-    throw new AppError('CONFLICT', 'Question inconnue dans le réordonnancement.', 409);
+  if (
+    !isPermutation(
+      orderedIds,
+      questions.map((question) => question.id),
+    )
+  ) {
+    throw new AppError('CONFLICT', 'La liste des questions a changé, rechargez la page.', 409);
   }
   await db.$transaction(
-    items.map((item) =>
-      db.questionDefinition.update({ where: { id: item.id }, data: { order: item.order } }),
+    orderedIds.map((id, order) =>
+      db.questionDefinition.update({ where: { id, serviceId }, data: { order } }),
+    ),
+  );
+}
+
+export async function reorderServiceOptions(serviceId: string, orderedIds: string[]) {
+  const options = await db.serviceOption.findMany({ where: { serviceId }, select: { id: true } });
+  if (
+    !isPermutation(
+      orderedIds,
+      options.map((option) => option.id),
+    )
+  ) {
+    throw new AppError('CONFLICT', 'La liste des options a changé, rechargez la page.', 409);
+  }
+  await db.$transaction(
+    orderedIds.map((id, order) =>
+      db.serviceOption.update({ where: { id, serviceId }, data: { order } }),
     ),
   );
 }

@@ -1,7 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import { AppError } from '@/lib/errors';
 import { validateImageFile } from './image-validation';
-import { deleteImageObject, getImageSignedUrl, uploadImageObject } from './storage';
+import {
+  deleteImageObject,
+  getImageSignedUrl,
+  isStorageConfigured,
+  uploadImageObject,
+} from './storage';
 
 /* ============================================================
  * Photos privées (P5.5, §15.2)
@@ -42,7 +47,7 @@ export async function storePrivateImages(
     }
     return uploaded;
   } catch (error) {
-    await Promise.all(uploaded.map((key) => deleteImageObject(key).catch(() => undefined)));
+    await deletePrivateImages(uploaded);
     throw error;
   }
 }
@@ -56,6 +61,32 @@ export async function signedPrivatePhotos(keys: string[]): Promise<SignedPhoto[]
   return Promise.all(keys.map(async (key) => ({ key, url: await getImageSignedUrl(key, 900) })));
 }
 
-export async function deletePrivateImages(keys: string[]): Promise<void> {
-  await Promise.all(keys.map((key) => deleteImageObject(key).catch(() => undefined)));
+export interface DeletePrivateImagesResult {
+  /** Objets réellement supprimés. */
+  deleted: number;
+  /** Clés dont la suppression a échoué (identifiants aléatoires, sans donnée personnelle). */
+  failed: string[];
+}
+
+/**
+ * Supprime des photos privées sans avaler les erreurs : renvoie le décompte réel
+ * et les clés en échec. Stockage non configuré => toutes les clés sont en échec.
+ */
+export async function deletePrivateImages(keys: string[]): Promise<DeletePrivateImagesResult> {
+  // Les URLs de démonstration (http(s):, //, /) ne sont pas des objets du bucket.
+  const objectKeys = keys.filter((key) => key && !/^https?:/.test(key) && !key.startsWith('/'));
+  if (objectKeys.length === 0) return { deleted: 0, failed: [] };
+  if (!isStorageConfigured()) return { deleted: 0, failed: objectKeys };
+  const outcomes = await Promise.all(
+    objectKeys.map(async (key) => {
+      try {
+        await deleteImageObject(key);
+        return null;
+      } catch {
+        return key;
+      }
+    }),
+  );
+  const failed = outcomes.filter((key): key is string => key !== null);
+  return { deleted: objectKeys.length - failed.length, failed };
 }

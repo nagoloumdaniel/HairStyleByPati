@@ -88,15 +88,24 @@ export async function submitReview(input: {
   });
 }
 
+const MODERABLE_STATUSES = ['SUBMITTED', 'APPROVED', 'REJECTED'] as const;
+
+/* Approuve / rejette un avis. Un avis déjà modéré peut être republié ou retiré (décision différente). */
 export async function moderateReview(input: {
   id: string;
   decision: 'APPROVED' | 'REJECTED';
   moderatorId: string;
 }): Promise<void> {
-  const review = await db.review.findUnique({ where: { id: input.id } });
+  const review = await db.review.findUnique({
+    where: { id: input.id },
+    select: { id: true, status: true },
+  });
   if (!review) throw new AppError('NOT_FOUND', 'Avis introuvable.', 404);
-  if (review.status !== 'SUBMITTED') {
-    throw new AppError('INVALID_STATE', 'Cet avis n’est pas en attente de modération.', 409);
+  if (!(MODERABLE_STATUSES as readonly string[]).includes(review.status)) {
+    throw new AppError('INVALID_STATE', 'Cet avis n’a pas encore été soumis.', 409);
+  }
+  if (review.status === input.decision) {
+    throw new AppError('INVALID_STATE', 'Cet avis a déjà ce statut.', 409);
   }
 
   await db.review.update({
@@ -107,4 +116,14 @@ export async function moderateReview(input: {
       moderatedById: input.moderatorId,
     },
   });
+}
+
+/* Supprime un avis déjà soumis (jamais un avis en attente de réponse de la cliente). */
+export async function deleteReview(id: string): Promise<void> {
+  const review = await db.review.findUnique({ where: { id }, select: { id: true, status: true } });
+  if (!review) throw new AppError('NOT_FOUND', 'Avis introuvable.', 404);
+  if (review.status === 'PENDING') {
+    throw new AppError('INVALID_STATE', 'Cet avis n’a pas encore été rédigé par la cliente.', 409);
+  }
+  await db.review.delete({ where: { id: review.id } });
 }

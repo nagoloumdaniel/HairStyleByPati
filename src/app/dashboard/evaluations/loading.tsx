@@ -1,20 +1,24 @@
 import { Skeleton } from '@/components/shared/Skeleton';
 
-/* P2.7 : squelette de la file d'évaluations. */
+/* Squelette de la file d'évaluations. */
 export default function EvaluationsLoading() {
   return (
-    <div className="p-6">
-      <Skeleton className="h-8 w-72" />
-      <Skeleton className="mt-2 h-4 w-full max-w-xl" />
-      <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <Skeleton key={index} className="h-24 w-full" />
+    <div aria-busy="true">
+      <div className="mb-4 flex items-center gap-3">
+        <Skeleton className="size-10" />
+        <div className="flex-1">
+          <Skeleton className="h-6 w-60" />
+          <Skeleton className="mt-1.5 h-4 w-full max-w-md" />
+        </div>
+      </div>
+      <div className="mb-3 flex gap-2 overflow-hidden">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <Skeleton key={index} className="h-9 w-28 shrink-0" />
         ))}
       </div>
-      <Skeleton className="mt-6 h-20 w-full" />
-      <div className="mt-4 flex flex-col gap-2">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <Skeleton key={index} className="h-16 w-full" />
+      <div className="grid gap-2">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <Skeleton key={index} className="h-[76px] w-full" />
         ))}
       </div>
     </div>

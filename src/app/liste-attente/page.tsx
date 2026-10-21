@@ -16,11 +16,11 @@ export default async function ListeAttentePage() {
   });
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-12 sm:px-6">
+    <main className="page-main">
       <Title as="h1" size="display" className="">
         Liste d’attente
       </Title>
-      <p className="mt-2 text-muted">
+      <p className="mt-2 hidden text-muted md:block">
         Aucun créneau disponible à la date souhaitée ? Laissez vos coordonnées : vous serez prévenue
         par e-mail si ce créneau exact se libère. La confirmation reste à votre initiative, avec une
         nouvelle vérification complète de la disponibilité.

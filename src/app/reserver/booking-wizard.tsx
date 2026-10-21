@@ -1,5 +1,6 @@
 'use client';
 
+import { Check, Ticket, X } from 'lucide-react';
 import Link from 'next/link';
 import { useActionState, useEffect, useRef, useState } from 'react';
 import type { BookableService } from '@/modules/reservations/queries';
@@ -10,10 +11,13 @@ import {
   type CompatibilityPreviewState,
 } from '@/modules/compatibilite/actions';
 import {
+  applyPromoCode,
+  loadAutomaticPromotion,
   loadBookingSlots,
   submitBooking,
   type BookingSlotsState,
   type BookingState,
+  type PromoCodeState,
 } from '@/modules/reservations/actions';
 import { QuestionField } from '@/app/compatibilite/compatibility-wizard';
 import { Badge } from '@/components/ui/Badge';
@@ -104,6 +108,14 @@ export function BookingWizard({
   const [contactPhone, setContactPhone] = useState('');
   const [comment, setComment] = useState('');
   const [consent, setConsent] = useState(false);
+  const [promoInput, setPromoInput] = useState('');
+  const [autoPromo, setAutoPromo] = useState<{
+    promotionName: string;
+    basePriceCents: number;
+    discountCents: number;
+    finalPriceCents: number;
+  } | null>(null);
+  const [promoApplied, setPromoApplied] = useState<PromoCodeState['applied'] | null>(null);
   const [clientError, setClientError] = useState('');
   const [verificationMessage, setVerificationMessage] = useState('');
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -119,6 +131,11 @@ export function BookingWizard({
   );
   const [bookingState, bookingAction, bookingPending] = useActionState<BookingState, FormData>(
     submitBooking,
+    {},
+  );
+
+  const [promoState, promoAction, promoPending] = useActionState<PromoCodeState, FormData>(
+    applyPromoCode,
     {},
   );
 
@@ -146,6 +163,27 @@ export function BookingWizard({
       setPhase('blocked');
     }
   }, [previewState.preview, phase]);
+
+  useEffect(() => {
+    if (promoState.applied) setPromoApplied(promoState.applied);
+  }, [promoState]);
+
+  // Offre automatique : aperçu du prix réellement figé à l'enregistrement.
+  const optionKey = optionIds.join(',');
+  useEffect(() => {
+    if (phase !== 'summary') return;
+    let cancelled = false;
+    loadAutomaticPromotion(service.slug, optionKey ? optionKey.split(',') : [])
+      .then((preview) => {
+        if (!cancelled) setAutoPromo(preview);
+      })
+      .catch(() => {
+        if (!cancelled) setAutoPromo(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [phase, service.slug, optionKey]);
 
   useEffect(() => {
     if (bookingState.success) setPhase('done');
@@ -189,6 +227,8 @@ export function BookingWizard({
                 : 8;
 
   const toggleOption = (optionId: string) => {
+    // Le prix remisé dépend des options : le code doit être revalidé.
+    setPromoApplied(null);
     setOptionIds((previous) =>
       previous.includes(optionId)
         ? previous.filter((id) => id !== optionId)
@@ -241,7 +281,7 @@ export function BookingWizard({
               }`}
             >
               <span aria-hidden="true" className="font-bold">
-                {stepNumber > number ? '✓' : number}
+                {stepNumber > number ? <Check aria-hidden="true" className="size-4" /> : number}
               </span>
               {label}
             </li>
@@ -648,7 +688,28 @@ export function BookingWizard({
             </div>
             <div className="flex justify-between gap-4 py-2">
               <dt className="text-muted">Prix</dt>
-              <dd className="text-right font-semibold text-fg">{formatCents(priceCents)}</dd>
+              <dd className="text-right font-semibold text-fg">
+                {promoApplied && promoApplied.discountCents > 0 ? (
+                  <>
+                    <s className="font-normal text-muted">
+                      {formatCents(promoApplied.basePriceCents)}
+                    </s>{' '}
+                    {formatCents(promoApplied.finalPriceCents)}
+                  </>
+                ) : autoPromo ? (
+                  <>
+                    <s className="font-normal text-muted">
+                      {formatCents(autoPromo.basePriceCents)}
+                    </s>{' '}
+                    {formatCents(autoPromo.finalPriceCents)}
+                    <span className="block text-xs font-normal text-success">
+                      Offre en cours : {autoPromo.promotionName}
+                    </span>
+                  </>
+                ) : (
+                  formatCents(priceCents)
+                )}
+              </dd>
             </div>
             <div className="flex justify-between gap-4 py-2">
               <dt className="text-muted">Coordonnées</dt>
@@ -659,6 +720,73 @@ export function BookingWizard({
               </dd>
             </div>
           </dl>
+
+          {priceCents != null ? (
+            <div className="mt-4">
+              {promoApplied ? (
+                <div className="flex items-center justify-between gap-3 rounded-[var(--radius-md)] bg-success-soft px-4 py-3 text-sm text-success">
+                  <p>
+                    <Ticket aria-hidden="true" className="mr-1.5 inline size-4 align-text-bottom" />
+                    {promoApplied.codeApplied ? (
+                      <>
+                        Code <strong>{promoApplied.code}</strong> appliqué :{' '}
+                        {promoApplied.promotionName}
+                        {promoApplied.discountCents > 0
+                          ? ` (-${formatCents(promoApplied.discountCents)})`
+                          : ''}
+                      </>
+                    ) : (
+                      <>
+                        Une offre plus avantageuse est déjà appliquée : {promoApplied.promotionName}
+                      </>
+                    )}
+                  </p>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    icon={X}
+                    iconOnly
+                    onClick={() => {
+                      setPromoApplied(null);
+                      setPromoInput('');
+                    }}
+                  >
+                    Retirer le code promo
+                  </Button>
+                </div>
+              ) : (
+                <form action={promoAction} className="flex items-end gap-2">
+                  <input type="hidden" name="serviceSlug" value={service.slug} />
+                  <input type="hidden" name="optionIds" value={JSON.stringify(optionIds)} />
+                  <div className="min-w-0 flex-1">
+                    <Input
+                      label="Code promo (facultatif)"
+                      name="code"
+                      icon={Ticket}
+                      value={promoInput}
+                      onChange={(event) => setPromoInput(event.target.value.toUpperCase())}
+                      maxLength={40}
+                      autoComplete="off"
+                      autoCapitalize="characters"
+                      spellCheck={false}
+                      placeholder="Ex. RENTREE20"
+                      error={promoState.error}
+                    />
+                  </div>
+                  <Button
+                    type="submit"
+                    variant="secondary"
+                    icon={Check}
+                    loading={promoPending}
+                    disabled={!promoInput.trim()}
+                  >
+                    Appliquer
+                  </Button>
+                </form>
+              )}
+            </div>
+          ) : null}
 
           <div className="mt-4 rounded-[var(--radius-md)] bg-accent-soft px-4 py-3 text-sm text-fg">
             <p className="font-semibold">Paiement sur place</p>
@@ -680,6 +808,7 @@ export function BookingWizard({
             <input type="hidden" name="phone" value={contactPhone} />
             <input type="hidden" name="comment" value={comment} />
             <input type="hidden" name="consent" value={consent ? 'on' : ''} />
+            <input type="hidden" name="promoCode" value={promoApplied?.code ?? ''} />
             <div className="absolute -left-[9999px]" aria-hidden="true">
               <label htmlFor="booking-website">Site web</label>
               <input id="booking-website" name="website" tabIndex={-1} autoComplete="off" />

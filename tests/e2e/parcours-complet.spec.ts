@@ -10,6 +10,7 @@
 import { randomBytes } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { test, expect, type Page } from '@playwright/test';
+import { selectOption, pickDate } from './helpers/fields';
 
 const stamp = `${Date.now().toString(36)}${randomBytes(3).toString('hex')}`;
 const prefix = `zz-e2e-parcours-${stamp}`;
@@ -188,7 +189,7 @@ test.describe('Parcours complet', () => {
 
     await expect(page.getByRole('heading', { name: 'Options et précisions' })).toBeVisible();
     await page.getByRole('button', { name: 'Choisir un créneau' }).click();
-    await page.getByLabel('Date souhaitée').fill(dateISO);
+    await pickDate(page, 'Date souhaitée', dateISO);
     const slot = page.getByRole('button', { name: '10:00', exact: true });
     await expect(slot).toBeVisible({ timeout: 20_000 });
     await slot.click();
@@ -244,7 +245,7 @@ test.describe('Parcours complet', () => {
 
     await login(page);
     await page.goto(`/dashboard/evaluations/${assessmentId}`);
-    await page.getByLabel('Décision').selectOption({ label: 'Accepter la compatibilité' });
+    await selectOption(page, 'Décision', { label: 'Accepter la compatibilité' });
     await page
       .getByLabel(/^Message transmis à la cliente/)
       .fill('Votre coiffure est compatible, vous pouvez réserver un créneau.');

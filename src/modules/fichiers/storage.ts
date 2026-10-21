@@ -6,6 +6,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { AppError } from '@/lib/errors';
+import { sanitizeImage } from './image-sanitize';
 
 /* ============================================================
  * Stockage objet compatible S3 (Cloudflare R2 en production).
@@ -83,12 +84,15 @@ export async function uploadImageObject(params: {
   contentType: string;
 }): Promise<void> {
   const config = requireConfig();
+  // Point de passage unique de tous les envois (galerie, prestations, photos privées) :
+  // ré-encodage sans métadonnées (EXIF/GPS retirés, orientation appliquée, 2400 px max).
+  const sanitized = await sanitizeImage(params.body);
   await getClient(config).send(
     new PutObjectCommand({
       Bucket: config.bucket,
       Key: params.key,
-      Body: params.body,
-      ContentType: params.contentType,
+      Body: sanitized.body,
+      ContentType: sanitized.mime,
       // Le stockage est privé : aucune URL publique prévisible.
       CacheControl: 'private, max-age=3600',
     }),
@@ -100,6 +104,8 @@ export async function getImageSignedUrl(
   key: string,
   expiresInSeconds = 3600,
 ): Promise<string | null> {
+  // Photos de démonstration : la clé est déjà une URL publique, pas un objet du bucket.
+  if (/^(https?:)?\/\//.test(key) || key.startsWith('/')) return key;
   const config = readStorageConfig();
   if (!config || !key) return null;
   const command = new GetObjectCommand({ Bucket: config.bucket, Key: key });
