@@ -276,9 +276,7 @@ export function ImagesPanel({
         </EmptyBlock>
       ) : (
         <>
-          <p className="text-sm text-muted">
-            La première photo est la photo principale : utilisez les flèches pour changer l’ordre.
-          </p>
+          <p className="text-sm text-muted">La première photo est la photo principale.</p>
           <ul className="flex flex-col gap-2">
             {list.map((image, index) => (
               <ImageRow

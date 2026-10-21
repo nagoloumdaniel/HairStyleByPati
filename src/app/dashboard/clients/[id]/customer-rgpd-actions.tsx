@@ -63,10 +63,9 @@ export function CustomerRgpdActions({
         Droits RGPD
       </h2>
       <p className="mt-1 text-sm text-muted">
-        Export ou effacement des données personnelles de {customerName}. L’effacement supprime les
-        conversations, évaluations, demandes, avis et photos privées, puis anonymise la fiche. Les
-        rendez-vous sont conservés pour les obligations comptables, sans données capillaires ni
-        identité.
+        Export ou effacement des données de {customerName}. L’effacement supprime conversations,
+        évaluations, demandes, avis et photos, puis anonymise la fiche. Les rendez-vous sont
+        conservés sans identité, pour la comptabilité.
       </p>
 
       <div className="mt-3">

@@ -106,8 +106,6 @@ function Section({
   );
 }
 
-const SMALL_BADGE = 'px-2! py-0.5! text-xs!';
-
 function SectionSkeleton() {
   return (
     <Card aria-hidden="true">
@@ -144,7 +142,7 @@ async function AppointmentsSection({ customerId, count }: { customerId: string; 
           aside={
             <Badge
               tone={APPOINTMENT_STATUS_TONES[appointment.status as never] ?? 'neutral'}
-              className={SMALL_BADGE}
+              size="sm"
             >
               {APPOINTMENT_STATUS_LABELS[appointment.status as never] ?? appointment.status}
             </Badge>
@@ -232,7 +230,7 @@ async function ConversationsSection({ customerId, count }: { customerId: string;
           }
           aside={
             conversation.unreadCount > 0 ? (
-              <Badge tone="accent" className={SMALL_BADGE}>
+              <Badge tone="accent" size="sm">
                 {conversation.unreadCount} non lu{conversation.unreadCount > 1 ? 's' : ''}
               </Badge>
             ) : null
@@ -298,7 +296,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
               ['Conversations', customer.counts.conversations],
             ] as const
           ).map(([label, count]) => (
-            <Card key={label} className="p-3! sm:p-4!">
+            <Card key={label}>
               <dt className="text-sm text-muted">{label}</dt>
               <dd className="font-heading text-2xl font-bold text-fg">{count}</dd>
             </Card>

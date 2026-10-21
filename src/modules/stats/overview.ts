@@ -92,7 +92,7 @@ export async function getDashboardOverview(now = new Date()): Promise<DashboardO
     db.appointment.findMany({
       where: { status: { in: [...ACTIVE_STATUSES] }, startsAt: { gte: now } },
       orderBy: { startsAt: 'asc' },
-      take: 6,
+      take: 5,
       select: {
         id: true,
         startsAt: true,
@@ -104,7 +104,7 @@ export async function getDashboardOverview(now = new Date()): Promise<DashboardO
     db.blockedPeriod.findMany({
       where: { endsAt: { gte: now } },
       orderBy: { startsAt: 'asc' },
-      take: 3,
+      take: 5,
     }),
     db.appointment.findMany({
       where: {

@@ -1,4 +1,4 @@
-import { Camera, ChevronLeft, ChevronRight, ClipboardCheck } from 'lucide-react';
+import { Camera, ClipboardCheck } from 'lucide-react';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import type { AssessmentStatus } from '@prisma/client';
@@ -9,6 +9,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { LocalDateTime } from '@/components/shared/LocalDateTime';
 import { Badge } from '@/components/ui/Badge';
+import { Pagination } from '@/components/ui/Pagination';
 import { ButtonLink } from '@/components/ui/Button';
 import { CardLink } from '@/components/ui/Card';
 
@@ -70,7 +71,7 @@ export default async function EvaluationsPage({
       <PageHeader
         icon={ClipboardCheck}
         title="Évaluations capillaires"
-        description="Demandes envoyées depuis le site. Une décision ne crée jamais de réservation."
+        description="Une décision ne crée jamais de réservation."
       />
 
       <nav
@@ -148,45 +149,12 @@ export default async function EvaluationsPage({
         </ul>
       )}
 
-      {result.totalPages > 1 ? (
-        <nav
-          aria-label="Pagination des évaluations"
-          className="mt-4 flex items-center justify-between gap-3"
-        >
-          {result.page > 1 ? (
-            <ButtonLink
-              href={pageHref(status, result.page - 1)}
-              rel="prev"
-              variant="secondary"
-              size="sm"
-              icon={ChevronLeft}
-              iconOnly="mobile"
-            >
-              Page précédente
-            </ButtonLink>
-          ) : (
-            <span aria-hidden="true" className="size-9" />
-          )}
-          <p className="text-center text-sm text-muted">
-            Page {result.page} sur {result.totalPages} · {result.total} demande
-            {result.total > 1 ? 's' : ''}
-          </p>
-          {result.page < result.totalPages ? (
-            <ButtonLink
-              href={pageHref(status, result.page + 1)}
-              rel="next"
-              variant="secondary"
-              size="sm"
-              icon={ChevronRight}
-              iconOnly="mobile"
-            >
-              Page suivante
-            </ButtonLink>
-          ) : (
-            <span aria-hidden="true" className="size-9" />
-          )}
-        </nav>
-      ) : null}
+      <Pagination
+        page={result.page}
+        totalPages={result.totalPages}
+        hrefFor={(next) => pageHref(status, next)}
+        label="Pagination des évaluations"
+      />
     </div>
   );
 }

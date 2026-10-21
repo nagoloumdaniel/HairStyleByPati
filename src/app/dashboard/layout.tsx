@@ -33,9 +33,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <ConfirmProvider>
       <script dangerouslySetInnerHTML={{ __html: DASHBOARD_THEME_SCRIPT }} />
       <DashboardThemeLock />
-      <div className="grid min-h-dvh w-full grid-cols-1 content-start lg:grid-cols-[232px_minmax(0,1fr)] lg:content-stretch">
-        <aside className="hidden min-w-0 bg-ink p-3 text-panel-fg lg:sticky lg:top-0 lg:block lg:h-dvh lg:self-start lg:overflow-y-auto">
-          <Link href="/dashboard" className="flex h-14 items-center gap-2 px-3">
+      <div
+        data-dashboard
+        className="grid min-h-dvh w-full grid-cols-1 content-start lg:grid-cols-[232px_minmax(0,1fr)] lg:content-stretch"
+      >
+        <aside className="hidden min-w-0 border-r border-panel-fg/10 bg-ink px-3 pt-3 text-panel-fg lg:sticky lg:top-0 lg:block lg:h-dvh lg:self-start lg:overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <Link href="/dashboard" className="mb-2 flex h-12 items-center gap-2 px-3">
             <Logo markClassName="h-7 w-auto text-panel-fg" showWordmark={false} />
             <span className="font-heading text-sm font-bold text-panel-fg">
               Hairstyle by Patricia
@@ -47,7 +50,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <Suspense fallback={<DashboardTopbar />}>
             <TopbarWithCounts />
           </Suspense>
-          <main className="px-3 pb-24 pt-3 sm:px-5 sm:pt-4 lg:px-6 lg:pb-8">{children}</main>
+          <main className="px-3 pb-24 pt-4 sm:px-5 sm:pt-5 lg:px-8 lg:pb-10">{children}</main>
         </div>
       </div>
       <MobileTabBar />

@@ -227,7 +227,7 @@ export function CalendarClient() {
                 key={item}
                 type="button"
                 size="sm"
-                variant={view === item ? 'primary' : 'ghost'}
+                variant={view === item ? 'primary' : 'secondary'}
                 aria-pressed={view === item}
                 onClick={() => setView(item)}
               >
@@ -317,7 +317,7 @@ export function CalendarClient() {
                             </span>
                             <Badge
                               tone={APPOINTMENT_STATUS_TONES[appointment.status] ?? 'neutral'}
-                              className="px-2! py-0.5! text-xs!"
+                              size="sm"
                             >
                               {APPOINTMENT_STATUS_SHORT_LABELS[appointment.status] ??
                                 appointment.status}
@@ -368,20 +368,20 @@ export function CalendarClient() {
                     >
                       <span className="text-xs font-semibold">{Number(dayISO.slice(-2))}</span>
                       {entries.length > 0 ? (
-                        <span className="rounded-full bg-accent px-1.5 text-[11px] font-semibold text-accent-fg sm:hidden">
+                        <span className="rounded-full bg-accent px-1.5 text-xs font-semibold text-accent-fg sm:hidden">
                           {entries.length}
                         </span>
                       ) : null}
                       {entries.slice(0, 2).map((appointment) => (
                         <span
                           key={appointment.id}
-                          className="hidden w-full truncate text-[11px] text-muted sm:block"
+                          className="hidden w-full truncate text-xs text-muted sm:block"
                         >
                           {timeLabel(appointment.startsAt, timeZone)} {appointment.customerName}
                         </span>
                       ))}
                       {entries.length > 2 ? (
-                        <span className="hidden text-[11px] font-semibold text-accent sm:block">
+                        <span className="hidden text-xs font-semibold text-accent sm:block">
                           +{entries.length - 2}
                         </span>
                       ) : null}

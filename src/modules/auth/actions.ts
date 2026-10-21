@@ -16,7 +16,7 @@ export interface LoginFormState {
 
 const loginFormSchema = z.object({
   email: z.string().trim().toLowerCase().pipe(z.string().email('E-mail invalide')),
-  password: z.string().min(1, 'Mot de passe requis'),
+  password: z.string().min(1, 'Mot de passe requis').max(200),
 });
 
 /**
@@ -34,7 +34,10 @@ export async function login(_prev: LoginFormState, formData: FormData): Promise<
     return { error: 'E-mail ou mot de passe incorrect.' };
   }
   const rawCallback = String(formData.get('callbackUrl') ?? '/dashboard');
-  const redirectTo = rawCallback.startsWith('/dashboard') ? rawCallback : '/dashboard';
+  const redirectTo =
+    rawCallback === '/dashboard' || rawCallback.startsWith('/dashboard/')
+      ? rawCallback
+      : '/dashboard';
 
   try {
     await signIn('credentials', {

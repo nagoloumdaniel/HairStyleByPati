@@ -71,7 +71,6 @@ export default async function ReservationsPage({
       <PageHeader
         icon={ClipboardList}
         title="Réservations"
-        description="Rendez-vous à venir et historique. Touchez une réservation pour la gérer."
         actions={
           <ButtonLink
             href="/dashboard/calendrier"

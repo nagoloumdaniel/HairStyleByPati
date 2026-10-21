@@ -249,8 +249,7 @@ export function CategoriesTab({ categories }: { categories: AdminCategory[] }) {
     <div className="flex flex-col gap-3 p-3 sm:p-4">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-muted">
-          {categories.length} catégorie{categories.length > 1 ? 's' : ''} · l’ordre est repris sur
-          le site public.
+          {categories.length} catégorie{categories.length > 1 ? 's' : ''}
         </p>
         <Button
           type="button"

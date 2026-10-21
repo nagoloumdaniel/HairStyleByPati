@@ -1,4 +1,5 @@
 import { db } from '@/lib/db';
+import { paginate } from '@/lib/pagination';
 
 export async function getApprovedReviews(limit = 6) {
   return db.review.findMany({
@@ -17,11 +18,18 @@ export type ModerationFilter = 'SUBMITTED' | 'APPROVED' | 'REJECTED';
 export const MODERATION_FILTERS: ModerationFilter[] = ['SUBMITTED', 'APPROVED', 'REJECTED'];
 
 /* Avis soumis par les clientes, filtrés par statut de modération (plus anciens d'abord en attente). */
-export async function listReviewsForModeration(status: ModerationFilter = 'SUBMITTED') {
-  return db.review.findMany({
+export async function listReviewsForModeration(
+  status: ModerationFilter = 'SUBMITTED',
+  requestedPage = 1,
+  pageSize = 20,
+) {
+  const total = await db.review.count({ where: { status } });
+  const { page, totalPages, skip, take } = paginate(total, requestedPage, pageSize);
+  const items = await db.review.findMany({
     where: { status },
     orderBy: status === 'SUBMITTED' ? { submittedAt: 'asc' } : { moderatedAt: 'desc' },
-    take: 100,
+    skip,
+    take,
     select: {
       id: true,
       rating: true,
@@ -33,6 +41,7 @@ export async function listReviewsForModeration(status: ModerationFilter = 'SUBMI
       service: { select: { name: true } },
     },
   });
+  return { items, total, page, totalPages };
 }
 
 export async function countReviewsByStatus(): Promise<Record<ModerationFilter, number>> {

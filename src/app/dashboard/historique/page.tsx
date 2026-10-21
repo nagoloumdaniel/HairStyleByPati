@@ -60,7 +60,6 @@ export default async function HistoriquePage({
       <PageHeader
         icon={History}
         title="Historique"
-        description="Les actions faites dans le dashboard : qui a fait quoi, et quand."
         actions={
           entityId ? (
             <ButtonLink href={hrefFor(group, '')} variant="secondary">
@@ -108,7 +107,7 @@ export default async function HistoriquePage({
                     <p className="font-semibold text-fg">{label}</p>
                   )}
                   <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm text-muted">
-                    <Badge tone="neutral" className="px-2! py-0.5! text-xs!">
+                    <Badge tone="neutral" size="sm">
                       {entityLabel(entry.entityType)}
                     </Badge>
                     <span>{entry.userName ?? 'Système'}</span>

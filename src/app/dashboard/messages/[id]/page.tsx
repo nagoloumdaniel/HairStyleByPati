@@ -70,13 +70,10 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
       />
 
       <div className="mb-3 flex flex-wrap items-center gap-1.5">
-        <Badge
-          tone={CONVERSATION_STATUS_TONES[conversation.status]}
-          className="px-2! py-0.5! text-xs!"
-        >
+        <Badge tone={CONVERSATION_STATUS_TONES[conversation.status]} size="sm">
           {CONVERSATION_STATUS_LABELS[conversation.status]}
         </Badge>
-        <Badge tone="neutral" className="px-2! py-0.5! text-xs!">
+        <Badge tone="neutral" size="sm">
           {CONVERSATION_SOURCE_LABELS[conversation.source]}
         </Badge>
       </div>

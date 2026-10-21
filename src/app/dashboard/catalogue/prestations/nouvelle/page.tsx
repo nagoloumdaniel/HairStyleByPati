@@ -23,7 +23,6 @@ export default async function NewServicePage() {
       <PageHeader
         icon={Plus}
         title="Nouvelle prestation"
-        description="Créez la fiche, puis ajoutez ses photos, options, règles de compatibilité et questions."
         back={<BackButton fallbackHref="/dashboard/catalogue" />}
       />
 
@@ -32,9 +31,7 @@ export default async function NewServicePage() {
           <Scissors aria-hidden="true" className="size-8 text-accent" />
           <div>
             <p className="font-semibold">Créez d&apos;abord une catégorie</p>
-            <p className="mt-1 text-sm text-muted">
-              Toute prestation appartient à une catégorie. Ajoutez-en une depuis le catalogue.
-            </p>
+            <p className="mt-1 text-sm text-muted">Toute prestation appartient à une catégorie.</p>
           </div>
           <ButtonLink href="/dashboard/catalogue" icon={Scissors}>
             Gérer les catégories

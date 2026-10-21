@@ -69,7 +69,7 @@ export function ConversationRowActions({
       ) : null}
       <Button
         type="button"
-        variant="ghost"
+        variant="danger"
         size="sm"
         icon={Trash2}
         iconOnly

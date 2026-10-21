@@ -305,10 +305,15 @@ function EditForm({
 
 export function GalerieClient({
   photos,
+  offset = 0,
+  total = photos.length,
   services,
   storageReady,
 }: {
   photos: GalleryRow[];
+  /** Rang global de la première photo de la page (pagination). */
+  offset?: number;
+  total?: number;
   services: ServiceOption[];
   storageReady: boolean;
 }) {
@@ -370,7 +375,6 @@ export function GalerieClient({
       <PageHeader
         icon={Images}
         title="Galerie"
-        description="Réalisations affichées sur le site, avec l’accord de la cliente."
         actions={
           <Button
             icon={Plus}
@@ -403,8 +407,7 @@ export function GalerieClient({
           </span>
           <p className="font-heading text-lg font-bold text-fg">Aucune photo</p>
           <p className="max-w-sm text-sm text-muted">
-            Ajoutez vos plus belles réalisations. Une photo n’est visible sur le site qu’une fois
-            publiée.
+            Une photo n’est visible sur le site qu’une fois publiée.
           </p>
           <Button icon={Plus} onClick={() => open('new')} disabled={!storageReady}>
             Ajouter une photo
@@ -430,7 +433,8 @@ export function GalerieClient({
                     <Thumb url={photo.url} alt={photo.alt || photo.serviceName || 'Réalisation'} />
                     <Badge
                       tone={photo.published ? 'success' : 'neutral'}
-                      className="absolute left-2 top-2 px-2! py-0.5! text-xs!"
+                      size="sm"
+                      className="absolute left-2 top-2"
                     >
                       {photo.published ? 'Publiée' : 'Brouillon'}
                     </Badge>
@@ -451,7 +455,7 @@ export function GalerieClient({
                     size="sm"
                     iconOnly
                     icon={MoveLeft}
-                    disabled={index === 0 || loading}
+                    disabled={offset + index === 0 || loading}
                     onClick={() => run(photo.id, adminMoveGalleryPhoto, { direction: 'up' })}
                   >
                     Déplacer avant
@@ -462,7 +466,7 @@ export function GalerieClient({
                     size="sm"
                     iconOnly
                     icon={MoveRight}
-                    disabled={index === photos.length - 1 || loading}
+                    disabled={offset + index === total - 1 || loading}
                     onClick={() => run(photo.id, adminMoveGalleryPhoto, { direction: 'down' })}
                   >
                     Déplacer après
@@ -482,7 +486,7 @@ export function GalerieClient({
                   </Button>
                   <Button
                     type="button"
-                    variant="secondary"
+                    variant="danger"
                     size="sm"
                     iconOnly
                     icon={Trash2}

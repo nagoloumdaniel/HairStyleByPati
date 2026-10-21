@@ -1,4 +1,4 @@
-import { CalendarClock, ChevronLeft, ChevronRight, Mail, Wand2 } from 'lucide-react';
+import { CalendarClock, Mail, Wand2 } from 'lucide-react';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import type { CustomRequestStatus } from '@prisma/client';
@@ -14,6 +14,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { LocalDateTime } from '@/components/shared/LocalDateTime';
 import { Badge } from '@/components/ui/Badge';
+import { Pagination } from '@/components/ui/Pagination';
 import { ButtonLink } from '@/components/ui/Button';
 import { CardLink } from '@/components/ui/Card';
 
@@ -58,7 +59,7 @@ export default async function CustomRequestsPage({
       <PageHeader
         icon={Wand2}
         title="Demandes personnalisées"
-        description="Coiffures hors catalogue et photos de référence. Une demande acceptée propose un créneau sans jamais le réserver."
+        description="Une demande acceptée propose un créneau sans jamais le réserver."
       />
 
       <nav
@@ -142,45 +143,12 @@ export default async function CustomRequestsPage({
         </ul>
       )}
 
-      {result.totalPages > 1 ? (
-        <nav
-          aria-label="Pagination des demandes"
-          className="mt-4 flex items-center justify-between gap-3"
-        >
-          {result.page > 1 ? (
-            <ButtonLink
-              href={hrefFor(status, result.page - 1)}
-              rel="prev"
-              variant="secondary"
-              size="sm"
-              icon={ChevronLeft}
-              iconOnly="mobile"
-            >
-              Page précédente
-            </ButtonLink>
-          ) : (
-            <span aria-hidden="true" className="size-9" />
-          )}
-          <p className="text-center text-sm text-muted">
-            Page {result.page} sur {result.totalPages} · {result.total} demande
-            {result.total > 1 ? 's' : ''}
-          </p>
-          {result.page < result.totalPages ? (
-            <ButtonLink
-              href={hrefFor(status, result.page + 1)}
-              rel="next"
-              variant="secondary"
-              size="sm"
-              icon={ChevronRight}
-              iconOnly="mobile"
-            >
-              Page suivante
-            </ButtonLink>
-          ) : (
-            <span aria-hidden="true" className="size-9" />
-          )}
-        </nav>
-      ) : null}
+      <Pagination
+        page={result.page}
+        totalPages={result.totalPages}
+        hrefFor={(next) => hrefFor(status, next)}
+        label="Pagination des demandes"
+      />
     </div>
   );
 }

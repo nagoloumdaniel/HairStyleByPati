@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { AppError, parseInput } from '@/lib/errors';
+import { rateLimit } from '@/lib/rate-limit';
 import { requireAdmin } from '@/modules/auth/guards';
 import { logAudit } from '@/modules/stats/audit';
 import { flushEmailsSoon } from './flush';
@@ -104,6 +105,38 @@ export async function deleteReadNotifications(): Promise<NotificationActionState
     revalidatePath('/dashboard/notifications');
     revalidatePath('/dashboard', 'layout');
     return { success: `${result.count} notification(s) lue(s) supprimée(s).` };
+  } catch (error) {
+    return handleError(error);
+  }
+}
+
+/* Supprime uniquement les e-mails en échec (FAILED) ; jamais les envoyés, en attente ni les alertes. */
+export async function deleteFailedEmails(): Promise<NotificationActionState> {
+  try {
+    const user = await requireAdmin();
+    if (!user) return { error: 'Session expirée.' };
+    const limit = await rateLimit(`notifications:purge-failed:${user.id}`, {
+      max: 10,
+      windowMs: 10 * 60_000,
+    });
+    if (!limit.allowed) return { error: 'Trop de tentatives. Réessayez dans quelques minutes.' };
+    const result = await db.notification.deleteMany({
+      where: { channel: 'EMAIL', status: 'FAILED' },
+    });
+    await logAudit({
+      action: 'notification.purge_failed',
+      entityType: 'Notification',
+      userId: user.id,
+      metadata: { count: result.count },
+    });
+    revalidatePath('/dashboard/notifications');
+    revalidatePath('/dashboard', 'layout');
+    return {
+      success:
+        result.count === 0
+          ? 'Aucun échec d’envoi à supprimer.'
+          : `${result.count} échec${result.count > 1 ? 's' : ''} d’envoi supprimé${result.count > 1 ? 's' : ''}.`,
+    };
   } catch (error) {
     return handleError(error);
   }
