@@ -278,9 +278,11 @@ model Appointment {
   assessments          HairAssessment[]
   review               Review?
 
-  // Anti double-réservation : un créneau ne peut être occupé qu'une
-  // fois par prestation (renforcé par transaction + verrou P6.2)
-  @@unique([serviceId, startsAt])
+  // Anti double-réservation : l'unicité (serviceId, startsAt) est un index unique PARTIEL
+  // ("Appointment_serviceId_startsAt_active_key", hors statuts annulés), créé par SQL dans la
+  // migration 20261022000000 car Prisma ne sait pas l'exprimer. Ne pas le recréer en @@unique.
+  // Renforcé par transaction + verrou P6.2.
+  @@index([serviceId, startsAt])
   @@index([startsAt])
   @@index([status, startsAt])
   @@index([customerId])
