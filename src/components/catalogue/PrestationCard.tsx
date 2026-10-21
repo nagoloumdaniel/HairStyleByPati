@@ -1,4 +1,6 @@
+import { CalendarCheck } from 'lucide-react';
 import Link from 'next/link';
+import { ButtonLink } from '@/components/ui/Button';
 import { CardImages } from './CardImages';
 
 export type PrestationCardProps = {
@@ -30,7 +32,7 @@ export function PrestationCard({
 }: PrestationCardProps) {
   return (
     <article className="prestation-card group relative isolate aspect-[4/5] overflow-hidden rounded-[var(--radius-xl)] bg-line text-[#fff8d8] focus-within:ring-4 focus-within:ring-accent">
-      <CardImages images={images} priority={priority} />
+      <CardImages images={images} href={href} priority={priority} />
       <div aria-hidden="true" className="card-blur pointer-events-none absolute inset-0" />
       <div aria-hidden="true" className="card-scrim pointer-events-none absolute inset-0" />
 
@@ -62,12 +64,14 @@ export function PrestationCard({
           {optionsLabel ? (
             <p className="hidden font-light text-[#fff8d8]/70 min-[380px]:block">{optionsLabel}</p>
           ) : null}
-          <Link
+          <ButtonLink
             href={bookHref}
-            className="pointer-events-auto relative z-[3] rounded-full bg-[#ffd84d] px-3.5 py-1.5 text-xs font-black text-[#17150b] transition hover:brightness-110"
+            size="sm"
+            icon={CalendarCheck}
+            className="pointer-events-auto relative z-[3]"
           >
             Réserver
-          </Link>
+          </ButtonLink>
         </div>
       </div>
     </article>

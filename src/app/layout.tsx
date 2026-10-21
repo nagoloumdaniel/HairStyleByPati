@@ -33,7 +33,7 @@ const SITE_URL =
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
     : 'http://localhost:3000');
 const SITE_DESCRIPTION =
-  'Départ et retwist de locs, nattes collées, vanilles. Coiffure à domicile à Dakar pour hommes et femmes : catalogue, diagnostic capillaire et réservation en ligne.';
+  'Départ et retwist de locs, nattes collées, vanilles. Coiffure sur rendez-vous à Dakar pour hommes et femmes : catalogue, diagnostic capillaire et réservation en ligne.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     'départ de locs',
     'nattes collées',
     'vanilles',
-    'coiffure à domicile',
+    'coiffure sur rendez-vous Dakar',
     'cheveux naturels',
     'Hairstyle by Patricia',
   ],

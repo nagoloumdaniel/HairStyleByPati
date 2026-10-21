@@ -1,17 +1,17 @@
-import { ArrowRight, CalendarDays, Clock, Mail, MapPin } from 'lucide-react';
+import { CalendarDays, Clock, LayoutGrid, Mail, MapPin, Sparkles } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 import type { Metadata } from 'next';
 
 import { getApprovedReviews } from '@/modules/avis/queries';
 import { Title } from '@/components/ui/Title';
+import { ButtonLink } from '@/components/ui/Button';
 import { PrestationCard } from '@/components/catalogue/PrestationCard';
 import { bookingHref } from '@/lib/catalogue';
 
 export const metadata: Metadata = {
   title: { absolute: 'Hairstyle by Patricia — Locs, nattes collées et vanilles à Dakar' },
   description:
-    'Départ et retwist de locs, nattes collées, vanilles. Coiffure à domicile à Dakar, diagnostic capillaire et réservation en ligne.',
+    'Départ et retwist de locs, nattes collées, vanilles. Coiffure sur rendez-vous à Dakar, diagnostic capillaire et réservation en ligne.',
   alternates: { canonical: '/' },
   openGraph: {
     title: 'Hairstyle by Patricia — Locs, nattes collées et vanilles à Dakar',
@@ -59,19 +59,17 @@ const steps = [
   {
     number: '1',
     title: 'Choisissez votre coiffure',
-    description: 'Parcourez le catalogue et sélectionnez la prestation adaptée à vos envies.',
+    description: 'Parcourez le catalogue et sélectionnez une prestation.',
   },
   {
     number: '2',
     title: 'Vérifiez la compatibilité',
-    description:
-      'Répondez aux questions capillaires pour valider que la coiffure convient à vos cheveux.',
+    description: 'Répondez à quelques questions sur vos cheveux.',
   },
   {
     number: '3',
     title: 'Réservez votre créneau',
-    description:
-      "Choisissez la date et l'heure qui vous conviennent et confirmez votre rendez-vous.",
+    description: 'Choisissez la date et l’heure, puis confirmez.',
   },
 ];
 
@@ -91,27 +89,19 @@ export default async function HomePage() {
             <Title as="h1" size="display" id="hero-title" className="landing-title title-on-dark">
               Hairstyle by Patricia
             </Title>
-            <p className="reveal max-w-xl text-lg text-panel-fg/85 md:text-xl">
+            <p className="reveal max-w-xl text-lg text-panel-fg md:text-xl">
               Départ et retwist de locs, nattes collées, vanilles.
             </p>
             <div
-              className="reveal flex w-full max-w-md flex-row gap-3 lg:max-w-xl"
+              className="reveal flex w-full max-w-sm flex-row gap-3 lg:max-w-sm"
               style={{ animationDelay: '200ms' }}
             >
-              <Link
-                href="/coiffures"
-                className="bg-gradient-primary inline-flex flex-1 items-center justify-center gap-2 rounded-full px-7 py-4 text-lg font-bold text-accent-fg shadow-soft transition hover:brightness-110 active:scale-[0.98]"
-              >
-                <CalendarDays aria-hidden="true" className="size-5" />
+              <ButtonLink href="/coiffures" icon={CalendarDays} className="flex-1">
                 Réserver
-              </Link>
-              <Link
-                href="/coiffures"
-                className="inline-flex border border-white/20 bg-white/10 backdrop-blur-md flex-1 items-center justify-center gap-2 rounded-full px-7 py-4 text-lg font-bold text-panel-fg transition hover:bg-white/10 active:scale-[0.98]"
-              >
+              </ButtonLink>
+              <ButtonLink href="/coiffures" variant="onDark" icon={LayoutGrid} className="flex-1">
                 Catalogue
-                <ArrowRight aria-hidden="true" className="size-5" />
-              </Link>
+              </ButtonLink>
             </div>
           </div>
 
@@ -137,22 +127,14 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <div className="page-main space-y-20">
+      <div className="page-main space-y-24 md:space-y-32">
         {/* Coiffures populaires */}
-        <section id="coiffures" className="space-y-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div>
-              <Title as="h2" className="">
-                Coiffures populaires
-              </Title>
-              <p className="text-muted">Nos prestations les plus demandées.</p>
-            </div>
-            <Link
-              href="/coiffures"
-              className="inline-flex items-center justify-center gap-2 font-semibold bg-accent text-accent-fg hover:bg-accent-hover shadow-soft px-7 py-3.5 text-lg rounded-[var(--radius-md)] transition active:scale-[0.98]"
-            >
+        <section id="coiffures" className="space-y-10">
+          <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
+            <Title as="h2">Coiffures populaires</Title>
+            <ButtonLink href="/coiffures" variant="secondary" icon={LayoutGrid}>
               Voir toutes les coiffures
-            </Link>
+            </ButtonLink>
           </div>
           <ul
             aria-label="Coiffures populaires"
@@ -175,54 +157,47 @@ export default async function HomePage() {
         </section>
 
         {/* Étapes de réservation */}
-        <section id="etapes" className="space-y-8">
-          <Title as="h2" className="">
-            Comment ça marche
-          </Title>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <section id="etapes" className="space-y-10">
+          <Title as="h2">Comment ça marche</Title>
+          <ol className="grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-12">
             {steps.map((step) => (
-              <div key={step.number} className="text-center">
-                <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent text-accent-fg font-heading font-bold text-xl mb-4">
+              <li key={step.number} className="border-t border-line pt-6">
+                <span
+                  aria-hidden="true"
+                  className="home-step-number text-gradient-primary block font-heading font-black italic"
+                >
                   {step.number}
-                </div>
-                <h3 className="text-xl font-heading font-bold text-fg mb-2">{step.title}</h3>
-                <p className="text-muted leading-relaxed">{step.description}</p>
-              </div>
+                </span>
+                <h3 className="mb-2 mt-4 font-heading text-xl font-bold text-fg">{step.title}</h3>
+                <p className="max-w-sm leading-relaxed text-muted">{step.description}</p>
+              </li>
             ))}
-          </div>
+          </ol>
         </section>
 
         {/* Présentation Patricia */}
-        <section id="patricia" className="reveal mx-auto max-w-3xl space-y-6 text-center">
-          <Title as="h2" className="">
-            À propos de Patricia
-          </Title>
-          <p className="text-muted leading-relaxed">
-            Moi, c&apos;est Patricia. Depuis novembre 2025, je coiffe les cheveux naturels : locs et
-            nattes collées, pour les hommes comme pour les femmes. J&apos;ai tout appris seule, à
-            force de pratique, et j&apos;ai déjà coiffé plus de 40 clients.
+        <section id="patricia" className="mx-auto max-w-3xl space-y-6 text-center">
+          <Title as="h2">À propos de Patricia</Title>
+          <p className="leading-relaxed text-muted">
+            Depuis novembre 2025, Patricia coiffe les cheveux naturels : locs et nattes collées,
+            pour les hommes comme pour les femmes. Autodidacte, elle a déjà coiffé plus de 40
+            clients.
           </p>
-          <p className="text-muted leading-relaxed">
-            Chez moi, on mise sur la rapidité, une belle finition, la bonne humeur et votre confort.
-            Avant de commencer, on regarde ensemble votre nature de cheveux pour choisir la coiffure
-            qui vous va.
-          </p>
-          <p className="font-heading text-xl font-bold text-fg">
-            Si vous êtes content, je le suis aussi.
+          <p className="leading-relaxed text-muted">
+            Avant de commencer, elle regarde avec vous votre nature de cheveux pour choisir la
+            coiffure qui vous va.
           </p>
         </section>
 
         {/* Témoignages (P8.10) : avis réels approuvés uniquement, jamais inventés. */}
         {reviews.length > 0 ? (
-          <section id="temoinages" className="space-y-8">
-            <Title as="h2" className="">
-              Elles nous font confiance
-            </Title>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <section id="temoignages" className="space-y-8">
+            <Title as="h2">Elles nous font confiance</Title>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
               {reviews.map((review) => (
                 <blockquote
                   key={review.id}
-                  className="card p-6 italic text-muted border-none bg-card shadow-soft"
+                  className="rounded-[var(--radius-lg)] bg-card p-6 italic text-muted shadow-soft"
                 >
                   {review.comment ? <p className="text-lg mb-4">« {review.comment} »</p> : null}
                   <footer className="text-sm font-semibold text-fg not-italic">
@@ -236,58 +211,38 @@ export default async function HomePage() {
         ) : null}
 
         {/* Demande personnalisée */}
-        <section className="rounded-2xl border border-line bg-card p-8 text-center shadow-soft md:p-12">
-          <Title as="h2" className="">
-            Une coiffure sur mesure en tête ?
-          </Title>
-          <p className="mx-auto mt-3 max-w-2xl text-ink-soft">
-            Décrivez votre projet et joignez jusqu’à trois photos de référence. Patricia étudie
-            votre demande et vous propose une prestation adaptée, sans réservation automatique.
+        <section className="bg-gradient-soft rounded-2xl border border-line p-8 text-center shadow-soft md:p-14">
+          <Title as="h2">Une coiffure sur mesure en tête ?</Title>
+          <p className="mx-auto mt-4 max-w-2xl leading-relaxed text-ink-soft">
+            Décrivez votre projet et joignez jusqu’à trois photos de référence. Patricia vous
+            propose une prestation adaptée.
           </p>
-          <Link
-            href="/demandes-personnalisees"
-            className="mt-6 inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-7 py-3.5 text-lg font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
-          >
-            Demander une coiffure personnalisée
-          </Link>
+          <ButtonLink href="/demandes-personnalisees" icon={Sparkles} className="mt-8">
+            Demande personnalisée
+          </ButtonLink>
         </section>
 
-        {/* Contact / Coordonnées */}
-        <section id="contact" className="rounded-2xl bg-page p-8 md:p-12 reveal">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            <div className="space-y-6">
-              <Title as="h2" className="">
-                Contactez-nous
-              </Title>
-              <p className="text-muted leading-relaxed">
-                Une question sur une prestation ou sur la disponibilité d&apos;un créneau ?
-                Contactez-nous, nous vous répondrons rapidement.
-              </p>
-              <Link
-                href="/contact"
-                className="inline-flex items-center justify-center gap-2 font-semibold bg-accent text-accent-fg hover:bg-accent-hover shadow-soft px-7 py-3.5 text-lg rounded-[var(--radius-md)] transition active:scale-[0.98]"
-              >
-                Envoyer un message
-              </Link>
-            </div>
-            <div className="space-y-4">
-              <p className="flex items-start gap-3 text-fg">
-                <MapPin aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-accent" />
-                <span>
-                  Hairstyle by Patricia
-                  <br />
-                  Ouest - Foire, Dakar, Sénégal
-                </span>
-              </p>
-              <p className="flex items-start gap-3 text-fg">
-                <Mail aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-accent" />
-                <span>zepatricia7@gmail.com</span>
-              </p>
-              <p className="flex items-start gap-3 text-fg">
-                <Clock aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-accent" />
-                <span>Lundi – Dimanche : 5h – 22h</span>
-              </p>
-            </div>
+        {/* Coordonnées */}
+        <section id="contact" className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-12">
+          <div className="space-y-6">
+            <Title as="h2">Contact</Title>
+            <ButtonLink href="/contact" icon={Mail}>
+              Envoyer un message
+            </ButtonLink>
+          </div>
+          <div className="space-y-4">
+            <p className="flex items-start gap-3 text-fg">
+              <MapPin aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-accent" />
+              <span>Ouest - Foire, Dakar, Sénégal</span>
+            </p>
+            <p className="flex items-start gap-3 text-fg">
+              <Mail aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-accent" />
+              <span>zepatricia7@gmail.com</span>
+            </p>
+            <p className="flex items-start gap-3 text-fg">
+              <Clock aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-accent" />
+              <span>Lundi – Dimanche : 5h – 22h</span>
+            </p>
           </div>
         </section>
       </div>
