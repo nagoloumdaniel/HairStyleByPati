@@ -20,7 +20,7 @@ async function login(page: Page): Promise<void> {
   await page.goto('/connexion?callbackUrl=/dashboard');
   await page.getByLabel('E-mail').fill(ADMIN_EMAIL || readEnv('AUTH_ADMIN_EMAIL') || '');
   await page
-    .getByLabel('Mot de passe')
+    .locator('input[name="password"]')
     .fill(ADMIN_PASSWORD || readEnv('AUTH_ADMIN_PASSWORD') || '');
   await page.getByRole('button', { name: 'Se connecter' }).click();
   await page.waitForURL((url) => url.pathname.startsWith('/dashboard'));

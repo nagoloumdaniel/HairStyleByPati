@@ -8,7 +8,6 @@
 import { randomBytes } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { test, expect, type Page } from '@playwright/test';
-import { selectOption } from './helpers/fields';
 
 const stamp = Date.now().toString(36);
 const prefix = `zz-e2e-notif-${stamp}`;
@@ -49,7 +48,7 @@ let failedNotificationId = '';
 async function login(page: Page, callbackUrl = '/dashboard/messages'): Promise<void> {
   await page.goto(`/connexion?callbackUrl=${encodeURIComponent(callbackUrl)}`);
   await page.getByLabel('E-mail').fill(ADMIN_EMAIL);
-  await page.getByLabel('Mot de passe').fill(ADMIN_PASSWORD);
+  await page.locator('input[name="password"]').fill(ADMIN_PASSWORD);
   await page.getByRole('button', { name: 'Se connecter' }).click();
   await page.waitForURL((url) => url.pathname.startsWith('/dashboard'));
 }
@@ -169,8 +168,8 @@ test.describe('Notifications et messagerie', () => {
   }) => {
     test.setTimeout(120_000);
     await page.goto('/contact');
-    await page.getByLabel('Nom', { exact: true }).fill('Cliente Notification E2E');
-    await page.getByLabel('E-mail', { exact: true }).fill(customerEmail);
+    await page.locator('input[name="name"]').fill('Cliente Notification E2E');
+    await page.locator('input[name="email"]').fill(customerEmail);
     await page.getByLabel('Téléphone (facultatif)').fill('06 10 20 30 40');
     await page.getByLabel('Sujet').fill(subject);
     await page
@@ -197,7 +196,12 @@ test.describe('Notifications et messagerie', () => {
     expect(queued).toHaveLength(3);
     expect(queued.filter((row: { channel: string }) => row.channel === 'EMAIL')).toHaveLength(2);
     expect(queued.some((row: { channel: string }) => row.channel === 'IN_APP')).toBe(true);
-    expect(queued.every((row: { status: string }) => row.status === 'PENDING')).toBe(true);
+    // L'envoi immédiat (flushEmailsSoon) peut déjà avoir traité les e-mails : PENDING, PROCESSING ou SENT.
+    expect(
+      queued.every((row: { status: string }) =>
+        ['PENDING', 'PROCESSING', 'SENT'].includes(row.status),
+      ),
+    ).toBe(true);
 
     const unauthorized = await request.post('/api/cron/notifications');
     expect(unauthorized.status()).toBe(401);
@@ -206,8 +210,19 @@ test.describe('Notifications et messagerie', () => {
       headers: { Authorization: `Bearer ${CRON_SECRET}` },
     });
     expect(cron.ok()).toBe(true);
-    const summary = (await cron.json()) as { sent: number };
-    expect(summary.sent).toBeGreaterThanOrEqual(2);
+    await expect
+      .poll(
+        async () =>
+          db.notification.count({
+            where: {
+              idempotencyKey: { contains: conversationId },
+              channel: 'EMAIL',
+              status: 'SENT',
+            },
+          }),
+        { timeout: 20_000 },
+      )
+      .toBeGreaterThanOrEqual(2);
 
     const sent = await db.notification.findMany({
       where: { idempotencyKey: { contains: conversationId } },
@@ -230,15 +245,20 @@ test.describe('Notifications et messagerie', () => {
     await expect(page.getByRole('heading', { name: 'Messages' })).toBeVisible();
     await expect(page.getByText(subject)).toBeVisible();
     await page.getByText(subject).click();
-    await expect(page.getByRole('heading', { name: subject })).toBeVisible();
+    await expect(page.getByRole('heading', { name: subject })).toBeVisible({ timeout: 30_000 });
     await expect(page.getByText(/renseignements sur les tresses/)).toBeVisible();
 
     const notificationsBefore = await db.notification.count({
       where: { idempotencyKey: { contains: conversationId } },
     });
-    await page.getByLabel('Note privée').fill('Cliente à rappeler avant le rendez-vous.');
-    await page.getByRole('button', { name: 'Ajouter la note interne' }).click();
-    await expect(page.getByText('Note interne enregistrée')).toBeVisible();
+    await page.getByRole('button', { name: 'Note interne', exact: true }).click();
+    await page.getByLabel('Votre note interne').fill('Cliente à rappeler avant le rendez-vous.');
+    await page.getByRole('button', { name: 'Ajouter la note', exact: true }).click();
+    await expect
+      .poll(async () => db.message.count({ where: { conversationId, isInternal: true } }), {
+        timeout: 20_000,
+      })
+      .toBe(1);
     const internal = await db.message.findFirst({
       where: { conversationId, isInternal: true },
     });
@@ -247,11 +267,18 @@ test.describe('Notifications et messagerie', () => {
       await db.notification.count({ where: { idempotencyKey: { contains: conversationId } } }),
     ).toBe(notificationsBefore);
 
+    await page.getByRole('button', { name: 'Répondre', exact: true }).click();
     await page
-      .getByLabel('Votre réponse')
+      .getByLabel('Votre réponse à la cliente')
       .fill('Bonjour, merci pour votre message. Nous vous répondons avec plaisir.');
-    await page.getByRole('button', { name: 'Envoyer la réponse' }).click();
-    await expect(page.getByText(/Réponse enregistrée/)).toBeVisible();
+    await page.getByRole('button', { name: 'Envoyer', exact: true }).click();
+    await expect
+      .poll(
+        async () =>
+          db.message.count({ where: { conversationId, author: 'ADMIN', isInternal: false } }),
+        { timeout: 20_000 },
+      )
+      .toBe(1);
     const adminMessage = await db.message.findFirst({
       where: { conversationId, author: 'ADMIN', isInternal: false },
     });
@@ -261,8 +288,11 @@ test.describe('Notifications et messagerie', () => {
     });
     expect(replyNotification).not.toBeNull();
 
-    await selectOption(page, 'Statut', 'TREATED');
-    await page.getByRole('button', { name: 'Appliquer' }).click();
+    await page.getByTitle(/^Statut :/).click();
+    await page
+      .getByRole('dialog', { name: 'Statut de la conversation' })
+      .getByRole('button', { name: /^Traité/ })
+      .click();
     await expect
       .poll(
         async () => {
@@ -274,7 +304,7 @@ test.describe('Notifications et messagerie', () => {
       .toBe('TREATED');
 
     await page.reload();
-    await expect(page.getByLabel('Statut')).toHaveValue('TREATED');
+    await expect(page.getByTitle('Statut : Traité')).toBeVisible();
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.waitForTimeout(300);
     await page.screenshot({

@@ -59,7 +59,7 @@ function localDateISO(date: Date): string {
 
 function testDateISO(): string {
   const date = new Date();
-  date.setDate(date.getDate() + 3);
+  date.setDate(date.getDate() + Number(process.env.E2E_DAY_OFFSET ?? 3));
   return localDateISO(date);
 }
 
@@ -136,7 +136,7 @@ async function cleanup(): Promise<void> {
 async function login(page: Page, callbackUrl = '/dashboard/calendrier'): Promise<void> {
   await page.goto(`/connexion?callbackUrl=${encodeURIComponent(callbackUrl)}`);
   await page.getByLabel('E-mail').fill(ADMIN_EMAIL);
-  await page.getByLabel('Mot de passe').fill(ADMIN_PASSWORD);
+  await page.locator('input[name="password"]').fill(ADMIN_PASSWORD);
   await page.getByRole('button', { name: 'Se connecter' }).click();
   await page.waitForURL((url) => url.pathname.startsWith('/dashboard'));
 }
@@ -416,35 +416,42 @@ test.describe('Réservations, annulations et calendrier', () => {
     });
 
     await page.goto('/dashboard/reservations/' + adminAppointmentId);
-    await expect(page.getByRole('heading', { name: /Rendez-vous AP-/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Réservation AP-/ })).toBeVisible();
 
-    const dateInput = page.getByLabel('Nouvelle date');
-    await dateInput.fill(dateISO);
-    const slot = page.getByRole('button', { name: '13:00', exact: true });
+    await page.getByRole('button', { name: 'Reprogrammer', exact: true }).click();
+    const rescheduleDialog = page.getByRole('dialog', { name: 'Reprogrammer le rendez-vous' });
+    await pickDate(page, 'Nouvelle date', dateISO);
+    const slot = rescheduleDialog.getByRole('button', { name: '10:00', exact: true });
     await expect(slot).toBeVisible({ timeout: 20_000 });
     await slot.click();
-    await page.getByRole('button', { name: 'Valider la reprogrammation' }).click();
-    await expect(page.getByText(/Rendez-vous reprogrammé/)).toBeVisible();
+    await rescheduleDialog.getByRole('button', { name: 'Valider', exact: true }).click();
+    await expect(page.getByText(/Rendez-vous reprogrammé/).first()).toBeVisible();
 
     const rescheduled = await db.appointment.findUnique({
       where: { id: adminAppointmentId },
     });
     expect(rescheduled?.status).toBe('RESCHEDULED');
     expect(rescheduled?.rescheduledFrom).not.toBeNull();
-    expect(localMinute(rescheduled!.startsAt.toISOString())).toBe(13 * 60);
+    expect(localMinute(rescheduled!.startsAt.toISOString())).toBe(10 * 60);
 
     // L'ancien créneau est libéré dans la même transaction.
-    const activeOnOldSlot = await db.appointment.count({
+    const activeOnOldSlot = await db.appointment.findMany({
       where: {
         serviceId,
         status: { in: ['PENDING', 'CONFIRMED', 'RESCHEDULED'] },
         startsAt: rescheduled!.rescheduledFrom!,
       },
+      select: { id: true, status: true, customerId: true },
     });
-    expect(activeOnOldSlot).toBe(0);
+    expect(
+      activeOnOldSlot,
+      `ancien créneau encore occupé : ${JSON.stringify(activeOnOldSlot)} (rendez-vous reprogrammé : ${adminAppointmentId})`,
+    ).toEqual([]);
 
-    await page.getByLabel(/Motif communiqué à la cliente/).fill('Indisponibilité du salon');
-    await page.getByRole('button', { name: 'Annuler le rendez-vous' }).click();
+    await page.getByRole('button', { name: 'Annuler', exact: true }).click();
+    const cancelDialog = page.getByRole('dialog', { name: 'Annuler le rendez-vous' });
+    await cancelDialog.getByLabel(/Motif communiqué à la cliente/).fill('Indisponibilité du salon');
+    await cancelDialog.getByRole('button', { name: 'Annuler le rendez-vous' }).click();
     await expect
       .poll(
         async () => {
@@ -467,7 +474,8 @@ test.describe('Réservations, annulations et calendrier', () => {
     await login(page, '/dashboard/reservations');
     await page.goto(`/dashboard/reservations/${pendingAppointmentId}`);
     await expect(page.getByText('En attente de confirmation').first()).toBeVisible();
-    await page.getByRole('button', { name: 'Confirmer le rendez-vous' }).click();
+    await page.getByRole('button', { name: 'Confirmer', exact: true }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Confirmer', exact: true }).click();
     await expect
       .poll(
         async () => {

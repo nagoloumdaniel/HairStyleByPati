@@ -33,9 +33,14 @@ const envPassword =
 async function login(page: Page, callbackUrl = '/dashboard/calendrier'): Promise<void> {
   await page.goto(`/connexion?callbackUrl=${encodeURIComponent(callbackUrl)}`);
   await page.getByLabel('E-mail').fill(envEmail);
-  await page.getByLabel('Mot de passe').fill(envPassword);
+  await page.locator('input[name="password"]').fill(envPassword);
   await page.getByRole('button', { name: 'Se connecter' }).click();
   await page.waitForURL((url) => url.pathname.startsWith('/dashboard'));
+}
+
+async function dashboardIsLight(page: Page): Promise<void> {
+  // Pas de bascule de thème dans le dashboard : seul l'attribut est vérifié.
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
 }
 
 async function themeIs(page: Page, theme: 'light' | 'dark'): Promise<void> {
@@ -153,22 +158,23 @@ test.describe('Thème clair et sombre', () => {
     await page.locator(TOGGLE).click();
     await themeIs(page, 'dark');
 
+    // Design : dashboard toujours en thème clair (DashboardThemeLock, DESIGN-RULES.md).
     await login(page);
-    await themeIs(page, 'dark');
+    await dashboardIsLight(page);
     await expect(page.getByRole('heading', { name: 'Calendrier' })).toBeVisible();
     await expect(page.getByText('Chargement du calendrier…')).toBeHidden({ timeout: 20_000 });
 
     await page.goto('/dashboard/reservations');
-    await themeIs(page, 'dark');
+    await dashboardIsLight(page);
     await assertNoOverflow(page, 'réservations en sombre');
 
     await page.goto('/dashboard/disponibilites');
-    await themeIs(page, 'dark');
+    await dashboardIsLight(page);
     await expect(page.getByRole('heading', { name: 'Disponibilités', exact: true })).toBeVisible();
     await assertNoOverflow(page, 'disponibilités en sombre');
 
     await page.goto('/dashboard/calendrier');
-    await themeIs(page, 'dark');
+    await dashboardIsLight(page);
     await expect(page.getByText('Chargement du calendrier…')).toBeHidden({ timeout: 20_000 });
     await page.waitForTimeout(800);
     await page.screenshot({
@@ -216,7 +222,7 @@ test.describe('Thème clair et sombre', () => {
     await assertNoOverflow(page, 'réservation mobile en sombre');
 
     await login(page);
-    await themeIs(page, 'dark');
+    await dashboardIsLight(page);
     await assertNoOverflow(page, 'dashboard mobile en sombre');
 
     expect(errors, errors.join('\n')).toEqual([]);

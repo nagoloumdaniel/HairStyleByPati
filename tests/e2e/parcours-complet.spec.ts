@@ -57,7 +57,7 @@ const dateISO = futureDateISO();
 async function login(page: Page): Promise<void> {
   await page.goto('/connexion?callbackUrl=/dashboard');
   await page.getByLabel('E-mail').fill(ADMIN_EMAIL);
-  await page.getByLabel('Mot de passe').fill(ADMIN_PASSWORD);
+  await page.locator('input[name="password"]').fill(ADMIN_PASSWORD);
   await page.getByRole('button', { name: 'Se connecter' }).click();
   await page.waitForURL((url) => url.pathname.startsWith('/dashboard'));
 }
@@ -172,7 +172,7 @@ test.describe('Parcours complet', () => {
     await page.goto(`/coiffures/${serviceSlug}`);
     await expect(page.getByRole('heading', { level: 1, name: serviceName })).toBeVisible();
 
-    await page.getByRole('link', { name: /Vérifier ma compatibilité capillaire/ }).click();
+    await page.getByRole('link', { name: /Vérifier ma compatibilité/ }).click();
     await expect(
       page.getByRole('heading', { name: 'Votre coiffure est-elle compatible ?' }),
     ).toBeVisible();
@@ -247,9 +247,10 @@ test.describe('Parcours complet', () => {
     await page.goto(`/dashboard/evaluations/${assessmentId}`);
     await selectOption(page, 'Décision', { label: 'Accepter la compatibilité' });
     await page
-      .getByLabel(/^Message transmis à la cliente/)
+      .getByLabel(/^Message pour la cliente/)
       .fill('Votre coiffure est compatible, vous pouvez réserver un créneau.');
     await page.getByRole('button', { name: 'Enregistrer la décision' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Accepter', exact: true }).click();
     await expect
       .poll(
         async () => {
@@ -278,7 +279,8 @@ test.describe('Parcours complet', () => {
       },
     });
     await page.goto(`/dashboard/reservations/${appointment.id}`);
-    await page.getByRole('button', { name: 'Confirmer le rendez-vous' }).click();
+    await page.getByRole('button', { name: 'Confirmer', exact: true }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Confirmer', exact: true }).click();
     await expect
       .poll(
         async () => {

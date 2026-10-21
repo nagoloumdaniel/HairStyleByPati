@@ -1,6 +1,6 @@
 # Hairstyle by Patricia
 
-**Coiffure à domicile à Dakar (Sénégal)** : départ et retwist de locs, nattes collées, vanilles, pour hommes et femmes. Site vitrine et catalogue de prestations, diagnostic de compatibilité capillaire, réservation en ligne (paiement sur place), messagerie et back-office d'administration.
+**Coiffure sur rendez-vous à Dakar (Sénégal)** : départ et retwist de locs, nattes collées, vanilles, pour hommes et femmes. Site vitrine et catalogue de prestations, diagnostic de compatibilité capillaire, réservation en ligne (paiement sur place), messagerie et back-office d'administration.
 
 🌐 **Site** : <https://hairstylebypati.vercel.app>
 
@@ -33,9 +33,11 @@ Tests : `npm test` (Vitest) · `npx playwright test` (E2E).
 
 ## Statut
 
-Phases 0 à 11 terminées (tests, recette, revue sécurité, performance, accessibilité, SEO). En cours : phase **12, lancement et maintenance** (voir [ROADMAP.md](ROADMAP.md)). Direction visuelle et consignes design : [DESIGN-RULES.md](DESIGN-RULES.md).
+Phases 0 à 12 livrées (tests, recette, revue sécurité, performance, accessibilité, SEO). Dernière évolution : refonte UI premium (accueil, catalogue, fiche coiffure, contact, demandes personnalisées, dashboard). Voir [CHANGELOG.md](CHANGELOG.md), [ROADMAP.md](ROADMAP.md) et les consignes design [DESIGN-RULES.md](DESIGN-RULES.md).
 
 Avec `EMAIL_MODE="console"` dans `.env.local`, aucun e-mail réel n'est envoyé : les envois sont simulés et tracés. Les routes cron sont protégées par `CRON_SECRET` et définies dans `vercel.json`.
+
+> Attention : en local, `.env.local` peut pointer vers la même base Neon que la production. Utiliser une branche Neon dédiée pour développer.
 
 ## Stack (figée — voir [docs/stack.md](docs/stack.md))
 
@@ -107,6 +109,10 @@ npm run dev     # 3. relancer
 
 Règle : lancer `npm run ci` / `npm run build` / `git push` serveur de
 développement arrêté.
+
+## Licence
+
+Code propriétaire, tous droits réservés (voir [LICENSE](LICENSE)). Signalement de vulnérabilité : [SECURITY.md](SECURITY.md).
 
 ## Règles du projet
 

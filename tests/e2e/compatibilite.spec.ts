@@ -126,7 +126,7 @@ async function cleanup(): Promise<void> {
 async function login(page: Page): Promise<void> {
   await page.goto('/connexion?callbackUrl=/dashboard/evaluations');
   await page.getByLabel('E-mail').fill(ADMIN_EMAIL);
-  await page.getByLabel('Mot de passe').fill(ADMIN_PASSWORD);
+  await page.locator('input[name="password"]').fill(ADMIN_PASSWORD);
   await page.getByRole('button', { name: 'Se connecter' }).click();
   await page.waitForURL((url) => url.pathname.startsWith('/dashboard'));
   await expect(page.getByRole('heading', { name: 'Évaluations capillaires' })).toBeVisible();
@@ -318,10 +318,11 @@ test.describe('Compatibilité capillaire', () => {
 
     await selectOption(page, 'Décision', { label: 'Accepter la compatibilité' });
     await page
-      .getByLabel(/^Message transmis à la cliente/)
+      .getByLabel(/^Message pour la cliente/)
       .fill('Vos cheveux sont compatibles, vous pouvez réserver un créneau.');
     await page.getByLabel(/^Note interne/).fill('Vérifié sur photo E2E.');
     await page.getByRole('button', { name: 'Enregistrer la décision' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Accepter', exact: true }).click();
 
     await expect(page.getByText('Acceptée', { exact: true })).toBeVisible();
 

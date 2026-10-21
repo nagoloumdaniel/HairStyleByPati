@@ -57,7 +57,7 @@ function desiredDateISO(): string {
 async function login(page: Page, callbackUrl = '/dashboard'): Promise<void> {
   await page.goto(`/connexion?callbackUrl=${encodeURIComponent(callbackUrl)}`);
   await page.getByLabel('E-mail').fill(ADMIN_EMAIL);
-  await page.getByLabel('Mot de passe').fill(ADMIN_PASSWORD);
+  await page.locator('input[name="password"]').fill(ADMIN_PASSWORD);
   await page.getByRole('button', { name: 'Se connecter' }).click();
   await page.waitForURL((url) => url.pathname.startsWith('/dashboard'));
 }
@@ -239,10 +239,17 @@ test.describe('Demandes personnalisées, clientes et pilotage', () => {
       headers: { Authorization: `Bearer ${CRON_SECRET}` },
     });
     expect(cron.ok()).toBe(true);
-    const ack = await db.notification.findFirst({
-      where: { templateKey: 'custom_request_received', recipient: requesterEmail },
-    });
-    expect(ack?.status).toBe('SENT');
+    await expect
+      .poll(
+        async () =>
+          (
+            await db.notification.findFirst({
+              where: { templateKey: 'custom_request_received', recipient: requesterEmail },
+            })
+          )?.status,
+        { timeout: 20_000 },
+      )
+      .toBe('SENT');
   });
 
   test('should decide, quote and record the custom request without creating an appointment', async ({
@@ -259,12 +266,13 @@ test.describe('Demandes personnalisées, clientes et pilotage', () => {
 
     await selectOption(page, 'Décision', 'ACCEPTED');
     await page.getByLabel('Prix estimatif (FCFA, facultatif)').fill('150');
-    await selectOption(page, 'Prestation existante à proposer (facultatif)', serviceId);
+    await selectOption(page, 'Prestation du catalogue à proposer (facultatif)', serviceId);
     await pickDateTime(page, 'proposedSlotLocal', `${desiredDateISO()}T10:00`);
     await page
-      .getByLabel('Message transmis à la cliente')
+      .getByLabel(/^Message à la cliente/)
       .fill('Votre projet est réalisable. Voici un créneau et un prix estimatif.');
     await page.getByRole('button', { name: 'Enregistrer la décision' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Accepter', exact: true }).click();
 
     await expect
       .poll(
@@ -332,14 +340,14 @@ test.describe('Demandes personnalisées, clientes et pilotage', () => {
     test.skip(ADMIN_EMAIL === '' || ADMIN_PASSWORD === '', 'Identifiants admin absents.');
     await login(page, '/dashboard/parametres');
     await page.goto('/dashboard/parametres');
-    await page.getByLabel('Nom de l’entreprise').fill(`Salon E2E ${stamp}`);
+    await page.getByLabel('Nom professionnel').fill(`Salon E2E ${stamp}`);
     await page.getByLabel('E-mail public').fill(`${prefix}-salon@example.com`);
-    await page.getByLabel('Adresse').fill('12 rue de Test, Dakar');
-    await page.getByLabel('Règles d’annulation affichées').fill('Annulation au moins 24 h avant.');
-    await page.getByLabel('Règles de réservation affichées').fill('Paiement sur place.');
+    await page.getByLabel('Adresse ou quartier').fill('12 rue de Test, Dakar');
+    await page.getByLabel('Règles d’annulation').fill('Annulation au moins 24 h avant.');
+    await page.getByLabel('Règles de réservation').fill('Paiement sur place.');
     await page.getByLabel('Signature des e-mails').fill('À bientôt, Patricia');
-    await page.getByRole('button', { name: 'Enregistrer l’identité' }).click();
-    await expect(page.getByText('Identité et paramètres enregistrés.')).toBeVisible();
+    await page.getByRole('button', { name: 'Enregistrer', exact: true }).click();
+    await expect(page.getByText('Paramètres enregistrés.').first()).toBeVisible();
 
     const settings = await db.salonSettings.findUnique({ where: { id: 1 } });
     expect(settings.name).toBe(`Salon E2E ${stamp}`);
@@ -362,7 +370,7 @@ test.describe('Demandes personnalisées, clientes et pilotage', () => {
 
     await page.goto('/dashboard/statistiques');
     await expect(page.getByRole('heading', { name: 'Statistiques' })).toBeVisible();
-    await expect(page.getByText(/somme des prix figés/)).toBeVisible();
+    await expect(page.getByText(/prix figés/)).toBeVisible();
     await expect(page.getByText(/50[\s  ]*F[\s  ]*CFA/).first()).toBeVisible();
     await page.screenshot({
       path: 'tests/e2e/screenshots/statistiques-desktop.png',
