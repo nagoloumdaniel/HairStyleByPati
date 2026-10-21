@@ -86,8 +86,12 @@ export async function anonymizeCustomerAction(
     revalidatePath('/dashboard/clients');
     revalidatePath(`/dashboard/clients/${input.customerId}`);
     revalidatePath('/dashboard', 'layout');
+    const failedNote =
+      result.photosFailed.length > 0
+        ? ` Attention : ${result.photosFailed.length} photo(s) n’ont pas pu être supprimées du stockage (consignées dans l’historique).`
+        : '';
     return {
-      success: `Fiche anonymisée : ${result.conversationsDeleted} conversation(s), ${result.assessmentsDeleted} évaluation(s), ${result.customRequestsDeleted} demande(s) et ${result.photosDeleted} photo(s) supprimées.`,
+      success: `Fiche anonymisée : ${result.conversationsDeleted} conversation(s), ${result.assessmentsDeleted} évaluation(s), ${result.customRequestsDeleted} demande(s) et ${result.photosDeleted} photo(s) supprimées.${failedNote}`,
     };
   } catch (error) {
     return handleError(error);

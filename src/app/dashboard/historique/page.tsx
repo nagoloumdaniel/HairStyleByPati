@@ -7,9 +7,9 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { Badge } from '@/components/ui/Badge';
 import { ButtonLink } from '@/components/ui/Button';
-import { FilterChips } from '../_inbox/FilterChips';
-import { Pagination } from '../_inbox/Pagination';
-import { RowCard, rowLinkClass } from '../_inbox/RowCard';
+import { FilterChips } from '@/components/ui/FilterChips';
+import { Pagination } from '@/components/ui/Pagination';
+import { RowCard, rowLinkClass } from '@/components/ui/RowCard';
 import { actionLabel, entityHref, entityLabel } from './labels';
 import { HISTORY_GROUPS, HISTORY_GROUP_KEYS, listHistory, type HistoryGroup } from './queries';
 
@@ -84,6 +84,7 @@ export default async function HistoriquePage({
 
       {result.items.length === 0 ? (
         <EmptyState
+          variant="compact"
           title="Aucune action enregistrée"
           message={
             group || entityId

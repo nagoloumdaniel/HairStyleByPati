@@ -273,7 +273,9 @@ function SpecificRow({ rule }: { rule: SpecificRuleView }) {
       <p className="min-w-0 text-sm">
         <span className="font-semibold">{label}</span>
         <span className="block text-muted">
-          {timeValue(rule.startMinute)} – {timeValue(rule.endMinute)}
+          {rule.startMinute === rule.endMinute
+            ? 'Fermé'
+            : `${timeValue(rule.startMinute)} – ${timeValue(rule.endMinute)}`}
         </span>
       </p>
       <Button

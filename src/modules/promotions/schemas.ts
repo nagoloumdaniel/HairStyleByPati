@@ -10,9 +10,24 @@ const isoDay = (required: string) =>
       message: 'Date invalide.',
     });
 
+/** Code promo facultatif : MAJUSCULES, 3 à 20 caractères [A-Z0-9-]. Vide = promotion automatique. */
+export const promoCodeSchema = z.preprocess(
+  (value) => (typeof value === 'string' ? value.trim().toUpperCase() : ''),
+  z.union([
+    z.literal('').transform(() => null),
+    z
+      .string()
+      .regex(
+        /^[A-Z0-9-]{3,20}$/,
+        'Le code doit faire 3 à 20 caractères : lettres, chiffres ou tirets.',
+      ),
+  ]),
+);
+
 export const promotionSchema = z
   .object({
     name: z.string().trim().min(2, 'Nom requis (2 caractères minimum).').max(120),
+    code: promoCodeSchema,
     kind: z.enum(['PERCENT', 'FIXED']),
     // Pourcentage entier 1-100, ou montant fixe en FCFA entier (converti en 1/100 FCFA).
     value: z

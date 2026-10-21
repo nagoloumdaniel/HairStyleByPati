@@ -2,12 +2,13 @@
 
 import type { AssessmentStatus, Prisma } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
-import { headers } from 'next/headers';
 import type { z } from 'zod';
 import { requireAdmin } from '@/modules/auth/guards';
 import { db } from '@/lib/db';
 import { AppError } from '@/lib/errors';
+import { getClientIp } from '@/lib/client-ip';
 import { rateLimit } from '@/lib/rate-limit';
+import { flushEmailsSoon } from '@/modules/notifications/flush';
 import { logAudit } from '@/modules/stats/audit';
 import { deletePrivateImages, storePrivateImages } from '@/modules/fichiers/private-images';
 import {
@@ -16,6 +17,7 @@ import {
   type CompatibilityVerdict,
 } from './engine';
 import { buildPublicQuestions, isQuestionVisible, normalizeAnswers } from './questions';
+import { buildAssessmentDecisionNotification } from './decision-notification';
 import { getCompatibilityServiceBySlug, mapCompatibilityRule } from './queries';
 import { suggestCompatibleServices } from './suggestions';
 import {
@@ -32,13 +34,6 @@ import {
  * - decideAssessment : décision de Patricia, elle ne crée JAMAIS
  *   d'Appointment (règle d'or P5.7).
  * ============================================================ */
-
-async function clientIp(): Promise<string> {
-  const list = await headers();
-  const forwarded = list.get('x-forwarded-for');
-  if (forwarded) return (forwarded.split(',')[0] ?? '').trim() || 'unknown';
-  return list.get('x-real-ip') ?? 'unknown';
-}
 
 function parseAnswersJson(raw: unknown): Record<string, unknown> | null {
   if (typeof raw !== 'string' || raw.trim() === '') return null;
@@ -85,8 +80,8 @@ export async function previewCompatibility(
   _prev: CompatibilityPreviewState,
   formData: FormData,
 ): Promise<CompatibilityPreviewState> {
-  const ip = await clientIp();
-  const limit = rateLimit(`compat:preview:${ip}`, { max: 40, windowMs: 60_000 });
+  const ip = await getClientIp();
+  const limit = await rateLimit(`compat:preview:${ip}`, { max: 40, windowMs: 60_000 });
   if (!limit.allowed) {
     return { error: 'Trop de demandes. Réessayez dans une minute.' };
   }
@@ -181,8 +176,8 @@ export async function submitAssessment(
   _prev: CompatibilitySubmitState,
   formData: FormData,
 ): Promise<CompatibilitySubmitState> {
-  const ip = await clientIp();
-  const limit = rateLimit(`compat:submit:${ip}`, { max: 6, windowMs: 10 * 60_000 });
+  const ip = await getClientIp();
+  const limit = await rateLimit(`compat:submit:${ip}`, { max: 6, windowMs: 10 * 60_000 });
   if (!limit.allowed) {
     return { error: 'Trop de demandes envoyées. Réessayez dans quelques minutes.' };
   }
@@ -353,7 +348,14 @@ export async function decideAssessment(
 
   const assessment = await db.hairAssessment.findUnique({
     where: { id: parsed.data.assessmentId },
-    select: { id: true, status: true, serviceId: true },
+    select: {
+      id: true,
+      status: true,
+      serviceId: true,
+      service: { select: { name: true } },
+      customer: { select: { name: true, email: true } },
+      customRequest: { select: { requesterName: true, requesterEmail: true } },
+    },
   });
   if (!assessment) return { error: 'Évaluation introuvable.' };
 
@@ -366,16 +368,34 @@ export async function decideAssessment(
 
   const status = DECISION_TARGET_STATUS[parsed.data.decision];
 
+  const decidedAt = new Date();
+  // La cliente est prévenue par e-mail (file d'envoi, jamais bloquant). Sans e-mail
+  // exploitable, on journalise et la décision reste enregistrée.
+  const notification = buildAssessmentDecisionNotification({
+    assessmentId: assessment.id,
+    decision: parsed.data.decision,
+    serviceName: assessment.service.name,
+    customerName: assessment.customer?.name ?? assessment.customRequest?.requesterName ?? 'Madame',
+    customerEmail: assessment.customer?.email ?? assessment.customRequest?.requesterEmail,
+    message: parsed.data.decisionMessage,
+    decidedAt,
+  });
+
   try {
-    await db.hairAssessment.update({
-      where: { id: assessment.id },
-      data: {
-        status,
-        decisionMessage: parsed.data.decisionMessage,
-        decisionNote: parsed.data.decisionNote || null,
-        decidedById: user.id,
-        decidedAt: new Date(),
-      },
+    await db.$transaction(async (tx) => {
+      await tx.hairAssessment.update({
+        where: { id: assessment.id },
+        data: {
+          status,
+          decisionMessage: parsed.data.decisionMessage,
+          decisionNote: parsed.data.decisionNote || null,
+          decidedById: user.id,
+          decidedAt,
+        },
+      });
+      if (notification) {
+        await tx.notification.createMany({ data: [notification], skipDuplicates: true });
+      }
     });
   } catch (error) {
     console.error(error);
@@ -394,14 +414,23 @@ export async function decideAssessment(
     },
   });
 
+  if (notification) {
+    flushEmailsSoon();
+  } else {
+    console.warn(`[evaluation] ${assessment.id} : aucun e-mail cliente, décision non notifiée.`);
+  }
+
   revalidatePath('/dashboard/evaluations');
   revalidatePath(`/dashboard/evaluations/${assessment.id}`);
   revalidatePath('/dashboard');
 
+  const notified = notification
+    ? ' La cliente est prévenue par e-mail.'
+    : ' Aucun e-mail connu : la cliente n’a pas été prévenue.';
   return {
     success:
-      parsed.data.decision === 'ALLOW_CONDITIONAL'
+      (parsed.data.decision === 'ALLOW_CONDITIONAL'
         ? 'Compatibilité acceptée sous conditions. Aucune réservation n’a été créée.'
-        : 'Décision enregistrée. Aucune réservation n’a été créée.',
+        : 'Décision enregistrée. Aucune réservation n’a été créée.') + notified,
   };
 }

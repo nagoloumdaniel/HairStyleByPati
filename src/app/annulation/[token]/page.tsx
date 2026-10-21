@@ -10,6 +10,7 @@ import {
   isActiveAppointmentStatus,
 } from '@/modules/reservations/status';
 import { getSalonSettings } from '@/modules/disponibilites/queries';
+import { resolveCancellationPolicy, splitParagraphs } from '@/modules/parametres/policies';
 import { LocalDateTime } from '@/components/shared/LocalDateTime';
 import { Badge } from '@/components/ui/Badge';
 import { CancelForm } from './cancel-form';
@@ -54,6 +55,9 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
   const now = new Date();
   const tokenValid = isCancellationTokenValid(appointment.cancelTokenExpiresAt, now);
   const active = isActiveAppointmentStatus(appointment.status);
+  const policyParagraphs = splitParagraphs(
+    resolveCancellationPolicy(settings.cancellationPolicy, settings.minCancelNoticeHours),
+  );
   const policy = evaluateCancellationPolicy({
     startsAt: appointment.startsAt,
     now,
@@ -122,6 +126,17 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
             <dd className="text-muted">Sur place</dd>
           </div>
         </dl>
+      </section>
+
+      <section className="rounded-[var(--radius-lg)] border border-line bg-page p-6">
+        <Title as="h2" className="">
+          Conditions d’annulation
+        </Title>
+        <div className="mt-3 space-y-2 text-sm leading-relaxed text-muted">
+          {policyParagraphs.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
+        </div>
       </section>
 
       {!tokenValid ? (

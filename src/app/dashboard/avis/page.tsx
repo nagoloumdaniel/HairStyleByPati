@@ -10,7 +10,7 @@ import {
 } from '@/modules/avis/queries';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { EmptyState } from '@/components/shared/EmptyState';
-import { FilterChips } from '../_inbox/FilterChips';
+import { FilterChips } from '@/components/ui/FilterChips';
 import { AvisClient } from './avis-client';
 
 export const metadata: Metadata = { title: 'Avis - Tableau de bord' };
@@ -65,7 +65,7 @@ export default async function AvisPage({
       />
 
       {reviews.length === 0 ? (
-        <EmptyState title="Aucun avis" message={EMPTY[status]} />
+        <EmptyState variant="compact" title="Aucun avis" message={EMPTY[status]} />
       ) : (
         <AvisClient
           reviews={reviews.map((review) => ({

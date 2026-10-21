@@ -1,10 +1,4 @@
-import {
-  CalendarClock,
-  CalendarDays,
-  ChevronLeft,
-  ChevronRight,
-  ClipboardList,
-} from 'lucide-react';
+import { CalendarClock, CalendarDays, ClipboardList } from 'lucide-react';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import type { AppointmentStatus } from '@prisma/client';
@@ -21,6 +15,8 @@ import { EmptyState } from '@/components/shared/EmptyState';
 import { Badge } from '@/components/ui/Badge';
 import { ButtonLink } from '@/components/ui/Button';
 import { CardLink } from '@/components/ui/Card';
+import { FilterChips } from '@/components/ui/FilterChips';
+import { Pagination } from '@/components/ui/Pagination';
 
 export const metadata: Metadata = { title: 'Réservations - Tableau de bord' };
 
@@ -88,41 +84,28 @@ export default async function ReservationsPage({
         }
       />
 
-      <nav
-        aria-label="Filtres des réservations"
-        className="-mx-3 mb-3 flex gap-2 overflow-x-auto px-3 pb-1 sm:mx-0 sm:flex-wrap sm:px-0"
-      >
-        <ButtonLink
-          href={pageHref('', 1, false)}
-          size="sm"
-          variant={!all ? 'primary' : 'secondary'}
-          aria-current={!all ? 'page' : undefined}
-        >
-          À venir
-        </ButtonLink>
-        <ButtonLink
-          href={pageHref('', 1, true)}
-          size="sm"
-          variant={!status && all ? 'primary' : 'secondary'}
-          aria-current={!status && all ? 'page' : undefined}
-        >
-          {`Tout (${totalCount})`}
-        </ButtonLink>
-        {STATUSES.map((item) => (
-          <ButtonLink
-            key={item}
-            href={pageHref(item, 1, true)}
-            size="sm"
-            variant={status === item ? 'primary' : 'secondary'}
-            aria-current={status === item ? 'page' : undefined}
-          >
-            {`${APPOINTMENT_STATUS_SHORT_LABELS[item]} (${counts[item] ?? 0})`}
-          </ButtonLink>
-        ))}
-      </nav>
+      <FilterChips
+        label="Filtres des réservations"
+        items={[
+          { href: pageHref('', 1, false), label: 'À venir', active: !all },
+          {
+            href: pageHref('', 1, true),
+            label: 'Tout',
+            count: totalCount,
+            active: !status && all,
+          },
+          ...STATUSES.map((item) => ({
+            href: pageHref(item, 1, true),
+            label: APPOINTMENT_STATUS_SHORT_LABELS[item],
+            count: counts[item] ?? 0,
+            active: status === item,
+          })),
+        ]}
+      />
 
       {result.items.length === 0 ? (
         <EmptyState
+          variant="compact"
           title="Aucune réservation"
           message={
             status || all
@@ -166,44 +149,12 @@ export default async function ReservationsPage({
         </ul>
       )}
 
-      {result.totalPages > 1 ? (
-        <nav
-          aria-label="Pagination des réservations"
-          className="mt-4 flex items-center justify-between gap-3"
-        >
-          {result.page > 1 ? (
-            <ButtonLink
-              href={pageHref(status, result.page - 1, all)}
-              rel="prev"
-              variant="secondary"
-              size="sm"
-              icon={ChevronLeft}
-              iconOnly="mobile"
-            >
-              Page précédente
-            </ButtonLink>
-          ) : (
-            <span aria-hidden="true" className="size-9" />
-          )}
-          <p className="text-center text-sm text-muted">
-            Page {result.page} sur {result.totalPages} · {result.total} rendez-vous
-          </p>
-          {result.page < result.totalPages ? (
-            <ButtonLink
-              href={pageHref(status, result.page + 1, all)}
-              rel="next"
-              variant="secondary"
-              size="sm"
-              icon={ChevronRight}
-              iconOnly="mobile"
-            >
-              Page suivante
-            </ButtonLink>
-          ) : (
-            <span aria-hidden="true" className="size-9" />
-          )}
-        </nav>
-      ) : null}
+      <Pagination
+        page={result.page}
+        totalPages={result.totalPages}
+        hrefFor={(nextPage) => pageHref(status, nextPage, all)}
+        label="Pagination des réservations"
+      />
     </div>
   );
 }

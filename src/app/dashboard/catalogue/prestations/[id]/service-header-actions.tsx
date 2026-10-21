@@ -34,6 +34,21 @@ export function ServiceHeaderActions({
   const nextStatus = isPublished || isArchived ? 'DRAFT' : 'PUBLISHED';
   const statusLabel = isArchived ? 'Rétablir' : isPublished ? 'Dépublier' : 'Publier';
 
+  async function onToggleStatus() {
+    if (isPublished) {
+      const ok = await confirm({
+        title: 'Dépublier cette prestation ?',
+        message: `« ${service.name} » ne sera plus visible sur le site ni réservable. Vous pourrez la republier à tout moment.`,
+        confirmLabel: 'Dépublier',
+        tone: 'primary',
+      });
+      if (!ok) return;
+    }
+    publish.run(() =>
+      adminSetServiceStatus({}, formDataOf({ id: service.id, status: nextStatus })),
+    );
+  }
+
   async function onArchive() {
     const ok = await confirm({
       title: 'Archiver cette prestation ?',
@@ -63,11 +78,7 @@ export function ServiceHeaderActions({
         icon={isArchived ? RotateCcw : isPublished ? EyeOff : Eye}
         iconOnly="mobile"
         loading={publish.pending}
-        onClick={() =>
-          publish.run(() =>
-            adminSetServiceStatus({}, formDataOf({ id: service.id, status: nextStatus })),
-          )
-        }
+        onClick={onToggleStatus}
       >
         {statusLabel}
       </Button>

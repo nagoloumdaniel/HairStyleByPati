@@ -1,3 +1,5 @@
+import type { EmailContext } from '@/modules/parametres/policies';
+
 /* ============================================================
  * P7.3 : modèles d'e-mails transactionnels.
  * Textes français sobres, lien direct, aucune donnée sensible
@@ -21,7 +23,8 @@ export type NotificationTemplateKey =
   | 'admin_custom_request'
   | 'custom_request_decision'
   | 'waitlist_slot_available'
-  | 'review_request';
+  | 'review_request'
+  | 'assessment_decision';
 
 export interface AppointmentEmailPayload {
   kind?: 'appointment';
@@ -77,12 +80,25 @@ export interface ReviewEmailPayload {
   reviewUrl: string;
 }
 
+export type AssessmentDecisionKind = 'ACCEPTED' | 'CONDITIONAL' | 'REFUSED' | 'INFO_REQUESTED';
+
+export interface AssessmentEmailPayload {
+  kind?: 'assessment';
+  assessmentId?: string;
+  customerName: string;
+  customerEmail?: string;
+  serviceName: string;
+  decision: AssessmentDecisionKind;
+  message?: string | null;
+}
+
 export type EmailPayload =
   | AppointmentEmailPayload
   | ConversationEmailPayload
   | CustomRequestEmailPayload
   | WaitlistEmailPayload
-  | ReviewEmailPayload;
+  | ReviewEmailPayload
+  | AssessmentEmailPayload;
 
 export interface RenderedEmail {
   subject: string;
@@ -129,10 +145,14 @@ function isReview(payload: EmailPayload): payload is ReviewEmailPayload {
   return (payload as ReviewEmailPayload).kind === 'review';
 }
 
-function renderWaitlist(payload: WaitlistEmailPayload): RenderedEmail {
+function isAssessment(payload: EmailPayload): payload is AssessmentEmailPayload {
+  return (payload as AssessmentEmailPayload).kind === 'assessment';
+}
+
+function renderWaitlist(payload: WaitlistEmailPayload, ctx: EmailContext): RenderedEmail {
   return {
     subject: `Une place s’est libérée : ${payload.serviceName}`,
-    html: layout({
+    html: layout(ctx, {
       title: 'Un créneau s’est libéré',
       intro: `Bonjour ${payload.customerName}, le créneau que vous attendiez pour ${payload.serviceName} vient de se libérer.`,
       rows: [['Créneau', formatDate(payload.startsAt)]],
@@ -144,10 +164,10 @@ function renderWaitlist(payload: WaitlistEmailPayload): RenderedEmail {
   };
 }
 
-function renderReview(payload: ReviewEmailPayload): RenderedEmail {
+function renderReview(payload: ReviewEmailPayload, ctx: EmailContext): RenderedEmail {
   return {
     subject: 'Votre avis compte pour Patricia',
-    html: layout({
+    html: layout(ctx, {
       title: 'Comment s’est passé votre rendez-vous ?',
       intro: `Bonjour ${payload.customerName}, Patricia espère que votre prestation « ${payload.serviceName} » vous a plu. Votre avis aide d’autres clientes à faire leur choix.`,
       ctaLabel: 'Laisser un avis',
@@ -166,9 +186,15 @@ interface LayoutInput {
   ctaLabel?: string;
   ctaUrl?: string | null;
   note?: string;
+  /** Blocs de politique affichés avant le pied (titre, texte). */
+  policies?: Array<[string, string]>;
 }
 
-function layout(input: LayoutInput): string {
+function multiline(value: string): string {
+  return escapeHtml(value).replaceAll('\n', '<br />');
+}
+
+function layout(ctx: EmailContext, input: LayoutInput): string {
   const rows = (input.rows ?? [])
     .map(
       ([label, value]) => `
@@ -192,6 +218,15 @@ function layout(input: LayoutInput): string {
     ? `<p style="margin:18px 0 0;color:#5a5224;font-size:13px;line-height:1.5">${escapeHtml(input.note)}</p>`
     : '';
 
+  const policies = (input.policies ?? [])
+    .filter(([, text]) => text.trim() !== '')
+    .map(
+      ([title, text]) =>
+        `<p style="margin:14px 0 0;color:#28230c;font-size:13px;line-height:1.5"><strong>${escapeHtml(title)}</strong><br />${multiline(text)}</p>`,
+    )
+    .join('');
+  const signature = ctx.signature?.trim() ? `<br /><br />${multiline(ctx.signature.trim())}` : '';
+
   return `<!doctype html>
 <html lang="fr">
   <body style="margin:0;padding:24px 12px;background:#fffcf0;font-family:Arial,Helvetica,sans-serif">
@@ -207,9 +242,10 @@ function layout(input: LayoutInput): string {
               ${paragraphs}
               ${cta}
               ${note}
+              ${policies}
               <p style="margin:24px 0 0;border-top:1px solid #eadfb0;padding-top:16px;color:#5a5224;font-size:12px;line-height:1.6">
                 ${SALON_NAME}<br />
-                Paiement sur place. Merci de votre confiance.
+                Paiement sur place. Merci de votre confiance.${signature}
               </p>
             </td></tr>
           </table>
@@ -240,9 +276,24 @@ function appointmentRows(
   return rows;
 }
 
+function confirmationPolicies(ctx: EmailContext): Array<[string, string]> {
+  const rows: Array<[string, string]> = [];
+  if (ctx.cancellationPolicy) rows.push(['Annulation', ctx.cancellationPolicy]);
+  if (ctx.bookingPolicy) rows.push(['Conditions de réservation', ctx.bookingPolicy]);
+  return rows;
+}
+
+function confirmationPoliciesText(ctx: EmailContext): string {
+  const rows = confirmationPolicies(ctx);
+  return rows.length === 0
+    ? ''
+    : `\n${rows.map(([title, text]) => `${title} : ${text}`).join('\n\n')}\n`;
+}
+
 function renderAppointment(
   key: NotificationTemplateKey,
   payload: AppointmentEmailPayload,
+  ctx: EmailContext,
 ): RenderedEmail {
   const admin = key.startsWith('admin_');
   const service = payload.serviceName ?? 'votre prestation';
@@ -257,7 +308,7 @@ function renderAppointment(
     case 'booking_received':
       return {
         subject: 'Votre demande de rendez-vous est enregistrée',
-        html: layout({
+        html: layout(ctx, {
           title: 'Votre rendez-vous est enregistré',
           intro: `Bonjour ${customer}, votre réservation pour ${service} a bien été enregistrée. Patricia confirmera votre créneau si nécessaire.`,
           rows,
@@ -268,21 +319,22 @@ function renderAppointment(
     case 'booking_confirmed':
       return {
         subject: 'Votre rendez-vous est confirmé',
-        html: layout({
+        html: layout(ctx, {
           title: 'Votre rendez-vous est confirmé',
           intro: `Bonjour ${customer}, votre rendez-vous pour ${service} est confirmé.`,
           rows,
           ctaLabel: 'Gérer ou annuler mon rendez-vous',
           ctaUrl: payload.cancelUrl ?? null,
           note: 'Paiement sur place. Conservez ce message pour retrouver votre rendez-vous.',
+          policies: confirmationPolicies(ctx),
         }),
-        text: `Bonjour ${customer},\n\nVotre rendez-vous pour ${service} est confirmé le ${when}.\nPaiement sur place.\n${payload.cancelUrl ? `Gérer mon rendez-vous : ${payload.cancelUrl}\n` : ''}\n${SALON_NAME}`,
+        text: `Bonjour ${customer},\n\nVotre rendez-vous pour ${service} est confirmé le ${when}.\nPaiement sur place.\n${payload.cancelUrl ? `Gérer mon rendez-vous : ${payload.cancelUrl}\n` : ''}${confirmationPoliciesText(ctx)}\n${SALON_NAME}`,
       };
     case 'booking_cancelled_customer':
     case 'booking_cancelled_admin':
       return {
         subject: 'Votre rendez-vous est annulé',
-        html: layout({
+        html: layout(ctx, {
           title: 'Votre rendez-vous est annulé',
           intro: `Bonjour ${customer}, votre rendez-vous pour ${service} a été annulé${key === 'booking_cancelled_admin' ? ' par Patricia' : ''}.`,
           rows,
@@ -297,7 +349,7 @@ function renderAppointment(
     case 'booking_rescheduled':
       return {
         subject: 'Votre rendez-vous est reprogrammé',
-        html: layout({
+        html: layout(ctx, {
           title: 'Votre rendez-vous est reprogrammé',
           intro: `Bonjour ${customer}, votre rendez-vous pour ${service} a été déplacé au nouveau créneau ci-dessous.`,
           rows,
@@ -310,7 +362,7 @@ function renderAppointment(
     case 'booking_reminder':
       return {
         subject: 'Rappel : votre rendez-vous approche',
-        html: layout({
+        html: layout(ctx, {
           title: 'Votre rendez-vous approche',
           intro: `Bonjour ${customer}, un rappel pour votre rendez-vous pour ${service}.`,
           rows,
@@ -323,7 +375,7 @@ function renderAppointment(
     case 'admin_new_booking':
       return {
         subject: `Nouvelle réservation : ${customer}`,
-        html: layout({
+        html: layout(ctx, {
           title: 'Nouvelle réservation',
           intro: `${customer} vient de réserver ${service}.`,
           rows,
@@ -335,7 +387,7 @@ function renderAppointment(
     case 'admin_booking_cancelled':
       return {
         subject: `Annulation : ${customer}`,
-        html: layout({
+        html: layout(ctx, {
           title: 'Rendez-vous annulé',
           intro: `${customer} a annulé son rendez-vous pour ${service}.`,
           rows,
@@ -347,7 +399,7 @@ function renderAppointment(
     case 'admin_booking_rescheduled':
       return {
         subject: `Reprogrammation : ${customer}`,
-        html: layout({
+        html: layout(ctx, {
           title: 'Rendez-vous reprogrammé',
           intro: `Le rendez-vous de ${customer} pour ${service} a été reprogrammé.`,
           rows,
@@ -364,6 +416,7 @@ function renderAppointment(
 function renderConversation(
   key: NotificationTemplateKey,
   payload: ConversationEmailPayload,
+  ctx: EmailContext,
 ): RenderedEmail {
   const messageLink = payload.adminLink
     ? `${APP_URL}${payload.adminLink}`
@@ -371,7 +424,7 @@ function renderConversation(
   if (key === 'admin_contact_message') {
     return {
       subject: `Nouveau message : ${payload.subject}`,
-      html: layout({
+      html: layout(ctx, {
         title: 'Nouveau message de contact',
         intro: `${payload.customerName} vous a envoyé un message.`,
         rows: [
@@ -388,7 +441,7 @@ function renderConversation(
   if (key === 'contact_received') {
     return {
       subject: 'Votre message a bien été reçu',
-      html: layout({
+      html: layout(ctx, {
         title: 'Message bien reçu',
         intro: `Bonjour ${payload.customerName}, Patricia a bien reçu votre message et vous répondra personnellement.`,
         rows: [['Sujet', payload.subject]],
@@ -400,7 +453,7 @@ function renderConversation(
   // conversation_reply
   return {
     subject: `Réponse à votre message : ${payload.subject}`,
-    html: layout({
+    html: layout(ctx, {
       title: 'Réponse de Patricia',
       intro: `Bonjour ${payload.customerName}, voici la réponse à votre message.`,
       paragraphs: payload.message ? [payload.message] : [],
@@ -413,6 +466,7 @@ function renderConversation(
 function renderCustomRequest(
   key: NotificationTemplateKey,
   payload: CustomRequestEmailPayload,
+  ctx: EmailContext,
 ): RenderedEmail | null {
   const adminLink = payload.adminLink
     ? `${APP_URL}${payload.adminLink}`
@@ -421,7 +475,7 @@ function renderCustomRequest(
   if (key === 'custom_request_received') {
     return {
       subject: 'Votre demande de coiffure personnalisée a bien été reçue',
-      html: layout({
+      html: layout(ctx, {
         title: 'Demande bien reçue',
         intro: `Bonjour ${payload.requesterName}, Patricia a bien reçu votre demande de coiffure personnalisée et vous répondra personnellement.`,
         rows: [['Date souhaitée', desired ?? 'Non précisée']],
@@ -434,7 +488,7 @@ function renderCustomRequest(
   if (key === 'admin_custom_request') {
     return {
       subject: `Nouvelle demande personnalisée : ${payload.requesterName}`,
-      html: layout({
+      html: layout(ctx, {
         title: 'Nouvelle demande personnalisée',
         intro: `${payload.requesterName} vous a envoyé une demande de coiffure hors catalogue.`,
         rows: [
@@ -464,7 +518,7 @@ function renderCustomRequest(
   if (payload.proposedSlot) rows.push(['Créneau proposé', formatDate(payload.proposedSlot)]);
   return {
     subject: 'Réponse à votre demande de coiffure personnalisée',
-    html: layout({
+    html: layout(ctx, {
       title: 'Réponse de Patricia',
       intro: `Bonjour ${payload.requesterName}, voici la réponse à votre demande de coiffure personnalisée.`,
       rows,
@@ -477,25 +531,96 @@ function renderCustomRequest(
   };
 }
 
-export function renderNotification(templateKey: string, payload: unknown): RenderedEmail | null {
-  if (!payload || typeof payload !== 'object') return null;
+const ASSESSMENT_DECISIONS: AssessmentDecisionKind[] = [
+  'ACCEPTED',
+  'CONDITIONAL',
+  'REFUSED',
+  'INFO_REQUESTED',
+];
+
+/* Décision de Patricia sur une évaluation capillaire : jamais de réservation
+   créée, le lien renvoie simplement vers le catalogue quand c'est accepté. */
+function renderAssessmentDecision(
+  payload: AssessmentEmailPayload,
+  ctx: EmailContext,
+): RenderedEmail | null {
+  if (!ASSESSMENT_DECISIONS.includes(payload.decision)) return null;
+  const name = payload.customerName;
+  const service = payload.serviceName;
+  const catalogUrl = `${APP_URL}/coiffures`;
+  const canBook = payload.decision === 'ACCEPTED' || payload.decision === 'CONDITIONAL';
+  const copy: Record<AssessmentDecisionKind, { subject: string; title: string; intro: string }> = {
+    ACCEPTED: {
+      subject: `Évaluation acceptée : ${service}`,
+      title: 'Votre évaluation est acceptée',
+      intro: `Bonjour ${name}, Patricia a étudié votre évaluation pour « ${service} » : votre chevelure est compatible.`,
+    },
+    CONDITIONAL: {
+      subject: `Évaluation acceptée sous conditions : ${service}`,
+      title: 'Évaluation acceptée sous conditions',
+      intro: `Bonjour ${name}, Patricia a étudié votre évaluation pour « ${service} » : la prestation est possible sous conditions, détaillées ci-dessous.`,
+    },
+    REFUSED: {
+      subject: `Réponse à votre évaluation : ${service}`,
+      title: 'Réponse à votre évaluation',
+      intro: `Bonjour ${name}, Patricia a étudié votre évaluation pour « ${service} ». Cette prestation ne peut malheureusement pas être réalisée dans votre situation.`,
+    },
+    INFO_REQUESTED: {
+      subject: `Précisions demandées : ${service}`,
+      title: 'Patricia a besoin de précisions',
+      intro: `Bonjour ${name}, Patricia a étudié votre évaluation pour « ${service} » et souhaite quelques précisions avant de se prononcer.`,
+    },
+  };
+  const { subject, title, intro } = copy[payload.decision];
+  const message = payload.message?.trim() ?? '';
+  const note = canBook
+    ? 'Cette réponse ne réserve aucun rendez-vous : choisissez votre coiffure et votre créneau depuis le catalogue.'
+    : payload.decision === 'INFO_REQUESTED'
+      ? 'Aucun rendez-vous n’est réservé. Répondez à cet e-mail ou contactez Patricia depuis le site.'
+      : undefined;
+  return {
+    subject,
+    html: layout(ctx, {
+      title,
+      intro,
+      paragraphs: message ? [message] : [],
+      ctaLabel: canBook ? 'Choisir ma coiffure et réserver' : undefined,
+      ctaUrl: canBook ? catalogUrl : null,
+      note,
+    }),
+    text: [intro, message, canBook ? `Catalogue : ${catalogUrl}` : '', note ?? '', SALON_NAME]
+      .filter(Boolean)
+      .join('\n\n'),
+  };
+}
+
+function renderInner(
+  templateKey: string,
+  payload: object,
+  ctx: EmailContext,
+): RenderedEmail | null {
   const key = templateKey as NotificationTemplateKey;
   if (isWaitlist(payload as EmailPayload)) {
     return key === 'waitlist_slot_available'
-      ? renderWaitlist(payload as WaitlistEmailPayload)
+      ? renderWaitlist(payload as WaitlistEmailPayload, ctx)
       : null;
   }
   if (isReview(payload as EmailPayload)) {
-    return key === 'review_request' ? renderReview(payload as ReviewEmailPayload) : null;
+    return key === 'review_request' ? renderReview(payload as ReviewEmailPayload, ctx) : null;
+  }
+  if (isAssessment(payload as EmailPayload)) {
+    return key === 'assessment_decision'
+      ? renderAssessmentDecision(payload as AssessmentEmailPayload, ctx)
+      : null;
   }
   if (isCustomRequest(payload as EmailPayload)) {
-    return renderCustomRequest(key, payload as CustomRequestEmailPayload);
+    return renderCustomRequest(key, payload as CustomRequestEmailPayload, ctx);
   }
   if (isConversation(payload as EmailPayload)) {
     if (!['admin_contact_message', 'contact_received', 'conversation_reply'].includes(key)) {
       return null;
     }
-    return renderConversation(key, payload as ConversationEmailPayload);
+    return renderConversation(key, payload as ConversationEmailPayload, ctx);
   }
   const appointmentKeys: NotificationTemplateKey[] = [
     'booking_received',
@@ -509,7 +634,24 @@ export function renderNotification(templateKey: string, payload: unknown): Rende
     'admin_booking_rescheduled',
   ];
   if (!appointmentKeys.includes(key)) return null;
-  return renderAppointment(key, payload as AppointmentEmailPayload);
+  return renderAppointment(key, payload as AppointmentEmailPayload, ctx);
+}
+
+/** Ajoute la signature à la version texte (le HTML la porte via le gabarit). */
+function withTextSignature(text: string, ctx: EmailContext): string {
+  const signature = ctx.signature?.trim();
+  return signature ? `${text.trimEnd()}\n\n${signature}` : text;
+}
+
+export function renderNotification(
+  templateKey: string,
+  payload: unknown,
+  context: EmailContext = {},
+): RenderedEmail | null {
+  if (!payload || typeof payload !== 'object') return null;
+  const rendered = renderInner(templateKey, payload, context);
+  if (!rendered) return null;
+  return { ...rendered, text: withTextSignature(rendered.text, context) };
 }
 
 export function notificationTemplateExists(templateKey: string): boolean {
@@ -531,5 +673,6 @@ export function notificationTemplateExists(templateKey: string): boolean {
     'custom_request_decision',
     'waitlist_slot_available',
     'review_request',
+    'assessment_decision',
   ].includes(templateKey);
 }

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { rateLimit } from '@/lib/rate-limit';
 import { requireAdmin } from '@/modules/auth/guards';
 import { logAudit } from '@/modules/stats/audit';
 import { collectCustomerData } from '@/modules/clients/rgpd';
@@ -13,6 +14,19 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   if (!user) {
     return NextResponse.json({ error: 'Non autorisé.' }, { status: 401 });
   }
+  // Export de données personnelles : 5 par 10 minutes et par administrateur.
+  const limit = await rateLimit(`export:customer:${user.id}`, { max: 5, windowMs: 10 * 60_000 });
+  if (!limit.allowed) {
+    return NextResponse.json(
+      { error: 'Trop d’exports. Réessayez dans quelques minutes.' },
+      {
+        status: 429,
+        headers: {
+          'Retry-After': String(Math.max(1, Math.ceil((limit.resetAt - Date.now()) / 1000))),
+        },
+      },
+    );
+  }
   const { id } = await params;
   if (!/^[A-Za-z0-9_-]{8,40}$/.test(id)) {
     return NextResponse.json({ error: 'Identifiant invalide.' }, { status: 400 });
@@ -26,7 +40,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     action: 'customer.export',
     entityType: 'Customer',
     entityId: id,
-  }).catch(() => undefined);
+  });
   const filename = `cliente-${id}-donnees-personnelles.json`;
   return new NextResponse(JSON.stringify(data, null, 2), {
     status: 200,

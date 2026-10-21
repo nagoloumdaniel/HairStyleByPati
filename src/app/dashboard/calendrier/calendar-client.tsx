@@ -10,10 +10,10 @@ import {
   APPOINTMENT_STATUS_SHORT_LABELS,
   APPOINTMENT_STATUS_TONES,
 } from '@/modules/reservations/status';
+import { EmptyState } from '@/components/shared/EmptyState';
 import { Skeleton } from '@/components/shared/Skeleton';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
 
 /* ============================================================
  * Calendrier dashboard : jour / semaine / mois / liste.
@@ -442,7 +442,9 @@ function DayView({
 }) {
   if (loading) return <Skeleton className="h-40 w-full" />;
   if (entries.length === 0) {
-    return <Card className="text-center text-sm text-muted">Aucun rendez-vous ce jour.</Card>;
+    return (
+      <EmptyState variant="compact" title="Aucun rendez-vous" message="Rien de prévu ce jour." />
+    );
   }
   return (
     <div className="grid gap-2">
@@ -465,7 +467,11 @@ function ListView({
   if (loading) return <Skeleton className="h-40 w-full" />;
   if (appointments.length === 0) {
     return (
-      <Card className="text-center text-sm text-muted">Aucun rendez-vous sur cette période.</Card>
+      <EmptyState
+        variant="compact"
+        title="Aucun rendez-vous"
+        message="Rien de prévu sur cette période."
+      />
     );
   }
   const groups = new Map<string, CalendarEntry[]>();

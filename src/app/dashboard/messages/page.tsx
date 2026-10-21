@@ -16,9 +16,10 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { LocalDateTime } from '@/components/shared/LocalDateTime';
 import { Badge } from '@/components/ui/Badge';
-import { FilterChips } from '../_inbox/FilterChips';
-import { Pagination } from '../_inbox/Pagination';
-import { Avatar, RowCard, rowLinkClass } from '../_inbox/RowCard';
+import { FilterChips } from '@/components/ui/FilterChips';
+import { Pagination } from '@/components/ui/Pagination';
+import { Avatar } from '@/components/ui/Avatar';
+import { RowCard, rowLinkClass } from '@/components/ui/RowCard';
 import { ConversationRowActions, MarkAllConversationsRead } from './conversation-list-actions';
 
 export const metadata: Metadata = { title: 'Messages - Tableau de bord' };
@@ -82,6 +83,7 @@ export default async function MessagesPage({
 
       {result.items.length === 0 ? (
         <EmptyState
+          variant="compact"
           title="Aucune conversation"
           message={
             status

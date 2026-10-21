@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
-import type { AdminServiceDetail } from '@/lib/catalogue-admin';
+import type { AdminServiceCore } from '@/lib/catalogue-admin';
 import { PRICE_MODE_LABELS, PRICE_MODES, type PriceMode } from '@/modules/catalogue/schemas';
 import { centsToEurosInput, priceModeFromService } from '@/modules/catalogue/pricing';
 import type { CatalogueActionState } from '@/modules/catalogue/actions';
@@ -49,7 +49,7 @@ export function ServiceForm({
 }: {
   action: (prev: CatalogueActionState, formData: FormData) => Promise<CatalogueActionState>;
   categories: CategoryOption[];
-  initial?: AdminServiceDetail;
+  initial?: AdminServiceCore;
   submitLabel: string;
 }) {
   const { state, onSubmit, pending } = useFormAction(action);

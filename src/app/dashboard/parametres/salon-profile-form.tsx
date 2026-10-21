@@ -1,9 +1,8 @@
 'use client';
 
 import { Clock, MessageSquareText, Save, UserRound } from 'lucide-react';
-import { useActionState, useEffect, useState, type ReactNode } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
@@ -15,6 +14,7 @@ import {
   WEEKDAY_LABELS,
   readOpeningHours,
 } from '@/modules/parametres/hours';
+import { SettingsSection } from './settings-section';
 
 type Settings = {
   name: string;
@@ -38,28 +38,6 @@ const TIME_OPTIONS = (() => {
   }
   return out;
 })();
-
-function Section({
-  icon: Icon,
-  title,
-  children,
-  className = '',
-}: {
-  icon: typeof Clock;
-  title: string;
-  children: ReactNode;
-  className?: string;
-}) {
-  return (
-    <Card className={className}>
-      <h2 className="mb-3 flex items-center gap-2 font-heading text-lg font-bold text-fg">
-        <Icon aria-hidden="true" className="size-5 text-accent" />
-        {title}
-      </h2>
-      <div className="flex flex-col gap-3">{children}</div>
-    </Card>
-  );
-}
 
 export function SalonProfileForm({ settings }: { settings: Settings }) {
   const { notify } = useToast();
@@ -96,7 +74,7 @@ export function SalonProfileForm({ settings }: { settings: Settings }) {
     <form action={formAction} className="flex flex-col gap-3">
       <input type="hidden" name="openingHours" value={hoursJson} />
       <div className="grid items-start gap-3 lg:grid-cols-2">
-        <Section icon={UserRound} title="Profil">
+        <SettingsSection icon={UserRound} title="Profil">
           <Input
             label="Nom professionnel"
             name="name"
@@ -134,9 +112,9 @@ export function SalonProfileForm({ settings }: { settings: Settings }) {
             error={errors.address}
             hint="Patricia se déplace à domicile : indiquez les quartiers desservis."
           />
-        </Section>
+        </SettingsSection>
 
-        <Section icon={Clock} title="Horaires de travail">
+        <SettingsSection icon={Clock} title="Horaires de travail">
           <fieldset>
             <legend className="mb-1.5 text-sm font-semibold text-fg">Jours travaillés</legend>
             <div className="flex flex-wrap gap-1.5">
@@ -191,9 +169,13 @@ export function SalonProfileForm({ settings }: { settings: Settings }) {
               {errors.openingHours}
             </p>
           ) : null}
-        </Section>
+        </SettingsSection>
 
-        <Section icon={MessageSquareText} title="Messages affichés" className="lg:col-span-2">
+        <SettingsSection
+          icon={MessageSquareText}
+          title="Messages affichés"
+          className="lg:col-span-2"
+        >
           <div className="grid gap-3 lg:grid-cols-2">
             <Textarea
               label="Règles d’annulation"
@@ -203,6 +185,7 @@ export function SalonProfileForm({ settings }: { settings: Settings }) {
               onChange={set('cancellationPolicy')}
               maxLength={3000}
               error={errors.cancellationPolicy}
+              hint="Affichée sur la page d’annulation, /infos-pratiques et dans l’e-mail de confirmation. Vide : texte par défaut."
             />
             <Textarea
               label="Règles de réservation"
@@ -212,6 +195,7 @@ export function SalonProfileForm({ settings }: { settings: Settings }) {
               onChange={set('bookingPolicy')}
               maxLength={3000}
               error={errors.bookingPolicy}
+              hint="Affichées sur /infos-pratiques et dans l’e-mail de confirmation. Vide : texte par défaut."
             />
           </div>
           <Textarea
@@ -222,8 +206,9 @@ export function SalonProfileForm({ settings }: { settings: Settings }) {
             onChange={set('emailSignature')}
             maxLength={1000}
             error={errors.emailSignature}
+            hint="Ajoutée en pied de tous les e-mails envoyés."
           />
-        </Section>
+        </SettingsSection>
       </div>
 
       <div className="flex flex-wrap items-center justify-end gap-3">

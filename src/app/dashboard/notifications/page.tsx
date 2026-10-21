@@ -14,9 +14,9 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { LocalDateTime } from '@/components/shared/LocalDateTime';
 import { Badge } from '@/components/ui/Badge';
-import { FilterChips } from '../_inbox/FilterChips';
-import { Pagination } from '../_inbox/Pagination';
-import { RowCard, rowLinkClass } from '../_inbox/RowCard';
+import { FilterChips } from '@/components/ui/FilterChips';
+import { Pagination } from '@/components/ui/Pagination';
+import { RowCard, rowLinkClass } from '@/components/ui/RowCard';
 import {
   NotificationRowActions,
   NotificationsHeaderActions,
@@ -96,11 +96,23 @@ function NotificationRow({ notification }: { notification: AdminNotificationView
             <p className="line-clamp-2 text-sm text-muted">{notification.detail}</p>
           ) : null}
           {failedEmail ? (
-            <p className="text-sm text-muted">
-              {notification.recipient} · {notification.attempts} tentative
-              {notification.attempts > 1 ? 's' : ''}
-              {notification.error ? ` · ${notification.error}` : ''}
-            </p>
+            <div className="min-w-0 text-sm text-muted">
+              <p className="truncate">
+                {notification.recipient} · {notification.attempts} tentative
+                {notification.attempts > 1 ? 's' : ''}
+              </p>
+              {notification.error ? (
+                <details className="group">
+                  <summary
+                    title={notification.error}
+                    className="relative z-10 cursor-pointer list-none rounded-sm focus-visible:outline-2 focus-visible:outline-cacao group-open:[&>span]:line-clamp-none"
+                  >
+                    <span className="line-clamp-2 break-words">{notification.error}</span>
+                    <span className="sr-only">Afficher ou masquer le détail de l’erreur</span>
+                  </summary>
+                </details>
+              ) : null}
+            </div>
           ) : null}
           <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted">
             <LocalDateTime
@@ -180,6 +192,7 @@ export default async function NotificationsPage({
 
       {result.items.length === 0 ? (
         <EmptyState
+          variant="compact"
           title={filter === 'unread' ? 'Tout est lu' : 'Aucune notification'}
           message={
             filter === 'failed'

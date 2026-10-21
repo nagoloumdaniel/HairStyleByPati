@@ -49,6 +49,13 @@ describe('bookingRequestSchema', () => {
     );
   });
 
+  it('should default the optional promo code to an empty string and trim it', () => {
+    const none = bookingRequestSchema.safeParse(validBooking);
+    expect(none.success && none.data.promoCode).toBe('');
+    const coded = bookingRequestSchema.safeParse({ ...validBooking, promoCode: '  bienvenue ' });
+    expect(coded.success && coded.data.promoCode).toBe('bienvenue');
+  });
+
   it('should reject an invalid phone number', () => {
     expect(bookingRequestSchema.safeParse({ ...validBooking, phone: 'abc' }).success).toBe(false);
   });

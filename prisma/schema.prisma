@@ -25,6 +25,8 @@ model User {
   name                   String
   email                  String                  @unique
   passwordHash           String
+  // Incrémenté pour révoquer toutes les sessions (déconnexion partout, changement de mot de passe).
+  sessionVersion         Int                     @default(0)
   role                   Role                    @default(ADMIN)
   createdAt              DateTime                @default(now())
   updatedAt              DateTime                @updatedAt
@@ -106,6 +108,8 @@ model ServiceOption {
   priceCents      Int
   durationMinutes Int     @default(0)
   active          Boolean @default(true)
+  // Position d'affichage (réordonnable depuis le dashboard).
+  order           Int     @default(0)
 }
 
 // ============================================================
@@ -321,6 +325,7 @@ model CustomRequest {
   decisions           CustomRequestDecision[]
 
   @@index([status, createdAt])
+  @@index([customerId])
 }
 
 enum CustomRequestDecisionAction {
@@ -424,6 +429,7 @@ model Conversation {
   messages      Message[]
 
   @@index([status, lastMessageAt])
+  @@index([customerId])
 }
 
 enum MessageAuthor {
@@ -607,6 +613,8 @@ enum PromotionKind {
 model Promotion {
   id        String             @id @default(cuid())
   name      String
+  // Code promo saisi par la cliente (null = promotion automatique).
+  code      String?            @unique
   kind      PromotionKind
   // Pourcentage (1-100) ou montant fixe en centimes selon `kind`
   value     Int
@@ -661,4 +669,14 @@ model SalonSettings {
   dataRetentionMonths  Int      @default(36)
   photoRetentionDays   Int      @default(90)
   updatedAt            DateTime @updatedAt
+}
+
+// Compteurs de limitation de débit partagés entre instances (serverless).
+model RateLimitBucket {
+  key       String   @id
+  count     Int      @default(0)
+  resetAt   DateTime
+  updatedAt DateTime @updatedAt
+
+  @@index([resetAt])
 }

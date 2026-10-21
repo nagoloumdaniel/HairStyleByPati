@@ -4,11 +4,10 @@ import { CornerUpLeft, Lock, Send } from 'lucide-react';
 import { useRef, useState, useTransition, type FormEvent, type KeyboardEvent } from 'react';
 import { adminAddInternalNote, adminReplyToConversation } from '@/modules/messagerie/actions';
 import { Button } from '@/components/ui/Button';
+import { Textarea } from '@/components/ui/Textarea';
 import { useToast } from '@/components/ui/Toast';
 
 type Mode = 'reply' | 'note';
-
-const MAX_HEIGHT = 160;
 
 /* Zone de saisie collée en bas (au-dessus de la barre d'onglets mobile).
    Réponse = ajoutée au fil + e-mail ; note interne = visible uniquement ici. Ctrl/Cmd + Entrée envoie. */
@@ -24,19 +23,11 @@ export function ConversationComposer({
   const [text, setText] = useState('');
   const [error, setError] = useState('');
   const [pending, startTransition] = useTransition();
-  const areaRef = useRef<HTMLTextAreaElement>(null);
   const sendingRef = useRef(false);
 
   const isReply = mode === 'reply';
   const Icon = isReply ? CornerUpLeft : Lock;
   const limit = isReply ? 5000 : 3000;
-
-  function grow() {
-    const el = areaRef.current;
-    if (!el) return;
-    el.style.height = 'auto';
-    el.style.height = `${Math.min(el.scrollHeight, MAX_HEIGHT)}px`;
-  }
 
   function submit(event?: FormEvent) {
     event?.preventDefault();
@@ -62,7 +53,6 @@ export function ConversationComposer({
         }
         notify(result.success ?? 'Enregistré.', 'success');
         setText('');
-        requestAnimationFrame(grow);
       } catch {
         const message = 'Envoi impossible. Vérifiez votre connexion et réessayez.';
         setError(message);
@@ -108,28 +98,18 @@ export function ConversationComposer({
       </div>
 
       <div className="flex items-end gap-2">
-        <div className="relative min-w-0 flex-1">
-          <Icon
-            aria-hidden="true"
-            className="pointer-events-none absolute left-3.5 top-3 size-4 text-cacao"
-          />
-          <textarea
-            ref={areaRef}
+        <div className="min-w-0 flex-1">
+          <Textarea
+            compact
+            icon={Icon}
+            label={isReply ? 'Votre réponse à la cliente' : 'Votre note interne'}
             value={text}
-            rows={1}
             maxLength={limit}
-            aria-label={isReply ? 'Votre réponse à la cliente' : 'Votre note interne'}
-            aria-invalid={error ? true : undefined}
+            error={error || undefined}
             aria-describedby="composer-hint"
             placeholder={isReply ? 'Écrire une réponse…' : 'Écrire une note privée…'}
-            onChange={(event) => {
-              setText(event.target.value);
-              grow();
-            }}
+            onChange={(event) => setText(event.target.value)}
             onKeyDown={onKeyDown}
-            className={`max-h-40 min-h-10 w-full resize-none rounded-[var(--radius-md)] border bg-card py-2.5 pl-10 pr-3 text-sm text-fg placeholder:text-muted ${
-              error ? 'border-alert' : 'border-line focus:border-cacao'
-            }`}
           />
         </div>
         <Button

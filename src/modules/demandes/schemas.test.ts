@@ -26,6 +26,22 @@ describe('customRequestSchema', () => {
     expect(customRequestSchema.safeParse({ ...validRequest, consent: '' }).success).toBe(false);
   });
 
+  it('should accept a Senegalese international number and an empty phone', () => {
+    expect(
+      customRequestSchema.safeParse({ ...validRequest, phone: '+221 77 123 45 67' }).success,
+    ).toBe(true);
+    expect(customRequestSchema.safeParse({ ...validRequest, phone: '' }).success).toBe(true);
+  });
+
+  it('should reject a phone containing letters or markup', () => {
+    expect(
+      customRequestSchema.safeParse({ ...validRequest, phone: '0612345678<script>' }).success,
+    ).toBe(false);
+    expect(
+      customRequestSchema.safeParse({ ...validRequest, phone: 'appelez-moi demain' }).success,
+    ).toBe(false);
+  });
+
   it('should reject a too short description or invalid date', () => {
     expect(
       customRequestSchema.safeParse({ ...validRequest, description: 'Trop court' }).success,

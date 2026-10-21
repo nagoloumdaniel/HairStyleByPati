@@ -61,6 +61,7 @@ export default async function WaitlistPage({
 
       {rows.length === 0 ? (
         <EmptyState
+          variant="compact"
           title="Aucune demande"
           message={
             all

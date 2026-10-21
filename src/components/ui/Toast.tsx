@@ -27,6 +27,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const notify = useCallback((message: string, tone: ToastTone = 'info') => {
     const id = Date.now() + Math.random();
     setToasts((prev) => [...prev, { id, message, tone }]);
+    // Rendus urgents espacés : une transition du routeur restée suspendue (revalidation d'une server
+    // action) n'est reprise par React qu'au rendu suivant ; sans eux la liste resterait périmée
+    // jusqu'à la disparition du toast.
+    for (const delay of [250, 700, 1400, 2400]) {
+      window.setTimeout(() => setToasts((prev) => [...prev]), delay);
+    }
     window.setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
     }, 4000);

@@ -2,13 +2,8 @@ import { ExternalLink, History, Scissors } from 'lucide-react';
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { requireAdmin } from '@/modules/auth/guards';
-import { getAdminServiceDetail, listAdminCategories } from '@/lib/catalogue-admin';
+import { getAdminServiceCore, listCategoryOptions } from '@/lib/catalogue-admin';
 import { formatDuration, formatPrice } from '@/lib/catalogue';
-import {
-  getImageSignedUrl,
-  getStorageConfigurationHint,
-  isStorageConfigured,
-} from '@/modules/fichiers/storage';
 import { adminUpdateService } from '@/modules/catalogue/actions';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { BackButton } from '@/components/shared/BackButton';
@@ -18,10 +13,13 @@ import { Card } from '@/components/ui/Card';
 import { Tabs } from '@/components/ui/Tabs';
 import { ServiceForm } from '../../service-form';
 import { ServiceHeaderActions } from './service-header-actions';
-import { OptionsPanel } from './options-panel';
-import { ImagesPanel } from './images-panel';
-import { CompatibilityPanel } from './compatibility-panel';
-import { QuestionsPanel } from './questions-panel';
+import {
+  CompatibilitySection,
+  ImagesSection,
+  OptionsSection,
+  QuestionsSection,
+  Section,
+} from './sections';
 
 export const metadata: Metadata = { title: 'Modifier une prestation - Tableau de bord' };
 
@@ -42,29 +40,15 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
   const { id } = await params;
   if (!user) redirect(`/connexion?callbackUrl=/dashboard/catalogue/prestations/${id}`);
 
-  const [service, categories] = await Promise.all([
-    getAdminServiceDetail(id),
-    listAdminCategories(),
-  ]);
+  // Données légères uniquement : les panneaux lourds se chargent en Suspense (voir sections.tsx).
+  const [service, categories] = await Promise.all([getAdminServiceCore(id), listCategoryOptions()]);
   if (!service) notFound();
-
-  const images = await Promise.all(
-    service.images.map(async (image) => ({
-      ...image,
-      url: await getImageSignedUrl(image.key).catch(() => null),
-    })),
-  );
-  const storageReady = isStorageConfigured();
 
   const informationPanel = (
     <Card>
       <ServiceForm
         action={adminUpdateService}
-        categories={categories.map((category) => ({
-          id: category.id,
-          name: category.name,
-          active: category.active,
-        }))}
+        categories={categories}
         initial={service}
         submitLabel="Enregistrer"
       />
@@ -125,30 +109,39 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
           { id: 'informations', label: 'Informations', content: informationPanel },
           {
             id: 'options',
-            label: `Options (${service.options.length})`,
-            content: <OptionsPanel serviceId={service.id} options={service.options} />,
+            label: `Options (${service.counts.options})`,
+            content: (
+              <Section>
+                <OptionsSection serviceId={service.id} />
+              </Section>
+            ),
           },
           {
             id: 'photos',
-            label: `Photos (${service.images.length})`,
+            label: `Photos (${service.counts.images})`,
             content: (
-              <ImagesPanel
-                serviceId={service.id}
-                images={images}
-                storageReady={storageReady}
-                storageHint={getStorageConfigurationHint()}
-              />
+              <Section>
+                <ImagesSection serviceId={service.id} />
+              </Section>
             ),
           },
           {
             id: 'compatibilite',
             label: 'Compatibilité',
-            content: <CompatibilityPanel serviceId={service.id} rule={service.compatibility} />,
+            content: (
+              <Section>
+                <CompatibilitySection serviceId={service.id} />
+              </Section>
+            ),
           },
           {
             id: 'questions',
-            label: `Questions (${service.questions.length})`,
-            content: <QuestionsPanel serviceId={service.id} questions={service.questions} />,
+            label: `Questions (${service.counts.questions})`,
+            content: (
+              <Section>
+                <QuestionsSection serviceId={service.id} />
+              </Section>
+            ),
           },
         ]}
       />

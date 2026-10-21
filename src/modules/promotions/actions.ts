@@ -16,6 +16,9 @@ function handleError(error: unknown): PromotionActionState {
   if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
     return { error: 'Promotion introuvable.' };
   }
+  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+    return { error: 'Ce code promo existe déjà. Choisissez-en un autre.' };
+  }
   console.error(error);
   return { error: 'Une erreur est survenue. Réessayez plus tard.' };
 }
@@ -40,6 +43,7 @@ function revalidate() {
 async function readPromotionForm(formData: FormData) {
   const parsed = parseForm(promotionSchema, {
     name: String(formData.get('name') ?? ''),
+    code: String(formData.get('code') ?? ''),
     kind: String(formData.get('kind') ?? ''),
     value: String(formData.get('value') ?? ''),
     startsAt: String(formData.get('startsAt') ?? ''),
@@ -61,7 +65,17 @@ async function readPromotionForm(formData: FormData) {
 
   // Pourcentage : entier 1-100 ; montant fixe : FCFA → 1/100 FCFA (unité interne).
   const value = input.kind === 'PERCENT' ? input.value : input.value * 100;
-  return { data: { name: input.name, kind: input.kind, value, startsAt, endsAt, serviceIds } };
+  return {
+    data: {
+      name: input.name,
+      code: input.code,
+      kind: input.kind,
+      value,
+      startsAt,
+      endsAt,
+      serviceIds,
+    },
+  };
 }
 
 export async function adminCreatePromotion(

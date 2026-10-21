@@ -2,9 +2,9 @@
 
 import { flushEmailsSoon } from '@/modules/notifications/flush';
 import { revalidatePath } from 'next/cache';
-import { headers } from 'next/headers';
 import type { z } from 'zod';
 import { requireAdmin } from '@/modules/auth/guards';
+import { getClientIp } from '@/lib/client-ip';
 import { rateLimit } from '@/lib/rate-limit';
 import { AppError } from '@/lib/errors';
 import { deviceTimeToUtc } from '@/lib/dates';
@@ -19,6 +19,7 @@ import {
   bookingSlotsSchema,
   calendarQuerySchema,
   customerCancelSchema,
+  promoCodeRequestSchema,
 } from './schemas';
 import {
   cancelAppointmentByAdmin,
@@ -26,6 +27,9 @@ import {
   createBooking,
   getBookingSlots,
   getRescheduleSlots,
+  previewAutomaticPromotion,
+  previewPromoCode,
+  type AutoPromotionPreview,
   rescheduleAppointment,
   updateAppointmentStatus,
 } from './service';
@@ -35,13 +39,6 @@ import { getCalendarAppointments, type CalendarAppointment } from './queries';
  * Server actions réservations (P6.3 à P6.9)
  * Toute validation et re-vérification est refaite côté serveur.
  * ============================================================ */
-
-async function clientIp(): Promise<string> {
-  const list = await headers();
-  const forwarded = list.get('x-forwarded-for');
-  if (forwarded) return (forwarded.split(',')[0] ?? '').trim() || 'unknown';
-  return list.get('x-real-ip') ?? 'unknown';
-}
 
 function parseForm<T extends z.ZodType>(
   schema: T,
@@ -110,8 +107,8 @@ export async function loadBookingSlots(
   _prev: BookingSlotsState,
   formData: FormData,
 ): Promise<BookingSlotsState> {
-  const ip = await clientIp();
-  const limit = rateLimit(`booking:slots:${ip}`, { max: 60, windowMs: 60_000 });
+  const ip = await getClientIp();
+  const limit = await rateLimit(`booking:slots:${ip}`, { max: 60, windowMs: 60_000 });
   if (!limit.allowed) return { error: 'Trop de demandes. Réessayez dans une minute.' };
 
   const parsed = parseForm(bookingSlotsSchema, {
@@ -162,8 +159,8 @@ export async function submitBooking(
   _prev: BookingState,
   formData: FormData,
 ): Promise<BookingState> {
-  const ip = await clientIp();
-  const limit = rateLimit(`booking:submit:${ip}`, { max: 20, windowMs: 15 * 60_000 });
+  const ip = await getClientIp();
+  const limit = await rateLimit(`booking:submit:${ip}`, { max: 20, windowMs: 15 * 60_000 });
   if (!limit.allowed) {
     return { error: 'Trop de demandes de réservation. Réessayez dans quelques minutes.' };
   }
@@ -190,6 +187,7 @@ export async function submitBooking(
     phone: String(formData.get('phone') ?? ''),
     comment: String(formData.get('comment') ?? ''),
     consent: formData.get('consent'),
+    promoCode: String(formData.get('promoCode') ?? ''),
   });
   if ('error' in parsed) return { error: parsed.error };
 
@@ -205,6 +203,7 @@ export async function submitBooking(
       comment: parsed.data.comment,
       answers: answersResult.data,
       optionIds: parseStringArray(formData.get('optionIds')),
+      promoCode: parsed.data.promoCode,
     });
     revalidateBookingPaths(booking.appointmentId);
     return {
@@ -225,14 +224,78 @@ export async function submitBooking(
   }
 }
 
+export type PromoCodeState = {
+  error?: string;
+  applied?: {
+    code: string;
+    promotionName: string;
+    codeApplied: boolean;
+    basePriceCents: number;
+    discountCents: number;
+    finalPriceCents: number;
+  };
+};
+
+/** Valide un code promo côté serveur (10 essais / 15 min / IP) et renvoie le prix remisé. */
+export async function applyPromoCode(
+  _prev: PromoCodeState,
+  formData: FormData,
+): Promise<PromoCodeState> {
+  const ip = await getClientIp();
+  const limit = await rateLimit(`booking:promo:${ip}`, { max: 10, windowMs: 15 * 60_000 });
+  if (!limit.allowed) return { error: 'Trop d’essais. Réessayez dans quelques minutes.' };
+
+  const parsed = parseForm(promoCodeRequestSchema, {
+    serviceSlug: String(formData.get('serviceSlug') ?? ''),
+    code: String(formData.get('code') ?? ''),
+  });
+  if ('error' in parsed) return { error: parsed.error };
+
+  try {
+    const applied = await previewPromoCode({
+      serviceSlug: parsed.data.serviceSlug,
+      optionIds: parseStringArray(formData.get('optionIds')),
+      code: parsed.data.code,
+    });
+    return { applied };
+  } catch (error) {
+    // Message unique pour tout échec de code : aucune fuite sur les autres codes.
+    if (error instanceof AppError && error.code === 'INVALID_PROMO') {
+      return { error: error.message };
+    }
+    return handleError(error);
+  }
+}
+
+/** Offre automatique applicable (aperçu du récapitulatif) : lecture seule, limitée par IP. */
+export async function loadAutomaticPromotion(
+  serviceSlug: string,
+  optionIds: string[],
+): Promise<AutoPromotionPreview | null> {
+  const ip = await getClientIp();
+  const limit = await rateLimit(`booking:autopromo:${ip}`, { max: 60, windowMs: 15 * 60_000 });
+  if (!limit.allowed) return null;
+  const parsed = parseForm(promoCodeRequestSchema.pick({ serviceSlug: true }), { serviceSlug });
+  if ('error' in parsed) return null;
+  const ids = optionIds.filter((id) => typeof id === 'string' && id.length > 0 && id.length <= 40);
+  try {
+    return await previewAutomaticPromotion({
+      serviceSlug: parsed.data.serviceSlug,
+      optionIds: ids.slice(0, 20),
+    });
+  } catch {
+    return null;
+  }
+}
+
 export type CustomerCancelState = { error?: string; success?: string };
 
 export async function cancelAppointmentByCustomer(
   _prev: CustomerCancelState,
   formData: FormData,
 ): Promise<CustomerCancelState> {
-  const ip = await clientIp();
-  const limit = rateLimit(`booking:cancel:${ip}`, { max: 10, windowMs: 10 * 60_000 });
+  const ip = await getClientIp();
+  const limit = await rateLimit(`booking:cancel:${ip}`, { max: 10, windowMs: 10 * 60_000 });
   if (!limit.allowed) return { error: 'Trop de demandes. Réessayez dans quelques minutes.' };
 
   const parsed = parseForm(customerCancelSchema, {

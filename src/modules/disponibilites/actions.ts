@@ -147,31 +147,26 @@ export async function adminSaveSpecificRule(
   const { dateISO, start, end, active, timeZone, confirmConflicts } = parsed.data;
 
   try {
-    if (active) {
-      const appointments = await futureActiveAppointments();
-      const conflicts = appointments.filter((appointment) => {
-        const parts = utcToDeviceParts(appointment.startsAt, timeZone);
-        if (parts.dateISO !== dateISO) return false;
-        return parts.minute < start || parts.minute + appointment.durationMinutes > end;
-      });
-      if (conflicts.length > 0 && !confirmConflicts) {
-        return conflictState(conflicts.length);
-      }
+    // Jour fermé : une règle « 00:00 – 00:00 » active remplace l'horaire habituel sans créneau
+    // (le moteur ignore les fenêtres vides). Rien n'était enregistré avant : le jour restait ouvert.
+    const startMinute = active ? start : 0;
+    const endMinute = active ? end : 0;
+    const appointments = await futureActiveAppointments();
+    const conflicts = appointments.filter((appointment) => {
+      const parts = utcToDeviceParts(appointment.startsAt, timeZone);
+      if (parts.dateISO !== dateISO) return false;
+      if (!active) return true;
+      return parts.minute < start || parts.minute + appointment.durationMinutes > end;
+    });
+    if (conflicts.length > 0 && !confirmConflicts) {
+      return conflictState(conflicts.length);
     }
 
     await db.$transaction(async (tx) => {
       await tx.availabilityRule.deleteMany({ where: { kind: 'SPECIFIC', date: dateISO } });
-      if (active) {
-        await tx.availabilityRule.create({
-          data: {
-            kind: 'SPECIFIC',
-            date: dateISO,
-            startMinute: start,
-            endMinute: end,
-            active: true,
-          },
-        });
-      }
+      await tx.availabilityRule.create({
+        data: { kind: 'SPECIFIC', date: dateISO, startMinute, endMinute, active: true },
+      });
     });
     await logAudit({
       userId: user.id,
@@ -181,7 +176,7 @@ export async function adminSaveSpecificRule(
       metadata: { dateISO, start, end, active },
     });
     revalidateAvailability();
-    return { success: active ? 'Horaires spécifiques enregistrés.' : 'Exception supprimée.' };
+    return { success: active ? 'Horaires spécifiques enregistrés.' : 'Jour fermé.' };
   } catch (error) {
     return handleError(error);
   }

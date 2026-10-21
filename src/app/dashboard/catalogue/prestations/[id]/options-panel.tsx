@@ -11,6 +11,7 @@ import { Modal } from '@/components/ui/Modal';
 import {
   adminCreateOption,
   adminDeleteOption,
+  adminReorderOptions,
   adminToggleOption,
   adminUpdateOption,
   type CatalogueActionState,
@@ -19,8 +20,10 @@ import {
   CheckboxField,
   EmptyBlock,
   FormError,
+  ReorderButtons,
   formDataOf,
   useFormAction,
+  useReorderableList,
   useRunAction,
 } from '../../catalogue-ui';
 
@@ -97,7 +100,21 @@ function OptionForm({
   );
 }
 
-function OptionRow({ serviceId, option }: { serviceId: string; option: AdminServiceOption }) {
+function OptionRow({
+  serviceId,
+  option,
+  index,
+  count,
+  pendingOrder,
+  onMove,
+}: {
+  serviceId: string;
+  option: AdminServiceOption;
+  index: number;
+  count: number;
+  pendingOrder: boolean;
+  onMove: (index: number, direction: -1 | 1) => void;
+}) {
   const [editOpen, setEditOpen] = useState(false);
   const confirm = useConfirm();
   const toggle = useRunAction();
@@ -115,6 +132,13 @@ function OptionRow({ serviceId, option }: { serviceId: string; option: AdminServ
 
   return (
     <li className="flex items-center gap-2 rounded-[var(--radius-md)] border border-line bg-card p-2 sm:gap-3 sm:p-3">
+      <ReorderButtons
+        index={index}
+        count={count}
+        pending={pendingOrder}
+        onMove={(direction) => onMove(index, direction)}
+        label={option.name}
+      />
       {/* Toute la zone texte ouvre la modification. */}
       <button
         type="button"
@@ -196,6 +220,9 @@ export function OptionsPanel({
   options: AdminServiceOption[];
 }) {
   const [createOpen, setCreateOpen] = useState(false);
+  const { list, move, pending } = useReorderableList(options, (orderedIds) =>
+    adminReorderOptions(serviceId, orderedIds),
+  );
   return (
     <div className="flex flex-col gap-3 rounded-[var(--radius-lg)] bg-card p-3 shadow-soft sm:p-4">
       <div className="flex items-center justify-between gap-3">
@@ -221,12 +248,20 @@ export function OptionsPanel({
         />
       </Modal>
 
-      {options.length === 0 ? (
+      {list.length === 0 ? (
         <EmptyBlock>Aucune option. La prestation s’ajoute au panier sans supplément.</EmptyBlock>
       ) : (
         <ul className="flex flex-col gap-2">
-          {options.map((option) => (
-            <OptionRow key={option.id} serviceId={serviceId} option={option} />
+          {list.map((option, index) => (
+            <OptionRow
+              key={option.id}
+              serviceId={serviceId}
+              option={option}
+              index={index}
+              count={list.length}
+              pendingOrder={pending}
+              onMove={move}
+            />
           ))}
         </ul>
       )}

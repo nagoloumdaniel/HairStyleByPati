@@ -8,8 +8,9 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { Button, ButtonLink } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Avatar, RowCard, rowLinkClass } from '../_inbox/RowCard';
-import { Pagination } from '../_inbox/Pagination';
+import { Avatar } from '@/components/ui/Avatar';
+import { RowCard, rowLinkClass } from '@/components/ui/RowCard';
+import { Pagination } from '@/components/ui/Pagination';
 
 export const metadata: Metadata = { title: 'Clientes - Tableau de bord' };
 
@@ -75,6 +76,7 @@ export default async function CustomersPage({
 
       {result.items.length === 0 ? (
         <EmptyState
+          variant="compact"
           title={search ? 'Aucun résultat' : 'Aucune cliente'}
           message={
             search

@@ -26,3 +26,49 @@ export function readOpeningHours(raw: unknown): { days: number[]; open: string; 
   const close = first.close <= OPENING_MAX && first.close > open ? first.close : OPENING_MAX;
   return { days: rows.map((row) => row.weekday), open, close };
 }
+
+const WEEKDAY_NAMES = [
+  'Lundi',
+  'Mardi',
+  'Mercredi',
+  'Jeudi',
+  'Vendredi',
+  'Samedi',
+  'Dimanche',
+] as const;
+
+/** « 05:00 » → « 5h », « 17:30 » → « 17h30 ». */
+export function formatHour(value: string): string {
+  const [h = '0', m = '00'] = value.split(':');
+  const hour = String(Number.parseInt(h, 10));
+  return m === '00' ? `${hour}h` : `${hour}h${m}`;
+}
+
+/** Lignes d'affichage public des horaires : jours consécutifs regroupés (« Lundi – Dimanche : 5h – 22h »). */
+export function formatOpeningHours(raw: unknown): string[] {
+  const { days, open, close } = readOpeningHours(raw);
+  const sorted = [...new Set(days)].sort((a, b) => a - b);
+  const range = `${formatHour(open)} – ${formatHour(close)}`;
+  const lines: string[] = [];
+  let start = sorted[0];
+  let previous = sorted[0];
+  const flush = () => {
+    if (start === undefined || previous === undefined) return;
+    const label =
+      start === previous
+        ? WEEKDAY_NAMES[start]
+        : `${WEEKDAY_NAMES[start]} – ${WEEKDAY_NAMES[previous]}`;
+    lines.push(`${label} : ${range}`);
+  };
+  for (const day of sorted.slice(1)) {
+    if (previous !== undefined && day === previous + 1) {
+      previous = day;
+      continue;
+    }
+    flush();
+    start = day;
+    previous = day;
+  }
+  flush();
+  return lines;
+}

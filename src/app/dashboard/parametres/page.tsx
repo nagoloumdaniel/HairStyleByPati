@@ -5,6 +5,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { CardLink } from '@/components/ui/Card';
 import { requireAdmin } from '@/modules/auth/guards';
 import { getSalonSettings } from '@/modules/disponibilites/queries';
+import { PasswordCard, SessionsCard } from './account-security';
 import { SalonProfileForm } from './salon-profile-form';
 
 export const metadata: Metadata = { title: 'Paramètres - Tableau de bord' };
@@ -45,6 +46,12 @@ export default async function SettingsPage() {
       </CardLink>
 
       <SalonProfileForm settings={settings} />
+
+      {/* Sécurité du compte : mot de passe et sessions. */}
+      <div className="mt-3 grid items-start gap-3 lg:grid-cols-2">
+        <PasswordCard />
+        <SessionsCard />
+      </div>
     </div>
   );
 }

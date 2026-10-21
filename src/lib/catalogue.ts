@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type { HairLength, PhotoPolicy, Prisma } from '@prisma/client';
 import { db } from './db';
+import { OPTION_ORDER_BY } from '@/modules/catalogue/ordering';
 
 /* ------------------------------------------------------------------ */
 /* Paramètres de requête publique (P1.9, P3.2)                        */
@@ -65,7 +66,7 @@ const CATALOGUE_SERVICE_SELECT = {
   },
   options: {
     where: { active: true },
-    orderBy: { name: 'asc' },
+    orderBy: OPTION_ORDER_BY,
     select: { name: true, priceCents: true },
   },
 } satisfies Prisma.ServiceSelect;
@@ -148,7 +149,7 @@ const SERVICE_DETAIL_SELECT = {
   },
   options: {
     where: { active: true },
-    orderBy: { name: 'asc' },
+    orderBy: OPTION_ORDER_BY,
     select: { id: true, name: true, priceCents: true, durationMinutes: true },
   },
   compatibility: {

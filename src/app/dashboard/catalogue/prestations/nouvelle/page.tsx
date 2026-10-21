@@ -2,7 +2,7 @@ import { Plus, Scissors } from 'lucide-react';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { requireAdmin } from '@/modules/auth/guards';
-import { listAdminCategories } from '@/lib/catalogue-admin';
+import { listCategoryOptions } from '@/lib/catalogue-admin';
 import { adminCreateService } from '@/modules/catalogue/actions';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { BackButton } from '@/components/shared/BackButton';
@@ -16,7 +16,7 @@ export default async function NewServicePage() {
   const user = await requireAdmin();
   if (!user) redirect('/connexion?callbackUrl=/dashboard/catalogue/prestations/nouvelle');
 
-  const categories = await listAdminCategories();
+  const categories = await listCategoryOptions();
 
   return (
     <div>

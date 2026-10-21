@@ -1,9 +1,9 @@
 'use server';
 
-import { headers } from 'next/headers';
 import { z } from 'zod';
 import { db } from '@/lib/db';
 import { AppError } from '@/lib/errors';
+import { getClientIp } from '@/lib/client-ip';
 import { rateLimit } from '@/lib/rate-limit';
 import { createBooking } from '@/modules/reservations/service';
 import { bookingReference } from '@/modules/reservations/schemas';
@@ -36,9 +36,8 @@ export async function confirmWaitlistBookingAction(
   }
 
   // Endpoint public : limité par IP, et réservé aux inscrites prévenues (jeton NOTIFIED).
-  const forwarded = (await headers()).get('x-forwarded-for');
-  const ip = (forwarded?.split(',')[0] ?? '').trim() || 'unknown';
-  if (!rateLimit(`waitlist-confirm:${ip}`, { max: 10, windowMs: 15 * 60_000 }).allowed) {
+  const ip = await getClientIp();
+  if (!(await rateLimit(`waitlist-confirm:${ip}`, { max: 10, windowMs: 15 * 60_000 })).allowed) {
     return { error: 'Trop de tentatives. Réessayez dans quelques minutes.' };
   }
   const entry = await db.waitlistEntry.findFirst({

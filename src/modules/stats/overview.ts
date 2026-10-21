@@ -193,6 +193,8 @@ export interface PeriodStatistics {
   byStatus: Array<{ status: string; count: number }>;
   popularServices: Array<{ name: string; count: number }>;
   series: StatsBucket[];
+  /** Vrai si plus de 20 000 rendez-vous : le graphique est alors partiel (totaux exacts). */
+  seriesTruncated: boolean;
 }
 
 const DAY_MS = 24 * 3_600_000;
@@ -267,54 +269,75 @@ function buildBuckets(period: StatsPeriod, now: Date) {
   };
 }
 
+/* Garde-fou : le graphique lit au plus ce nombre de rendez-vous (triés par date). Au-delà, la série
+   est tronquée (`seriesTruncated`) ; les totaux, statuts et prestations restent exacts (agrégations SQL). */
+const SERIES_ROW_LIMIT = 20_000;
+
 export async function getPeriodStatistics(
   period: StatsPeriod,
   now = new Date(),
 ): Promise<PeriodStatistics> {
   const { from, granularity, buckets, index } = buildBuckets(period, now);
   const to = salonDayBounds(now).end;
+  const where = { startsAt: { gte: from, lt: to } };
 
-  const [rows, customRequests] = await Promise.all([
+  const [byStatusRows, topServiceRows, seriesRows, customRequests] = await Promise.all([
+    // Totaux exacts par statut (+ somme des prix figés).
+    db.appointment.groupBy({
+      by: ['status'],
+      where,
+      _count: { _all: true, priceCents: true },
+      _sum: { priceCents: true },
+    }),
+    db.appointment.groupBy({
+      by: ['serviceId'],
+      where: { ...where, status: { in: ['CONFIRMED', 'RESCHEDULED', 'COMPLETED'] } },
+      _count: { _all: true },
+      orderBy: [{ _count: { serviceId: 'desc' } }, { serviceId: 'asc' }],
+      take: 8,
+    }),
+    // Série du graphique : lignes minimales, ordre déterministe, borne explicite (+1 pour détecter le dépassement).
     db.appointment.findMany({
-      where: { startsAt: { gte: from, lt: to } },
-      select: { startsAt: true, status: true, priceCents: true, serviceId: true },
-      take: 20_000,
+      where,
+      orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
+      select: { startsAt: true, status: true, priceCents: true },
+      take: SERIES_ROW_LIMIT + 1,
     }),
     db.customRequest.count({ where: { createdAt: { gte: from, lt: to } } }),
   ]);
 
-  const statusCount = new Map<string, number>();
-  const serviceCount = new Map<string, number>();
+  const seriesTruncated = seriesRows.length > SERIES_ROW_LIMIT;
+  for (const row of seriesRows.slice(0, SERIES_ROW_LIMIT)) {
+    const cancelled = row.status === 'CANCELLED_BY_CUSTOMER' || row.status === 'CANCELLED_BY_ADMIN';
+    const bucket = buckets[index(row.startsAt)];
+    if (!bucket) continue;
+    if (!cancelled) bucket.appointments++;
+    if (row.status === 'COMPLETED' && row.priceCents != null) bucket.revenueCents += row.priceCents;
+  }
+
+  let totalAppointments = 0;
   let revenueCents = 0;
   let completedCount = 0;
   let pricedCompleted = 0;
   let cancelledCount = 0;
   let noShowCount = 0;
-
-  for (const row of rows) {
-    statusCount.set(row.status, (statusCount.get(row.status) ?? 0) + 1);
-    const cancelled = row.status === 'CANCELLED_BY_CUSTOMER' || row.status === 'CANCELLED_BY_ADMIN';
-    if (cancelled) cancelledCount++;
-    if (row.status === 'NO_SHOW') noShowCount++;
-    const bucket = buckets[index(row.startsAt)];
-    if (bucket && !cancelled) bucket.appointments++;
-    if (row.status === 'COMPLETED') {
-      completedCount++;
-      if (row.priceCents != null) {
-        revenueCents += row.priceCents;
-        pricedCompleted++;
-        if (bucket) bucket.revenueCents += row.priceCents;
-      }
+  for (const row of byStatusRows) {
+    const count = row._count._all;
+    totalAppointments += count;
+    if (row.status === 'CANCELLED_BY_CUSTOMER' || row.status === 'CANCELLED_BY_ADMIN') {
+      cancelledCount += count;
     }
-    if (['CONFIRMED', 'RESCHEDULED', 'COMPLETED'].includes(row.status)) {
-      serviceCount.set(row.serviceId, (serviceCount.get(row.serviceId) ?? 0) + 1);
+    if (row.status === 'NO_SHOW') noShowCount += count;
+    if (row.status === 'COMPLETED') {
+      completedCount += count;
+      revenueCents += row._sum.priceCents ?? 0;
+      pricedCompleted += row._count.priceCents;
     }
   }
 
-  const topServices = [...serviceCount.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
-  const services = topServices.length
+  const services = topServiceRows.length
     ? await db.service.findMany({
-        where: { id: { in: topServices.map(([id]) => id) } },
+        where: { id: { in: topServiceRows.map((r) => r.serviceId) } },
         select: { id: true, name: true },
       })
     : [];
@@ -323,21 +346,22 @@ export async function getPeriodStatistics(
   return {
     period,
     granularity,
-    totalAppointments: rows.length,
+    totalAppointments,
     completedCount,
     cancelledCount,
     noShowCount,
     customRequests,
     revenueCents,
     averageTicketCents: pricedCompleted > 0 ? Math.round(revenueCents / pricedCompleted) : 0,
-    byStatus: [...statusCount.entries()]
-      .map(([status, count]) => ({ status, count }))
-      .sort((a, b) => b.count - a.count),
-    popularServices: topServices.map(([id, count]) => ({
-      name: names.get(id) ?? 'Prestation supprimée',
-      count,
+    byStatus: byStatusRows
+      .map((row) => ({ status: row.status as string, count: row._count._all }))
+      .sort((x, y) => y.count - x.count),
+    popularServices: topServiceRows.map((row) => ({
+      name: names.get(row.serviceId) ?? 'Prestation supprimée',
+      count: row._count._all,
     })),
     series: buckets,
+    seriesTruncated,
   };
 }
 

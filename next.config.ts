@@ -13,6 +13,17 @@ function storageHostname(): string | null {
   }
 }
 
+/** Sources d'images autorisées par la CSP : plus de https: générique. */
+const imgSrc = [
+  "'self'",
+  'data:',
+  'blob:',
+  'https://images.pexels.com',
+  // URLs signées du bucket R2 (path-style : <compte>.r2.cloudflarestorage.com) et hôte configuré.
+  'https://*.r2.cloudflarestorage.com',
+  ...(storageHostname() ? [`https://${storageHostname()}`] : []),
+];
+
 const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'X-Frame-Options', value: 'DENY' },
@@ -36,7 +47,7 @@ if (isProduction) {
         "default-src 'self'",
         "script-src 'self' 'unsafe-inline'",
         "style-src 'self' 'unsafe-inline'",
-        "img-src 'self' data: blob: https:",
+        `img-src ${imgSrc.join(' ')}`,
         "font-src 'self' data:",
         "connect-src 'self'",
         "frame-ancestors 'none'",

@@ -1,6 +1,16 @@
 'use client';
 
-import { Banknote, CalendarRange, Percent, Plus, Power, PowerOff, Tag, Trash2 } from 'lucide-react';
+import {
+  Banknote,
+  CalendarRange,
+  Percent,
+  Plus,
+  Power,
+  PowerOff,
+  Tag,
+  Ticket,
+  Trash2,
+} from 'lucide-react';
 import {
   startTransition as startFormTransition,
   useActionState,
@@ -34,6 +44,8 @@ type Phase = 'active' | 'upcoming' | 'ended' | 'off';
 export type PromotionRow = {
   id: string;
   name: string;
+  /** Code promo saisi par la cliente ; null = promotion automatique. */
+  code: string | null;
   kind: Kind;
   /** Pourcentage, ou montant en 1/100 FCFA. */
   value: number;
@@ -137,6 +149,20 @@ function PromotionForm({
         maxLength={120}
         defaultValue={promotion?.name ?? ''}
         placeholder="Ex. Offre de rentrée"
+      />
+      <Input
+        label="Code promo (facultatif)"
+        name="code"
+        icon={Ticket}
+        maxLength={20}
+        defaultValue={promotion?.code ?? ''}
+        placeholder="Ex. RENTREE20"
+        autoCapitalize="characters"
+        autoComplete="off"
+        spellCheck={false}
+        pattern="[A-Za-z0-9\-]{3,20}"
+        title="3 à 20 caractères : lettres, chiffres ou tirets"
+        hint="Sans code, la réduction s’applique automatiquement. Avec un code, seule la cliente qui le saisit en profite."
       />
       <div className="grid grid-cols-2 gap-3">
         <Select
@@ -319,7 +345,7 @@ export function PromotionsClient({
       <PageHeader
         icon={Tag}
         title="Promotions"
-        description="Réductions appliquées automatiquement à la réservation."
+        description="Réductions automatiques ou sur code promo, appliquées à la réservation."
         actions={
           <Button icon={Plus} iconOnly="mobile" onClick={() => open('new')}>
             Nouvelle promotion
@@ -367,6 +393,12 @@ export function PromotionsClient({
                     <Badge tone={phase.tone} className="px-2! py-0.5! text-xs!">
                       {phase.label}
                     </Badge>
+                    {promotion.code ? (
+                      <span className="inline-flex items-center gap-1 rounded-[var(--radius-full)] bg-accent-soft px-2 py-0.5 text-xs font-semibold tracking-wide text-accent">
+                        <Ticket aria-hidden="true" className="size-3.5" />
+                        {promotion.code}
+                      </span>
+                    ) : null}
                   </span>
                   <span className="mt-0.5 block truncate font-semibold text-fg">
                     {promotion.name}

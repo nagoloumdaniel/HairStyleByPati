@@ -98,7 +98,7 @@ export async function adminUploadGalleryPhoto(
       action: 'gallery.upload',
       entityType: 'GalleryPhoto',
       metadata: { count: added },
-    }).catch(() => undefined);
+    });
     revalidate();
   }
   if (added === 0) return { error: lastError ?? 'Envoi impossible.' };

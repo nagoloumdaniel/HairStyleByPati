@@ -8,15 +8,23 @@ export function EmptyState({
   actionLabel,
   actionHref,
   onAction,
+  variant = 'default',
 }: {
   title: string;
   message: string;
   actionLabel?: string;
   actionHref?: string;
   onAction?: () => void;
+  /** `compact` : sobre, titre simple (dashboard). `default` : titre animé (pages publiques). */
+  variant?: 'default' | 'compact';
 }) {
+  const compact = variant === 'compact';
   return (
-    <div className="flex flex-col items-center rounded-[var(--radius-lg)] bg-card px-6 py-12 text-center shadow-soft">
+    <div
+      className={`flex flex-col items-center rounded-[var(--radius-lg)] bg-card text-center shadow-soft ${
+        compact ? 'px-4 py-8' : 'px-6 py-12'
+      }`}
+    >
       <span
         aria-hidden="true"
         className="inline-flex size-12 items-center justify-center rounded-full bg-accent-soft text-cacao"
@@ -36,9 +44,13 @@ export function EmptyState({
           <path d="M20 4 8.12 15.88M14.47 14.48 20 20M8.12 8.12 12 12" />
         </svg>
       </span>
-      <Title as="h2" className="mt-4">
-        {title}
-      </Title>
+      {compact ? (
+        <h2 className="mt-3 font-heading text-lg font-bold text-fg">{title}</h2>
+      ) : (
+        <Title as="h2" className="mt-4">
+          {title}
+        </Title>
+      )}
       <p className="mt-2 max-w-md text-muted">{message}</p>
       {actionLabel && actionHref ? (
         <ButtonLink href={actionHref} className="mt-6">

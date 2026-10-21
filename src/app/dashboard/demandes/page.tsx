@@ -88,6 +88,7 @@ export default async function CustomRequestsPage({
 
       {result.items.length === 0 ? (
         <EmptyState
+          variant="compact"
           title="Aucune demande"
           message={
             status

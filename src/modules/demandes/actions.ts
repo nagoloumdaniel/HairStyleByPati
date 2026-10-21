@@ -1,11 +1,11 @@
 'use server';
 
 import { flushEmailsSoon } from '@/modules/notifications/flush';
-import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 import type { CustomRequestStatus, Prisma } from '@prisma/client';
 import { db } from '@/lib/db';
 import { AppError, parseInput } from '@/lib/errors';
+import { getClientIp } from '@/lib/client-ip';
 import { rateLimit } from '@/lib/rate-limit';
 import { deviceTimeToUtc } from '@/lib/dates';
 import { requireAdmin } from '@/modules/auth/guards';
@@ -25,12 +25,6 @@ function handleError(error: unknown): { error: string } {
   if (error instanceof AppError) return { error: error.message };
   console.error(error);
   return { error: 'Une erreur est survenue. Réessayez.' };
-}
-
-async function clientIp(): Promise<string> {
-  const headersList = await headers();
-  const forwarded = headersList.get('x-forwarded-for');
-  return forwarded ? (forwarded.split(',')[0] ?? '').trim() : 'unknown';
 }
 
 function parseDesiredDate(dateISO: string): Date | null {
@@ -69,8 +63,8 @@ export async function submitCustomRequest(
   _state: CustomRequestSubmitState,
   formData: FormData,
 ): Promise<CustomRequestSubmitState> {
-  const ip = await clientIp();
-  const limit = rateLimit(`demandes:submit:${ip}`, { max: 4, windowMs: 60 * 60_000 });
+  const ip = await getClientIp();
+  const limit = await rateLimit(`demandes:submit:${ip}`, { max: 4, windowMs: 60 * 60_000 });
   if (!limit.allowed) {
     return { error: 'Trop de demandes envoyées. Réessayez dans un moment.' };
   }

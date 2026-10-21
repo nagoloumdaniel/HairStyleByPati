@@ -5,7 +5,14 @@ export const hairLengthSchema = z.enum(['SHORT', 'MEDIUM', 'LONG', 'VERY_LONG'])
 export const customRequestSchema = z.object({
   name: z.string().trim().min(2, 'Nom requis (2 caractères minimum).').max(100),
   email: z.string().trim().email('E-mail invalide.').max(200),
-  phone: z.string().trim().min(8, 'Téléphone invalide.').max(30).optional().or(z.literal('')),
+  phone: z
+    .string()
+    .trim()
+    .min(8, 'Téléphone invalide.')
+    .max(30)
+    .regex(/^[+\d\s().-]*$/, 'Téléphone invalide (chiffres, espaces et + uniquement).')
+    .optional()
+    .or(z.literal('')),
   description: z
     .string()
     .trim()

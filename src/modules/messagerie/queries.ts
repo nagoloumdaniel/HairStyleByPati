@@ -82,6 +82,10 @@ const LIST_SELECT = {
     take: 1,
     select: { content: true },
   },
+  // Non lus : compteur filtré calculé dans la même requête (évite une 2e requête séquentielle).
+  _count: {
+    select: { messages: { where: { author: 'CUSTOMER', isInternal: false, readAt: null } } },
+  },
 } satisfies Prisma.ConversationSelect;
 
 type ListRow = Prisma.ConversationGetPayload<{ select: typeof LIST_SELECT }>;
@@ -109,20 +113,6 @@ export async function listConversations(options?: {
     }),
   ]);
 
-  const unreadByConversation = await db.message.groupBy({
-    by: ['conversationId'],
-    where: {
-      conversationId: { in: rows.map((row) => row.id) },
-      author: 'CUSTOMER',
-      isInternal: false,
-      readAt: null,
-    },
-    _count: { _all: true },
-  });
-  const unreadMap = new Map(
-    unreadByConversation.map((row) => [row.conversationId, row._count._all]),
-  );
-
   return {
     items: rows.map((row: ListRow) => ({
       id: row.id,
@@ -133,7 +123,7 @@ export async function listConversations(options?: {
       customerName: row.customer?.name ?? 'Contact sans fiche',
       customerEmail: row.customer?.email ?? null,
       lastMessage: row.messages[0]?.content ?? '',
-      unreadCount: unreadMap.get(row.id) ?? 0,
+      unreadCount: row._count.messages,
     })),
     total,
     page,

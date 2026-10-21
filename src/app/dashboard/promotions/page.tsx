@@ -26,6 +26,7 @@ export default async function PromotionsPage() {
   const rows: PromotionRow[] = promotions.map((promotion) => ({
     id: promotion.id,
     name: promotion.name,
+    code: promotion.code,
     kind: promotion.kind,
     value: promotion.value,
     startsAt: day(promotion.startsAt),

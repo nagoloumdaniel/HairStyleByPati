@@ -132,6 +132,21 @@ function CategoryRow({
   const nextActive = !category.active;
   const hasServices = category.serviceCount > 0;
 
+  async function onToggleActive() {
+    if (category.active) {
+      const ok = await confirm({
+        title: 'Désactiver cette catégorie ?',
+        message: `« ${category.name} » et ses prestations ne seront plus visibles sur le site. Vous pourrez la réactiver à tout moment.`,
+        confirmLabel: 'Désactiver',
+        tone: 'primary',
+      });
+      if (!ok) return;
+    }
+    toggle.run(() =>
+      adminSetCategoryActive({}, formDataOf({ id: category.id, active: nextActive })),
+    );
+  }
+
   async function onDelete() {
     const ok = await confirm({
       title: 'Supprimer cette catégorie ?',
@@ -190,11 +205,7 @@ function CategoryRow({
           iconOnly
           icon={category.active ? EyeOff : Eye}
           loading={toggle.pending}
-          onClick={() =>
-            toggle.run(() =>
-              adminSetCategoryActive({}, formDataOf({ id: category.id, active: nextActive })),
-            )
-          }
+          onClick={onToggleActive}
           aria-label={`${nextActive ? 'Activer' : 'Désactiver'} la catégorie ${category.name}`}
           title={nextActive ? 'Activer' : 'Désactiver'}
         >

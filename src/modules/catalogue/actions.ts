@@ -23,6 +23,7 @@ import {
   getServiceImageKeys,
   reorderCategories,
   reorderServiceImages,
+  reorderServiceOptions,
   reorderServiceQuestions,
   setCategoryActive,
   setPrimaryServiceImage,
@@ -97,6 +98,8 @@ function revalidateCatalogue(service?: { id?: string; slug?: string }) {
   if (service?.id) revalidatePath(`/dashboard/catalogue/prestations/${service.id}`);
   revalidatePath('/coiffures');
   if (service?.slug) revalidatePath(`/coiffures/${service.slug}`);
+  // Page statique dont le menu « Prestation souhaitée » liste les prestations publiées.
+  revalidatePath('/liste-attente');
 }
 
 /* ============================================================ */
@@ -899,6 +902,33 @@ export async function adminReorderQuestions(
     });
     revalidateCatalogue({ id: serviceId });
     return { success: 'Ordre des questions enregistré.' };
+  } catch (error) {
+    return handleError(error);
+  }
+}
+
+/** Monter / descendre une option : liste COMPLÈTE des ids dans le nouvel ordre. */
+export async function adminReorderOptions(
+  serviceId: string,
+  orderedIds: string[],
+): Promise<CatalogueActionState> {
+  const user = await requireAdmin();
+  if (!user) return { error: 'Accès interdit.' };
+  if (typeof serviceId !== 'string' || !serviceId.trim()) return { error: 'Prestation invalide.' };
+
+  const parsed = parseForm(orderedIdsSchema, orderedIds);
+  if ('error' in parsed) return { error: parsed.error };
+
+  try {
+    await reorderServiceOptions(serviceId, parsed.data);
+    await logAudit({
+      userId: user.id,
+      action: 'service.option.reorder',
+      entityType: 'ServiceOption',
+      metadata: { serviceId, count: parsed.data.length },
+    });
+    revalidateCatalogue({ id: serviceId });
+    return { success: 'Ordre des options enregistré.' };
   } catch (error) {
     return handleError(error);
   }

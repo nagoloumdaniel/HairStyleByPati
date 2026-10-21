@@ -63,6 +63,21 @@ describe('datetime helpers', () => {
 });
 
 describe('windowsForDate', () => {
+  it('treats an empty specific rule (00:00-00:00) as a closed day', () => {
+    const closed: AvailabilityRuleInput = {
+      kind: 'SPECIFIC',
+      date: '2026-06-02',
+      weekday: null,
+      startMinute: 0,
+      endMinute: 0,
+      active: true,
+    };
+    expect(windowsForDate([weekly(1, 540, 720), closed], '2026-06-02')).toEqual([]);
+    expect(windowsForDate([weekly(1, 540, 720), closed], '2026-06-09')).toEqual([
+      { startMinute: 540, endMinute: 720 },
+    ]);
+  });
+
   it('should use the weekly rules of the matching weekday', () => {
     const windows = windowsForDate([weekly(1, 540, 720)], '2026-06-02');
     expect(windows).toEqual([{ startMinute: 540, endMinute: 720 }]);

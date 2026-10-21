@@ -42,6 +42,8 @@ export const authConfig = {
     jwt({ token, user }) {
       if (user) {
         token.role = user.role;
+        // Version de session au login : requireAdmin la compare à la base (révocation).
+        token.sv = user.sessionVersion ?? 0;
       }
       return token;
     },
@@ -49,6 +51,8 @@ export const authConfig = {
       if (session.user) {
         session.user.id = token.sub ?? '';
         session.user.role = (typeof token.role === 'string' ? token.role : 'ADMIN') as Role;
+        // Jetons émis avant l'introduction de sv : équivalent à la version par défaut (0).
+        session.user.sv = typeof token.sv === 'number' ? token.sv : 0;
       }
       return session;
     },

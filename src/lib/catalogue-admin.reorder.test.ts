@@ -8,6 +8,10 @@ const mocks = vi.hoisted(() => {
     categoryFindMany: vi.fn(),
     imageFindMany: vi.fn(),
     questionFindMany: vi.fn(),
+    optionFindMany: vi.fn(),
+    serviceFindUnique: vi.fn(async () => ({ id: 's1' })),
+    optionAggregate: vi.fn(),
+    optionCreate: vi.fn((args: unknown) => args),
     transaction: vi.fn(async (ops: unknown[]) => ops),
   };
 });
@@ -17,12 +21,21 @@ vi.mock('./db', () => ({
     category: { findMany: mocks.categoryFindMany, update: mocks.update },
     serviceImage: { findMany: mocks.imageFindMany, update: mocks.update },
     questionDefinition: { findMany: mocks.questionFindMany, update: mocks.update },
+    service: { findUnique: mocks.serviceFindUnique },
+    serviceOption: {
+      findMany: mocks.optionFindMany,
+      update: mocks.update,
+      aggregate: mocks.optionAggregate,
+      create: mocks.optionCreate,
+    },
     $transaction: mocks.transaction,
   },
 }));
 
 import {
+  createServiceOption,
   reorderCategories,
+  reorderServiceOptions,
   reorderServiceImages,
   reorderServiceQuestions,
   setPrimaryServiceImage,
@@ -64,6 +77,47 @@ describe('reorderServiceQuestions', () => {
     ]);
     await expect(reorderServiceQuestions('s1', ['q2', 'zz'])).rejects.toMatchObject({
       status: 409,
+    });
+  });
+});
+
+describe('reorderServiceOptions', () => {
+  it('numérote dans la prestation et refuse une option étrangère, manquante ou en double', async () => {
+    mocks.optionFindMany.mockResolvedValue(ids('o1', 'o2', 'o3'));
+    await reorderServiceOptions('s1', ['o3', 'o1', 'o2']);
+    expect(mocks.update.mock.calls.map(([args]) => args)).toEqual([
+      { where: { id: 'o3', serviceId: 's1' }, data: { order: 0 } },
+      { where: { id: 'o1', serviceId: 's1' }, data: { order: 1 } },
+      { where: { id: 'o2', serviceId: 's1' }, data: { order: 2 } },
+    ]);
+    mocks.transaction.mockClear();
+    await expect(reorderServiceOptions('s1', ['o1', 'zz', 'o2'])).rejects.toMatchObject({
+      status: 409,
+    });
+    await expect(reorderServiceOptions('s1', ['o1', 'o2'])).rejects.toMatchObject({ status: 409 });
+    await expect(reorderServiceOptions('s1', ['o1', 'o1', 'o2'])).rejects.toMatchObject({
+      status: 409,
+    });
+    expect(mocks.transaction).not.toHaveBeenCalled();
+  });
+});
+
+describe('createServiceOption', () => {
+  const data = { name: 'Perles', priceCents: 500_000, durationMinutes: 30, active: true };
+
+  it('place la nouvelle option en dernier (ordre max + 1)', async () => {
+    mocks.optionAggregate.mockResolvedValue({ _max: { order: 4 } });
+    await createServiceOption('s1', data);
+    expect(mocks.optionCreate).toHaveBeenCalledWith({
+      data: { serviceId: 's1', ...data, order: 5 },
+    });
+  });
+
+  it('commence à 0 pour la première option', async () => {
+    mocks.optionAggregate.mockResolvedValue({ _max: { order: null } });
+    await createServiceOption('s1', data);
+    expect(mocks.optionCreate).toHaveBeenCalledWith({
+      data: { serviceId: 's1', ...data, order: 0 },
     });
   });
 });

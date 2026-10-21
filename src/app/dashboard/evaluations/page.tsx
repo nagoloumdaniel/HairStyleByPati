@@ -100,6 +100,7 @@ export default async function EvaluationsPage({
 
       {result.items.length === 0 ? (
         <EmptyState
+          variant="compact"
           title="Aucune évaluation"
           message={
             status

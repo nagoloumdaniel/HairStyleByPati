@@ -26,6 +26,19 @@ export function ServiceActionsRow({
   const next: ServiceStatus = isPublished || isArchived ? 'DRAFT' : 'PUBLISHED';
   const label = isArchived ? 'Rétablir en brouillon' : isPublished ? 'Dépublier' : 'Publier';
 
+  async function onToggleStatus() {
+    if (isPublished) {
+      const ok = await confirm({
+        title: 'Dépublier cette prestation ?',
+        message: `« ${service.name} » ne sera plus visible sur le site ni réservable. Vous pourrez la republier à tout moment.`,
+        confirmLabel: 'Dépublier',
+        tone: 'primary',
+      });
+      if (!ok) return;
+    }
+    statusAction.run(() => adminSetServiceStatus({}, formDataOf({ id: service.id, status: next })));
+  }
+
   async function onArchive() {
     const ok = await confirm({
       title: 'Archiver cette prestation ?',
@@ -46,11 +59,7 @@ export function ServiceActionsRow({
         iconOnly
         icon={isArchived ? RotateCcw : isPublished ? EyeOff : Eye}
         loading={statusAction.pending}
-        onClick={() =>
-          statusAction.run(() =>
-            adminSetServiceStatus({}, formDataOf({ id: service.id, status: next })),
-          )
-        }
+        onClick={onToggleStatus}
         aria-label={`${label} : ${service.name}`}
         title={label}
       >

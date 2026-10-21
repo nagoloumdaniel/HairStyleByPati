@@ -65,7 +65,7 @@ export default async function StatisticsPage({
               <Link
                 href={`/dashboard/statistiques?period=${p}`}
                 aria-current={p === period ? 'page' : undefined}
-                className={`inline-flex h-8 items-center whitespace-nowrap rounded-full px-3 text-sm font-semibold transition ${
+                className={`inline-flex h-9 items-center whitespace-nowrap rounded-full px-3 text-sm font-semibold transition ${
                   p === period ? 'bg-ink text-panel-fg' : 'text-fg hover:bg-accent-soft'
                 }`}
               >
@@ -99,6 +99,12 @@ export default async function StatisticsPage({
           <Kpi icon={Wand2} label="Demandes personnalisées" value={stats.customRequests} />
         </CardLink>
       </div>
+
+      {stats.seriesTruncated ? (
+        <p role="status" className="mt-3 text-sm text-muted">
+          Volume très élevé : les graphiques sont partiels, les totaux restent exacts.
+        </p>
+      ) : null}
 
       <div className="mt-3 grid items-start gap-3 xl:grid-cols-2">
         <Card>

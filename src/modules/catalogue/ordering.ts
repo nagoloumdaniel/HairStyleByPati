@@ -1,3 +1,5 @@
+import type { Prisma } from '@prisma/client';
+
 /* ============================================================
  * Ordonnancement (catégories, photos, questions) — logique pure,
  * partagée par l'UI (optimistic) et testable sans base.
@@ -30,3 +32,13 @@ export function isPermutation(ids: readonly string[], knownIds: readonly string[
   }
   return true;
 }
+
+/**
+ * Tri unique des options de prestation (admin ET public) : ordre choisi dans le dashboard,
+ * puis nom (ordre historique tant que rien n'a été réordonné), puis id (tri stable).
+ */
+export const OPTION_ORDER_BY: Prisma.ServiceOptionOrderByWithRelationInput[] = [
+  { order: 'asc' },
+  { name: 'asc' },
+  { id: 'asc' },
+];

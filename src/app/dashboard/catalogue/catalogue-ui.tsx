@@ -2,11 +2,10 @@
 
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import {
-  startTransition,
-  useActionState,
   useEffect,
   useOptimistic,
   useRef,
+  useState,
   useTransition,
   type FormEvent,
   type ReactNode,
@@ -27,23 +26,39 @@ type FormAction = (prev: CatalogueActionState, formData: FormData) => Promise<Ca
 /* Formulaire : état, bouton en chargement, toast de succès, rappel onSuccess.
    On soumet via `onSubmit` (et non `<form action>`) : React 19 réinitialise sinon les champs non
    contrôlés après l'action, ce qui efface la saisie quand le serveur renvoie une erreur.
-   L'erreur reste affichée dans le formulaire (FormError) : un toast serait sous la modale. */
+   L'erreur reste affichée dans le formulaire (FormError) : un toast serait sous la modale.
+   Pas de `useActionState` : son état et son `pending` voyagent dans la même transition que la mise
+   à jour du routeur (revalidatePath). Si ce rendu reste suspendu, le résultat n'est appliqué qu'au
+   prochain rendu urgent : bouton en chargement, modale ouverte, aucun toast. Ici le résultat est
+   appliqué par des mises à jour urgentes, une fois la server action terminée. */
 export function useFormAction(action: FormAction, onSuccess?: () => void) {
-  const [state, formAction, pending] = useActionState<CatalogueActionState, FormData>(action, {});
+  const [state, setState] = useState<CatalogueActionState>({});
+  const [pending, setPending] = useState(false);
+  const busyRef = useRef(false);
   const { notify } = useToast();
   const onSuccessRef = useRef(onSuccess);
   useEffect(() => {
     onSuccessRef.current = onSuccess;
   });
-  useEffect(() => {
-    if (!state.success) return;
-    notify(state.success, 'success');
-    onSuccessRef.current?.();
-  }, [state, notify]);
-  function onSubmit(event: FormEvent<HTMLFormElement>) {
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (busyRef.current) return;
+    busyRef.current = true;
+    setPending(true);
     const formData = new FormData(event.currentTarget);
-    startTransition(() => formAction(formData));
+    let result: CatalogueActionState;
+    try {
+      result = await action({}, formData);
+    } catch {
+      result = { error: 'Une erreur est survenue. Réessayez plus tard.' };
+    }
+    busyRef.current = false;
+    setState(result);
+    setPending(false);
+    if (result.success) {
+      notify(result.success, 'success');
+      onSuccessRef.current?.();
+    }
   }
   return { state, onSubmit, pending };
 }
