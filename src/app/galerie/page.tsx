@@ -19,10 +19,6 @@ export default async function GaleriePage() {
       <Title as="h1" size="display" className="">
         Galerie de réalisations
       </Title>
-      <p className="mt-2 hidden max-w-2xl text-muted md:block">
-        Un aperçu de réalisations de Patricia, partagées avec l’autorisation explicite des clientes
-        concernées.
-      </p>
       {photos.length === 0 ? (
         <p className="mt-10 rounded-[var(--radius-md)] border border-dashed border-line p-10 text-center text-muted">
           La galerie sera bientôt disponible.

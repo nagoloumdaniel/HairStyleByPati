@@ -1,7 +1,10 @@
+import { CalendarCheck, ChevronRight, Clock, MailCheck, MapPin, Sparkles } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { ContactForm } from './ContactForm';
+import { SocialLinks } from '@/components/layout/SocialLinks';
+import { ButtonLink } from '@/components/ui/Button';
 import { Title } from '@/components/ui/Title';
 
 export const metadata: Metadata = {
@@ -11,9 +14,27 @@ export const metadata: Metadata = {
   alternates: { canonical: '/contact' },
 };
 
+const INFOS = [
+  {
+    Icon: MailCheck,
+    title: 'Réponse sous 24 h ouvrées',
+    text: 'Par e-mail.',
+  },
+  {
+    Icon: MapPin,
+    title: 'Coiffure sur rendez-vous',
+    text: 'Patricia vous reçoit à Dakar.',
+  },
+  {
+    Icon: Clock,
+    title: 'Lundi - Dimanche, 5h - 22h',
+    text: 'Horaires de rendez-vous.',
+  },
+] as const;
+
 export default function ContactPage() {
   return (
-    <main className="page-main space-y-12">
+    <main className="page-main space-y-10">
       <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
         <ol className="flex flex-wrap items-center gap-2">
           <li>
@@ -21,7 +42,9 @@ export default function ContactPage() {
               Accueil
             </Link>
           </li>
-          <li aria-hidden="true">/</li>
+          <li aria-hidden="true">
+            <ChevronRight className="size-3.5" />
+          </li>
           <li>
             <span aria-current="page" className="font-medium text-fg">
               Contact
@@ -30,46 +53,58 @@ export default function ContactPage() {
         </ol>
       </nav>
 
-      <header className="max-w-3xl space-y-3">
-        <p className="hidden text-sm font-semibold uppercase tracking-[0.14em] text-cacao md:block">
-          Contact
-        </p>
-        <Title as="h1" size="display" className="">
+      <header className="max-w-3xl space-y-4">
+        <Title as="h1" size="display">
           Écrivez-nous
         </Title>
-        <p className="hidden text-lg leading-relaxed text-muted md:block">
-          Une question sur une prestation, un rendez-vous ou les horaires ? Patricia vous répond
-          personnellement.
-        </p>
       </header>
 
-      <section className="max-w-3xl">
-        <ContactForm />
-      </section>
+      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-10">
+        <section aria-label="Formulaire de contact" className="order-2 lg:order-1">
+          <ContactForm />
+        </section>
 
-      <section className="max-w-3xl rounded-2xl bg-page p-8 text-center md:p-10">
-        <Title as="h2" className="">
-          Retrouvez-nous aussi
-        </Title>
-        <p className="mx-auto mt-3 max-w-md text-muted">
-          Hairstyle by Patricia – coiffures texturées, tresses, vanilles, locs et coiffures
-          protectrices.
-        </p>
-        <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-          <Link
-            href="/coiffures"
-            className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] border border-line bg-card px-6 py-3 font-semibold text-fg shadow-soft transition hover:border-cacao hover:bg-page"
-          >
-            Voir le catalogue
-          </Link>
-          <Link
-            href="/coiffures"
-            className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
-          >
-            Réserver un créneau
-          </Link>
-        </div>
-      </section>
+        <aside
+          aria-label="Informations pratiques"
+          className="order-1 space-y-6 rounded-[var(--radius-lg)] bg-gradient-soft p-6 sm:p-8 lg:order-2"
+        >
+          <h2 className="font-heading text-xl font-bold text-fg">Infos pratiques</h2>
+          <ul className="space-y-5">
+            {INFOS.map(({ Icon, title, text }) => (
+              <li key={title} className="flex gap-3">
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-card text-cacao shadow-soft">
+                  <Icon aria-hidden="true" className="size-5" />
+                </span>
+                <div>
+                  <p className="font-semibold text-fg">{title}</p>
+                  <p className="text-sm text-muted">{text}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          <div className="border-t border-line pt-5">
+            <div className="flex flex-col gap-2">
+              <ButtonLink href="/coiffures" icon={CalendarCheck} className="w-full">
+                Réserver un créneau
+              </ButtonLink>
+              <ButtonLink
+                href="/demandes-personnalisees"
+                variant="secondary"
+                icon={Sparkles}
+                className="w-full"
+              >
+                Demande personnalisée
+              </ButtonLink>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between gap-3 border-t border-line pt-4">
+            <p className="text-sm text-muted">Suivre Patricia</p>
+            <SocialLinks />
+          </div>
+        </aside>
+      </div>
     </main>
   );
 }

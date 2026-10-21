@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
+import { Mail, Scissors } from 'lucide-react';
 import Link from 'next/link';
+import { Breadcrumb } from '@/components/shared/Breadcrumb';
+import { ButtonLink } from '@/components/ui/Button';
 import { Title } from '@/components/ui/Title';
 
 export const metadata: Metadata = {
@@ -12,33 +15,12 @@ export const metadata: Metadata = {
 export default function MentionsLegalesPage() {
   return (
     <main className="page-main space-y-12">
-      <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
-        <ol className="flex flex-wrap items-center gap-2">
-          <li>
-            <Link href="/" className="transition hover:text-cacao">
-              Accueil
-            </Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li>
-            <span aria-current="page" className="font-medium text-fg">
-              Mentions légales
-            </span>
-          </li>
-        </ol>
-      </nav>
+      <Breadcrumb items={[{ label: 'Accueil', href: '/' }, { label: 'Mentions légales' }]} />
 
-      <header className="max-w-3xl space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-[0.14em] text-cacao">
-          Informations légales
-        </p>
+      <header className="max-w-3xl">
         <Title as="h1" size="display" className="">
           Mentions légales
         </Title>
-        <p className="text-lg leading-relaxed text-muted">
-          Identité, coordonnées, hébergement et conditions de publication du site Hairstyle by
-          Patricia.
-        </p>
       </header>
 
       <section className="max-w-3xl space-y-8">
@@ -50,7 +32,8 @@ export default function MentionsLegalesPage() {
             <div className="bg-page p-6 rounded-xl border border-line">
               <dt className="font-medium text-fg mb-1">Nom commercial</dt>
               <dd>
-                Hairstyle by Patricia — coiffure à domicile spécialisée dans les cheveux texturés.
+                Hairstyle by Patricia — coiffure sur rendez-vous à Dakar, spécialisée dans les
+                cheveux texturés.
               </dd>
             </div>
             <div className="bg-page p-6 rounded-xl border border-line">
@@ -58,20 +41,14 @@ export default function MentionsLegalesPage() {
               <dd>Coiffures texturées : tresses, vanilles, locs, coiffures protectrices.</dd>
             </div>
           </div>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div className="bg-page p-6 rounded-xl border border-line">
-              <dt className="font-medium text-fg mb-1">Contact</dt>
-              <dd>
-                E-mail :
-                <a href="mailto:zepatricia7@gmail.com" className="text-cacao underline">
-                  zepatricia7@gmail.com
-                </a>
-              </dd>
-            </div>
-            <div className="bg-page p-6 rounded-xl border border-line">
-              <dt className="font-medium text-fg mb-1">SIRET (à compléter)</dt>
-              <dd className="text-xs opacity-80">Numéro SIRET à renseigner par Patricia.</dd>
-            </div>
+          <div className="bg-page p-6 rounded-xl border border-line">
+            <dt className="font-medium text-fg mb-1">Contact</dt>
+            <dd>
+              E-mail :{' '}
+              <a href="mailto:zepatricia7@gmail.com" className="text-cacao underline">
+                zepatricia7@gmail.com
+              </a>
+            </dd>
           </div>
         </dl>
       </section>
@@ -82,8 +59,7 @@ export default function MentionsLegalesPage() {
         </Title>
         <div className="bg-page p-6 rounded-xl border border-line">
           <p className="text-muted leading-relaxed">
-            Ce site est hébergé sur une plateforme de cloud publique (ex. Vercel ou équivalent). Les
-            coordonnées précises de l’hébergeur doivent être renseignées ici par Patricia.
+            Ce site est hébergé sur une plateforme de cloud publique.
           </p>
         </div>
       </section>
@@ -117,24 +93,17 @@ export default function MentionsLegalesPage() {
         </p>
       </section>
 
-      <section className="max-w-3xl rounded-2xl bg-page p-8 text-center md:p-10 border border-line">
+      <section className="max-w-3xl rounded-2xl border border-line bg-page p-8 text-center md:p-10">
         <Title as="h2" className="">
-          Une question sur ces mentions ?
+          Une question ?
         </Title>
-        <p className="mx-auto mt-3 max-w-md text-muted">Patricia vous répond personnellement.</p>
         <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-          <Link
-            href="/contact"
-            className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
-          >
+          <ButtonLink href="/contact" icon={Mail}>
             Nous contacter
-          </Link>
-          <Link
-            href="/coiffures"
-            className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] border border-line bg-card px-6 py-3 font-semibold text-fg shadow-soft transition hover:border-cacao hover:bg-page"
-          >
+          </ButtonLink>
+          <ButtonLink href="/coiffures" variant="secondary" icon={Scissors}>
             Voir le catalogue
-          </Link>
+          </ButtonLink>
         </div>
       </section>
     </main>

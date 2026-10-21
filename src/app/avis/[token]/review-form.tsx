@@ -1,5 +1,6 @@
 'use client';
 
+import { Send } from 'lucide-react';
 import { useActionState, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Textarea } from '@/components/ui/Textarea';
@@ -50,7 +51,7 @@ export function ReviewForm({ token }: { token: string }) {
           {state.error}
         </p>
       ) : null}
-      <Button type="submit" loading={pending}>
+      <Button type="submit" icon={Send} loading={pending}>
         Envoyer mon avis
       </Button>
     </form>

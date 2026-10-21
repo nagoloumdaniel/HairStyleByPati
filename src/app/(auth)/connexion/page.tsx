@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Title } from '@/components/ui/Title';
 import { LoginForm } from './login-form';
 
 export const metadata: Metadata = {
@@ -16,8 +17,9 @@ export default async function ConnexionPage({
   return (
     <main className="flex min-h-screen items-center justify-center px-6">
       <div className="w-full max-w-sm rounded-2xl bg-card p-8 shadow-lg">
-        <h1 className="text-2xl font-semibold">Espace administrateur</h1>
-        <p className="mt-1 text-sm opacity-70">Accès réservé à Patricia.</p>
+        <Title as="h1" size="display" className="">
+          Espace administrateur
+        </Title>
         <div className="mt-6">
           <LoginForm callbackUrl={callbackUrl} />
         </div>

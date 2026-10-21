@@ -1,6 +1,8 @@
-import Link from 'next/link';
+import { Mail, Scissors } from 'lucide-react';
 import type { Metadata } from 'next';
 import { Accordion } from '@/components/ui/Accordion';
+import { Breadcrumb } from '@/components/shared/Breadcrumb';
+import { ButtonLink } from '@/components/ui/Button';
 import { Title } from '@/components/ui/Title';
 
 export const metadata: Metadata = {
@@ -39,7 +41,7 @@ const faqItems = [
     id: 'duree',
     title: 'Combien de temps dure une prestation ?',
     content:
-      'La durée dépend de la coiffure et de votre longueur de cheveux. Chaque fiche du catalogue indique une durée indicative ; la durée réelle est confirmée lors du diagnostic à votre domicile.',
+      'La durée dépend de la coiffure et de votre longueur de cheveux. Chaque fiche du catalogue indique une durée indicative ; la durée réelle est confirmée lors du diagnostic de vos cheveux.',
   },
   {
     id: 'prix',
@@ -64,34 +66,12 @@ const faqItems = [
 export default function FaqPage() {
   return (
     <main className="page-main space-y-12">
-      <nav aria-label="Fil d'Ariane" className="text-sm text-muted">
-        <ol className="flex flex-wrap items-center gap-2">
-          <li>
-            <Link href="/" className="transition hover:text-cacao">
-              Accueil
-            </Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li>
-            <span aria-current="page" className="font-medium text-fg">
-              FAQ
-            </span>
-          </li>
-        </ol>
-      </nav>
+      <Breadcrumb items={[{ label: 'Accueil', href: '/' }, { label: 'FAQ' }]} />
 
-      <header className="max-w-3xl space-y-3">
-        <p className="hidden text-sm font-semibold uppercase tracking-[0.14em] text-cacao md:block">
-          Questions fréquentes
-        </p>
+      <header className="max-w-3xl">
         <Title as="h1" size="display" className="">
           Vos questions, nos réponses
         </Title>
-        <p className="hidden text-lg leading-relaxed text-muted md:block">
-          Réservation, préparation, prix, annulation : retrouvez les réponses aux questions les plus
-          courantes. Une question reste sans réponse ? Contactez-nous, nous vous répondrons
-          rapidement.
-        </p>
       </header>
 
       <section aria-labelledby="faq-titre">
@@ -105,22 +85,13 @@ export default function FaqPage() {
         <Title as="h2" className="">
           Une autre question ?
         </Title>
-        <p className="mx-auto mt-3 max-w-md text-muted">
-          Écrivez-nous, Patricia vous répond personnellement, généralement sous 24 heures ouvrées.
-        </p>
         <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-          <Link
-            href="/contact"
-            className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
-          >
+          <ButtonLink href="/contact" icon={Mail}>
             Nous contacter
-          </Link>
-          <Link
-            href="/coiffures"
-            className="inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] border border-line bg-card px-6 py-3 font-semibold text-fg shadow-soft transition hover:border-cacao hover:bg-page"
-          >
+          </ButtonLink>
+          <ButtonLink href="/coiffures" variant="secondary" icon={Scissors}>
             Voir le catalogue
-          </Link>
+          </ButtonLink>
         </div>
       </section>
     </main>

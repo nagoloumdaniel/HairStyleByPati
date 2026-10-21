@@ -1,7 +1,16 @@
 'use client';
 
-import { Check } from 'lucide-react';
-
+import {
+  ArrowLeft,
+  Check,
+  Mail,
+  Pencil,
+  Scissors,
+  Send,
+  CalendarCheck,
+  Camera,
+  ShieldCheck,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useActionState, useEffect, useRef, useState } from 'react';
 import type { CompatibilityRuleData } from '@/modules/compatibilite/engine';
@@ -17,7 +26,7 @@ import {
   type CompatibilitySubmitState,
 } from '@/modules/compatibilite/actions';
 import { Badge } from '@/components/ui/Badge';
-import { Button } from '@/components/ui/Button';
+import { Button, ButtonLink } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
@@ -170,12 +179,10 @@ export function QuestionField({
 
 export function CompatibilityWizard({
   serviceSlug,
-  serviceName,
   rule,
   questions,
 }: {
   serviceSlug: string;
-  serviceName: string;
   rule: CompatibilityRuleData | null;
   questions: PublicQuestion[];
 }) {
@@ -271,9 +278,6 @@ export function CompatibilityWizard({
           >
             Quelques questions sur vos cheveux
           </Title>
-          <p className="mt-2 text-muted">
-            Pour {serviceName}, seules les informations réellement utiles sont demandées.
-          </p>
 
           <form
             action={previewAction}
@@ -285,8 +289,8 @@ export function CompatibilityWizard({
 
             {visibleQuestions.length === 0 ? (
               <p className="rounded-[var(--radius-md)] bg-success-soft px-4 py-3 text-sm text-success">
-                Cette prestation n’a pas de restriction capillaire particulière. Vous pouvez passer
-                directement à la réservation.
+                Aucune restriction capillaire pour cette prestation. Vous pouvez réserver
+                directement.
               </p>
             ) : (
               visibleQuestions.map((question) => (
@@ -317,15 +321,12 @@ export function CompatibilityWizard({
             ) : null}
 
             <div className="flex flex-wrap items-center gap-3">
-              <Button type="submit" loading={previewPending}>
+              <Button type="submit" icon={ShieldCheck} loading={previewPending}>
                 Vérifier ma compatibilité
               </Button>
-              <Link
-                href={`/coiffures/${serviceSlug}`}
-                className="text-sm font-semibold text-cacao underline-offset-4 hover:underline"
-              >
+              <ButtonLink href={`/coiffures/${serviceSlug}`} variant="ghost" icon={ArrowLeft}>
                 Retour à la prestation
-              </Link>
+              </ButtonLink>
             </div>
           </form>
         </Card>
@@ -361,16 +362,20 @@ export function CompatibilityWizard({
 
           <div className="mt-6 flex flex-wrap gap-3">
             {preview.nextStep === 'BOOK' ? (
-              <Link
+              <ButtonLink
                 href={`/reserver?service=${encodeURIComponent(serviceSlug)}`}
-                className="inline-flex items-center justify-center rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
+                icon={CalendarCheck}
               >
                 Réserver cette prestation
-              </Link>
+              </ButtonLink>
             ) : null}
 
             {preview.nextStep === 'SUBMIT_ASSESSMENT' ? (
-              <Button type="button" onClick={() => setPhase('contact')}>
+              <Button
+                type="button"
+                icon={preview.canRequestPhotoEvaluation ? Camera : Send}
+                onClick={() => setPhase('contact')}
+              >
                 {preview.canRequestPhotoEvaluation
                   ? 'Envoyer une photo pour évaluation'
                   : 'Demander une évaluation à Patricia'}
@@ -379,24 +384,19 @@ export function CompatibilityWizard({
 
             {preview.nextStep === 'BLOCKED' ? (
               <>
-                <Link
-                  href="/coiffures"
-                  className="inline-flex items-center justify-center rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover"
-                >
+                <ButtonLink href="/coiffures" icon={Scissors}>
                   Voir les autres coiffures
-                </Link>
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center justify-center rounded-[var(--radius-md)] border border-line bg-card px-6 py-3 font-semibold text-fg transition hover:border-cacao"
-                >
+                </ButtonLink>
+                <ButtonLink href="/contact" variant="secondary" icon={Mail}>
                   Contacter Patricia
-                </Link>
+                </ButtonLink>
               </>
             ) : null}
 
             <Button
               type="button"
               variant="ghost"
+              icon={Pencil}
               onClick={() => {
                 setPhase('questions');
                 setClientError('');
@@ -414,12 +414,13 @@ export function CompatibilityWizard({
               <ul className="mt-3 flex flex-wrap gap-2">
                 {preview.suggestions.map((suggestion) => (
                   <li key={suggestion.id}>
-                    <Link
+                    <ButtonLink
                       href={`/coiffures/${suggestion.slug}`}
-                      className="inline-flex items-center rounded-[var(--radius-md)] border border-line bg-card px-4 py-2 font-semibold text-fg transition hover:border-cacao"
+                      variant="secondary"
+                      size="sm"
                     >
                       {suggestion.name}
-                    </Link>
+                    </ButtonLink>
                   </li>
                 ))}
               </ul>
@@ -427,16 +428,8 @@ export function CompatibilityWizard({
           ) : null}
 
           {preview.nextStep !== 'BOOK' ? (
-            <p className="mt-4 text-sm text-muted">
-              Aucune réservation n’est créée à cette étape. Patricia examine votre demande et vous
-              répond. La disponibilité du créneau sera vérifiée séparément au moment de réserver.
-            </p>
-          ) : (
-            <p className="mt-4 text-sm text-muted">
-              La compatibilité et la disponibilité seront vérifiées à nouveau côté serveur au moment
-              d’enregistrer votre rendez-vous.
-            </p>
-          )}
+            <p className="mt-4 text-sm text-muted">Aucune réservation n’est créée à cette étape.</p>
+          ) : null}
         </Card>
       ) : null}
 
@@ -451,10 +444,6 @@ export function CompatibilityWizard({
           >
             Demander l’évaluation de Patricia
           </Title>
-          <p className="mt-2 text-muted">
-            Laissez vos coordonnées pour recevoir la réponse. Vos informations capillaires et vos
-            photos ne sont jamais publiées.
-          </p>
 
           <form action={submitAction} className="mt-6 flex flex-col gap-5">
             <input type="hidden" name="serviceSlug" value={serviceSlug} />
@@ -473,22 +462,10 @@ export function CompatibilityWizard({
             <div className="grid gap-4 sm:grid-cols-2">
               <Input label="Nom et prénom" name="name" required autoComplete="name" />
               <Input label="E-mail" name="email" type="email" required autoComplete="email" />
-              <Input
-                label="Téléphone"
-                name="phone"
-                type="tel"
-                required
-                autoComplete="tel"
-                hint="Pour vous joindre si nécessaire."
-              />
+              <Input label="Téléphone" name="phone" type="tel" required autoComplete="tel" />
             </div>
 
-            <Textarea
-              label="Informations complémentaires (facultatif)"
-              name="comment"
-              rows={4}
-              hint="Précisez ce qui vous fait douter, ou toute information utile à Patricia."
-            />
+            <Textarea label="Informations complémentaires (facultatif)" name="comment" rows={4} />
 
             {!photoForbidden ? (
               <div className="flex flex-col gap-1.5">
@@ -505,14 +482,12 @@ export function CompatibilityWizard({
                   className="w-full rounded-[var(--radius-md)] border border-line bg-card px-4 py-2.5 text-sm file:mr-3 file:rounded-full file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-fg"
                 />
                 <p className="text-sm text-muted">
-                  JPEG, PNG ou WebP, 5 Mo maximum par photo, 3 photos maximum. Ces photos restent
-                  privées et ne sont visibles que par Patricia.
+                  JPEG, PNG ou WebP, 5 Mo et 3 photos maximum. Visibles par Patricia uniquement.
                 </p>
               </div>
             ) : (
               <p className="rounded-[var(--radius-md)] bg-line px-4 py-3 text-sm text-muted">
-                Cette prestation ne nécessite pas de photo. Votre commentaire suffit à Patricia pour
-                vous répondre.
+                Cette prestation ne nécessite pas de photo.
               </p>
             )}
 
@@ -541,10 +516,15 @@ export function CompatibilityWizard({
             ) : null}
 
             <div className="flex flex-wrap items-center gap-3">
-              <Button type="submit" loading={submitPending}>
+              <Button type="submit" icon={Send} loading={submitPending}>
                 Envoyer ma demande
               </Button>
-              <Button type="button" variant="ghost" onClick={() => setPhase('result')}>
+              <Button
+                type="button"
+                variant="ghost"
+                icon={ArrowLeft}
+                onClick={() => setPhase('result')}
+              >
                 Retour
               </Button>
             </div>
@@ -570,33 +550,29 @@ export function CompatibilityWizard({
           {success.status === 'RECEIVED' ? (
             <div className="mt-4 space-y-2 rounded-[var(--radius-md)] bg-accent-soft px-4 py-3 text-sm text-fg">
               <p>
-                Statut : <strong>en attente d’évaluation</strong>. Patricia vous répondra après
-                examen de vos informations.
+                Statut : <strong>en attente d’évaluation</strong>.
               </p>
               {success.reference ? (
                 <p>
                   Référence de votre demande : <strong>{success.reference}</strong>
                 </p>
               ) : null}
-              <p>Une évaluation n’est pas une réservation : aucun créneau n’est réservé.</p>
+              <p>Aucun créneau n’est réservé.</p>
             </div>
           ) : null}
 
           <div className="mt-6 flex flex-wrap gap-3">
             {success.canBook ? (
-              <Link
+              <ButtonLink
                 href={`/reserver?service=${encodeURIComponent(serviceSlug)}`}
-                className="inline-flex items-center justify-center rounded-[var(--radius-md)] bg-accent px-6 py-3 font-semibold text-accent-fg shadow-soft transition hover:bg-accent-hover active:scale-[0.98]"
+                icon={CalendarCheck}
               >
                 Réserver cette prestation
-              </Link>
+              </ButtonLink>
             ) : null}
-            <Link
-              href="/coiffures"
-              className="inline-flex items-center justify-center rounded-[var(--radius-md)] border border-line bg-card px-6 py-3 font-semibold text-fg transition hover:border-cacao"
-            >
+            <ButtonLink href="/coiffures" variant="secondary" icon={Scissors}>
               Retour au catalogue
-            </Link>
+            </ButtonLink>
           </div>
         </Card>
       ) : null}

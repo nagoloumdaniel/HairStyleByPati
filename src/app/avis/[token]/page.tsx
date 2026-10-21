@@ -17,7 +17,9 @@ export default async function AvisTokenPage({ params }: { params: Promise<{ toke
     return (
       <main className="page-main">
         <div className="rounded-[var(--radius-lg)] border border-alert bg-alert-soft p-8 text-center">
-          <h1 className="font-heading text-2xl font-bold text-alert">Lien invalide</h1>
+          <Title as="h1" size="display" className="">
+            Lien invalide
+          </Title>
           <p className="mt-3 text-fg">Ce lien d’avis ne correspond à aucun rendez-vous.</p>
         </div>
       </main>
@@ -48,7 +50,6 @@ export default async function AvisTokenPage({ params }: { params: Promise<{ toke
         <Title as="h1" size="display" className="">
           Votre avis sur « {review.service.name} »
         </Title>
-        <p className="mt-2 text-muted">Votre avis est relu par Patricia avant toute publication.</p>
         <div className="mt-6">
           <ReviewForm token={token} />
         </div>
