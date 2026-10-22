@@ -180,7 +180,7 @@ function renderReview(payload: ReviewEmailPayload, ctx: EmailContext): RenderedE
       intro: `Bonjour ${payload.customerName}, Patricia espère que votre prestation « ${payload.serviceName} » vous a plu. Votre avis aide d’autres clientes à faire leur choix.`,
       ctaLabel: 'Laisser un avis',
       ctaUrl: payload.reviewUrl,
-      note: 'Votre avis est relu par Patricia avant toute publication.',
+      note: 'Votre avis est publié sur le site dès son envoi, avec la mention « client vérifié ».',
     }),
     text: `Bonjour ${payload.customerName},\n\nVotre avis sur ${payload.serviceName} compte pour Patricia.\nLaisser un avis : ${payload.reviewUrl}\n\n${SALON_NAME}`,
   };
