@@ -26,7 +26,7 @@ import {
 } from '../../catalogue-ui';
 
 /* ============================================================
- * P4.4 / P4.5 — Photos d'une prestation : upload contrôlé,
+ * P4.4 / P4.5 - Photos d'une prestation : upload contrôlé,
  * ordre (la première est la principale), texte alternatif, suppression.
  * Les images sont servies par URL signée, jamais publiques.
  * ============================================================ */

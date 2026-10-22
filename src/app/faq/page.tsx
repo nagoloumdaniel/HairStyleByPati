@@ -4,6 +4,8 @@ import { Accordion } from '@/components/ui/Accordion';
 import { Breadcrumb } from '@/components/shared/Breadcrumb';
 import { ButtonLink } from '@/components/ui/Button';
 import { Title } from '@/components/ui/Title';
+import { getCachedSalonSettings } from '@/lib/public-cache';
+import { homeServiceSentence } from '@/modules/parametres/home-service';
 
 export const metadata: Metadata = {
   title: 'FAQ',
@@ -63,7 +65,26 @@ const faqItems = [
   },
 ];
 
-export default function FaqPage() {
+/* L'option à domicile n'apparaît que si Patricia l'a activée (paramètres du dashboard). */
+async function loadHomeServiceItem() {
+  try {
+    const settings = await getCachedSalonSettings();
+    if (!settings.homeServiceEnabled) return [];
+    return [
+      {
+        id: 'domicile',
+        title: 'Proposez-vous la coiffure à domicile ?',
+        content: `${homeServiceSentence(settings.travelFeeCents)} Sans cette option, Patricia reçoit sur rendez-vous à Dakar.`,
+      },
+    ];
+  } catch (error) {
+    console.error('[faq] paramètres illisibles, option à domicile masquée', error);
+    return [];
+  }
+}
+
+export default async function FaqPage() {
+  const items = [...faqItems, ...(await loadHomeServiceItem())];
   return (
     <main className="page-main space-y-12">
       <Breadcrumb items={[{ label: 'Accueil', href: '/' }, { label: 'FAQ' }]} />
@@ -78,7 +99,7 @@ export default function FaqPage() {
         <h2 id="faq-titre" className="sr-only">
           Liste des questions fréquentes
         </h2>
-        <Accordion items={faqItems} />
+        <Accordion items={items} />
       </section>
 
       <section className="mx-auto w-full max-w-3xl rounded-2xl bg-page p-8 text-center md:p-10">

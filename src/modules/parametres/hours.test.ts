@@ -3,14 +3,14 @@ import { formatHour, formatOpeningHours } from './hours';
 
 describe('formatOpeningHours', () => {
   it('affiche la valeur par défaut quand rien n’est enregistré', () => {
-    expect(formatOpeningHours(null)).toEqual(['Lundi – Dimanche : 5h – 22h']);
+    expect(formatOpeningHours(null)).toEqual(['Lundi - Dimanche : 5h - 22h']);
   });
 
   it('regroupe les jours consécutifs', () => {
     const raw = [0, 1, 2, 4].map((weekday) => ({ weekday, open: '08:00', close: '18:30' }));
     expect(formatOpeningHours(raw)).toEqual([
-      'Lundi – Mercredi : 8h – 18h30',
-      'Vendredi : 8h – 18h30',
+      'Lundi - Mercredi : 8h - 18h30',
+      'Vendredi : 8h - 18h30',
     ]);
   });
 

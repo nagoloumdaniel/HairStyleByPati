@@ -1,5 +1,5 @@
 /* ============================================================
- * Avis clients (P8.10) — fonctions pures, testables sans base.
+ * Avis clients (P8.10) - fonctions pures, testables sans base.
  * Un avis n'est jamais affiché publiquement avant modération (§19).
  * ============================================================ */
 
@@ -19,7 +19,7 @@ export function isValidRating(rating: unknown): rating is 1 | 2 | 3 | 4 | 5 {
 
 /**
  * Un avis n'est jamais visible publiquement s'il n'est pas explicitement
- * approuvé par une décision de modération — jamais par défaut (§19).
+ * approuvé par une décision de modération - jamais par défaut (§19).
  */
 export function isPubliclyVisible(status: ReviewStatus): boolean {
   return status === 'APPROVED';

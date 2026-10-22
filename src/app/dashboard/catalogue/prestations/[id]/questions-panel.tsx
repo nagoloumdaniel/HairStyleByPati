@@ -38,7 +38,7 @@ import {
 } from '../../catalogue-ui';
 
 /* ============================================================
- * P4.8 — Éditeur des questions capillaires par prestation.
+ * P4.8 - Éditeur des questions capillaires par prestation.
  * Les questions peuvent être conditionnelles (affichées selon
  * la réponse à une autre question). L'ordre se règle avec les flèches.
  * ============================================================ */

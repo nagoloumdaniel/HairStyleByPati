@@ -134,6 +134,9 @@ export interface AppointmentDetail {
   endsAt: Date;
   priceCents: number | null;
   durationMinutes: number;
+  homeService: boolean;
+  travelFeeCents: number | null;
+  homeAddress: string | null;
   selectedOptions: SelectedOption[];
   hairInfo: Record<string, unknown>;
   comments: string | null;
@@ -156,6 +159,9 @@ const APPOINTMENT_DETAIL_SELECT = {
   endsAt: true,
   priceCents: true,
   durationMinutes: true,
+  homeService: true,
+  travelFeeCents: true,
+  homeAddress: true,
   selectedOptions: true,
   hairInfo: true,
   comments: true,
@@ -190,6 +196,9 @@ function mapAppointmentDetail(row: AppointmentDetailRow): AppointmentDetail {
     endsAt: row.endsAt,
     priceCents: row.priceCents,
     durationMinutes: row.durationMinutes,
+    homeService: row.homeService,
+    travelFeeCents: row.travelFeeCents,
+    homeAddress: row.homeAddress,
     selectedOptions,
     hairInfo,
     comments: row.comments,
@@ -233,6 +242,9 @@ export interface AppointmentListItem {
   endsAt: Date;
   durationMinutes: number;
   priceCents: number | null;
+  homeService: boolean;
+  travelFeeCents: number | null;
+  homeAddress: string | null;
   customerName: string;
   customerEmail: string;
   serviceName: string;
@@ -265,6 +277,9 @@ export async function listAppointmentsAdmin(
         endsAt: true,
         durationMinutes: true,
         priceCents: true,
+        homeService: true,
+        travelFeeCents: true,
+        homeAddress: true,
         customer: { select: { name: true, email: true } },
         service: { select: { name: true } },
       },
@@ -279,6 +294,9 @@ export async function listAppointmentsAdmin(
     endsAt: row.endsAt,
     durationMinutes: row.durationMinutes,
     priceCents: row.priceCents,
+    homeService: row.homeService,
+    travelFeeCents: row.travelFeeCents,
+    homeAddress: row.homeAddress,
     customerName: row.customer.name,
     customerEmail: row.customer.email,
     serviceName: row.service.name,

@@ -500,22 +500,17 @@ test.describe('Réservations, annulations et calendrier', () => {
     await login(page, '/dashboard/disponibilites');
     await expect(page.getByRole('heading', { name: 'Disponibilités', exact: true })).toBeVisible();
 
-    const fillBlockForm = async () => {
-      await pickDateTime(page, 'startsAtLocal', `${dateISO}T15:30`);
-      await pickDateTime(page, 'endsAtLocal', `${dateISO}T17:00`);
-      await page.getByLabel('Motif (facultatif)').fill('Blocage test E2E');
-    };
-    await fillBlockForm();
+    await pickDateTime(page, 'startsAtLocal', `${dateISO}T15:30`);
+    await pickDateTime(page, 'endsAtLocal', `${dateISO}T17:00`);
+    await page.getByLabel('Motif (facultatif)').fill('Blocage test E2E');
     await page.getByRole('button', { name: 'Bloquer cette période' }).click();
-    await expect(page.getByText(/affecte \d+ rendez-vous actif/)).toBeVisible({ timeout: 20_000 });
 
-    // Le formulaire est réinitialisé après le retour du serveur : on le remplit à nouveau.
-    await fillBlockForm();
-    await page
-      .getByLabel(/Confirmer même si/)
-      .last()
-      .check();
-    await page.getByRole('button', { name: 'Bloquer cette période' }).click();
+    // Des rendez-vous actifs sont touchés : une confirmation explicite est demandée.
+    const warning = page.getByRole('alertdialog').or(page.getByRole('dialog'));
+    await expect(warning.getByText(/affecte \d+ rendez-vous actif/)).toBeVisible({
+      timeout: 20_000,
+    });
+    await warning.getByRole('button', { name: 'Continuer', exact: true }).click();
     await expect(page.getByText('Indisponibilité enregistrée.')).toBeVisible({ timeout: 20_000 });
 
     await db.blockedPeriod.deleteMany({ where: { reason: 'Blocage test E2E' } });
@@ -627,6 +622,8 @@ test.describe('Réservations, annulations et calendrier', () => {
 
     await login(page);
     await page.getByRole('button', { name: 'Liste', exact: true }).click();
+    // Le rendez-vous de test a été annulé par le test précédent : on affiche aussi les annulés.
+    await page.getByRole('button', { name: 'Annulées', exact: true }).click();
     await expect(page.getByText('Chargement du calendrier…')).toBeHidden({ timeout: 20_000 });
     await expect(page.getByText('Cliente Admin E2E').first()).toBeVisible({ timeout: 20_000 });
     const calendarOverflow = await page.evaluate(

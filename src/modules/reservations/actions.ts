@@ -149,6 +149,8 @@ export interface BookingSuccess {
   endsAt: string;
   durationMinutes: number;
   priceCents: number | null;
+  homeService: boolean;
+  travelFeeCents: number | null;
   serviceName: string;
   cancelUrl: string;
 }
@@ -188,6 +190,8 @@ export async function submitBooking(
     comment: String(formData.get('comment') ?? ''),
     consent: formData.get('consent'),
     promoCode: String(formData.get('promoCode') ?? ''),
+    homeService: formData.get('homeService'),
+    homeAddress: String(formData.get('homeAddress') ?? ''),
   });
   if ('error' in parsed) return { error: parsed.error };
 
@@ -204,6 +208,8 @@ export async function submitBooking(
       answers: answersResult.data,
       optionIds: parseStringArray(formData.get('optionIds')),
       promoCode: parsed.data.promoCode,
+      homeService: parsed.data.homeService,
+      homeAddress: parsed.data.homeAddress,
     });
     revalidateBookingPaths(booking.appointmentId);
     return {
@@ -215,6 +221,8 @@ export async function submitBooking(
         endsAt: booking.endsAt.toISOString(),
         durationMinutes: booking.durationMinutes,
         priceCents: booking.priceCents,
+        homeService: booking.homeService,
+        travelFeeCents: booking.travelFeeCents,
         serviceName: booking.serviceName,
         cancelUrl: `/annulation/${booking.cancelToken}`,
       },

@@ -1,4 +1,4 @@
-import { CalendarDays, CalendarCheck, Mail, Phone } from 'lucide-react';
+import { CalendarDays, CalendarCheck, House, Mail, MapPin, Phone } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
@@ -141,8 +141,35 @@ export default async function AppointmentDetailPage({
                 <dt className="font-semibold">Prestation</dt>
                 <dd className="text-muted">{appointment.service.name}</dd>
               </div>
+              {appointment.homeService ? (
+                <>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <dt className="font-semibold">Lieu</dt>
+                    <dd>
+                      <Badge tone="accent">
+                        <House aria-hidden="true" className="mr-1 size-3.5" />À domicile
+                      </Badge>
+                    </dd>
+                  </div>
+                  <div className="flex flex-wrap justify-between gap-2">
+                    <dt className="flex items-center gap-1.5 font-semibold">
+                      <MapPin aria-hidden="true" className="size-4 text-accent" />
+                      Adresse
+                    </dt>
+                    <dd className="whitespace-pre-line text-muted">
+                      {appointment.homeAddress ?? 'Non renseignée'}
+                    </dd>
+                  </div>
+                  <div className="flex flex-wrap justify-between gap-2">
+                    <dt className="font-semibold">Frais de déplacement</dt>
+                    <dd className="text-muted">{formatFcfa(appointment.travelFeeCents ?? 0)}</dd>
+                  </div>
+                </>
+              ) : null}
               <div className="flex flex-wrap justify-between gap-2">
-                <dt className="font-semibold">Prix figé</dt>
+                <dt className="font-semibold">
+                  {appointment.homeService ? 'Total figé (frais inclus)' : 'Prix figé'}
+                </dt>
                 <dd className="text-muted">{formatFcfaOrPending(appointment.priceCents)}</dd>
               </div>
               <div className="flex flex-wrap justify-between gap-2">

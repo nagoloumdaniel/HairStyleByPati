@@ -28,7 +28,7 @@ import {
 } from '../../catalogue-ui';
 
 /* ============================================================
- * P4.3 — Options payantes d'une prestation (prix et durée
+ * P4.3 - Options payantes d'une prestation (prix et durée
  * additionnels). Prix en FCFA (colonne en 1/100 FCFA).
  * ============================================================ */
 

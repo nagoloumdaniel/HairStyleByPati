@@ -72,3 +72,37 @@ export function computeBookingSnapshot(
 
   return { durationMinutes, priceCents, selectedOptions, invalidOptionIds };
 }
+
+/* ------------------------------------------------------------------ */
+/* Coiffure à domicile                                                 */
+/* ------------------------------------------------------------------ */
+
+export type HomeServiceResolution =
+  | { ok: true; homeService: boolean; travelFeeCents: number | null }
+  | { ok: false; reason: 'DISABLED' };
+
+/**
+ * Décide de l'option « à domicile » à partir des réglages serveur.
+ * Les frais viennent TOUJOURS des réglages : le client n'envoie que sa demande (booléen).
+ */
+export function resolveHomeService(
+  requested: boolean,
+  settings: { homeServiceEnabled: boolean; travelFeeCents: number },
+): HomeServiceResolution {
+  if (!requested) return { ok: true, homeService: false, travelFeeCents: null };
+  if (!settings.homeServiceEnabled) return { ok: false, reason: 'DISABLED' };
+  return { ok: true, homeService: true, travelFeeCents: Math.max(0, settings.travelFeeCents) };
+}
+
+/**
+ * Total figé = prix de la prestation (déjà remisé) + frais de déplacement.
+ * Règle documentée : les promotions s'appliquent à la prestation et à ses options
+ * uniquement, jamais aux frais de déplacement. Prix sur devis => total inconnu (null).
+ */
+export function addTravelFee(
+  servicePriceCents: number | null,
+  travelFeeCents: number | null,
+): number | null {
+  if (servicePriceCents == null) return null;
+  return servicePriceCents + Math.max(0, travelFeeCents ?? 0);
+}

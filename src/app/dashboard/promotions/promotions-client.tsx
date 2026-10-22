@@ -404,7 +404,7 @@ export function PromotionsClient({
                   </span>
                   <span className="mt-1 flex items-center gap-1.5 text-sm text-muted">
                     <CalendarRange aria-hidden="true" className="size-4 shrink-0" />
-                    {formatDay(promotion.startsAt)} – {formatDay(promotion.endsAt)}
+                    {formatDay(promotion.startsAt)} - {formatDay(promotion.endsAt)}
                   </span>
                   <span className="mt-1 line-clamp-2 block text-xs text-muted">
                     {promotion.serviceNames.join(', ') || 'Aucune prestation'}

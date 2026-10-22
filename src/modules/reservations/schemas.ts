@@ -53,19 +53,50 @@ const consentSchema = z.preprocess(
   }),
 );
 
-export const bookingRequestSchema = z.object({
-  serviceSlug: z.string().trim().min(1, 'Prestation manquante.').max(160),
-  dateISO: dateISOSchema,
-  startsAt: z.string().datetime({ offset: true }),
-  timeZone: timeZoneSchema,
-  name: nameSchema,
-  email: emailSchema,
-  phone: phoneSchema,
-  comment: commentSchema,
-  consent: consentSchema,
-  // Code promo facultatif : seulement borné ici, la validité réelle est revérifiée par createBooking.
-  promoCode: z.string().trim().max(40, 'Code promo invalide.').default(''),
-});
+const homeServiceSchema = z.preprocess(
+  (value) => value === 'on' || value === true || value === 'true',
+  z.boolean().default(false),
+);
+
+/** Adresse ou quartier de la cliente pour la coiffure à domicile (texte libre borné). */
+export const HOME_ADDRESS_MIN = 5;
+export const HOME_ADDRESS_MAX = 300;
+
+const homeAddressSchema = z.preprocess(
+  (value) => (typeof value === 'string' ? value.trim() : ''),
+  z.string().max(HOME_ADDRESS_MAX, `L’adresse est limitée à ${HOME_ADDRESS_MAX} caractères.`),
+);
+
+export const bookingRequestSchema = z
+  .object({
+    serviceSlug: z.string().trim().min(1, 'Prestation manquante.').max(160),
+    dateISO: dateISOSchema,
+    startsAt: z.string().datetime({ offset: true }),
+    timeZone: timeZoneSchema,
+    name: nameSchema,
+    email: emailSchema,
+    phone: phoneSchema,
+    comment: commentSchema,
+    consent: consentSchema,
+    // Code promo facultatif : seulement borné ici, la validité réelle est revérifiée par createBooking.
+    promoCode: z.string().trim().max(40, 'Code promo invalide.').default(''),
+    // Coiffure à domicile : seule la demande est lue ici, les frais sont recalculés côté serveur.
+    homeService: homeServiceSchema,
+    homeAddress: homeAddressSchema,
+  })
+  .superRefine((value, ctx) => {
+    if (value.homeService && value.homeAddress.length < HOME_ADDRESS_MIN) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['homeAddress'],
+        message: 'Indiquez votre adresse ou votre quartier pour la coiffure à domicile.',
+      });
+    }
+  })
+  .transform((value) => ({
+    ...value,
+    homeAddress: value.homeService ? value.homeAddress : '',
+  }));
 
 export const promoCodeRequestSchema = z.object({
   serviceSlug: z.string().trim().min(1, 'Prestation manquante.').max(160),

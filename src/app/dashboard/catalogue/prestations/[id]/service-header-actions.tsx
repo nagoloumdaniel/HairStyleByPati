@@ -12,7 +12,7 @@ import {
 import { formDataOf, useRunAction } from '../../catalogue-ui';
 
 /* ============================================================
- * P4.6 — Publication, dépublication et archivage d'une
+ * P4.6 - Publication, dépublication et archivage d'une
  * prestation. La suppression est refusée si des réservations
  * historiques existent (contrôle aussi côté serveur).
  * ============================================================ */

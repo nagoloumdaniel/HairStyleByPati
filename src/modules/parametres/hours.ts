@@ -44,11 +44,11 @@ export function formatHour(value: string): string {
   return m === '00' ? `${hour}h` : `${hour}h${m}`;
 }
 
-/** Lignes d'affichage public des horaires : jours consécutifs regroupés (« Lundi – Dimanche : 5h – 22h »). */
+/** Lignes d'affichage public des horaires : jours consécutifs regroupés (« Lundi - Dimanche : 5h - 22h »). */
 export function formatOpeningHours(raw: unknown): string[] {
   const { days, open, close } = readOpeningHours(raw);
   const sorted = [...new Set(days)].sort((a, b) => a - b);
-  const range = `${formatHour(open)} – ${formatHour(close)}`;
+  const range = `${formatHour(open)} - ${formatHour(close)}`;
   const lines: string[] = [];
   let start = sorted[0];
   let previous = sorted[0];
@@ -57,7 +57,7 @@ export function formatOpeningHours(raw: unknown): string[] {
     const label =
       start === previous
         ? WEEKDAY_NAMES[start]
-        : `${WEEKDAY_NAMES[start]} – ${WEEKDAY_NAMES[previous]}`;
+        : `${WEEKDAY_NAMES[start]} - ${WEEKDAY_NAMES[previous]}`;
     lines.push(`${label} : ${range}`);
   };
   for (const day of sorted.slice(1)) {

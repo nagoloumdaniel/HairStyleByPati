@@ -70,7 +70,9 @@ test.describe('Page de prestation dynamique', () => {
       await expect(page).toHaveURL(/\/coiffures\/[^/]+$/);
     } else {
       // Catalogue vide (pas de DB seedée) : le test reste vert, pas de lien à cliquer.
-      await expect(page.getByText(/Aucune coiffure|catalogue/)).toBeVisible();
+      await expect(
+        page.getByRole('heading', { name: /Le catalogue arrive bientôt|Aucune coiffure/ }),
+      ).toBeVisible();
     }
   });
 });

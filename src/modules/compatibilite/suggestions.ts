@@ -8,7 +8,7 @@ import {
  * Suggestions de coiffures compatibles (P8.9)
  * Fonction pure : ne propose JAMAIS une prestation dont le moteur
  * de compatibilité ne confirme pas une réservation directe (COMPATIBLE
- * + BOOK). Aucune restriction n'est contournée — une suggestion qui
+ * + BOOK). Aucune restriction n'est contournée - une suggestion qui
  * nécessiterait une photo ou une validation manuelle n'est pas proposée.
  * ============================================================ */
 

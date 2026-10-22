@@ -203,7 +203,7 @@ export function serviceGallery(
       src: image.key,
       alt:
         image.alt ||
-        `${service.name} — photo ${index + 1} sur ${displayable.length} (${service.category.name})`,
+        `${service.name} - photo ${index + 1} sur ${displayable.length} (${service.category.name})`,
     }));
   }
 
@@ -345,11 +345,11 @@ function formatEuros(cents: number): string {
 }
 
 /**
- * Fourchette de prix : « 50 – 75 FCFA » (demi-cadratin entouré d'espaces fines,
+ * Fourchette de prix : « 50 - 75 FCFA » (demi-cadratin entouré d'espaces fines,
  * unité affichée une seule fois). Valeurs en 1/100 FCFA (colonnes *Cents).
  */
 export function formatPriceRange(fromCents: number, toCents: number): string {
-  return `${amountFormatter.format(fromCents / 100)} – ${formatEuros(toCents)}`;
+  return `${amountFormatter.format(fromCents / 100)} - ${formatEuros(toCents)}`;
 }
 
 /** Les 4 modes de prix du §4.4 : fixe, départ, fourchette, « Prix à confirmer ». */

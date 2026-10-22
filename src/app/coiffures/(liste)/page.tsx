@@ -81,11 +81,11 @@ export default async function CataloguePage({
 
         {services.length === 0 ? (
           <EmptyState
-            title="Aucune coiffure ne correspond"
+            title={hasFilters ? 'Aucune coiffure ne correspond' : 'Le catalogue arrive bientôt'}
             message={
               hasFilters
                 ? 'Essayez un autre mot-clé ou une autre catégorie.'
-                : 'Le catalogue est en cours de mise à jour. Revenez bientôt.'
+                : 'Les coiffures seront publiées très prochainement. Revenez bientôt.'
             }
             actionLabel={hasFilters ? 'Voir toutes les coiffures' : undefined}
             actionHref={hasFilters ? '/coiffures' : undefined}

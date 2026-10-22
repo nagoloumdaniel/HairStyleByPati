@@ -419,7 +419,7 @@ function EntryRow({ appointment, timeZone }: { appointment: CalendarEntry; timeZ
     >
       <span className="min-w-0">
         <span className="block font-semibold text-fg">
-          {timeLabel(appointment.startsAt, timeZone)} – {timeLabel(appointment.endsAt, timeZone)}{' '}
+          {timeLabel(appointment.startsAt, timeZone)} - {timeLabel(appointment.endsAt, timeZone)}{' '}
           <span className="font-normal">· {appointment.customerName}</span>
         </span>
         <span className="block truncate text-muted">{appointment.serviceName}</span>

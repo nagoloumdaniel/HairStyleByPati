@@ -120,3 +120,46 @@ describe('calendarQuerySchema', () => {
     );
   });
 });
+
+describe('bookingRequestSchema home service', () => {
+  it('should default to no home service and an empty address', () => {
+    const result = bookingRequestSchema.safeParse(validBooking);
+    expect(result.success && result.data.homeService).toBe(false);
+    expect(result.success && result.data.homeAddress).toBe('');
+  });
+
+  it('should require an address when the home service is requested', () => {
+    expect(bookingRequestSchema.safeParse({ ...validBooking, homeService: 'on' }).success).toBe(
+      false,
+    );
+    expect(
+      bookingRequestSchema.safeParse({ ...validBooking, homeService: 'on', homeAddress: '  ab ' })
+        .success,
+    ).toBe(false);
+  });
+
+  it('should accept and trim a home address', () => {
+    const result = bookingRequestSchema.safeParse({
+      ...validBooking,
+      homeService: 'on',
+      homeAddress: '  Mermoz, rue 12, villa 4  ',
+    });
+    expect(result.success && result.data.homeService).toBe(true);
+    expect(result.success && result.data.homeAddress).toBe('Mermoz, rue 12, villa 4');
+  });
+
+  it('should bound the address length', () => {
+    expect(
+      bookingRequestSchema.safeParse({
+        ...validBooking,
+        homeService: 'on',
+        homeAddress: 'a'.repeat(301),
+      }).success,
+    ).toBe(false);
+  });
+
+  it('should drop a stray address when the home service is not requested', () => {
+    const result = bookingRequestSchema.safeParse({ ...validBooking, homeAddress: 'Mermoz' });
+    expect(result.success && result.data.homeAddress).toBe('');
+  });
+});

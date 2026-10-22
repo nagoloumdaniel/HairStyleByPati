@@ -7,6 +7,8 @@ import {
   CalendarClock,
   Check,
   ClipboardList,
+  House,
+  MapPin,
   Pencil,
   Scissors,
   ShieldCheck,
@@ -18,6 +20,8 @@ import Link from 'next/link';
 import { useActionState, useEffect, useRef, useState } from 'react';
 import type { BookableService } from '@/modules/reservations/queries';
 import type { PublicQuestion } from '@/modules/compatibilite/questions';
+import { addTravelFee } from '@/modules/reservations/pricing';
+import { HOME_ADDRESS_MAX, HOME_ADDRESS_MIN } from '@/modules/reservations/schemas';
 import { isQuestionAnswered, isQuestionVisible } from '@/modules/compatibilite/questions';
 import {
   previewCompatibility,
@@ -96,6 +100,9 @@ interface BookingSettings {
   holdSlotMinutes: number;
   maxAdvanceDays: number;
   cancelReasonRequired: boolean;
+  /** Coiffure à domicile proposée ; les frais réels sont recalculés par le serveur. */
+  homeServiceEnabled: boolean;
+  travelFeeCents: number;
 }
 
 export function BookingWizard({
@@ -109,6 +116,8 @@ export function BookingWizard({
   const [phase, setPhase] = useState<Phase>(questions.length > 0 ? 'questions' : 'options');
   const [answers, setAnswers] = useState<Record<string, unknown>>({});
   const [optionIds, setOptionIds] = useState<string[]>([]);
+  const [homeService, setHomeService] = useState(false);
+  const [homeAddress, setHomeAddress] = useState('');
   const [dateISO, setDateISO] = useState('');
   const [timeZone, setTimeZone] = useState('Africa/Dakar');
   const [selectedSlot, setSelectedSlot] = useState<{
@@ -223,6 +232,18 @@ export function BookingWizard({
     ? null
     : (service.priceFromCents ?? 0) +
       selectedOptions.reduce((sum, option) => sum + option.priceCents, 0);
+
+  const travelFeeCents =
+    settings.homeServiceEnabled && homeService ? settings.travelFeeCents : null;
+  // Prix de la prestation affiché (promotion éventuelle comprise) : les frais s'ajoutent après.
+  const servicePriceShown =
+    promoApplied && promoApplied.discountCents > 0
+      ? promoApplied.finalPriceCents
+      : autoPromo
+        ? autoPromo.finalPriceCents
+        : priceCents;
+  const totalCents = addTravelFee(servicePriceShown, travelFeeCents);
+  const homeAddressValid = !homeService || homeAddress.trim().length >= HOME_ADDRESS_MIN;
 
   const stepNumber =
     phase === 'questions'
@@ -450,12 +471,86 @@ export function BookingWizard({
               ))
             )}
           </div>
+          {settings.homeServiceEnabled ? (
+            <div className="mt-5 flex flex-col gap-3">
+              <label
+                className={`flex cursor-pointer items-center justify-between gap-4 rounded-[var(--radius-md)] border p-4 transition ${
+                  homeService ? 'border-cacao bg-accent-soft' : 'border-line hover:border-cacao'
+                }`}
+              >
+                <span className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    checked={homeService}
+                    onChange={(event) => {
+                      setHomeService(event.target.checked);
+                      setClientError('');
+                    }}
+                    className="size-4"
+                  />
+                  <span>
+                    <span className="flex items-center gap-2 font-semibold text-fg">
+                      <House aria-hidden="true" className="size-4 text-accent" />
+                      Coiffure à domicile
+                    </span>
+                    <span className="text-sm text-muted">
+                      Option payante : Patricia vient à votre adresse.
+                    </span>
+                  </span>
+                </span>
+                <span className="whitespace-nowrap font-semibold text-cacao">
+                  +{formatCents(settings.travelFeeCents)}
+                </span>
+              </label>
+              {homeService ? (
+                <Textarea
+                  label="Adresse ou quartier"
+                  icon={MapPin}
+                  value={homeAddress}
+                  onChange={(event) => setHomeAddress(event.target.value)}
+                  rows={2}
+                  maxLength={HOME_ADDRESS_MAX}
+                  required
+                  autoComplete="street-address"
+                  hint="Où Patricia doit venir (rue, quartier, repère). Frais de déplacement à votre charge."
+                />
+              ) : null}
+            </div>
+          ) : null}
           <div className="mt-5 rounded-[var(--radius-md)] bg-line px-4 py-3 text-sm text-fg">
             Durée estimée : <strong>{formatMinutes(durationMinutes)}</strong> · Prix :{' '}
             <strong>{formatCents(priceCents)}</strong>
+            {travelFeeCents != null ? (
+              <>
+                {' '}
+                + déplacement <strong>{formatCents(travelFeeCents)}</strong> · Total :{' '}
+                <strong>{formatCents(addTravelFee(priceCents, travelFeeCents))}</strong>
+              </>
+            ) : null}
           </div>
+          {clientError && phase === 'options' ? (
+            <p
+              role="alert"
+              className="mt-3 rounded-[var(--radius-md)] bg-alert-soft px-4 py-3 text-sm font-medium text-alert"
+            >
+              {clientError}
+            </p>
+          ) : null}
           <div className="mt-5 flex flex-wrap gap-3">
-            <Button type="button" icon={CalendarClock} onClick={() => setPhase('slot')}>
+            <Button
+              type="button"
+              icon={CalendarClock}
+              onClick={() => {
+                if (!homeAddressValid) {
+                  setClientError(
+                    'Indiquez votre adresse ou votre quartier pour la coiffure à domicile.',
+                  );
+                  return;
+                }
+                setClientError('');
+                setPhase('slot');
+              }}
+            >
               Choisir un créneau
             </Button>
             <Button
@@ -723,6 +818,29 @@ export function BookingWizard({
                 )}
               </dd>
             </div>
+            {travelFeeCents != null ? (
+              <>
+                <div className="flex justify-between gap-4 py-2">
+                  <dt className="text-muted">Lieu</dt>
+                  <dd className="text-right font-semibold text-fg">
+                    À domicile
+                    <span className="block whitespace-pre-line font-normal text-muted">
+                      {homeAddress.trim()}
+                    </span>
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-4 py-2">
+                  <dt className="text-muted">Frais de déplacement</dt>
+                  <dd className="text-right font-semibold text-fg">
+                    {formatCents(travelFeeCents)}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-4 py-2">
+                  <dt className="text-muted">Total</dt>
+                  <dd className="text-right font-semibold text-fg">{formatCents(totalCents)}</dd>
+                </div>
+              </>
+            ) : null}
             <div className="flex justify-between gap-4 py-2">
               <dt className="text-muted">Coordonnées</dt>
               <dd className="text-right font-semibold text-fg">
@@ -821,6 +939,8 @@ export function BookingWizard({
             <input type="hidden" name="comment" value={comment} />
             <input type="hidden" name="consent" value={consent ? 'on' : ''} />
             <input type="hidden" name="promoCode" value={promoApplied?.code ?? ''} />
+            <input type="hidden" name="homeService" value={homeService ? 'on' : ''} />
+            <input type="hidden" name="homeAddress" value={homeService ? homeAddress.trim() : ''} />
             <div className="absolute -left-[9999px]" aria-hidden="true">
               <label htmlFor="booking-website">Site web</label>
               <input id="booking-website" name="website" tabIndex={-1} autoComplete="off" />
@@ -886,8 +1006,16 @@ export function BookingWizard({
                 }).format(new Date(bookingState.success.startsAt))}
               </dd>
             </div>
+            {bookingState.success.homeService ? (
+              <div className="flex justify-between gap-4">
+                <dt>Coiffure à domicile (déplacement)</dt>
+                <dd className="font-semibold">
+                  {formatCents(bookingState.success.travelFeeCents ?? 0)}
+                </dd>
+              </div>
+            ) : null}
             <div className="flex justify-between gap-4">
-              <dt>Prix</dt>
+              <dt>{bookingState.success.homeService ? 'Total' : 'Prix'}</dt>
               <dd className="font-semibold">{formatCents(bookingState.success.priceCents)}</dd>
             </div>
           </dl>

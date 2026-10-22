@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 /**
- * P3.8 — robots.txt du site public.
+ * P3.8 - robots.txt du site public.
  * Autorise l'exploration de toutes les pages publiques et pointe vers le sitemap.
  */
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';

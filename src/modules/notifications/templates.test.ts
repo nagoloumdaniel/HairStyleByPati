@@ -200,3 +200,42 @@ describe('renderNotification : admin_assessment_received', () => {
     expect(rendered?.text).toContain('/dashboard/evaluations/eval123');
   });
 });
+
+describe('renderNotification : coiffure à domicile', () => {
+  const home = {
+    ...appointment,
+    homeService: true,
+    homeAddress: 'Mermoz, rue 12 <villa 4>',
+    travelFeeCents: 500000,
+  };
+  const homeKeys = [
+    'booking_received',
+    'booking_confirmed',
+    'booking_rescheduled',
+    'booking_reminder',
+    'admin_new_booking',
+    'admin_booking_rescheduled',
+  ];
+
+  it.each(homeKeys)('should mention home service, address and fee in %s', (key) => {
+    const rendered = renderNotification(key, home);
+    expect(rendered?.html).toContain('À domicile');
+    expect(rendered?.html).toContain('Mermoz, rue 12 &lt;villa 4&gt;');
+    expect(rendered?.html).not.toContain('<villa 4>');
+    expect(rendered?.html).toMatch(/5\s000/);
+    expect(rendered?.text).toContain('domicile');
+    expect(rendered?.text).toContain('Mermoz, rue 12 <villa 4>');
+    expect(rendered?.text).toMatch(/5\s000/);
+  });
+
+  it('should not mention home service for a regular appointment', () => {
+    const rendered = renderNotification('booking_confirmed', appointment);
+    expect(rendered?.html).not.toContain('domicile');
+    expect(rendered?.text).not.toContain('domicile');
+  });
+
+  it('should show a free travel fee explicitly instead of an empty amount', () => {
+    const rendered = renderNotification('booking_confirmed', { ...home, travelFeeCents: 0 });
+    expect(rendered?.html).toContain('Offerts');
+  });
+});

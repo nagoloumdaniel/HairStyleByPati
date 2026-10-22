@@ -25,6 +25,10 @@ export interface SalonSettingsData {
   bookingPolicy: string | null;
   dataRetentionMonths: number;
   photoRetentionDays: number;
+  /** Coiffure à domicile proposée en option payante. */
+  homeServiceEnabled: boolean;
+  /** Frais de déplacement, en 1/100 FCFA (affichage = valeur / 100). */
+  travelFeeCents: number;
 }
 
 export const DEFAULT_SALON_SETTINGS: SalonSettingsData = {
@@ -47,6 +51,8 @@ export const DEFAULT_SALON_SETTINGS: SalonSettingsData = {
   bookingPolicy: null,
   dataRetentionMonths: 36,
   photoRetentionDays: 90,
+  homeServiceEnabled: false,
+  travelFeeCents: 0,
 };
 
 export function mapSalonSettings(row: SalonSettings): SalonSettingsData {
@@ -70,6 +76,8 @@ export function mapSalonSettings(row: SalonSettings): SalonSettingsData {
     bookingPolicy: row.bookingPolicy,
     dataRetentionMonths: row.dataRetentionMonths,
     photoRetentionDays: row.photoRetentionDays,
+    homeServiceEnabled: row.homeServiceEnabled,
+    travelFeeCents: row.travelFeeCents,
   };
 }
 

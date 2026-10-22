@@ -10,7 +10,7 @@ import { adminSaveCompatibility } from '@/modules/catalogue/actions';
 import { CheckboxField, FormError, useFormAction } from '../../catalogue-ui';
 
 /* ============================================================
- * P4.7 — Éditeur des règles de compatibilité capillaire.
+ * P4.7 - Éditeur des règles de compatibilité capillaire.
  * Ces règles sont évaluées côté serveur par le moteur P5.
  * ============================================================ */
 

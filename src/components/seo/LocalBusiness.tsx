@@ -1,5 +1,5 @@
 /**
- * P3.8 — Données structurées LocalBusiness (JSON-LD) pour Patricia.
+ * P3.8 - Données structurées LocalBusiness (JSON-LD) pour Patricia.
  * Aide les moteurs de recherche à afficher les infos de l’activité (nom, adresse,
  * horaires) dans les résultats enrichis.
  */

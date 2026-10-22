@@ -66,7 +66,7 @@ export async function generateMetadata({ params }: ServicePageProps): Promise<Me
       `${service.name} chez Hairstyle by Patricia : ${formatPrice(service)}, ${formatDuration(service.durationMinutes)}. Réservez en ligne.`,
     alternates: { canonical: `/coiffures/${service.slug}` },
     openGraph: {
-      title: `${service.name} — Hairstyle by Patricia`,
+      title: `${service.name} | Hairstyle by Patricia`,
       description,
       type: 'website',
       url: `/coiffures/${service.slug}`,

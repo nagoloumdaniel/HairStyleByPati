@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { AnswerType, HairLength, PhotoPolicy, ServiceStatus } from '@prisma/client';
 
 /* ============================================================
- * Schémas de validation — back-office catalogue (Phase 4)
+ * Schémas de validation - back-office catalogue (Phase 4)
  * Toute entrée utilisateur passe par Zod côté serveur (P1.9).
  * ============================================================ */
 

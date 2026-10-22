@@ -1,5 +1,5 @@
 /**
- * Stratégie dates — P1.5 (heure de l'appareil).
+ * Stratégie dates - P1.5 (heure de l'appareil).
  *
  * Règle : tout est STOCKÉ en UTC (Date Prisma). L'affichage et la
  * saisie utilisent uniquement l'heure locale de l'appareil connecté

@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { db } from '@/lib/db';
 
 /**
- * P3.8 — Sitemap XML du site public.
+ * P3.8 - Sitemap XML du site public.
  * Routes statiques + pages de prestations publiées (dynamiques depuis Prisma).
  * L'URL de base vient de NEXT_PUBLIC_APP_URL (fallback localhost en dev).
  */

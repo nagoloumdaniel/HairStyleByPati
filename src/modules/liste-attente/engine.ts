@@ -1,5 +1,5 @@
 /* ============================================================
- * Liste d'attente (P8.8) — fonctions pures, testables sans base.
+ * Liste d'attente (P8.8) - fonctions pures, testables sans base.
  * Le créneau souhaité est exact (date + heure UTC) : aucune logique
  * de fuseau côté serveur (cohérent avec la règle P1.5).
  * ============================================================ */
