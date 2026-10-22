@@ -41,9 +41,14 @@ export const homeServiceSettingsSchema = z.object({
 
 export type HomeServiceSettingsInput = z.infer<typeof homeServiceSettingsSchema>;
 
+/** Montant annoncé au public : « à partir de 1 500 FCFA » (montant fixe, à la charge de la cliente). */
+export function travelFeeFromLabel(travelFeeCents: number): string {
+  return `à partir de ${formatFcfa(travelFeeCents)}`;
+}
+
 /** Phrase publique (FAQ, infos pratiques) : l'option est présentée comme possible, jamais obligatoire. */
 export function homeServiceSentence(travelFeeCents: number): string {
   return travelFeeCents > 0
-    ? `Coiffure à domicile possible en option, frais de déplacement en supplément (${formatFcfa(travelFeeCents)}).`
+    ? `Coiffure à domicile possible en option, frais de déplacement à votre charge : ${travelFeeFromLabel(travelFeeCents)}.`
     : 'Coiffure à domicile possible en option, sans frais de déplacement.';
 }

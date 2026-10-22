@@ -37,8 +37,8 @@ describe('renderNotification', () => {
 
   it('should keep the formal tone (vouvoiement) in booking emails', () => {
     const rendered = renderNotification('booking_confirmed', appointment);
-    expect(rendered?.html).toContain('ton rendez-vous');
-    expect(rendered?.html).not.toMatch(/votre|vous/i);
+    expect(rendered?.html).toContain('votre rendez-vous');
+    expect(rendered?.html).not.toMatch(/(^|[^a-z])(ton|ta|tes|tu)([^a-z]|$)/i);
   });
 
   it('should escape HTML from user-controlled values', () => {
