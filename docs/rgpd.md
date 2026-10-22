@@ -8,16 +8,16 @@ Hairstyle by Patricia, salon de coiffure. Contact vie privée : adresse e-mail c
 
 ## Registre des traitements
 
-| Traitement             | Données                                                                              | Finalité                                    | Base légale                             | Conservation                                                                 | Destinataires                  |
-| ---------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------- | --------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------ |
-| Réservation            | nom, e-mail, téléphone, prestation, créneau, prix, réponses capillaires, commentaire | gérer le rendez-vous, rappels, annulations  | exécution du contrat                    | relation client puis obligations comptables                                  | Patricia, Neon, Resend, Vercel |
-| Évaluation capillaire  | réponses capillaires, photos privées, message                                        | vérifier la compatibilité avant réservation | consentement                            | photos purgées après `photoRetentionDays` (90 j par défaut)                  | Patricia, Cloudflare R2        |
-| Demande personnalisée  | coordonnées, description, photos privées, date souhaitée                             | étudier une coiffure hors catalogue         | consentement                            | photos purgées après `photoRetentionDays`, demande conservée puis anonymisée | Patricia, Cloudflare R2        |
-| Messagerie             | coordonnées, contenu des échanges, notes internes                                    | répondre aux demandes                       | intérêt légitime / exécution du contrat | 12 mois après la dernière réponse, puis anonymisation                        | Patricia                       |
-| Notifications          | e-mail, contenu transactionnel, statut d'envoi                                       | informer des changements de rendez-vous     | exécution du contrat / intérêt légitime | journal technique limité, purge des photos séparée                           | Resend, Neon                   |
-| Comptes administrateur | nom, e-mail, empreinte de mot de passe                                               | sécuriser le dashboard                      | intérêt légitime                        | durée du compte                                                              | Patricia, Vercel, Neon         |
-| Journaux d'audit       | identifiant utilisateur, action, entité                                              | sécurité et traçabilité                     | intérêt légitime                        | durée de conservation de sécurité à valider                                  | Patricia, Neon                 |
-| Thème et session       | cookie de session, préférence de thème                                               | fonctionnement de l'interface               | nécessaire au service                   | session, préférence locale                                                   | navigateur                     |
+| Traitement             | Données                                                                              | Finalité                                    | Base légale                             | Conservation                                                                 | Destinataires                        |
+| ---------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------- | --------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------ |
+| Réservation            | nom, e-mail, téléphone, prestation, créneau, prix, réponses capillaires, commentaire | gérer le rendez-vous, rappels, annulations  | exécution du contrat                    | relation client puis obligations comptables                                  | Patricia, Neon, Gmail (SMTP), Vercel |
+| Évaluation capillaire  | réponses capillaires, photos privées, message                                        | vérifier la compatibilité avant réservation | consentement                            | photos purgées après `photoRetentionDays` (90 j par défaut)                  | Patricia, Cloudflare R2              |
+| Demande personnalisée  | coordonnées, description, photos privées, date souhaitée                             | étudier une coiffure hors catalogue         | consentement                            | photos purgées après `photoRetentionDays`, demande conservée puis anonymisée | Patricia, Cloudflare R2              |
+| Messagerie             | coordonnées, contenu des échanges, notes internes                                    | répondre aux demandes                       | intérêt légitime / exécution du contrat | 12 mois après la dernière réponse, puis anonymisation                        | Patricia                             |
+| Notifications          | e-mail, contenu transactionnel, statut d'envoi                                       | informer des changements de rendez-vous     | exécution du contrat / intérêt légitime | journal technique limité, purge des photos séparée                           | Gmail (SMTP), Neon                   |
+| Comptes administrateur | nom, e-mail, empreinte de mot de passe                                               | sécuriser le dashboard                      | intérêt légitime                        | durée du compte                                                              | Patricia, Vercel, Neon               |
+| Journaux d'audit       | identifiant utilisateur, action, entité                                              | sécurité et traçabilité                     | intérêt légitime                        | durée de conservation de sécurité à valider                                  | Patricia, Neon                       |
+| Thème et session       | cookie de session, préférence de thème                                               | fonctionnement de l'interface               | nécessaire au service                   | session, préférence locale                                                   | navigateur                           |
 
 Purge automatique (cron de rétention) : avis non publiés (en attente, soumis non modérés, rejetés) après 12 mois ; notifications internes lues après 6 mois ; e-mails définitivement en échec après 3 mois. Les avis publiés ne sont jamais purgés automatiquement.
 
@@ -67,12 +67,12 @@ Le consentement est recueilli sur les formulaires de photos et de demande person
 
 ## Sous-traitants et transferts
 
-| Fournisseur   | Rôle                            | Localisation / garanties à vérifier             |
-| ------------- | ------------------------------- | ----------------------------------------------- |
-| Neon          | base PostgreSQL                 | région du projet, DPA et clauses contractuelles |
-| Vercel        | hébergement et crons            | DPA Vercel, région d'exécution                  |
-| Resend        | envoi d'e-mails transactionnels | DPA Resend, sous-traitants e-mail               |
-| Cloudflare R2 | stockage privé des photos       | DPA Cloudflare, région du bucket                |
+| Fournisseur    | Rôle                            | Localisation / garanties à vérifier                 |
+| -------------- | ------------------------------- | --------------------------------------------------- |
+| Neon           | base PostgreSQL                 | région du projet, DPA et clauses contractuelles     |
+| Vercel         | hébergement et crons            | DPA Vercel, région d'exécution                      |
+| Google (Gmail) | envoi d'e-mails transactionnels | conditions Google Workspace / Gmail, sous-traitants |
+| Cloudflare R2  | stockage privé des photos       | DPA Cloudflare, région du bucket                    |
 
 Les contrats de sous-traitance (DPA) doivent être téléchargés, archivés et datés avant la mise en production. Ce dépôt ne contient pas ces contrats signés.
 

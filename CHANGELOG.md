@@ -38,7 +38,7 @@ Version initiale complète correspondant au périmètre MVP du cahier des charge
 
 ### Notifications et messagerie
 
-- File d'e-mails (Resend, mode console en développement) idempotente, reprise sur échec, jamais bloquante pour l'enregistrement d'une réservation.
+- File d'e-mails (Gmail SMTP ou mode console) idempotente, reprise sur échec, jamais bloquante pour l'enregistrement d'une réservation.
 - Rappels automatiques H-24 anti-doublon, notifications dashboard avec lien direct.
 - Messagerie centralisée (contact, renseignements, compatibilité, demandes personnalisées) avec notes internes invisibles côté client.
 

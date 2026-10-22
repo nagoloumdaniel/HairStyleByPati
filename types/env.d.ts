@@ -27,9 +27,10 @@ declare namespace NodeJS {
     readonly AUTH_ADMIN_EMAIL?: string;
     readonly AUTH_ADMIN_PASSWORD?: string;
 
-    // --- E-mails (Resend, phase 7, non lu par le code actuel) ---
-    readonly RESEND_API_KEY?: string;
-    readonly EMAIL_FROM?: string;
+    // --- E-mails (phase 7) : EMAIL_MODE = smtp (Gmail) ou console ---
+    readonly EMAIL_MODE?: string;
+    readonly SMTP_USER?: string;
+    readonly SMTP_PASSWORD?: string;
 
     // --- Phases futures (S3/R2, Sentry, politique salon) ---
     readonly S3_ENDPOINT?: string;

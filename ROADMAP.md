@@ -12,7 +12,7 @@
 2. **Skill `verification-before-completion` obligatoire à la fin de chaque tâche** — ne jamais déclarer une tâche terminée sans exécuter la commande de vérification et montrer la sortie (build, test, lint, capture navigateur).
 3. **Skill `test-driven-development`** sur toute tâche de logique métier (règles, moteurs, API) : test d'abord, implémentation ensuite.
 4. **Workflow git :** une branche par phase (`phase/0-fondations`, etc.), commits atomiques, PR = phase. Skills `using-git-worktrees` (isolation), `finishing-a-development-branch` (merge), `changelog-generator` (versions).
-5. **Stack imposée par le cahier des charges §14 :** Next.js (App Router) + TypeScript strict, Tailwind CSS + composants personnalisés (shadcn/ui via `pick-ui-library`), PostgreSQL, Prisma, stockage objet S3, e-mails Resend/Brevo.
+5. **Stack imposée par le cahier des charges §14 :** Next.js (App Router) + TypeScript strict, Tailwind CSS + composants personnalisés (shadcn/ui via `pick-ui-library`), PostgreSQL, Prisma, stockage objet S3, e-mails (Gmail SMTP ou mode console).
 6. **Avant chaque tâche :** charger le skill affecté en lisant `C:\Users\Landh\.claude\skills\<nom>\SKILL.md`, puis exécuter en mode caveman.
 7. **Déblocage :** si un bug dépasse 3 tentatives → skill `systematic-debugging`. Refactors → `safe-refactor`. Travail parallélisable (pages indépendantes) → `dispatching-parallel-agents`.
 
@@ -36,7 +36,7 @@
 - [x] **P0.1** Init repo Git, `.gitignore` Next.js, README initial, premier commit. — *skill : caveman + verification-before-completion*
 - [x] **P0.2** Figer le cahier des charges : extraire la liste complète des critères d'acceptation §17 dans `docs/acceptation.md`. — *skill : writing-plans*
 - [x] **P0.3** Rédiger `docs/plan-detaille.md` décomposant chaque fonctionnalité en modules (§14.2) avec interfaces et données. — *skill : writing-plans + executing-plans*
-- [x] **P0.4** Décision stack précise : Next.js 15 / React 19 / Tailwind v4 / Prisma / PostgreSQL (Neon ou équivalent) / Resend / S3 (Cloudflare R2 ou équivalent). Documenter le « pourquoi » dans `docs/stack.md`. — *skill : lean-build + pick-ui-library*
+- [x] **P0.4** Décision stack précise : Next.js 15 / React 19 / Tailwind v4 / Prisma / PostgreSQL (Neon ou équivalent) / Gmail SMTP / S3 (Cloudflare R2 ou équivalent). Documenter le « pourquoi » dans `docs/stack.md`. — *skill : lean-build + pick-ui-library*
 - [x] **P0.5** Arborescence modulaire par domaine (catalogue, compatibilite, disponibilites, reservations, clients, demandes, messagerie, notifications, fichiers, auth, parametres, stats). — *skill : site-architecture*
 - [x] **P0.6** Créer `.env.example` documenté (toutes variables : DB, S3, e-mail, secrets de signature). Aucun secret réel dans le repo. — *skill : caveman*
 - [x] **P0.7** Branch strategy + conventions de commit (conventional commits). Hooks pre-commit : lint-staged + tsc --noEmit. — *skill : caveman-commit*
@@ -140,9 +140,9 @@
 ## PHASE 7 — NOTIFICATIONS & MESSAGERIE
 
 > Objectif : fiables, idempotentes, découplées (§10).
-> État : terminée le 19/10/2026. File d'attente e-mail avec fournisseur Resend et mode console local, reprise progressive, rappels H-24 idempotents, notifications dashboard avec liens directs, messagerie complète avec réponse e-mail et notes internes. Les modèles des demandes personnalisées seront branchés avec le module de la phase 8.
+> État : terminée le 19/10/2026. File d'attente e-mail avec fournisseur Gmail SMTP et mode console local, reprise progressive, rappels H-24 idempotents, notifications dashboard avec liens directs, messagerie complète avec réponse e-mail et notes internes. Les modèles des demandes personnalisées seront branchés avec le module de la phase 8.
 
-- [x] **P7.1** Service d'e-mail transactionnel (Resend/Brevo) avec abstraction fournisseur. — *skill : caveman*
+- [x] **P7.1** Service d'e-mail transactionnel (Gmail SMTP ou console) avec abstraction fournisseur. — *skill : caveman*
 - [x] **P7.2** File d'attente d'envoi + reprise sur échec ; l'envoi e-mail ne bloque et ne conditionne jamais l'enregistrement d'une réservation. — *skill : test-driven-development*
 - [x] **P7.3** Modèles d'e-mail pour les événements §10.1 : réservation, attente, confirmation, annulations, reprogrammation, rappel, contact et réponse. Les événements des demandes personnalisées seront ajoutés en phase 8. — *skill : caveman*
 - [x] **P7.4** Idempotence des notifications (jamais de doublon même si relance technique). — *skill : test-driven-development*
