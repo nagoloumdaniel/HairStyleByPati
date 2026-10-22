@@ -55,7 +55,7 @@ const faqItems = [
     id: 'annulation',
     title: 'Quelle est la politique d’annulation ?',
     content:
-      'Vous pouvez annuler ou déplacer votre rendez-vous gratuitement jusqu’à 24 heures avant l’heure convenue, via le lien sécurisé reçu par e-mail. Passé ce délai ou en cas d’absence, Patricia applique les conditions détaillées dans les informations pratiques.',
+      'Vous pouvez annuler votre rendez-vous gratuitement en ligne jusqu’à 30 minutes avant l’heure convenue, via le lien sécurisé reçu par e-mail. Passé ce délai, le lien ne fonctionne plus : contactez Patricia directement. Les conditions détaillées dans les informations pratiques s’appliquent.',
   },
   {
     id: 'options',
