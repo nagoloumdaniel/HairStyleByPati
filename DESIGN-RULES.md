@@ -64,8 +64,9 @@
 - FAQ : questions sur 2 colonnes (md+) ; bloc « Une autre question » centré.
 - Champs : menu déroulant `Select`, calendrier `DateField`, heure `TimeField`, `DateTimeField` personnalisés (jamais de select/date natifs) ; icône dans chaque champ (`Input` en ajoute automatiquement selon type/nom).
 - Navbar : icônes réseaux sociaux (`SocialLinks`, react-icons) ; icônes via lucide-react, jamais d'emoji.
-- Landing `/` : hero plein écran sur fond `bg-hero` + dégradés (`.landing-hero`), SANS fond blanc ni carte. Gauche : titre (Title, aligné à gauche, grand), sous-titre « Départ et retwist de locs, nattes collées, vanilles. », boutons Réserver/Catalogue (→ `/coiffures`). Droite : photo `public/landing/landing.jpeg` dans un cercle qui se déforme en continu (`.landing-blob`, 12 s, fluide, désactivé si reduced-motion). AUCUNE petite carte/UI autour. Photo jamais étirée (carré natif). Section « À propos » sans image.
+- Landing `/` : hero plein écran sur fond `bg-hero` + dégradés (`.landing-hero`), SANS fond blanc ni carte. Gauche : titre (Title, aligné à gauche, grand), sous-titre « Départ et retwist de locs, nattes collées, vanilles. », boutons Réserver/Catalogue (→ `/coiffures`). Droite : photo `public/landing/landing.jpeg` dans un cercle qui se déforme en continu (`.landing-blob`, 12 s, fluide, désactivé si reduced-motion). AUCUNE petite carte/UI autour dans le hero. Photo jamais étirée (carré natif). Section « À propos » sans image.
 - Horaires : Lundi – Dimanche, 5h – 22h (partout). Landing : mêmes polices que le reste du site (Playfair Display + Lato), aucune exception.
+- Landing `/` (sections sous le hero) : « Mes réalisations » (6 dernières photos de la galerie via `GalleryGrid compact`, section absente s'il n'y en a pas) et « Elles nous font confiance » (3 derniers avis publiés avec étoiles, absente sans avis). Vouvoiement partout.
 - Boutons « Réserver » (navbar, landing, contact, infos) → `/coiffures`. `/reserver` sans `?service=` redirige vers le catalogue (plus de liste de noms) ; `/reserver?service=slug` reste le parcours de réservation.
 - Dashboard admin : SANS navbar publique ni footer (masqués sous `/dashboard`). Sidebar avec icônes lucide, « Voir le site » et bascule de thème ; chaque titre de page dashboard a son icône.
 - Dashboard : plein écran (pas de `max-w` global ni de marges autour), sidebar collée à gauche pleine hauteur (`lg:h-dvh`, sticky), contenu qui remplit toute la largeur restante ; responsive (mobile : barre de navigation horizontale en haut, contenu pleine largeur).
@@ -81,3 +82,6 @@
   - Icône dans chaque champ (`Input`, `Select icon`, `Textarea`).
   - Popups : `Modal` (portail, fond flouté, bouton ✕, Échap, clic extérieur, focus piégé, page non scrollable derrière). Pas de `window.confirm` : utiliser `useConfirm()` (`src/components/ui/Confirm.tsx`).
   - En-tête de page : `PageHeader` (icône + titre + description + actions).
+- **Avis et galerie (consignes cliente)** :
+  - Avis publiés immédiatement, sans modération ; l'admin les supprime (`useConfirm`). Étoiles 1-5 (`StarRatingInput`, `Stars`), commentaire facultatif, 3 photos max, badge « Client vérifié » pour les avis par lien e-mail. Moyenne + nombre d'avis sur `PrestationCard` et la fiche (masqués sans avis, jamais de note inventée). Vouvoiement.
+  - Galerie : `/galerie` (grille + `Lightbox` accessible clavier), pas de zoom au survol. Dashboard : ajout direct, légende/prestation facultatives, plus de consentement.

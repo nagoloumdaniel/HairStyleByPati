@@ -1,4 +1,5 @@
 import type { EmailContext } from '@/modules/parametres/policies';
+import { PAYMENT_SHORT } from '@/modules/parametres/payment';
 import { formatFcfa } from '@/modules/reservations/format';
 
 /* ============================================================
@@ -179,7 +180,7 @@ function renderReview(payload: ReviewEmailPayload, ctx: EmailContext): RenderedE
       intro: `Bonjour ${payload.customerName}, Patricia espère que votre prestation « ${payload.serviceName} » vous a plu. Votre avis aide d’autres clientes à faire leur choix.`,
       ctaLabel: 'Laisser un avis',
       ctaUrl: payload.reviewUrl,
-      note: 'Votre avis est relu par Patricia avant toute publication.',
+      note: 'Votre avis est publié sur le site dès son envoi, avec la mention « client vérifié ».',
     }),
     text: `Bonjour ${payload.customerName},\n\nVotre avis sur ${payload.serviceName} compte pour Patricia.\nLaisser un avis : ${payload.reviewUrl}\n\n${SALON_NAME}`,
   };
@@ -252,7 +253,7 @@ function layout(ctx: EmailContext, input: LayoutInput): string {
               ${policies}
               <p style="margin:24px 0 0;border-top:1px solid #eadfb0;padding-top:16px;color:#5a5224;font-size:12px;line-height:1.6">
                 ${SALON_NAME}<br />
-                Paiement sur place. Merci de votre confiance.${signature}
+                ${PAYMENT_SHORT} Merci de votre confiance.${signature}
               </p>
             </td></tr>
           </table>
@@ -337,9 +338,9 @@ function renderAppointment(
           title: 'Votre rendez-vous est enregistré',
           intro: `Bonjour ${customer}, votre réservation pour ${service} a bien été enregistrée. Patricia confirmera votre créneau si nécessaire.`,
           rows,
-          note: 'Paiement sur place. Vous recevrez une confirmation dès que le rendez-vous sera validé.',
+          note: `${PAYMENT_SHORT} Vous recevrez une confirmation dès que le rendez-vous sera validé.`,
         }),
-        text: `Bonjour ${customer},\n\nVotre réservation pour ${service} est enregistrée.\nDate : ${when}\n${home}Paiement sur place.\n\n${SALON_NAME}`,
+        text: `Bonjour ${customer},\n\nVotre réservation pour ${service} est enregistrée.\nDate : ${when}\n${home}${PAYMENT_SHORT}\n\n${SALON_NAME}`,
       };
     case 'booking_confirmed':
       return {
@@ -350,10 +351,10 @@ function renderAppointment(
           rows,
           ctaLabel: 'Gérer ou annuler mon rendez-vous',
           ctaUrl: payload.cancelUrl ?? null,
-          note: 'Paiement sur place. Conservez ce message pour retrouver votre rendez-vous.',
+          note: `${PAYMENT_SHORT} Conservez ce message pour retrouver votre rendez-vous.`,
           policies: confirmationPolicies(ctx),
         }),
-        text: `Bonjour ${customer},\n\nVotre rendez-vous pour ${service} est confirmé le ${when}.\n${home}Paiement sur place.\n${payload.cancelUrl ? `Gérer mon rendez-vous : ${payload.cancelUrl}\n` : ''}${confirmationPoliciesText(ctx)}\n${SALON_NAME}`,
+        text: `Bonjour ${customer},\n\nVotre rendez-vous pour ${service} est confirmé le ${when}.\n${home}${PAYMENT_SHORT}\n${payload.cancelUrl ? `Gérer mon rendez-vous : ${payload.cancelUrl}\n` : ''}${confirmationPoliciesText(ctx)}\n${SALON_NAME}`,
       };
     case 'booking_cancelled_customer':
     case 'booking_cancelled_admin':
@@ -380,9 +381,9 @@ function renderAppointment(
           rows,
           ctaLabel: 'Gérer ou annuler mon rendez-vous',
           ctaUrl: payload.cancelUrl ?? null,
-          note: 'Paiement sur place.',
+          note: PAYMENT_SHORT,
         }),
-        text: `Bonjour ${customer},\n\nVotre rendez-vous pour ${service} est reprogrammé : ${when}.\n${home}Paiement sur place.\n\n${SALON_NAME}`,
+        text: `Bonjour ${customer},\n\nVotre rendez-vous pour ${service} est reprogrammé : ${when}.\n${home}${PAYMENT_SHORT}\n\n${SALON_NAME}`,
       };
     case 'booking_reminder':
       return {
@@ -393,9 +394,9 @@ function renderAppointment(
           rows,
           ctaLabel: 'Voir mon rendez-vous',
           ctaUrl: payload.cancelUrl ?? `${APP_URL}/reserver`,
-          note: 'Paiement sur place. En cas d’empêchement, utilisez le lien reçu avec votre confirmation.',
+          note: `${PAYMENT_SHORT} En cas d’empêchement, utilisez le lien reçu avec votre confirmation.`,
         }),
-        text: `Bonjour ${customer},\n\nRappel : rendez-vous pour ${service} le ${when}.\n${home}Paiement sur place.\n\n${SALON_NAME}`,
+        text: `Bonjour ${customer},\n\nRappel : rendez-vous pour ${service} le ${when}.\n${home}${PAYMENT_SHORT}\n\n${SALON_NAME}`,
       };
     case 'admin_new_booking':
       return {

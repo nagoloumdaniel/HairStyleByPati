@@ -4,6 +4,15 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/).
 
 ## [Non publié]
 
+### Reprise des évolutions de SarielleFashion
+
+- Annulation en ligne : délai exprimé en minutes (30 par défaut). Migration `cancel_notice_minutes` (valeur existante convertie : heures x 60).
+- Paiement : toujours sur place, en espèces ou par virement (infos pratiques, FAQ, récapitulatif, e-mails).
+- Coiffure à domicile : frais de déplacement fixes annoncés « à partir de X FCFA ».
+- Avis publiés immédiatement, sans modération ; formulaire avec étoiles, commentaire et jusqu'à 3 photos sur chaque fiche prestation ; moyenne et nombre d'avis sur les cartes et les fiches ; section d'avis sur l'accueil ; suppression par l'admin. Migration `avis_publication_immediate_galerie`.
+- Galerie de réalisations : ajout direct depuis le dashboard, page publique avec visionneuse, section « Mes réalisations » sur l'accueil.
+- Fournisseur d'e-mails Resend supprimé : modes `smtp` (Gmail) ou `console` uniquement.
+
 ### Interface
 
 - Refonte premium : accueil, catalogue, fiche coiffure (galerie, bloc de réservation sticky, coiffures similaires), contact, demandes personnalisées, dashboard.
@@ -38,7 +47,7 @@ Version initiale complète correspondant au périmètre MVP du cahier des charge
 
 ### Notifications et messagerie
 
-- File d'e-mails (Resend, mode console en développement) idempotente, reprise sur échec, jamais bloquante pour l'enregistrement d'une réservation.
+- File d'e-mails (Gmail SMTP ou mode console) idempotente, reprise sur échec, jamais bloquante pour l'enregistrement d'une réservation.
 - Rappels automatiques H-24 anti-doublon, notifications dashboard avec lien direct.
 - Messagerie centralisée (contact, renseignements, compatibilité, demandes personnalisées) avec notes internes invisibles côté client.
 

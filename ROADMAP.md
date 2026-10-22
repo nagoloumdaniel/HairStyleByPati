@@ -12,7 +12,7 @@
 2. **Skill `verification-before-completion` obligatoire à la fin de chaque tâche** — ne jamais déclarer une tâche terminée sans exécuter la commande de vérification et montrer la sortie (build, test, lint, capture navigateur).
 3. **Skill `test-driven-development`** sur toute tâche de logique métier (règles, moteurs, API) : test d'abord, implémentation ensuite.
 4. **Workflow git :** une branche par phase (`phase/0-fondations`, etc.), commits atomiques, PR = phase. Skills `using-git-worktrees` (isolation), `finishing-a-development-branch` (merge), `changelog-generator` (versions).
-5. **Stack imposée par le cahier des charges §14 :** Next.js (App Router) + TypeScript strict, Tailwind CSS + composants personnalisés (shadcn/ui via `pick-ui-library`), PostgreSQL, Prisma, stockage objet S3, e-mails Resend/Brevo.
+5. **Stack imposée par le cahier des charges §14 :** Next.js (App Router) + TypeScript strict, Tailwind CSS + composants personnalisés (shadcn/ui via `pick-ui-library`), PostgreSQL, Prisma, stockage objet S3, e-mails (Gmail SMTP ou mode console).
 6. **Avant chaque tâche :** charger le skill affecté en lisant `C:\Users\Landh\.claude\skills\<nom>\SKILL.md`, puis exécuter en mode caveman.
 7. **Déblocage :** si un bug dépasse 3 tentatives → skill `systematic-debugging`. Refactors → `safe-refactor`. Travail parallélisable (pages indépendantes) → `dispatching-parallel-agents`.
 
@@ -36,7 +36,7 @@
 - [x] **P0.1** Init repo Git, `.gitignore` Next.js, README initial, premier commit. — *skill : caveman + verification-before-completion*
 - [x] **P0.2** Figer le cahier des charges : extraire la liste complète des critères d'acceptation §17 dans `docs/acceptation.md`. — *skill : writing-plans*
 - [x] **P0.3** Rédiger `docs/plan-detaille.md` décomposant chaque fonctionnalité en modules (§14.2) avec interfaces et données. — *skill : writing-plans + executing-plans*
-- [x] **P0.4** Décision stack précise : Next.js 15 / React 19 / Tailwind v4 / Prisma / PostgreSQL (Neon ou équivalent) / Resend / S3 (Cloudflare R2 ou équivalent). Documenter le « pourquoi » dans `docs/stack.md`. — *skill : lean-build + pick-ui-library*
+- [x] **P0.4** Décision stack précise : Next.js 15 / React 19 / Tailwind v4 / Prisma / PostgreSQL (Neon ou équivalent) / Gmail SMTP / S3 (Cloudflare R2 ou équivalent). Documenter le « pourquoi » dans `docs/stack.md`. — *skill : lean-build + pick-ui-library*
 - [x] **P0.5** Arborescence modulaire par domaine (catalogue, compatibilite, disponibilites, reservations, clients, demandes, messagerie, notifications, fichiers, auth, parametres, stats). — *skill : site-architecture*
 - [x] **P0.6** Créer `.env.example` documenté (toutes variables : DB, S3, e-mail, secrets de signature). Aucun secret réel dans le repo. — *skill : caveman*
 - [x] **P0.7** Branch strategy + conventions de commit (conventional commits). Hooks pre-commit : lint-staged + tsc --noEmit. — *skill : caveman-commit*
@@ -140,9 +140,9 @@
 ## PHASE 7 — NOTIFICATIONS & MESSAGERIE
 
 > Objectif : fiables, idempotentes, découplées (§10).
-> État : terminée le 19/10/2026. File d'attente e-mail avec fournisseur Resend et mode console local, reprise progressive, rappels H-24 idempotents, notifications dashboard avec liens directs, messagerie complète avec réponse e-mail et notes internes. Les modèles des demandes personnalisées seront branchés avec le module de la phase 8.
+> État : terminée le 19/10/2026. File d'attente e-mail avec fournisseur Gmail SMTP et mode console local, reprise progressive, rappels H-24 idempotents, notifications dashboard avec liens directs, messagerie complète avec réponse e-mail et notes internes. Les modèles des demandes personnalisées seront branchés avec le module de la phase 8.
 
-- [x] **P7.1** Service d'e-mail transactionnel (Resend/Brevo) avec abstraction fournisseur. — *skill : caveman*
+- [x] **P7.1** Service d'e-mail transactionnel (Gmail SMTP ou console) avec abstraction fournisseur. — *skill : caveman*
 - [x] **P7.2** File d'attente d'envoi + reprise sur échec ; l'envoi e-mail ne bloque et ne conditionne jamais l'enregistrement d'une réservation. — *skill : test-driven-development*
 - [x] **P7.3** Modèles d'e-mail pour les événements §10.1 : réservation, attente, confirmation, annulations, reprogrammation, rappel, contact et réponse. Les événements des demandes personnalisées seront ajoutés en phase 8. — *skill : caveman*
 - [x] **P7.4** Idempotence des notifications (jamais de doublon même si relance technique). — *skill : test-driven-development*
@@ -166,8 +166,8 @@
 - [x] **P8.7** Gestion des absences (no-show) + impact statistique sans bannissement automatique. — *skill : test-driven-development*
 - [x] **P8.8** Liste d'attente : créneau exact (pas de date "libre", aucune logique de fuseau serveur), alerte e-mail à la libération, lien de confirmation à durée limitée (2h, cron `/api/cron/liste-attente`), re-vérification complète via `createBooking` à la confirmation (aucune création d'Appointment en dehors du flux standard). — *skill : writing-plans + test-driven-development* (hors v1 §19, livré en phase 12)
 - [x] **P8.9** Suggestions de coiffures compatibles affichées quand une prestation est incompatible : ne proposent que des prestations `COMPATIBLE` + `BOOK` d'après le moteur (`suggestCompatibleServices`, testé) — jamais de contournement d'une restriction. — *skill : test-driven-development* (hors v1 §19, livré en phase 12)
-- [x] **P8.10** Avis clients : demande envoyée automatiquement quand un RDV passe à « terminé », lien à durée limitée (60 jours), soumission libre, modération obligatoire (`dashboard/avis`) avant affichage public ; témoignages de la page d'accueil remplacés par les avis réellement approuvés (plus de citations inventées). — *skill : frontend-design + test-driven-development* (hors v1 §19, livré en phase 12)
-- [x] **P8.11** Galerie de réalisations publique (`/galerie`) : upload dashboard avec confirmation explicite d'autorisation de la cliente obligatoire avant publication, URLs signées calculées à la lecture (bucket privé). — *skill : frontend-design* (hors v1 §19, livré en phase 12)
+- [x] **P8.10** Avis clients : demande envoyée automatiquement quand un RDV passe à « terminé », lien à durée limitée (60 jours), avis publiés immédiatement, sans modération (suppression par l'admin dans `dashboard/avis`, avec tous les détails) ; formulaire étoiles + commentaire + 3 photos sur chaque fiche prestation et via le lien e-mail (badge « client vérifié »), anti-abus (rate limit, honeypot), moyenne et nombre d'avis sur les cartes et les fiches, section d'avis sur l'accueil (jamais de citations inventées). — *skill : frontend-design + test-driven-development* (hors v1 §19, livré en phase 12)
+- [x] **P8.11** Galerie de réalisations publique (`/galerie`) : ajout direct depuis le dashboard (plus de consentement à cocher), visionneuse accessible, section « Mes réalisations » sur l'accueil, URLs signées calculées à la lecture (bucket privé). — *skill : frontend-design* (hors v1 §19, livré en phase 12)
 - [x] **P8.12** Promotions : réduction % ou montant fixe par prestation, période de validité, appliquée automatiquement et de façon figée (`promotionId`/`discountCents` instantanés sur l'Appointment) au moment de la réservation — testé (`applyPromotion`, `findActivePromotion`). — *skill : frontend-design + test-driven-development* (hors v1 §19, livré en phase 12)
 
 ## PHASE 9 — SÉCURITÉ APPROFONDIE, RGPD, FIABILITÉ
