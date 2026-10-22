@@ -6,54 +6,22 @@ import { getApprovedReviews } from '@/modules/avis/queries';
 import { Title } from '@/components/ui/Title';
 import { ButtonLink } from '@/components/ui/Button';
 import { PrestationCard } from '@/components/catalogue/PrestationCard';
-import { bookingHref } from '@/lib/catalogue';
+import { bookingHref, formatDuration, formatPrice, serviceImages } from '@/lib/catalogue';
+import { getCachedPopularServices } from '@/lib/popular-services';
 
 export const metadata: Metadata = {
-  title: { absolute: 'Hairstyle by Patricia — Locs, nattes collées et vanilles à Dakar' },
+  title: { absolute: 'Hairstyle by Patricia | Locs, nattes collées et vanilles à Dakar' },
   description:
     'Départ et retwist de locs, nattes collées, vanilles. Coiffure sur rendez-vous à Dakar, diagnostic capillaire et réservation en ligne.',
   alternates: { canonical: '/' },
   openGraph: {
-    title: 'Hairstyle by Patricia — Locs, nattes collées et vanilles à Dakar',
+    title: 'Hairstyle by Patricia | Locs, nattes collées et vanilles à Dakar',
     description:
       'Départ et retwist de locs, nattes collées, vanilles. Prenez rendez-vous en quelques clics.',
     type: 'website',
     url: '/',
   },
 };
-
-const popularServices = [
-  {
-    title: 'Tresses BOX',
-    slug: 'tresses-box',
-    price: 'À partir de 20 000 FCFA',
-    duration: '3h00',
-    category: 'Tresses',
-    image:
-      'https://images.pexels.com/photos/36441633/pexels-photo-36441633.jpeg?auto=compress&cs=tinysrgb&w=800',
-    alt: 'Tresses BOX — coiffure protectrice (photo de démonstration)',
-  },
-  {
-    title: 'Vanilles légères',
-    slug: 'vanilles-legeres',
-    price: 'À partir de 15 000 FCFA',
-    duration: '2h30',
-    category: 'Vanilles',
-    image:
-      'https://images.pexels.com/photos/37547660/pexels-photo-37547660.jpeg?auto=compress&cs=tinysrgb&w=800',
-    alt: 'Vanilles légères — coiffure protectrice (photo de démonstration)',
-  },
-  {
-    title: 'Rétissage de locs',
-    slug: 'retissage-de-locs',
-    price: 'À partir de 25 000 FCFA',
-    duration: '2h00',
-    category: 'Locs',
-    image:
-      'https://images.pexels.com/photos/30152002/pexels-photo-30152002.jpeg?auto=compress&cs=tinysrgb&w=800',
-    alt: 'Rétissage de locs — entretien (photo de démonstration)',
-  },
-];
 
 const steps = [
   {
@@ -74,7 +42,7 @@ const steps = [
 ];
 
 export default async function HomePage() {
-  const reviews = await getApprovedReviews(3);
+  const [reviews, popular] = await Promise.all([getApprovedReviews(3), getCachedPopularServices()]);
   return (
     <main>
       {/* Hero plein écran : texte à gauche, portrait arrondi à droite avec petites cartes
@@ -128,33 +96,35 @@ export default async function HomePage() {
       </section>
 
       <div className="page-main space-y-24 md:space-y-32">
-        {/* Coiffures populaires */}
-        <section id="coiffures" className="space-y-10">
-          <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
-            <Title as="h2">Coiffures populaires</Title>
-            <ButtonLink href="/coiffures" variant="secondary" icon={LayoutGrid}>
-              Voir toutes les coiffures
-            </ButtonLink>
-          </div>
-          <ul
-            aria-label="Coiffures populaires"
-            className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
-          >
-            {popularServices.slice(0, 6).map((service) => (
-              <li key={service.slug}>
-                <PrestationCard
-                  href={`/coiffures/${service.slug}`}
-                  bookHref={bookingHref(service.slug)}
-                  images={[{ src: service.image, alt: service.alt }]}
-                  badge={service.category}
-                  title={service.title}
-                  price={service.price}
-                  duration={service.duration}
-                />
-              </li>
-            ))}
-          </ul>
-        </section>
+        {/* Les plus réservées : section absente s'il n'y a aucune réservation. */}
+        {popular.length > 0 ? (
+          <section id="plus-reservees" className="space-y-10">
+            <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
+              <Title as="h2">Les plus réservées</Title>
+              <ButtonLink href="/coiffures" variant="secondary" icon={LayoutGrid}>
+                Voir toutes les coiffures
+              </ButtonLink>
+            </div>
+            <ul
+              aria-label="Les coiffures les plus réservées"
+              className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
+            >
+              {popular.map((service) => (
+                <li key={service.id}>
+                  <PrestationCard
+                    href={`/coiffures/${service.slug}`}
+                    bookHref={bookingHref(service.slug)}
+                    images={serviceImages(service)}
+                    badge={service.category.name}
+                    title={service.name}
+                    price={formatPrice(service)}
+                    duration={formatDuration(service.durationMinutes)}
+                  />
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
 
         {/* Étapes de réservation */}
         <section id="etapes" className="space-y-10">
@@ -201,7 +171,7 @@ export default async function HomePage() {
                 >
                   {review.comment ? <p className="text-lg mb-4">« {review.comment} »</p> : null}
                   <footer className="text-sm font-semibold text-fg not-italic">
-                    — {review.customer.name.split(' ')[0]} · {review.service.name}
+                    - {review.customer.name.split(' ')[0]} · {review.service.name}
                     {review.rating ? ` · ${review.rating}/5` : ''}
                   </footer>
                 </blockquote>
@@ -241,7 +211,7 @@ export default async function HomePage() {
             </p>
             <p className="flex items-start gap-3 text-fg">
               <Clock aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-accent" />
-              <span>Lundi – Dimanche : 5h – 22h</span>
+              <span>Lundi - Dimanche : 5h - 22h</span>
             </p>
           </div>
         </section>
