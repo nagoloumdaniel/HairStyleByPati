@@ -273,6 +273,10 @@ model Appointment {
   cancelReason         String?
   // Ancien créneau conservé lors d'une reprogrammation (§9.4)
   rescheduledFrom      DateTime?
+  // Coiffure à domicile : instantané des frais et adresse de la cliente
+  homeService          Boolean           @default(false)
+  travelFeeCents       Int?
+  homeAddress          String?
   createdAt            DateTime          @default(now())
   updatedAt            DateTime          @updatedAt
   assessments          HairAssessment[]
@@ -670,6 +674,9 @@ model SalonSettings {
   // RGPD : conservation des données et des photos privées
   dataRetentionMonths  Int      @default(36)
   photoRetentionDays   Int      @default(90)
+  // Coiffure à domicile (option payante, frais de déplacement en 1/100 FCFA)
+  homeServiceEnabled   Boolean  @default(false)
+  travelFeeCents       Int      @default(0)
   updatedAt            DateTime @updatedAt
 }
 

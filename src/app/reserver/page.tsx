@@ -61,6 +61,8 @@ export default async function ReserverPage({
           holdSlotMinutes: settings.holdSlotMinutes,
           maxAdvanceDays: settings.maxAdvanceDays,
           cancelReasonRequired: settings.cancelReasonRequired,
+          homeServiceEnabled: settings.homeServiceEnabled,
+          travelFeeCents: settings.travelFeeCents,
         }}
       />
     </main>

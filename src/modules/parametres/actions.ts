@@ -7,6 +7,7 @@ import { AppError } from '@/lib/errors';
 import { requireAdmin } from '@/modules/auth/guards';
 import { logAudit } from '@/modules/stats/audit';
 import { OPENING_MAX, OPENING_MIN } from './hours';
+import { fcfaToCents, homeServiceSettingsSchema } from './home-service';
 
 export type SalonProfileState = {
   success?: string;
@@ -82,15 +83,24 @@ export async function adminSaveSalonProfile(
       bookingPolicy: text('bookingPolicy'),
       openingHours: text('openingHours'),
     });
-    if (!parsed.success) {
+    const homeParsed = homeServiceSettingsSchema.safeParse({
+      homeServiceEnabled: formData.get('homeServiceEnabled'),
+      travelFeeFcfa: text('travelFeeFcfa'),
+    });
+    if (!parsed.success || !homeParsed.success) {
       const fieldErrors: Record<string, string> = {};
-      for (const issue of parsed.error.issues) {
+      const issues = [
+        ...(parsed.success ? [] : parsed.error.issues),
+        ...(homeParsed.success ? [] : homeParsed.error.issues),
+      ];
+      for (const issue of issues) {
         const key = String(issue.path[0] ?? '');
         if (key && !fieldErrors[key]) fieldErrors[key] = issue.message;
       }
       return { error: 'Corrigez les champs signalés.', fieldErrors };
     }
     const input = parsed.data;
+    const homeService = homeParsed.data;
 
     let openingHours: z.infer<typeof openingHoursSchema> | undefined;
     if (input.openingHours) {
@@ -120,6 +130,8 @@ export async function adminSaveSalonProfile(
       emailSignature: input.emailSignature || null,
       cancellationPolicy: input.cancellationPolicy || null,
       bookingPolicy: input.bookingPolicy || null,
+      homeServiceEnabled: homeService.homeServiceEnabled,
+      travelFeeCents: fcfaToCents(homeService.travelFeeFcfa),
     };
     await db.salonSettings.upsert({
       where: { id: 1 },
@@ -131,6 +143,10 @@ export async function adminSaveSalonProfile(
       action: 'settings.profile.update',
       entityType: 'SalonSettings',
       entityId: '1',
+      metadata: {
+        homeServiceEnabled: homeService.homeServiceEnabled,
+        travelFeeFcfa: homeService.travelFeeFcfa,
+      },
     }).catch(() => undefined);
     revalidateTag('salon-settings');
     revalidatePath('/dashboard/parametres');

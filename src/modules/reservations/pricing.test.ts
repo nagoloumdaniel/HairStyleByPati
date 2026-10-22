@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { computeBookingSnapshot, type BookingOptionInput } from './pricing';
+import {
+  addTravelFee,
+  computeBookingSnapshot,
+  resolveHomeService,
+  type BookingOptionInput,
+} from './pricing';
 
 const service = {
   name: 'Tresses collées',
@@ -67,5 +72,56 @@ describe('computeBookingSnapshot', () => {
       options,
     );
     expect(snapshot.durationMinutes).toBe(15);
+  });
+});
+
+describe('resolveHomeService', () => {
+  const enabled = { homeServiceEnabled: true, travelFeeCents: 500000 };
+
+  it('should ignore the option when the client does not request it', () => {
+    expect(resolveHomeService(false, enabled)).toEqual({
+      ok: true,
+      homeService: false,
+      travelFeeCents: null,
+    });
+  });
+
+  it('should take the travel fee from the settings, never from the client', () => {
+    expect(resolveHomeService(true, enabled)).toEqual({
+      ok: true,
+      homeService: true,
+      travelFeeCents: 500000,
+    });
+  });
+
+  it('should refuse the option when it is disabled in the settings', () => {
+    expect(resolveHomeService(true, { homeServiceEnabled: false, travelFeeCents: 500000 })).toEqual(
+      { ok: false, reason: 'DISABLED' },
+    );
+  });
+
+  it('should accept a free travel fee of zero', () => {
+    expect(resolveHomeService(true, { homeServiceEnabled: true, travelFeeCents: 0 })).toEqual({
+      ok: true,
+      homeService: true,
+      travelFeeCents: 0,
+    });
+  });
+});
+
+describe('addTravelFee', () => {
+  it('should add the fee after the discount, so promotions never reduce the travel fee', () => {
+    // Prestation 60 000 FCFA, remise 10 % => 54 000 FCFA, frais 5 000 FCFA => 59 000 FCFA.
+    const discountedService = 5400000;
+    expect(addTravelFee(discountedService, 500000)).toBe(5900000);
+  });
+
+  it('should return the service price unchanged without travel fee', () => {
+    expect(addTravelFee(6000, null)).toBe(6000);
+    expect(addTravelFee(6000, 0)).toBe(6000);
+  });
+
+  it('should keep the total unknown when the service price is on request', () => {
+    expect(addTravelFee(null, 500000)).toBeNull();
   });
 });

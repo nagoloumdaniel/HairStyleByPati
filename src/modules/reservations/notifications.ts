@@ -44,6 +44,10 @@ export interface NotificationContext {
   cancelToken?: string | null;
   reason?: string | null;
   settings: Pick<SalonSettingsData, 'contactEmail'>;
+  /** Coiffure à domicile : instantané figé sur le rendez-vous. */
+  homeService?: boolean;
+  homeAddress?: string | null;
+  travelFeeCents?: number | null;
   idempotencySuffix?: string;
 }
 
@@ -70,6 +74,9 @@ export async function queueAppointmentNotifications(
     status: context.status,
     reason: context.reason ?? null,
     cancelUrl: context.cancelToken ? `${appUrl}/annulation/${context.cancelToken}` : null,
+    homeService: context.homeService ?? false,
+    homeAddress: context.homeService ? (context.homeAddress ?? null) : null,
+    travelFeeCents: context.homeService ? (context.travelFeeCents ?? 0) : null,
   } as Prisma.InputJsonValue;
 
   const rows: Prisma.NotificationCreateManyInput[] = [];

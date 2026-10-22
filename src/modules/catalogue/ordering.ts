@@ -1,7 +1,7 @@
 import type { Prisma } from '@prisma/client';
 
 /* ============================================================
- * Ordonnancement (catégories, photos, questions) — logique pure,
+ * Ordonnancement (catégories, photos, questions) - logique pure,
  * partagée par l'UI (optimistic) et testable sans base.
  * ============================================================ */
 

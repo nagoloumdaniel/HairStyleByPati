@@ -147,7 +147,7 @@ export async function adminSaveSpecificRule(
   const { dateISO, start, end, active, timeZone, confirmConflicts } = parsed.data;
 
   try {
-    // Jour fermé : une règle « 00:00 – 00:00 » active remplace l'horaire habituel sans créneau
+    // Jour fermé : une règle « 00:00 - 00:00 » active remplace l'horaire habituel sans créneau
     // (le moteur ignore les fenêtres vides). Rien n'était enregistré avant : le jour restait ouvert.
     const startMinute = active ? start : 0;
     const endMinute = active ? end : 0;

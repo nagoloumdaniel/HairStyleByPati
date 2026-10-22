@@ -1,4 +1,5 @@
 import type { EmailContext } from '@/modules/parametres/policies';
+import { formatFcfa } from '@/modules/reservations/format';
 
 /* ============================================================
  * P7.3 : modèles d'e-mails transactionnels.
@@ -39,6 +40,10 @@ export interface AppointmentEmailPayload {
   status?: string;
   reason?: string | null;
   cancelUrl?: string | null;
+  /** Coiffure à domicile (instantané figé sur le rendez-vous). */
+  homeService?: boolean;
+  homeAddress?: string | null;
+  travelFeeCents?: number | null;
 }
 
 export interface ConversationEmailPayload {
@@ -258,6 +263,18 @@ function layout(ctx: EmailContext, input: LayoutInput): string {
 </html>`;
 }
 
+function travelFeeLabel(cents: number | null | undefined): string {
+  return cents ? formatFcfa(cents) : 'Offerts';
+}
+
+/** Lignes texte « coiffure à domicile » (version texte brut des e-mails), vide sinon. */
+function homeServiceText(payload: AppointmentEmailPayload): string {
+  if (!payload.homeService) return '';
+  return `Lieu : à domicile${payload.homeAddress ? ` (${payload.homeAddress})` : ''}
+Frais de déplacement : ${travelFeeLabel(payload.travelFeeCents)}
+`;
+}
+
 function appointmentRows(
   payload: AppointmentEmailPayload,
   admin: boolean,
@@ -274,6 +291,11 @@ function appointmentRows(
     if (payload.customerPhone) rows.push(['Téléphone', payload.customerPhone]);
   }
   rows.push([admin ? 'Créneau' : 'Date et heure', formatDate(payload.startsAt)]);
+  if (payload.homeService) {
+    rows.push(['Lieu', 'À domicile']);
+    if (payload.homeAddress) rows.push(['Adresse', payload.homeAddress]);
+    rows.push(['Frais de déplacement', travelFeeLabel(payload.travelFeeCents)]);
+  }
   if (payload.reason) rows.push(['Motif', payload.reason]);
   return rows;
 }
@@ -302,6 +324,7 @@ function renderAppointment(
   const customer = payload.customerName;
   const when = formatDate(payload.startsAt);
   const rows = appointmentRows(payload, admin);
+  const home = homeServiceText(payload);
   const appointmentLink = payload.appointmentId
     ? `${APP_URL}/dashboard/reservations/${payload.appointmentId}`
     : `${APP_URL}/dashboard/reservations`;
@@ -316,7 +339,7 @@ function renderAppointment(
           rows,
           note: 'Paiement sur place. Vous recevrez une confirmation dès que le rendez-vous sera validé.',
         }),
-        text: `Bonjour ${customer},\n\nVotre réservation pour ${service} est enregistrée.\nDate : ${when}\nPaiement sur place.\n\n${SALON_NAME}`,
+        text: `Bonjour ${customer},\n\nVotre réservation pour ${service} est enregistrée.\nDate : ${when}\n${home}Paiement sur place.\n\n${SALON_NAME}`,
       };
     case 'booking_confirmed':
       return {
@@ -330,7 +353,7 @@ function renderAppointment(
           note: 'Paiement sur place. Conservez ce message pour retrouver votre rendez-vous.',
           policies: confirmationPolicies(ctx),
         }),
-        text: `Bonjour ${customer},\n\nVotre rendez-vous pour ${service} est confirmé le ${when}.\nPaiement sur place.\n${payload.cancelUrl ? `Gérer mon rendez-vous : ${payload.cancelUrl}\n` : ''}${confirmationPoliciesText(ctx)}\n${SALON_NAME}`,
+        text: `Bonjour ${customer},\n\nVotre rendez-vous pour ${service} est confirmé le ${when}.\n${home}Paiement sur place.\n${payload.cancelUrl ? `Gérer mon rendez-vous : ${payload.cancelUrl}\n` : ''}${confirmationPoliciesText(ctx)}\n${SALON_NAME}`,
       };
     case 'booking_cancelled_customer':
     case 'booking_cancelled_admin':
@@ -359,7 +382,7 @@ function renderAppointment(
           ctaUrl: payload.cancelUrl ?? null,
           note: 'Paiement sur place.',
         }),
-        text: `Bonjour ${customer},\n\nVotre rendez-vous pour ${service} est reprogrammé : ${when}.\nPaiement sur place.\n\n${SALON_NAME}`,
+        text: `Bonjour ${customer},\n\nVotre rendez-vous pour ${service} est reprogrammé : ${when}.\n${home}Paiement sur place.\n\n${SALON_NAME}`,
       };
     case 'booking_reminder':
       return {
@@ -372,7 +395,7 @@ function renderAppointment(
           ctaUrl: payload.cancelUrl ?? `${APP_URL}/reserver`,
           note: 'Paiement sur place. En cas d’empêchement, utilisez le lien reçu avec votre confirmation.',
         }),
-        text: `Bonjour ${customer},\n\nRappel : rendez-vous pour ${service} le ${when}.\nPaiement sur place.\n\n${SALON_NAME}`,
+        text: `Bonjour ${customer},\n\nRappel : rendez-vous pour ${service} le ${when}.\n${home}Paiement sur place.\n\n${SALON_NAME}`,
       };
     case 'admin_new_booking':
       return {
@@ -384,7 +407,7 @@ function renderAppointment(
           ctaLabel: 'Ouvrir la fiche rendez-vous',
           ctaUrl: appointmentLink,
         }),
-        text: `Nouvelle réservation de ${customer} pour ${service} le ${when}.\n\n${appointmentLink}`,
+        text: `Nouvelle réservation de ${customer} pour ${service} le ${when}.\n${home}\n${appointmentLink}`,
       };
     case 'admin_booking_cancelled':
       return {
@@ -408,7 +431,7 @@ function renderAppointment(
           ctaLabel: 'Ouvrir la fiche rendez-vous',
           ctaUrl: appointmentLink,
         }),
-        text: `Rendez-vous de ${customer} pour ${service} reprogrammé le ${when}.\n\n${appointmentLink}`,
+        text: `Rendez-vous de ${customer} pour ${service} reprogrammé le ${when}.\n${home}\n${appointmentLink}`,
       };
     default:
       return { subject: '', html: '', text: '' };

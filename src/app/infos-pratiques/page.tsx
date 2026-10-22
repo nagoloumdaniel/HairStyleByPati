@@ -7,6 +7,7 @@ import { formatOpeningHours } from '@/modules/parametres/hours';
 import { getCachedSalonSettings } from '@/lib/public-cache';
 import { DEFAULT_SALON_SETTINGS, type SalonSettingsData } from '@/modules/disponibilites/queries';
 import { resolveBookingPolicy, splitParagraphs } from '@/modules/parametres/policies';
+import { homeServiceSentence } from '@/modules/parametres/home-service';
 
 export const metadata: Metadata = {
   title: 'Informations pratiques',
@@ -95,6 +96,13 @@ export default async function InfosPratiquesPage() {
               </span>
             ))}
           </p>
+          {settings.homeServiceEnabled ? (
+            <p className="text-muted">
+              <span className="font-semibold text-fg">Coiffure à domicile</span>
+              <br />
+              {homeServiceSentence(settings.travelFeeCents)}
+            </p>
+          ) : null}
           {settings.phone ? (
             <p className="text-muted">
               <span className="font-semibold text-fg">Téléphone</span>

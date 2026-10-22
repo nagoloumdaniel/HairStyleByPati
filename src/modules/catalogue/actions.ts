@@ -57,7 +57,7 @@ import {
 } from './schemas';
 
 /* ============================================================
- * Server actions — back-office catalogue (Phase 4).
+ * Server actions - back-office catalogue (Phase 4).
  * Chaque action : garde requireAdmin + validation Zod + AuditLog.
  * Aucune donnée n'est modifiée sans autorisation vérifiée côté serveur.
  * ============================================================ */

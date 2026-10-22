@@ -202,6 +202,9 @@ export async function queueDueReminders(options?: { now?: Date }): Promise<Remin
       startsAt: appointment.startsAt.toISOString(),
       endsAt: appointment.endsAt.toISOString(),
       status: appointment.status,
+      homeService: appointment.homeService,
+      homeAddress: appointment.homeService ? appointment.homeAddress : null,
+      travelFeeCents: appointment.homeService ? (appointment.travelFeeCents ?? 0) : null,
       cancelUrl: appointment.cancelToken
         ? `${(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000').replace(/\/$/, '')}/annulation/${appointment.cancelToken}`
         : null,

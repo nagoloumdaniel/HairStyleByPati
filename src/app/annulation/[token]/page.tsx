@@ -99,6 +99,22 @@ export default async function AnnulationPage({ params }: { params: Promise<{ tok
                 : euroFormatter.format(appointment.priceCents / 100)}
             </dd>
           </div>
+          {appointment.homeService ? (
+            <>
+              <div className="flex flex-wrap justify-between gap-2">
+                <dt className="font-semibold text-fg">Lieu</dt>
+                <dd className="whitespace-pre-line text-muted">
+                  À domicile{appointment.homeAddress ? `\n${appointment.homeAddress}` : ''}
+                </dd>
+              </div>
+              <div className="flex flex-wrap justify-between gap-2">
+                <dt className="font-semibold text-fg">Frais de déplacement</dt>
+                <dd className="text-muted">
+                  {euroFormatter.format((appointment.travelFeeCents ?? 0) / 100)}
+                </dd>
+              </div>
+            </>
+          ) : null}
           <div className="flex flex-wrap justify-between gap-2">
             <dt className="font-semibold text-fg">Cliente</dt>
             <dd className="text-muted">{appointment.customer.name}</dd>

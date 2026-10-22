@@ -20,7 +20,7 @@ const loginFormSchema = z.object({
 });
 
 /**
- * Connexion administrateur (P1.7 + P1.9) — validation Zod centralisée
+ * Connexion administrateur (P1.7 + P1.9) - validation Zod centralisée
  * via parseInput, messages d'erreur volontairement identiques
  * (e-mail inconnu / mot de passe faux) pour ne pas révéler quels
  * comptes existent. Le callbackUrl est validé séparément : seules

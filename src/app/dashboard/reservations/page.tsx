@@ -1,10 +1,10 @@
-import { CalendarClock, CalendarDays, ClipboardList } from 'lucide-react';
+import { CalendarClock, CalendarDays, ClipboardList, House } from 'lucide-react';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import type { AppointmentStatus } from '@prisma/client';
 import { requireAdmin } from '@/modules/auth/guards';
 import { countAppointmentsByStatus, listAppointmentsAdmin } from '@/modules/reservations/queries';
-import { formatDuration, formatFcfaOrPending } from '@/modules/reservations/format';
+import { formatDuration, formatFcfa, formatFcfaOrPending } from '@/modules/reservations/format';
 import {
   APPOINTMENT_STATUS_SHORT_LABELS,
   APPOINTMENT_STATUS_TONES,
@@ -127,6 +127,17 @@ export default async function ReservationsPage({
                       {appointment.serviceName} · {formatDuration(appointment.durationMinutes)} ·{' '}
                       {formatFcfaOrPending(appointment.priceCents)}
                     </p>
+                    {appointment.homeService ? (
+                      <p className="mt-1 flex min-w-0 items-center gap-1.5 text-sm text-muted">
+                        <Badge tone="accent" size="sm" className="shrink-0">
+                          <House aria-hidden="true" className="mr-1 size-3" />À domicile
+                        </Badge>
+                        <span className="truncate">
+                          {appointment.homeAddress ?? 'Adresse non renseignée'} · déplacement{' '}
+                          {formatFcfa(appointment.travelFeeCents ?? 0)}
+                        </span>
+                      </p>
+                    ) : null}
                   </div>
                   <div className="flex shrink-0 items-center justify-between gap-3 sm:justify-end">
                     <span className="flex items-center gap-1.5 text-sm text-muted">

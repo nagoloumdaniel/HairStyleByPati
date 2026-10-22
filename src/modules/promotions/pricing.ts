@@ -1,5 +1,5 @@
 /* ============================================================
- * Moteur de promotions (P8.12) — fonctions pures, testables sans base.
+ * Moteur de promotions (P8.12) - fonctions pures, testables sans base.
  * Une promotion ne s'applique jamais au-delà de 100 % ni en dessous
  * de 0 : le prix réduit est toujours un entier positif ou nul.
  * ============================================================ */
@@ -59,7 +59,7 @@ function eligiblePromotions(
 /**
  * Choisit la promotion active pour une prestation à un instant donné.
  * S'il y en a plusieurs, la première de la liste fournie (triée par l'appelant)
- * l'emporte — un seul rabais à la fois.
+ * l'emporte - un seul rabais à la fois.
  */
 export function findActivePromotion(
   promotions: PromotionCandidate[],

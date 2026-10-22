@@ -16,7 +16,12 @@ import {
 import { OPTION_ORDER_BY } from '@/modules/catalogue/ordering';
 import { logAudit } from '@/modules/stats/audit';
 import { getBookableServiceBySlug, type BookableService } from './queries';
-import { computeBookingSnapshot, type SelectedOptionSnapshot } from './pricing';
+import {
+  addTravelFee,
+  computeBookingSnapshot,
+  resolveHomeService,
+  type SelectedOptionSnapshot,
+} from './pricing';
 import {
   applyPromotion,
   findBestPromotion,
@@ -34,7 +39,7 @@ import { assertTransition } from './status';
 import { queueAppointmentNotifications } from './notifications';
 import { notifyWaitlistForFreedSlot } from '@/modules/liste-attente/service';
 import { createReviewRequest } from '@/modules/avis/service';
-import { bookingReference } from './schemas';
+import { bookingReference, HOME_ADDRESS_MIN } from './schemas';
 import { expirePendingHolds } from './expiry';
 
 /* ============================================================
@@ -347,6 +352,9 @@ export interface CreateBookingInput {
   optionIds: string[];
   /** Code promo saisi par la cliente (facultatif) : revalidé ici, jamais cru côté client. */
   promoCode?: string | null;
+  /** Coiffure à domicile demandée : acceptée seulement si activée, frais recalculés ici. */
+  homeService?: boolean;
+  homeAddress?: string | null;
   /** Confirmation depuis un lien de liste d'attente (P8.8), facultatif. */
   waitlistToken?: string | null;
 }
@@ -359,6 +367,8 @@ export interface CreatedBooking {
   endsAt: Date;
   durationMinutes: number;
   priceCents: number | null;
+  homeService: boolean;
+  travelFeeCents: number | null;
   cancelToken: string;
   serviceName: string;
   customerEmail: string;
@@ -389,6 +399,22 @@ export async function createBooking(input: CreateBookingInput): Promise<CreatedB
       }
       const settings = await settingsInTx(tx);
       const snapshot = computeBookingSnapshot(service, input.optionIds, service.options);
+      const home = resolveHomeService(Boolean(input.homeService), settings);
+      if (!home.ok) {
+        throw new AppError(
+          'HOME_SERVICE_DISABLED',
+          'La coiffure à domicile n’est plus proposée. Retirez cette option pour continuer.',
+          409,
+        );
+      }
+      const homeAddress = home.homeService ? (input.homeAddress?.trim() ?? '') : '';
+      if (home.homeService && homeAddress.length < HOME_ADDRESS_MIN) {
+        throw new AppError(
+          'HOME_ADDRESS_REQUIRED',
+          'Indiquez votre adresse ou votre quartier pour la coiffure à domicile.',
+          400,
+        );
+      }
       // Promotions : automatiques + code saisi (revalidé), une seule appliquée, la plus avantageuse.
       const enteredCode = input.promoCode?.trim() ? input.promoCode : null;
       const promoCandidates =
@@ -496,7 +522,14 @@ export async function createBooking(input: CreateBookingInput): Promise<CreatedB
           startsAt: slot.startsAt,
           endsAt: slot.endsAt,
           status,
-          priceCents: discount ? discount.finalPriceCents : snapshot.priceCents,
+          // Total figé = prestation (remisée) + frais de déplacement (jamais remisés).
+          priceCents: addTravelFee(
+            discount ? discount.finalPriceCents : snapshot.priceCents,
+            home.travelFeeCents,
+          ),
+          homeService: home.homeService,
+          travelFeeCents: home.travelFeeCents,
+          homeAddress: home.homeService ? homeAddress : null,
           promotionId: discount?.promotionId ?? null,
           promotionName: discount?.promotionName ?? null,
           discountCents: discount?.discountCents ?? null,
@@ -538,6 +571,9 @@ export async function createBooking(input: CreateBookingInput): Promise<CreatedB
         status,
         cancelToken,
         settings,
+        homeService: home.homeService,
+        homeAddress: home.homeService ? homeAddress : null,
+        travelFeeCents: home.travelFeeCents,
       };
       await queueAppointmentNotifications(tx, 'created', notificationContext);
       if (status === 'CONFIRMED') {
@@ -552,6 +588,8 @@ export async function createBooking(input: CreateBookingInput): Promise<CreatedB
         endsAt: appointment.endsAt,
         durationMinutes: appointment.durationMinutes,
         priceCents: appointment.priceCents,
+        homeService: home.homeService,
+        travelFeeCents: home.travelFeeCents,
         cancelToken,
         serviceName: service.name,
         customerEmail: customer.email,
@@ -568,6 +606,8 @@ export async function createBooking(input: CreateBookingInput): Promise<CreatedB
     metadata: {
       status: created.status,
       serviceName: created.serviceName,
+      // Booléen seulement : jamais l'adresse de la cliente dans l'audit.
+      homeService: created.homeService,
       startsAt: created.startsAt.toISOString(),
     },
   });
@@ -677,6 +717,9 @@ export async function rescheduleAppointment(input: {
         status: 'RESCHEDULED',
         cancelToken: appointment.cancelToken,
         settings,
+        homeService: appointment.homeService,
+        homeAddress: appointment.homeAddress,
+        travelFeeCents: appointment.travelFeeCents,
         idempotencySuffix: slot.startsAt.toISOString(),
       });
       await notifyWaitlistForFreedSlot(
@@ -761,6 +804,9 @@ export async function updateAppointmentStatus(input: {
         status: 'CONFIRMED',
         cancelToken: appointment.cancelToken,
         settings,
+        homeService: appointment.homeService,
+        homeAddress: appointment.homeAddress,
+        travelFeeCents: appointment.travelFeeCents,
       });
     }
     if (input.status === 'COMPLETED') {
