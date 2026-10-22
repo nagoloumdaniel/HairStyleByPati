@@ -156,7 +156,7 @@ function WeekdayForm({ weekday, rule }: { weekday: number; rule: WeeklyRuleView 
       <fieldset
         disabled={!active}
         aria-label={`Horaires de ${WEEKDAYS[weekday]}`}
-        className={`grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-end gap-2 border-0 p-0 transition-opacity ${
+        className={`min-w-0 border-0 p-0 transition-opacity ${
           active ? '' : 'opacity-50'
         } ${active ? '' : 'grayscale'}`}
       >
