@@ -29,7 +29,7 @@ import {
 } from './catalogue-ui';
 
 /* ============================================================
- * P4.2 — CRUD des catégories : créer, modifier (clic sur la ligne),
+ * P4.2 - CRUD des catégories : créer, modifier (clic sur la ligne),
  * activer/désactiver, monter/descendre (optimistic), supprimer si vide.
  * ============================================================ */
 

@@ -6,7 +6,7 @@ import { paginate } from './pagination';
 import { AppError } from './errors';
 
 /* ============================================================
- * Couche service admin catalogue (Phase 4) — opérations Prisma.
+ * Couche service admin catalogue (Phase 4) - opérations Prisma.
  * Les données sont validées par Zod dans les server actions ;
  * ces fonctions restent utilisables et testables côté serveur.
  * ============================================================ */

@@ -9,7 +9,7 @@ import { Lato, Playfair_Display } from 'next/font/google';
 import { THEME_SCRIPT } from '@/lib/inline-scripts';
 import './globals.css';
 
-/* P1.3 — polices optimisées via next/font : préchargement, swap,
+/* P1.3 - polices optimisées via next/font : préchargement, swap,
    zéro requête externe, poids limités au strict nécessaire. */
 const lato = Lato({
   subsets: ['latin'],
@@ -38,7 +38,7 @@ const SITE_DESCRIPTION =
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Hairstyle by Patricia — Locs, nattes collées et vanilles à Dakar',
+    default: 'Hairstyle by Patricia - Locs, nattes collées et vanilles à Dakar',
     template: '%s | Hairstyle by Patricia',
   },
   description: SITE_DESCRIPTION,
@@ -61,12 +61,12 @@ export const metadata: Metadata = {
     locale: 'fr_SN',
     url: '/',
     siteName: 'Hairstyle by Patricia',
-    title: 'Hairstyle by Patricia — Locs, nattes collées et vanilles à Dakar',
+    title: 'Hairstyle by Patricia | Locs, nattes collées et vanilles à Dakar',
     description: SITE_DESCRIPTION,
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Hairstyle by Patricia — Locs, nattes collées et vanilles à Dakar',
+    title: 'Hairstyle by Patricia | Locs, nattes collées et vanilles à Dakar',
     description: SITE_DESCRIPTION,
   },
   robots: { index: true, follow: true },

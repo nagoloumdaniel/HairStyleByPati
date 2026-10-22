@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-/** Erreur applicative contrôlée — jamais leakée telle quelle au client. */
+/** Erreur applicative contrôlée - jamais leakée telle quelle au client. */
 export class AppError extends Error {
   constructor(
     public readonly code: string,

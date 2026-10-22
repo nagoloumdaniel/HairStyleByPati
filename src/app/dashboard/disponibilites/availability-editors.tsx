@@ -275,7 +275,7 @@ function SpecificRow({ rule }: { rule: SpecificRuleView }) {
         <span className="block text-muted">
           {rule.startMinute === rule.endMinute
             ? 'Fermé'
-            : `${timeValue(rule.startMinute)} – ${timeValue(rule.endMinute)}`}
+            : `${timeValue(rule.startMinute)} - ${timeValue(rule.endMinute)}`}
         </span>
       </p>
       <Button

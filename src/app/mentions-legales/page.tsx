@@ -32,7 +32,7 @@ export default function MentionsLegalesPage() {
             <div className="bg-page p-6 rounded-xl border border-line">
               <dt className="font-medium text-fg mb-1">Nom commercial</dt>
               <dd>
-                Hairstyle by Patricia — coiffure sur rendez-vous à Dakar, spécialisée dans les
+                Hairstyle by Patricia - coiffure sur rendez-vous à Dakar, spécialisée dans les
                 cheveux texturés.
               </dd>
             </div>

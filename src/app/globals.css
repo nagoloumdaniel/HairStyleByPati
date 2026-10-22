@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 /* ============================================================
-   Tokens design — système jaune doré / ocre (DESIGN-RULES.md)
+   Tokens design - système jaune doré / ocre (DESIGN-RULES.md)
    Rôles : Fond · Surface · Texte · Primaire · Accent (clair / sombre).
    Aucune autre couleur de marque : tout dérive de l'échelle primary.
    ============================================================ */
@@ -135,7 +135,7 @@ h4 {
   font-family: var(--font-heading);
 }
 
-/* Focus visible — accessibilité P2.9 : anneau or toujours perceptible */
+/* Focus visible - accessibilité P2.9 : anneau or toujours perceptible */
 :where(a, button, [tabindex]):focus-visible {
   outline: 3px solid var(--color-accent);
   outline-offset: 2px;
@@ -186,7 +186,7 @@ html[data-theme='dark'] .theme-icon-light {
   display: none;
 }
 
-/* Reveal discret au scroll (P2.8) — désactivé si reduced motion */
+/* Reveal discret au scroll (P2.8) - désactivé si reduced motion */
 @keyframes reveal-up {
   from {
     opacity: 0;

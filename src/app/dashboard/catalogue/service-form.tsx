@@ -13,7 +13,7 @@ import type { CatalogueActionState } from '@/modules/catalogue/actions';
 import { FormError, useFormAction } from './catalogue-ui';
 
 /* ============================================================
- * P4.3 — Formulaire prestation : identité, catégorie, prix
+ * P4.3 - Formulaire prestation : identité, catégorie, prix
  * (fixe, départ, fourchette, à confirmer), durée et statut.
  * Prix saisis en FCFA, sans décimales.
  * ============================================================ */
