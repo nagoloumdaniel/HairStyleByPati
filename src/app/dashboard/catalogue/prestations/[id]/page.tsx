@@ -2,7 +2,16 @@ import { ExternalLink, History, Scissors } from 'lucide-react';
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { requireAdmin } from '@/modules/auth/guards';
-import { getAdminServiceCore, listCategoryOptions } from '@/lib/catalogue-admin';
+import {
+  getAdminServiceCore,
+  getAdminServiceImages,
+  listCategoryOptions,
+} from '@/lib/catalogue-admin';
+import {
+  getImageSignedUrl,
+  getStorageConfigurationHint,
+  isStorageConfigured,
+} from '@/modules/fichiers/storage';
 import { formatDuration, formatPrice } from '@/lib/catalogue';
 import { adminUpdateService } from '@/modules/catalogue/actions';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -41,8 +50,20 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
   if (!user) redirect(`/connexion?callbackUrl=/dashboard/catalogue/prestations/${id}`);
 
   // Données légères uniquement : les panneaux lourds se chargent en Suspense (voir sections.tsx).
-  const [service, categories] = await Promise.all([getAdminServiceCore(id), listCategoryOptions()]);
+  const [service, categories, imageRows] = await Promise.all([
+    getAdminServiceCore(id),
+    listCategoryOptions(),
+    getAdminServiceImages(id),
+  ]);
   if (!service) notFound();
+  // Signature locale (HMAC, sans appel réseau) : les miniatures du formulaire s'affichent tout de suite.
+  const photos = await Promise.all(
+    imageRows.map(async (image) => ({
+      id: image.id,
+      alt: image.alt,
+      url: await getImageSignedUrl(image.key).catch(() => null),
+    })),
+  );
 
   const informationPanel = (
     <Card>
@@ -51,6 +72,9 @@ export default async function ServiceDetailPage({ params }: { params: Promise<{ 
         categories={categories}
         initial={service}
         submitLabel="Enregistrer"
+        photos={photos}
+        storageReady={isStorageConfigured()}
+        storageHint={getStorageConfigurationHint()}
       />
     </Card>
   );

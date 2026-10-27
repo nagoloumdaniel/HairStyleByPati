@@ -2,6 +2,7 @@ import { z } from 'zod';
 import type { HairLength, PhotoPolicy, Prisma } from '@prisma/client';
 import { db } from './db';
 import { OPTION_ORDER_BY } from '@/modules/catalogue/ordering';
+import { getImageSignedUrl } from '@/modules/fichiers/storage';
 
 /* ------------------------------------------------------------------ */
 /* Paramètres de requête publique (P1.9, P3.2)                        */
@@ -104,6 +105,23 @@ export async function getPublishedCategories(): Promise<CatalogueCategory[]> {
   }));
 }
 
+/**
+ * Les photos uploadées sont des clés de stockage privé (P4.4) : on les remplace par une URL signée
+ * (1 h) pour que l'affichage public les utilise. Photo illisible = écartée (repli démo).
+ * Les URLs déjà publiques (démo) passent telles quelles.
+ */
+export async function withSignedImages<T extends { images: { key: string }[] }>(
+  service: T,
+): Promise<T> {
+  const images = await Promise.all(
+    service.images.map(async (image) => ({
+      ...image,
+      key: (await getImageSignedUrl(image.key).catch(() => null)) ?? '',
+    })),
+  );
+  return { ...service, images: images.filter((image) => image.key !== '') };
+}
+
 export async function getPublishedServices(query: CatalogueQuery) {
   const { search, category, page, pageSize } = query;
   const skip = (page - 1) * pageSize;
@@ -129,7 +147,7 @@ export async function getPublishedServices(query: CatalogueQuery) {
   ]);
 
   return {
-    services,
+    services: await Promise.all(services.map(withSignedImages)),
     total,
     page,
     pageSize,
@@ -173,10 +191,11 @@ export type ServiceDetail = Prisma.ServiceGetPayload<{
 }>;
 
 export async function getPublishedServiceBySlug(slug: string): Promise<ServiceDetail | null> {
-  return db.service.findFirst({
+  const service = await db.service.findFirst({
     where: { slug, status: 'PUBLISHED', category: { active: true } },
     select: SERVICE_DETAIL_SELECT,
   });
+  return service ? withSignedImages(service) : null;
 }
 
 export const HAIR_LENGTH_LABELS: Record<HairLength, string> = {

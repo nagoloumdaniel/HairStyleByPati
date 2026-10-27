@@ -3,6 +3,7 @@
 import { Clock, FolderOpen, Hash, Link2, Plus, Save, Scissors, Tag, Wallet } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
+import { ImageUploadField, type ExistingImage } from '@/components/ui/ImageUploadField';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
@@ -10,6 +11,7 @@ import type { AdminServiceCore } from '@/lib/catalogue-admin';
 import { PRICE_MODE_LABELS, PRICE_MODES, type PriceMode } from '@/modules/catalogue/schemas';
 import { centsToEurosInput, priceModeFromService } from '@/modules/catalogue/pricing';
 import type { CatalogueActionState } from '@/modules/catalogue/actions';
+import { MAX_SERVICE_PHOTOS } from '@/modules/catalogue/photos';
 import { FormError, useFormAction } from './catalogue-ui';
 
 /* ============================================================
@@ -46,11 +48,18 @@ export function ServiceForm({
   categories,
   initial,
   submitLabel,
+  photos = [],
+  storageReady = true,
+  storageHint,
 }: {
   action: (prev: CatalogueActionState, formData: FormData) => Promise<CatalogueActionState>;
   categories: CategoryOption[];
   initial?: AdminServiceCore;
   submitLabel: string;
+  /** Photos déjà enregistrées (édition), avec URL signée. */
+  photos?: ExistingImage[];
+  storageReady?: boolean;
+  storageHint?: string;
 }) {
   const { state, onSubmit, pending } = useFormAction(action);
   const [name, setName] = useState(initial?.name ?? '');
@@ -193,6 +202,16 @@ export function ServiceForm({
           hint="Les plus petits nombres apparaissent en premier."
         />
       </div>
+
+      {/* Remonté quand la liste enregistrée change (après sauvegarde) pour repartir de l'état serveur. */}
+      <ImageUploadField
+        key={photos.map((photo) => photo.id).join('|')}
+        label="Photos de la prestation"
+        initial={photos}
+        max={MAX_SERVICE_PHOTOS}
+        disabled={!storageReady}
+        disabledReason={storageHint}
+      />
 
       <FormError message={state.error} />
 

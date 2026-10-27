@@ -9,6 +9,7 @@ import { AppError } from '@/lib/errors';
 import { logAudit } from '@/modules/stats/audit';
 import {
   addServiceImage,
+  applyServicePhotoChanges,
   archiveService,
   createCategory,
   createService,
@@ -20,6 +21,7 @@ import {
   deleteServiceOption,
   deleteServiceQuestion,
   getServiceImage,
+  getServiceImageIds,
   getServiceImageKeys,
   reorderCategories,
   reorderServiceImages,
@@ -44,6 +46,7 @@ import {
 } from '@/modules/fichiers/storage';
 import { buildServiceImageKey, validateImageFile } from '@/modules/fichiers/image-validation';
 import { eurosToCents, priceFieldsFromInput } from './pricing';
+import { resolvePhotoPlan, type PhotoPlanItem } from './photos';
 import {
   adminServiceFiltersSchema,
   categoryInputSchema,
@@ -249,6 +252,96 @@ export async function adminReorderCategories(orderedIds: string[]): Promise<Cata
 }
 
 /* ============================================================ */
+/* Photos saisies dans le formulaire prestation (max 3)          */
+/* ============================================================ */
+
+interface PreparedPhotos {
+  items: PhotoPlanItem[];
+  removeIds: string[];
+  files: { bytes: Uint8Array; mime: string; extension: 'jpg' | 'png' | 'webp' }[];
+}
+
+/**
+ * Valide TOUT avant toute écriture : plan (limite de 3 appliquée côté serveur), type déclaré,
+ * taille et signature binaire de chaque fichier. Renvoie null si le formulaire ne gère pas les photos.
+ */
+async function preparePhotos(
+  formData: FormData,
+  existingIds: string[],
+): Promise<PreparedPhotos | null | { error: string }> {
+  if (!formData.has('photoOrder')) return null;
+  const files = formData.getAll('photos').filter((v): v is File => v instanceof File && v.size > 0);
+  const plan = resolvePhotoPlan({
+    orderRaw: formData.get('photoOrder'),
+    fileCount: files.length,
+    existingIds,
+  });
+  if (!plan.ok) return { error: plan.error };
+  if (files.length > 0 && !isStorageConfigured()) return { error: getStorageConfigurationHint() };
+  try {
+    const validated = await Promise.all(
+      files.map(async (file) => {
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        const result = validateImageFile({ size: file.size, type: file.type, bytes });
+        return { bytes, mime: result.mime, extension: result.extension };
+      }),
+    );
+    return { items: plan.items, removeIds: plan.removeIds, files: validated };
+  } catch (error) {
+    return handleError(error) as { error: string };
+  }
+}
+
+/** Envoie les nouvelles photos, applique le plan en base, puis efface du stockage les photos retirées. */
+async function commitPhotos(
+  serviceId: string,
+  serviceName: string,
+  prepared: PreparedPhotos,
+  userId: string,
+): Promise<void> {
+  const uploaded: string[] = [];
+  try {
+    const keys = await Promise.all(
+      prepared.files.map(async (file) => {
+        const key = buildServiceImageKey(serviceId, file.extension);
+        await uploadImageObject({
+          key,
+          body: file.bytes,
+          contentType: file.mime,
+        });
+        uploaded.push(key);
+        return key;
+      }),
+    );
+    const removedKeys = await applyServicePhotoChanges(
+      serviceId,
+      prepared.items.map((item, index) =>
+        item.kind === 'existing'
+          ? { kind: 'existing' as const, id: item.id }
+          : {
+              kind: 'new' as const,
+              key: keys[item.fileIndex]!,
+              alt: `${serviceName} - photo ${index + 1}`,
+            },
+      ),
+      prepared.removeIds,
+    );
+    await Promise.all(removedKeys.map((key) => deleteImageObject(key).catch(() => undefined)));
+    await logAudit({
+      userId,
+      action: 'service.image.sync',
+      entityType: 'ServiceImage',
+      entityId: serviceId,
+      metadata: { added: prepared.files.length, removed: removedKeys.length },
+    });
+  } catch (error) {
+    // Pas d'objet orphelin si l'enregistrement échoue.
+    await Promise.all(uploaded.map((key) => deleteImageObject(key).catch(() => undefined)));
+    throw error;
+  }
+}
+
+/* ============================================================ */
 /* Prestations (P4.3, P4.6)                                     */
 /* ============================================================ */
 
@@ -261,6 +354,9 @@ export async function adminCreateService(
 
   const parsed = parseForm(serviceInputSchema, Object.fromEntries(formData));
   if ('error' in parsed) return { error: parsed.error };
+
+  const photos = await preparePhotos(formData, []);
+  if (photos && 'error' in photos) return { error: photos.error };
 
   let created: { id: string; name: string; slug: string } | null = null;
   try {
@@ -285,6 +381,12 @@ export async function adminCreateService(
       entityId: service.id,
       metadata: { name: service.name, slug: service.slug },
     });
+    if (photos) {
+      // La prestation existe déjà : un échec d'envoi n'empêche pas d'ouvrir sa fiche.
+      await commitPhotos(service.id, service.name, photos, user.id).catch((error) => {
+        console.error(error);
+      });
+    }
     revalidateCatalogue(service);
   } catch (error) {
     return handleError(error);
@@ -308,6 +410,9 @@ export async function adminUpdateService(
   const parsed = parseForm(serviceInputSchema, Object.fromEntries(formData));
   if ('error' in parsed) return { error: parsed.error };
 
+  const photos = await preparePhotos(formData, await getServiceImageIds(id));
+  if (photos && 'error' in photos) return { error: photos.error };
+
   try {
     const price = priceFieldsFromInput(parsed.data);
     const service = await updateService(id, {
@@ -329,6 +434,7 @@ export async function adminUpdateService(
       entityId: id,
       metadata: { name: service.name },
     });
+    if (photos) await commitPhotos(id, service.name, photos, user.id);
     revalidateCatalogue(service);
     return { success: 'Prestation enregistrée.' };
   } catch (error) {
