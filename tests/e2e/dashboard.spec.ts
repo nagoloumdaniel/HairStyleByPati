@@ -111,7 +111,8 @@ test.describe('Back-office catalogue', () => {
     await page.getByRole('button', { name: 'Nouvelle catégorie' }).click();
     const categoryDialog = page.getByRole('dialog', { name: 'Nouvelle catégorie' });
     await categoryDialog.getByLabel(/^Nom/).fill(categoryName);
-    await expect(categoryDialog.getByLabel(/^Slug/)).toHaveValue(categorySlug);
+    // Le slug est généré côté serveur : aucun champ Slug dans le formulaire.
+    await expect(categoryDialog.getByLabel(/^Slug/)).toHaveCount(0);
     await categoryDialog.getByRole('button', { name: 'Créer la catégorie' }).click();
     await expect(categoryDialog).toBeHidden();
     await expect(page.getByText(categoryName, { exact: true })).toBeVisible();
@@ -123,7 +124,7 @@ test.describe('Back-office catalogue', () => {
     await expect(page).toHaveURL(/\/dashboard\/catalogue\/prestations\/nouvelle$/);
 
     await page.getByLabel(/^Nom de la prestation/).fill(serviceName);
-    await expect(page.getByLabel(/^Slug/)).toHaveValue(serviceSlug);
+    await expect(page.getByLabel(/^Slug/)).toHaveCount(0);
     await page
       .getByLabel(/^Description/)
       .fill('Prestation créée par le test de non-régression P4.10.');
