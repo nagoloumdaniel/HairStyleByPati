@@ -135,6 +135,11 @@ function WeekdayForm({ weekday, rule }: { weekday: number; rule: WeeklyRuleView 
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     data.set('weekday', String(weekday));
+    // Jour fermé : les champs désactivés ne sont pas postés ; le serveur exige des heures valides.
+    if (!active) {
+      data.set('start', '09:00');
+      data.set('end', '18:00');
+    }
     run(adminSaveWeeklyRule, data);
   }
 
@@ -158,9 +163,7 @@ function WeekdayForm({ weekday, rule }: { weekday: number; rule: WeeklyRuleView 
       <div
         role="group"
         aria-label={`Horaires de ${WEEKDAYS[weekday]}`}
-        className={`min-w-0 border-0 p-0 transition-opacity ${
-          active ? '' : 'opacity-50'
-        } ${active ? '' : 'grayscale'}`}
+        className="grid min-w-0 grid-cols-2 items-end gap-2 sm:grid-cols-[1fr_1fr_auto]"
       >
         <Input
           label="Début"
@@ -181,7 +184,6 @@ function WeekdayForm({ weekday, rule }: { weekday: number; rule: WeeklyRuleView 
           variant="secondary"
           icon={Save}
           loading={pending}
-          disabled={!active}
           className="col-span-2 w-full sm:col-span-1 sm:size-10 sm:w-10 sm:px-0"
         >
           <span className="sm:sr-only">{`Enregistrer ${WEEKDAYS[weekday]?.toLowerCase()}`}</span>
