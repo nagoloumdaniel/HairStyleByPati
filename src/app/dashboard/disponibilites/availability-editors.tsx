@@ -153,8 +153,10 @@ function WeekdayForm({ weekday, rule }: { weekday: number; rule: WeeklyRuleView 
           Ouvert
         </label>
       </div>
-      <fieldset
-        disabled={!active}
+      {/* Une seule ligne dès `sm` (Début, Fin, bouton carré aligné sur le bas des champs h-10) ;
+          en dessous, Début/Fin côte à côte puis bouton pleine largeur. Fermé = tout désactivé. */}
+      <div
+        role="group"
         aria-label={`Horaires de ${WEEKDAYS[weekday]}`}
         className={`min-w-0 border-0 p-0 transition-opacity ${
           active ? '' : 'opacity-50'
@@ -164,18 +166,27 @@ function WeekdayForm({ weekday, rule }: { weekday: number; rule: WeeklyRuleView 
           label="Début"
           name="start"
           type="time"
+          disabled={!active}
           defaultValue={timeValue(rule?.startMinute ?? 540)}
         />
         <Input
           label="Fin"
           name="end"
           type="time"
+          disabled={!active}
           defaultValue={timeValue(rule?.endMinute ?? 1080)}
         />
-        <Button type="submit" variant="secondary" icon={Save} iconOnly loading={pending}>
-          {`Enregistrer ${WEEKDAYS[weekday]?.toLowerCase()}`}
+        <Button
+          type="submit"
+          variant="secondary"
+          icon={Save}
+          loading={pending}
+          disabled={!active}
+          className="col-span-2 w-full sm:col-span-1 sm:size-10 sm:w-10 sm:px-0"
+        >
+          <span className="sm:sr-only">{`Enregistrer ${WEEKDAYS[weekday]?.toLowerCase()}`}</span>
         </Button>
-      </fieldset>
+      </div>
     </form>
   );
 }

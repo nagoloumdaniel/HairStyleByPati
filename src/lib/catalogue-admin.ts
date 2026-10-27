@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client';
 import type { AnswerType, HairLength, PhotoPolicy, ServiceStatus } from '@prisma/client';
 import { isPermutation, OPTION_ORDER_BY } from '@/modules/catalogue/ordering';
+import { MAX_SERVICE_PHOTOS } from '@/modules/catalogue/photos';
 import { db } from './db';
 import { paginate } from './pagination';
 import { AppError } from './errors';
@@ -619,7 +620,7 @@ export async function deleteServiceOption(optionId: string) {
 /* Photos de prestation (P4.4, P4.5)                                   */
 /* ------------------------------------------------------------------ */
 
-export const MAX_SERVICE_IMAGES = 8;
+export const MAX_SERVICE_IMAGES = MAX_SERVICE_PHOTOS;
 
 export async function addServiceImage(serviceId: string, key: string, alt: string) {
   const service = await db.service.findUnique({ where: { id: serviceId }, select: { id: true } });
@@ -647,6 +648,62 @@ export async function addServiceImage(serviceId: string, key: string, alt: strin
       order: (last?.order ?? -1) + 1,
       isPrimary: count === 0,
     },
+  });
+}
+
+/** Ids des photos d'une prestation, dans l'ordre d'affichage. */
+export async function getServiceImageIds(serviceId: string): Promise<string[]> {
+  const rows = await db.serviceImage.findMany({
+    where: { serviceId },
+    orderBy: [{ order: 'asc' }, { createdAt: 'asc' }],
+    select: { id: true },
+  });
+  return rows.map((row) => row.id);
+}
+
+export type ServicePhotoChange =
+  { kind: 'existing'; id: string } | { kind: 'new'; key: string; alt: string };
+
+/**
+ * Applique en une transaction le plan de photos du formulaire : supprime les retirées,
+ * crée les nouvelles, renumérote (la première devient la principale).
+ * Retourne les clés de stockage des photos supprimées (à effacer par l'appelant).
+ */
+export async function applyServicePhotoChanges(
+  serviceId: string,
+  changes: ServicePhotoChange[],
+  removeIds: string[],
+): Promise<string[]> {
+  if (changes.length > MAX_SERVICE_IMAGES) {
+    throw new AppError('LIMIT', `Maximum ${MAX_SERVICE_IMAGES} photos par prestation.`, 409);
+  }
+  return db.$transaction(async (tx) => {
+    const removed = await tx.serviceImage.findMany({
+      where: { serviceId, id: { in: removeIds } },
+      select: { id: true, key: true },
+    });
+    await tx.serviceImage.deleteMany({
+      where: { serviceId, id: { in: removed.map((r) => r.id) } },
+    });
+    for (const [index, change] of changes.entries()) {
+      if (change.kind === 'existing') {
+        await tx.serviceImage.updateMany({
+          where: { id: change.id, serviceId },
+          data: { order: index, isPrimary: index === 0 },
+        });
+      } else {
+        await tx.serviceImage.create({
+          data: {
+            serviceId,
+            key: change.key,
+            alt: change.alt,
+            order: index,
+            isPrimary: index === 0,
+          },
+        });
+      }
+    }
+    return removed.map((r) => r.key);
   });
 }
 
