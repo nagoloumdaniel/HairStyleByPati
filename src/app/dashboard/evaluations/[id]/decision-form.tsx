@@ -109,6 +109,7 @@ export function DecisionForm({
 
       <Textarea
         label="Message pour la cliente"
+        placeholder="Ex. Votre coiffure est possible, voici les prochaines étapes…"
         required
         rows={4}
         minLength={3}
@@ -119,6 +120,7 @@ export function DecisionForm({
       />
       <Textarea
         label="Note interne (facultatif)"
+        placeholder="Ex. Cheveux fins, prévoir un soin avant la pose"
         rows={2}
         maxLength={1000}
         value={note}

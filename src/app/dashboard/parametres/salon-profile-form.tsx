@@ -83,6 +83,9 @@ export function SalonProfileForm({ settings }: { settings: Settings }) {
         <SettingsSection icon={UserRound} title="Profil">
           <Input
             label="Nom professionnel"
+            icon={UserRound}
+            autoComplete="off"
+            placeholder="Ex. Hair Style By Pati"
             name="name"
             value={values.name}
             onChange={set('name')}
@@ -110,6 +113,7 @@ export function SalonProfileForm({ settings }: { settings: Settings }) {
           />
           <Textarea
             label="Adresse ou quartier"
+            placeholder="Ex. Dakar, Mermoz"
             name="address"
             rows={2}
             value={values.address}
@@ -219,6 +223,7 @@ export function SalonProfileForm({ settings }: { settings: Settings }) {
           <div className="grid gap-3 lg:grid-cols-2">
             <Textarea
               label="Règles d’annulation"
+              placeholder="Ex. Annulation gratuite jusqu'à 24 h avant le rendez-vous."
               name="cancellationPolicy"
               rows={3}
               value={values.cancellationPolicy}
@@ -229,6 +234,7 @@ export function SalonProfileForm({ settings }: { settings: Settings }) {
             />
             <Textarea
               label="Règles de réservation"
+              placeholder="Ex. Un acompte peut être demandé pour confirmer le créneau."
               name="bookingPolicy"
               rows={3}
               value={values.bookingPolicy}
@@ -240,6 +246,7 @@ export function SalonProfileForm({ settings }: { settings: Settings }) {
           </div>
           <Textarea
             label="Signature des e-mails"
+            placeholder="Ex. Patricia, Hair Style By Pati"
             name="emailSignature"
             rows={2}
             value={values.emailSignature}

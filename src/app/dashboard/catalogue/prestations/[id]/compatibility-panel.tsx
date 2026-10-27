@@ -129,6 +129,7 @@ export function CompatibilityPanel({
       <div className="grid gap-3">
         <Textarea
           label="Conditions particulières (facultatif)"
+          placeholder="Ex. Cheveux lavés et démêlés avant le rendez-vous"
           name="conditionsNote"
           defaultValue={rule?.conditionsNote ?? ''}
           hint="Affichées à la cliente et à Patricia, par exemple un soin préalable ou un temps supplémentaire."
@@ -136,6 +137,7 @@ export function CompatibilityPanel({
         />
         <Textarea
           label="Message si la prestation est incompatible"
+          placeholder="Ex. Cette coiffure n'est pas adaptée à vos locs, je vous propose…"
           name="incompatibleMessage"
           defaultValue={rule?.incompatibleMessage ?? ''}
           hint="Expliquez pourquoi et proposez une alternative. Vide : message par défaut."
@@ -143,6 +145,7 @@ export function CompatibilityPanel({
         />
         <Textarea
           label="Message si la compatibilité est incertaine"
+          placeholder="Ex. Envoyez-moi une photo pour que je confirme."
           name="uncertainMessage"
           defaultValue={rule?.uncertainMessage ?? ''}
           hint="Par exemple : envoyez une photo pour que Patricia confirme."

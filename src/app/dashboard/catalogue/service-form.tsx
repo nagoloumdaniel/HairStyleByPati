@@ -1,6 +1,6 @@
 'use client';
 
-import { Clock, FolderOpen, Hash, Link2, Plus, Save, Scissors, Tag, Wallet } from 'lucide-react';
+import { Clock, FolderOpen, Hash, Plus, Save, Scissors, Tag, Wallet } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { ImageUploadField, type ExistingImage } from '@/components/ui/ImageUploadField';
@@ -24,16 +24,6 @@ interface CategoryOption {
   id: string;
   name: string;
   active: boolean;
-}
-
-function slugify(value: string): string {
-  return value
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 120);
 }
 
 const PRICE_HINTS: Record<PriceMode, string> = {
@@ -63,8 +53,6 @@ export function ServiceForm({
 }) {
   const { state, onSubmit, pending } = useFormAction(action);
   const [name, setName] = useState(initial?.name ?? '');
-  const [slug, setSlug] = useState(initial?.slug ?? '');
-  const [slugTouched, setSlugTouched] = useState(Boolean(initial?.id));
   const [priceMode, setPriceMode] = useState<PriceMode>(() =>
     initial ? priceModeFromService(initial) : 'FROM',
   );
@@ -76,35 +64,20 @@ export function ServiceForm({
     <form onSubmit={onSubmit} className="flex flex-col gap-4">
       {initial?.id ? <input type="hidden" name="id" value={initial.id} /> : null}
 
-      <div className="grid gap-3 md:grid-cols-2">
-        <Input
-          label="Nom de la prestation"
-          name="name"
-          icon={Scissors}
-          required
-          value={name}
-          onChange={(event) => {
-            const next = event.target.value;
-            setName(next);
-            if (!slugTouched) setSlug(slugify(next));
-          }}
-        />
-        <Input
-          label="Slug"
-          name="slug"
-          icon={Link2}
-          required
-          value={slug}
-          onChange={(event) => {
-            setSlugTouched(true);
-            setSlug(event.target.value);
-          }}
-          hint="Utilisé dans l'URL publique, par exemple /coiffures/tresses-collees."
-        />
-      </div>
+      <Input
+        label="Nom de la prestation"
+        name="name"
+        icon={Scissors}
+        required
+        autoComplete="off"
+        placeholder="Ex. Tresses africaines"
+        value={name}
+        onChange={(event) => setName(event.target.value)}
+      />
 
       <Textarea
         label="Description"
+        placeholder="Ex. Tresses nettes et durables, rendu attendu, conseils d'entretien…"
         name="description"
         defaultValue={initial?.description ?? ''}
         hint="Décrivez la prestation, le rendu attendu et les conseils d'entretien."
@@ -167,6 +140,7 @@ export function ServiceForm({
           {priceMode === 'RANGE' ? (
             <Input
               label="Prix maximum (FCFA)"
+              placeholder="Ex. 25000"
               name="priceToEuros"
               type="number"
               inputMode="numeric"
@@ -182,6 +156,7 @@ export function ServiceForm({
       <div className="grid gap-3 md:grid-cols-2">
         <Input
           label="Durée (minutes)"
+          placeholder="Ex. 180"
           name="durationMinutes"
           icon={Clock}
           type="number"

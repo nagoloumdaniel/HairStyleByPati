@@ -17,7 +17,7 @@ import {
 import { useState, type ChangeEvent, type InputHTMLAttributes } from 'react';
 import { DateField } from './DateField';
 import { DateTimeField } from './DateTimeField';
-import { Field, autoPlaceholder } from './Field';
+import { Field, autoPlaceholder, isPersonLabel } from './Field';
 import { TimeField } from './TimeField';
 
 type InputProps = InputHTMLAttributes<HTMLInputElement> & {
@@ -28,7 +28,11 @@ type InputProps = InputHTMLAttributes<HTMLInputElement> & {
 };
 
 /* Icône par défaut selon le type ou le nom du champ ; `icon={null}` la retire. */
-function autoIcon(type: string | undefined, name: string | undefined): LucideIcon | null {
+function autoIcon(
+  type: string | undefined,
+  name: string | undefined,
+  label: string,
+): LucideIcon | null {
   if (type === 'email') return Mail;
   if (type === 'tel') return Phone;
   if (type === 'password') return Lock;
@@ -41,7 +45,9 @@ function autoIcon(type: string | undefined, name: string | undefined): LucideIco
         : Hash;
   if (/mail/i.test(name ?? '')) return Mail;
   if (/phone|tel/i.test(name ?? '')) return Phone;
-  if (/name|nom|prenom/i.test(name ?? '')) return User;
+  // Icône « personne » seulement pour une vraie personne, jamais pour un nom d'élément.
+  if (/^(fullname|customerName|requesterName|prenom)$/i.test(name ?? '') || isPersonLabel(label))
+    return User;
   if (/handle|user|insta/i.test(name ?? '')) return AtSign;
   return null;
 }
@@ -104,7 +110,7 @@ export function Input({ label, error, hint, id, required, icon, type, ...rest }:
     .filter(Boolean)
     .join(' ');
   const isPassword = type === 'password';
-  const Icon = icon === null ? null : (icon ?? autoIcon(type, rest.name));
+  const Icon = icon === null ? null : (icon ?? autoIcon(type, rest.name, label));
   return (
     <Field id={inputId} label={label} required={required} error={error} hint={hint}>
       <div className="relative">

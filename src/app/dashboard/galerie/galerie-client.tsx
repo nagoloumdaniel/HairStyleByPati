@@ -169,7 +169,13 @@ function UploadForm({ services, onDone }: { services: ServiceOption[]; onDone: (
         icon={Scissors}
         options={serviceOptions(services)}
       />
-      <Input label="Légende (facultatif)" name="alt" icon={Type} maxLength={200} />
+      <Input
+        label="Légende (facultatif)"
+        name="alt"
+        icon={Type}
+        maxLength={200}
+        placeholder="Ex. Vanilles sur cheveux crépus"
+      />
       {state.error ? (
         <p role="alert" className="text-sm font-medium text-alert">
           {state.error}
@@ -229,6 +235,7 @@ function EditForm({
         name="alt"
         icon={Type}
         maxLength={200}
+        placeholder="Ex. Vanilles sur cheveux crépus"
         defaultValue={photo.alt}
       />
       <Select

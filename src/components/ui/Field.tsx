@@ -47,6 +47,16 @@ export const fieldBox = (error?: string) =>
     error ? 'border-alert' : 'border-line focus:border-cacao'
   }`;
 
+/** Libellé désignant une personne (« Nom et prénom », « Prénom »…). */
+export function isPersonLabel(label: string): boolean {
+  return /pr[ée]nom/i.test(label);
+}
+
+/** Libellé demandant explicitement le nom complet d'une personne. */
+function isFullNameLabel(label: string): boolean {
+  return /nom et pr[ée]nom/i.test(label);
+}
+
 /* Placeholder par défaut quand aucun n'est fourni : selon type/nom, sinon dérivé du libellé. */
 export function autoPlaceholder(label: string, type?: string, name?: string): string {
   const n = name ?? '';
@@ -56,7 +66,10 @@ export function autoPlaceholder(label: string, type?: string, name?: string): st
   if (type === 'search') return 'Rechercher…';
   if (type === 'url') return 'https://';
   if (type === 'number') return /price|prix|amount|value|montant/i.test(n) ? 'Ex. 15000' : 'Ex. 0';
-  if (/^(name|nom|fullname|customerName|requesterName)$/i.test(n)) return 'Votre nom et prénom';
+  // « Nom et prénom » seulement pour une vraie personne (champs dédiés ou libellé explicite) :
+  // un `name` générique (prestation, catégorie, option…) reçoit un placeholder dérivé du libellé.
+  if (/^(fullname|customerName|requesterName)$/i.test(n) || isFullNameLabel(label))
+    return 'Votre nom et prénom';
   if (/subject|objet/i.test(n)) return 'Objet de votre message';
   const clean = label
     .replace(/\s*\((facultatif|obligatoire)\)\s*/gi, ' ')
