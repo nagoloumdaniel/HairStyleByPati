@@ -149,6 +149,7 @@ function PromotionForm({
         maxLength={120}
         defaultValue={promotion?.name ?? ''}
         placeholder="Ex. Offre de rentrée"
+        autoComplete="off"
       />
       <Input
         label="Code promo (facultatif)"

@@ -95,6 +95,7 @@ function UploadForm({ serviceId, storageReady }: { serviceId: string; storageRea
       </div>
       <Input
         label="Texte alternatif"
+        placeholder="Ex. Tresses africaines vues de dos"
         name="alt"
         maxLength={160}
         hint="Décrivez la coiffure visible sur la photo (accessibilité)."
@@ -121,6 +122,7 @@ function AltForm({ image, onDone }: { image: ImageWithUrl; onDone: () => void })
       <input type="hidden" name="id" value={image.id} />
       <Input
         label="Texte alternatif"
+        placeholder="Ex. Tresses africaines vues de dos"
         name="alt"
         maxLength={160}
         autoFocus

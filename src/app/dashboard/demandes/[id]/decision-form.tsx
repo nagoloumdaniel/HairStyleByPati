@@ -157,6 +157,7 @@ export function CustomRequestDecisionForm({
       ) : null}
       <Textarea
         label="Message à la cliente"
+        placeholder="Ex. Merci pour votre demande, voici ma proposition…"
         name="message"
         rows={4}
         required={action !== 'IN_REVIEW'}

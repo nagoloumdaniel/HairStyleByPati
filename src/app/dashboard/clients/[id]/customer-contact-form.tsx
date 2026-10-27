@@ -1,6 +1,6 @@
 'use client';
 
-import { Save } from 'lucide-react';
+import { Save, User } from 'lucide-react';
 import { startTransition, useActionState, useEffect, type FormEvent } from 'react';
 import { updateCustomerContactAction, type CustomerRgpdState } from '@/modules/clients/actions';
 import { Button } from '@/components/ui/Button';
@@ -46,7 +46,15 @@ export function CustomerContactForm({
       className="mt-3 flex flex-col gap-3"
     >
       <input type="hidden" name="customerId" value={customerId} />
-      <Input label="Nom" name="name" defaultValue={name} required maxLength={100} />
+      <Input
+        label="Nom"
+        name="name"
+        icon={User}
+        placeholder="Nom et prénom de la cliente"
+        defaultValue={name}
+        required
+        maxLength={100}
+      />
       <Input
         label="E-mail"
         name="email"

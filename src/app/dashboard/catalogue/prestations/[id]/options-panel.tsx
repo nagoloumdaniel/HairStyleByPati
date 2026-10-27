@@ -1,6 +1,6 @@
 'use client';
 
-import { Eye, EyeOff, Pencil, Plus, Save, Trash2 } from 'lucide-react';
+import { Eye, EyeOff, Layers, Pencil, Plus, Save, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import type { AdminServiceOption } from '@/lib/catalogue-admin';
 import { Badge } from '@/components/ui/Badge';
@@ -64,6 +64,9 @@ function OptionForm({
       {initial?.id ? <input type="hidden" name="id" value={initial.id} /> : null}
       <Input
         label="Nom de l'option"
+        icon={Layers}
+        autoComplete="off"
+        placeholder="Ex. Pose de lace"
         name="name"
         required
         autoFocus
@@ -82,6 +85,7 @@ function OptionForm({
         />
         <Input
           label="Durée ajoutée (minutes)"
+          placeholder="Ex. 30"
           name="durationMinutes"
           type="number"
           inputMode="numeric"

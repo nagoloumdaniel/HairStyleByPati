@@ -34,6 +34,7 @@ export function PasswordCard() {
       <form ref={formRef} action={formAction} className="flex flex-col gap-3">
         <Input
           label="Mot de passe actuel"
+          placeholder="Votre mot de passe actuel"
           name="currentPassword"
           type="password"
           icon={Lock}
@@ -43,6 +44,7 @@ export function PasswordCard() {
         />
         <Input
           label="Nouveau mot de passe"
+          placeholder="Choisissez un nouveau mot de passe"
           name="newPassword"
           type="password"
           icon={Lock}
@@ -54,6 +56,7 @@ export function PasswordCard() {
         />
         <Input
           label="Confirmer le nouveau mot de passe"
+          placeholder="Répétez le nouveau mot de passe"
           name="confirmPassword"
           type="password"
           icon={Lock}

@@ -95,6 +95,7 @@ function QuestionForm({
 
       <Input
         label="Question posée à la cliente"
+        placeholder="Ex. Vos cheveux sont-ils déjà démêlés ?"
         name="label"
         icon={MessageCircleQuestion}
         required
@@ -105,6 +106,7 @@ function QuestionForm({
       <div className="grid gap-3 sm:grid-cols-2">
         <Input
           label="Clé technique"
+          placeholder="Ex. cheveux_demeles"
           name="key"
           icon={KeyRound}
           required
@@ -124,6 +126,7 @@ function QuestionForm({
       {hasChoices ? (
         <Input
           label="Choix proposés"
+          placeholder="Ex. Oui, Non, Je ne sais pas"
           name="options"
           icon={List}
           defaultValue={initial?.options?.join(', ') ?? ''}
@@ -152,6 +155,7 @@ function QuestionForm({
         <div className="grid gap-3 sm:grid-cols-2">
           <Input
             label="Clé de la question de départ"
+            placeholder="Ex. porte_des_locs"
             name="conditionDependsOn"
             icon={GitBranch}
             defaultValue={condition.dependsOn}
@@ -159,6 +163,7 @@ function QuestionForm({
           />
           <Input
             label="Valeur attendue"
+            placeholder="Ex. oui"
             name="conditionEquals"
             icon={GitBranch}
             defaultValue={condition.equals}
