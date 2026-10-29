@@ -50,7 +50,11 @@ Locs (départ et retwist), nattes collées, vanilles, pour hommes et femmes, sur
 
 ## Captures d'écran
 
-Aucune capture n'est versionnée pour le moment : photos, logo et marque appartiennent à Patricia et ne seront publiés qu'avec son accord. Pour voir le rendu, consulter le [site en production](https://hairstylebypati.vercel.app).
+Captures du [site en production](https://hairstylebypati.vercel.app) (page catalogue). Le logo et la marque appartiennent à Patricia ; les photos de sa clientèle ne sont pas reproduites ici et ne seront publiées qu'avec son accord.
+
+| Catalogue (bureau)                                              | Catalogue (mobile)                                             |
+| --------------------------------------------------------------- | -------------------------------------------------------------- |
+| ![Catalogue, version bureau](docs/assets/catalogue-desktop.png) | ![Catalogue, version mobile](docs/assets/catalogue-mobile.png) |
 
 ## Stack
 
