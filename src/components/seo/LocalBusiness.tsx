@@ -51,8 +51,7 @@ export default function LocalBusiness({ data }: { data: LocalBusinessData }) {
     '@type': 'HealthAndBeautyBusiness',
     name: data.name,
     logo: `${appUrl}/brand/logo-mark-og.png`,
-    image:
-      'https://images.pexels.com/photos/10825829/pexels-photo-10825829.jpeg?auto=compress&cs=tinysrgb&w=400',
+    image: `${appUrl}/landing/landing.jpeg`,
     address: {
       '@type': 'PostalAddress',
       streetAddress: data.address.streetAddress,
