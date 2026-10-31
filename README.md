@@ -1,124 +1,187 @@
 # Hairstyle by Patricia
 
-**Coiffure sur rendez-vous à Dakar (Sénégal)** : départ et retwist de locs, nattes collées, vanilles, pour hommes et femmes. Site vitrine et catalogue de prestations, diagnostic de compatibilité capillaire, réservation en ligne (paiement sur place), messagerie et back-office d'administration.
+**Site vitrine, catalogue et réservation en ligne pour une coiffeuse indépendante à Dakar (Sénégal).**
+Locs (départ et retwist), nattes collées, vanilles, pour hommes et femmes, sur rendez-vous.
 
-🌐 **Site** : <https://hairstylebypati.vercel.app>
-
-![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=nextdotjs)
+[![Site en production](https://img.shields.io/badge/production-hairstylebypati.vercel.app-c8a24a?logo=vercel&logoColor=white)](https://hairstylebypati.vercel.app)
+![Next.js](https://img.shields.io/badge/Next.js-15.5-black?logo=nextdotjs)
 ![React](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)
 ![Tailwind](https://img.shields.io/badge/Tailwind-v4-38bdf8?logo=tailwindcss&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-6-2d3748?logo=prisma&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-336791?logo=postgresql&logoColor=white)
-
-## Fonctionnalités
-
-- **Landing** : hero plein écran, portrait en cercle animé (forme fluide en boucle), accès direct au catalogue.
-- **Catalogue** de prestations (cartes immersives, photos, prix en FCFA, durée) et fiches détaillées.
-- **Compatibilité capillaire** configurable avant réservation.
-- **Réservation en ligne** en plusieurs étapes, créneaux protégés, liste d'attente, annulation en ligne.
-- **Demandes personnalisées** avec photos de référence, galerie, FAQ, avis approuvés.
-- **Back-office** : prestations, disponibilités, réservations, clients, messagerie, avis.
-- Thème clair / sombre, responsive, accessibilité WCAG 2.2 AA, SEO technique (métadonnées, Open Graph, sitemap, JSON-LD).
-
-## Démarrage rapide
-
-```bash
-npm install
-cp .env.example .env.local   # renseigner les variables (noms uniquement dans le dépôt)
-npx prisma migrate dev
-npm run dev                  # http://localhost:3000
-```
-
-Tests : `npm test` (Vitest) · `npx playwright test` (E2E).
+![Licence](https://img.shields.io/badge/licence-propri%C3%A9taire-lightgrey)
 
 ## Statut
 
-Phases 0 à 12 livrées (tests, recette, revue sécurité, performance, accessibilité, SEO). Dernière évolution : refonte UI premium (accueil, catalogue, fiche coiffure, contact, demandes personnalisées, dashboard). Voir [CHANGELOG.md](CHANGELOG.md), [ROADMAP.md](ROADMAP.md) et les consignes design [DESIGN-RULES.md](DESIGN-RULES.md).
+- **En production** : <https://hairstylebypati.vercel.app> (Vercel, déploiement au push sur `main`).
+- **Démo** : le site public (catalogue, compatibilité capillaire, réservation) est utilisable librement. Le back-office est réservé à Patricia ; aucune démo publique n'en est proposée.
+- **Licence** : code propriétaire, tous droits réservés (voir [Licence](#licence)). Le dépôt est public à titre de référence uniquement.
 
-Avec `EMAIL_MODE="console"` dans `.env.local`, aucun e-mail réel n'est envoyé : les envois sont simulés et tracés. Les routes cron sont protégées par `CRON_SECRET` et définies dans `vercel.json`.
+## Situation, problème, solution
 
-> Attention : en local, `.env.local` peut pointer vers la même base Neon que la production. Utiliser une branche Neon dédiée pour développer.
+**Situation.** Patricia exerce seule à Dakar. Les rendez-vous passent par messages et appels : créneaux gérés de tête, risque de doubles réservations, questions répétitives sur la compatibilité d'une coiffure avec le cheveu de la cliente (longueur, état, photos).
 
-## Stack (figée — voir [docs/stack.md](docs/stack.md))
+**Problème.** Une coiffure comme des locs se prépare : une cliente dont le cheveu est inadapté perd du temps et de l'argent, et Patricia perd un créneau. Il faut qualifier avant de réserver, sans bloquer les clientes.
 
-| Couche          | Choix                                                      |
-| --------------- | ---------------------------------------------------------- |
-| Framework       | Next.js 15 (App Router) + React 19 + TypeScript strict     |
-| UI              | **Tailwind CSS v4** + composants personnalisés (shadcn/ui) |
-| Base de données | PostgreSQL (Neon) + Prisma                                 |
-| E-mails         | Gmail SMTP (nodemailer) ou mode console                    |
-| Fichiers        | Cloudflare R2 (API S3)                                     |
-| Auth            | Auth.js (NextAuth) credentials + bcryptjs (coût 12)        |
-| Hébergement     | Vercel                                                     |
+**Solution.** Un site en français, pensé mobile, qui enchaîne :
 
-## Documentation
+1. un **catalogue** de prestations (photos, prix en FCFA, durée),
+2. un **diagnostic de compatibilité** configurable par prestation,
+3. une **réservation en ligne** sans double réservation possible, paiement sur place,
+4. un **back-office** où Patricia valide, planifie et échange avec ses clientes.
 
-| Document                                       | Contenu                                                      |
-| ---------------------------------------------- | ------------------------------------------------------------ |
-| [Cahier de charge.md](<Cahier de charge.md>)   | Spécification client v1.0 (20 sections)                      |
-| [CHANGELOG.md](CHANGELOG.md)                   | Historique des versions                                      |
-| [ROADMAP.md](ROADMAP.md)                       | 13 phases, 122 mini-tâches                                   |
-| [docs/acceptation.md](docs/acceptation.md)     | Critères d'acceptation §17 + couverture                      |
-| [docs/plan-detaille.md](docs/plan-detaille.md) | Décomposition par module (§14.2)                             |
-| [docs/stack.md](docs/stack.md)                 | Choix techniques et justification                            |
-| [docs/architecture.md](docs/architecture.md)   | Arborescence par domaine + plan de pages                     |
-| [docs/security.md](docs/security.md)           | Revue sécurité, risques, sauvegarde                          |
-| [docs/rgpd.md](docs/rgpd.md)                   | Registre, droits et procédures RGPD                          |
-| [docs/performance.md](docs/performance.md)     | Scores Lighthouse, axe, SEO et responsive                    |
-| [docs/git.md](docs/git.md)                     | Branches, conventions de commit, hooks                       |
-| [docs/guide-admin.md](docs/guide-admin.md)     | Guide d'utilisation du dashboard (Patricia)                  |
-| [docs/maintenance.md](docs/maintenance.md)     | Environnements, déploiement, monitoring, plan de maintenance |
-| [.env.example](.env.example)                   | Variables d'environnement documentées                        |
+## Fonctionnalités
 
-## Développement
+**Côté clientes (site public)**
+
+- Accueil, catalogue, fiches détaillées (galerie, prix, durée, coiffures similaires, avis).
+- Diagnostic de compatibilité capillaire (questions conditionnelles, photo d'évaluation stockée en privé).
+- Réservation en 8 étapes, annulation en ligne par lien sécurisé à durée limitée, liste d'attente, rappel e-mail H-24.
+- Demandes personnalisées avec photos de référence, galerie de réalisations, avis avec photos, FAQ, infos pratiques, contact.
+- Thème clair/sombre, responsive, accessibilité visée WCAG 2.2 AA.
+
+**Côté Patricia (back-office `/dashboard`)**
+
+- Catalogue (catégories, prestations, options, règles de compatibilité), disponibilités et absences, promotions.
+- Réservations (machine à statuts, calendrier jour/semaine/mois/liste), fiches clientes, liste d'attente.
+- Messagerie centralisée avec notes internes, notifications, décisions sur évaluations et demandes personnalisées.
+- Galerie, avis, statistiques, historique d'audit, paramètres du salon. Guide : [docs/guide-admin.md](docs/guide-admin.md).
+
+## Captures d'écran
+
+Captures du [site en production](https://hairstylebypati.vercel.app) (page catalogue). Le logo et la marque appartiennent à Patricia ; les photos de sa clientèle ne sont pas reproduites ici et ne seront publiées qu'avec son accord.
+
+| Catalogue (bureau)                                              | Catalogue (mobile)                                             |
+| --------------------------------------------------------------- | -------------------------------------------------------------- |
+| ![Catalogue, version bureau](docs/assets/catalogue-desktop.png) | ![Catalogue, version mobile](docs/assets/catalogue-mobile.png) |
+
+## Stack
+
+Versions lues dans `package.json` (plages semver).
+
+| Couche          | Choix                                                                          |
+| --------------- | ------------------------------------------------------------------------------ |
+| Framework       | Next.js 15.5 (App Router), React 19, TypeScript 5.9 strict                     |
+| UI              | Tailwind CSS 4, composants maison, lucide-react ; Playfair Display + Lato      |
+| Base de données | PostgreSQL sur Neon, Prisma 6                                                  |
+| Auth            | Auth.js (next-auth 5 bêta), identifiants, bcryptjs (coût 12)                   |
+| E-mails         | nodemailer (Gmail SMTP) ou mode `console`                                      |
+| Fichiers        | Cloudflare R2 (API S3, `@aws-sdk/client-s3`), photos privées par URL présignée |
+| Validation      | Zod sur les entrées serveur                                                    |
+| Tests           | Vitest 5 (unitaires), Playwright 1.64 (E2E desktop + mobile, axe-core)         |
+| Qualité         | ESLint 9, Prettier 3, husky + lint-staged, `npm run ci`                        |
+| Hébergement     | Vercel (cron pour les rappels et la purge RGPD)                                |
+
+Node 22 ou plus requis. Choix détaillés : [docs/stack.md](docs/stack.md).
+
+## Architecture
+
+```mermaid
+flowchart LR
+  V[Visiteuse] --> N[Next.js 15<br/>App Router, Vercel]
+  P[Patricia] --> D[Dashboard<br/>Auth.js]
+  D --> N
+  N --> M[Modules métier<br/>src/modules]
+  M --> DB[(PostgreSQL Neon<br/>via Prisma)]
+  M --> R2[(Cloudflare R2<br/>photos)]
+  M --> Q[File de notifications]
+  Q --> S[SMTP Gmail]
+  C[Cron Vercel] --> N
+```
+
+Le code est organisé par domaine dans `src/modules/` (réservations, compatibilité, notifications, avis, etc.) et les pages dans `src/app/`. Détail : [docs/architecture.md](docs/architecture.md).
+
+## Modèle de données
+
+26 modèles et 17 enums Prisma ([prisma/schema.prisma](prisma/schema.prisma)), 15 migrations. Vue simplifiée du coeur :
+
+```mermaid
+erDiagram
+  Category ||--o{ Service : contient
+  Service ||--o{ ServiceImage : photos
+  Service ||--o{ ServiceOption : options
+  Service ||--o{ CompatibilityRule : regles
+  Service ||--o{ QuestionDefinition : questions
+  Customer ||--o{ Appointment : reserve
+  Service ||--o{ Appointment : concerne
+  Customer ||--o{ HairAssessment : evaluations
+  Customer ||--o{ CustomRequest : demandes
+  Customer ||--o{ Conversation : echanges
+  Conversation ||--o{ Message : messages
+  Service ||--o{ Review : avis
+  Review ||--o{ ReviewPhoto : photos
+  Appointment ||--o{ Notification : declenche
+  Service ||--o{ WaitlistEntry : attente
+```
+
+Prix et durée sont **figés** sur chaque réservation (instantané). Les montants sont stockés en entiers (colonnes `*Cents`, voir [Pays, langue, devise](#pays-langue-devise)).
+
+## Fonctionnement de la réservation
+
+1. La cliente choisit une prestation, répond au diagnostic de compatibilité si la prestation l'exige, puis sélectionne un créneau calculé depuis les disponibilités et les absences.
+2. À la validation, le serveur ouvre une transaction et prend un **verrou PostgreSQL** (`pg_advisory_xact_lock`) avant de revérifier le créneau et d'insérer : deux demandes simultanées sur le même créneau ne peuvent pas aboutir toutes les deux. Un **test de concurrence** E2E (`tests/e2e/reservations.spec.ts`) le vérifie.
+3. Les règles de compatibilité sont revérifiées côté serveur à la réservation : une évaluation acceptée ne réserve jamais un créneau automatiquement.
+4. Une notification e-mail est mise en file (idempotente, reprise sur échec, jamais bloquante pour l'enregistrement).
+5. La cliente peut annuler via un lien sécurisé tant que le délai d'annulation (30 minutes par défaut, configurable) n'est pas dépassé. Le paiement se fait sur place.
+
+## Pays, langue, devise
+
+- Interface **en français** uniquement.
+- Devise : **FCFA (XOF)**, sans décimales. Les prix sont stockés en **1/100 de FCFA** (colonnes `*Cents`, héritées de la base technique partagée avec un projet frère) et divisés par 100 à l'affichage (`src/lib/catalogue.ts`).
+- Fuseau : **Africa/Dakar** ; dates stockées en UTC. Téléphones au format **+221**.
+
+## Tests
+
+Comptage au 2026-10-29 :
+
+- **Vitest** : 50 fichiers, 439 tests, tous verts (`npm test`).
+- **Playwright** : 13 fichiers dans `tests/e2e/` (public, réservations dont concurrence, compatibilité, dashboard, notifications, sécurité/RGPD, SEO, responsive et axe-core, thème), projets desktop et mobile. Ils exigent une base de test et des identifiants admin d'essai (`E2E_ADMIN_EMAIL`, `E2E_ADMIN_PASSWORD`) ; ils ne tournent pas dans la CI GitHub.
+
+```bash
+npm test                                      # Vitest
+npx playwright test --project=desktop --workers=1
+npm run ci                                    # typecheck + format + lint + tests + build
+```
+
+`npm run ci` enchaîne `tsc --noEmit`, `prettier --check`, `eslint`, `vitest run` et `next build`. Le hook `pre-push` (husky) le lance avant chaque push ; le workflow [.github/workflows/ci.yml](.github/workflows/ci.yml) rejoue la chaîne sur les pull requests vers `main`.
+
+## Démarrage local
 
 ```bash
 npm install
-npm run dev        # serveur de développement
-npm run ci         # CI locale : typecheck + format + lint + tests + build
-npm run typecheck  # tsc --noEmit
-npm run lint       # ESLint
-npm run format     # Prettier
-npm run clean      # supprime le cache .next
-npm run db:seed    # catégories de base + compte admin
-npm run db:seed:demo  # catalogue de démonstration (développement uniquement)
-npx playwright test tests/e2e/dashboard.spec.ts --project=desktop  # back-office (E2E_ADMIN_EMAIL/E2E_ADMIN_PASSWORD requis)
-npx playwright test tests/e2e/compatibilite.spec.ts --project=desktop  # compatibilité, photos privées et décisions
-npx playwright test tests/e2e/reservations.spec.ts --project=desktop --workers=1  # réservation, annulation, calendrier
-npx playwright test tests/e2e/security.spec.ts --project=desktop --workers=1  # sécurité, en-têtes, RGPD, purge
-node scripts/backup-db.mjs   # sauvegarde PostgreSQL dans backups/ (ignoré par Git)
+cp .env.example .env.local   # renseigner les variables (aucun secret dans le dépôt)
+npx prisma migrate dev
+npm run db:seed              # catégories de base + compte admin
+npm run dev                  # http://localhost:3000
 ```
 
-`npm run db:seed:demo` ajoute 12 prestations d'exemple publiées pour vérifier le site public. Ne jamais l'exécuter sur la base de production : le catalogue réel est saisi par Patricia depuis le dashboard (Phase 4).
+Avec `EMAIL_MODE="console"`, aucun e-mail réel n'est envoyé. Utiliser une **branche Neon dédiée**, jamais la base de production. Ne jamais lancer `db:seed:demo` en production. Si `next dev` tourne, ne pas lancer build ou push : le cache `.next` serait corrompu (`npm run clean` pour le réparer).
 
-Les hooks `pre-commit` (lint-staged + `tsc --noEmit`) et `pre-push` (`npm run ci`) sont installés automatiquement par `npm install` (script `prepare` → husky). CI/CD : locale via `npm run ci`, déploiement Vercel au push sur `main`.
+## Déploiement
 
-### Cache `.next` : erreurs `Cannot find module './500.js'`
+Vercel, au push sur `main` ; migrations avec `npm run db:deploy`. Les routes cron (rappels H-24, purge des photos privées expirées) sont dans `vercel.json` et protégées par `CRON_SECRET`. Environnements, monitoring et sauvegardes (`scripts/backup-db.mjs`) : [docs/maintenance.md](docs/maintenance.md).
 
-`next dev` et `next build` partagent le dossier `.next`. Lancer un build
-(ou un `git push`, car le hook `pre-push` exécute `npm run ci`) pendant que
-le serveur de développement tourne corrompt ce cache.
+## Difficultés rencontrées
 
-Procédure :
+- **Double réservation** : un contrôle suivi d'une insertion laisse passer deux requêtes simultanées ; résolu par un verrou consultatif PostgreSQL dans la transaction et un index d'unicité limité aux réservations actives (migration `slot_unique_active_only`).
+- **Devise sans décimales** : le schéma stocke en 1/100 alors que le FCFA n'en a pas ; conversion centralisée.
+- **Photos privées et RGPD** : évaluations capillaires stockées en privé, accès par URL présignée, purge automatique à échéance.
+- **Notifications fiables** : file idempotente pour qu'un échec SMTP n'annule jamais une réservation.
 
-```bash
-# 1. arrêter le serveur de développement (Ctrl+C)
-npm run clean   # 2. supprimer le cache .next
-npm run dev     # 3. relancer
-```
+## Contributions, branches, contributeurs
 
-Règle : lancer `npm run ci` / `npm run build` / `git push` serveur de
-développement arrêté.
+Chiffres calculés avec git au 2026-10-29 :
+
+- 170 commits sur `main` entre le 17 et le 28 octobre 2026, dont 36 commits de fusion ; 33 pull requests.
+- 3 identités git (noms et adresses de commit différents), toutes la même personne : **Daniel Nagoloum Talla**, auteur et mainteneur. Aucun autre contributeur humain.
+- **65 commits portent un trailer `Co-Authored-By: Claude`** : une partie du code a été écrite avec l'assistance de Claude (Anthropic), sous la direction et la relecture de l'auteur.
+- Conventions : une branche par sujet (`phase/*`, `feat/*`, `fix/*`, `docs/*`), Conventional Commits, PR vers `main`. Voir [CONTRIBUTING.md](CONTRIBUTING.md) et [docs/git.md](docs/git.md).
+
+## Documentation
+
+[Cahier de charge](<Cahier de charge.md>) · [ROADMAP](ROADMAP.md) · [CHANGELOG](CHANGELOG.md) · [DESIGN-RULES](DESIGN-RULES.md) · [acceptation](docs/acceptation.md) · [sécurité](docs/security.md) · [RGPD](docs/rgpd.md) · [performance](docs/performance.md) · [guide admin](docs/guide-admin.md) · [maintenance](docs/maintenance.md)
 
 ## Licence
 
-Code propriétaire, tous droits réservés (voir [LICENSE](LICENSE)). Signalement de vulnérabilité : [SECURITY.md](SECURITY.md).
-
-## Règles du projet
-
-- Aucun secret réel dans le dépôt : seul `.env.example` est versionné.
-- Validation serveur systématique (Zod) sur toutes les entrées.
-- Règles de compatibilité vérifiées côté serveur uniquement.
-- Instantanés de prix/durée sur chaque réservation.
-- Dates stockées en UTC, affichées à l'heure de l'appareil connecté.
-- Conventional Commits sur toutes les branches.
+Code propriétaire, © 2026 Daniel Nagoloum Talla, tous droits réservés ([LICENSE](LICENSE)). Aucune utilisation, copie ou redistribution n'est autorisée sans accord écrit ; GitHub l'affiche donc comme « Other ». Le nom « Hairstyle by Patricia », son logo, les photographies et les contenus appartiennent à Patricia et ne sont couverts par aucune cession. Signalement de vulnérabilité : [SECURITY.md](SECURITY.md).

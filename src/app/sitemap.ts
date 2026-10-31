@@ -14,6 +14,7 @@ const STATIC_ROUTES = [
   { url: '/contact', changeFrequency: 'monthly' as const, priority: 0.8 },
   { url: '/galerie', changeFrequency: 'weekly' as const, priority: 0.7 },
   { url: '/faq', changeFrequency: 'monthly' as const, priority: 0.7 },
+  { url: '/compatibilite', changeFrequency: 'monthly' as const, priority: 0.7 },
   { url: '/infos-pratiques', changeFrequency: 'monthly' as const, priority: 0.7 },
   { url: '/demandes-personnalisees', changeFrequency: 'monthly' as const, priority: 0.8 },
   { url: '/mentions-legales', changeFrequency: 'yearly' as const, priority: 0.5 },
@@ -21,11 +22,8 @@ const STATIC_ROUTES = [
 ] as const;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date();
-
   const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.map((route) => ({
     url: `${BASE_URL}${route.url}`,
-    lastModified: now,
     changeFrequency: route.changeFrequency,
     priority: route.priority,
   }));

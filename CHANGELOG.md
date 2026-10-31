@@ -21,6 +21,8 @@ Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/).
 ### Dépôt
 
 - Ajout de LICENSE, SECURITY.md, modèle de PR, Dependabot ; captures E2E et archives retirées du suivi Git.
+- Présentation GitHub : README complet (architecture, modèle de données, réservation, tests, contributeurs), CONTRIBUTING adapté à la licence propriétaire, SECURITY sans contact personnel.
+- SEO : le sitemap n'invente plus de date de modification pour les pages statiques.
 
 ## [1.0.0] — Phase 12, lancement
 
